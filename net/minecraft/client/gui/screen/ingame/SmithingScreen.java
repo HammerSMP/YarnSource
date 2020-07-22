@@ -22,16 +22,16 @@ public class SmithingScreen
 extends ForgingScreen<SmithingScreenHandler> {
     private static final Identifier TEXTURE = new Identifier("textures/gui/container/smithing.png");
 
-    public SmithingScreen(SmithingScreenHandler arg, PlayerInventory arg2, Text arg3) {
-        super(arg, arg2, arg3, TEXTURE);
+    public SmithingScreen(SmithingScreenHandler handler, PlayerInventory playerInventory, Text title) {
+        super(handler, playerInventory, title, TEXTURE);
         this.titleX = 60;
         this.titleY = 18;
     }
 
     @Override
-    protected void drawForeground(MatrixStack arg, int i, int j) {
+    protected void drawForeground(MatrixStack matrices, int mouseX, int mouseY) {
         RenderSystem.disableBlend();
-        super.drawForeground(arg, i, j);
+        super.drawForeground(matrices, mouseX, mouseY);
     }
 }
 

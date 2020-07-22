@@ -38,28 +38,28 @@ public class AdvancementManager {
     private Listener listener;
 
     @Environment(value=EnvType.CLIENT)
-    private void remove(Advancement arg) {
-        for (Advancement lv : arg.getChildren()) {
+    private void remove(Advancement advancement) {
+        for (Advancement lv : advancement.getChildren()) {
             this.remove(lv);
         }
-        LOGGER.info("Forgot about advancement {}", (Object)arg.getId());
-        this.advancements.remove(arg.getId());
-        if (arg.getParent() == null) {
-            this.roots.remove(arg);
+        LOGGER.info("Forgot about advancement {}", (Object)advancement.getId());
+        this.advancements.remove(advancement.getId());
+        if (advancement.getParent() == null) {
+            this.roots.remove(advancement);
             if (this.listener != null) {
-                this.listener.onRootRemoved(arg);
+                this.listener.onRootRemoved(advancement);
             }
         } else {
-            this.dependents.remove(arg);
+            this.dependents.remove(advancement);
             if (this.listener != null) {
-                this.listener.onDependentRemoved(arg);
+                this.listener.onDependentRemoved(advancement);
             }
         }
     }
 
     @Environment(value=EnvType.CLIENT)
-    public void removeAll(Set<Identifier> set) {
-        for (Identifier lv : set) {
+    public void removeAll(Set<Identifier> advancements) {
+        for (Identifier lv : advancements) {
             Advancement lv2 = this.advancements.get(lv);
             if (lv2 == null) {
                 LOGGER.warn("Told to remove advancement {} but I don't know what that is", (Object)lv);
@@ -120,19 +120,19 @@ public class AdvancementManager {
     }
 
     @Nullable
-    public Advancement get(Identifier arg) {
-        return this.advancements.get(arg);
+    public Advancement get(Identifier id) {
+        return this.advancements.get(id);
     }
 
     @Environment(value=EnvType.CLIENT)
-    public void setListener(@Nullable Listener arg) {
-        this.listener = arg;
-        if (arg != null) {
+    public void setListener(@Nullable Listener listener) {
+        this.listener = listener;
+        if (listener != null) {
             for (Advancement lv : this.roots) {
-                arg.onRootAdded(lv);
+                listener.onRootAdded(lv);
             }
             for (Advancement lv2 : this.dependents) {
-                arg.onDependentAdded(lv2);
+                listener.onDependentAdded(lv2);
             }
         }
     }

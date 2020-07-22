@@ -19,14 +19,14 @@ extends Item {
     }
 
     @Override
-    public ActionResult useOnEntity(ItemStack arg, PlayerEntity arg2, LivingEntity arg3, Hand arg4) {
+    public ActionResult useOnEntity(ItemStack stack, PlayerEntity user, LivingEntity entity, Hand hand) {
         Saddleable lv;
-        if (arg3 instanceof Saddleable && arg3.isAlive() && !(lv = (Saddleable)((Object)arg3)).isSaddled() && lv.canBeSaddled()) {
-            if (!arg2.world.isClient) {
+        if (entity instanceof Saddleable && entity.isAlive() && !(lv = (Saddleable)((Object)entity)).isSaddled() && lv.canBeSaddled()) {
+            if (!user.world.isClient) {
                 lv.saddle(SoundCategory.NEUTRAL);
-                arg.decrement(1);
+                stack.decrement(1);
             }
-            return ActionResult.success(arg2.world.isClient);
+            return ActionResult.success(user.world.isClient);
         }
         return ActionResult.PASS;
     }

@@ -17,11 +17,11 @@ implements Comparable<ProfilerTiming> {
     public final long visitCount;
     public final String name;
 
-    public ProfilerTiming(String string, double d, double e, long l) {
-        this.name = string;
-        this.parentSectionUsagePercentage = d;
-        this.totalUsagePercentage = e;
-        this.visitCount = l;
+    public ProfilerTiming(String name, double parentUsagePercentage, double totalUsagePercentage, long visitCount) {
+        this.name = name;
+        this.parentSectionUsagePercentage = parentUsagePercentage;
+        this.totalUsagePercentage = totalUsagePercentage;
+        this.visitCount = visitCount;
     }
 
     @Override

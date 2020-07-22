@@ -14,18 +14,18 @@ import net.minecraft.util.Util;
 public final class DynamicSerializableUuid {
     public static final Codec<UUID> field_25122 = Codec.INT_STREAM.comapFlatMap(intStream -> Util.toIntArray(intStream, 4).map(DynamicSerializableUuid::toUuid), uUID -> Arrays.stream(DynamicSerializableUuid.toIntArray(uUID)));
 
-    public static UUID toUuid(int[] is) {
-        return new UUID((long)is[0] << 32 | (long)is[1] & 0xFFFFFFFFL, (long)is[2] << 32 | (long)is[3] & 0xFFFFFFFFL);
+    public static UUID toUuid(int[] array) {
+        return new UUID((long)array[0] << 32 | (long)array[1] & 0xFFFFFFFFL, (long)array[2] << 32 | (long)array[3] & 0xFFFFFFFFL);
     }
 
-    public static int[] toIntArray(UUID uUID) {
-        long l = uUID.getMostSignificantBits();
-        long m = uUID.getLeastSignificantBits();
+    public static int[] toIntArray(UUID uuid) {
+        long l = uuid.getMostSignificantBits();
+        long m = uuid.getLeastSignificantBits();
         return DynamicSerializableUuid.toIntArray(l, m);
     }
 
-    private static int[] toIntArray(long l, long m) {
-        return new int[]{(int)(l >> 32), (int)l, (int)(m >> 32), (int)m};
+    private static int[] toIntArray(long uuidMost, long uuidLeast) {
+        return new int[]{(int)(uuidMost >> 32), (int)uuidMost, (int)(uuidLeast >> 32), (int)uuidLeast};
     }
 }
 

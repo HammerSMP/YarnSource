@@ -61,17 +61,17 @@ public class Style {
     @Nullable
     private final Identifier font;
 
-    private Style(@Nullable TextColor arg, @Nullable Boolean boolean_, @Nullable Boolean boolean2, @Nullable Boolean boolean3, @Nullable Boolean boolean4, @Nullable Boolean boolean5, @Nullable ClickEvent arg2, @Nullable HoverEvent arg3, @Nullable String string, @Nullable Identifier arg4) {
-        this.color = arg;
-        this.bold = boolean_;
-        this.italic = boolean2;
-        this.underlined = boolean3;
-        this.strikethrough = boolean4;
-        this.obfuscated = boolean5;
-        this.clickEvent = arg2;
-        this.hoverEvent = arg3;
-        this.insertion = string;
-        this.font = arg4;
+    private Style(@Nullable TextColor color, @Nullable Boolean bold, @Nullable Boolean italic, @Nullable Boolean underlined, @Nullable Boolean strikethrough, @Nullable Boolean obfuscated, @Nullable ClickEvent clickEvent, @Nullable HoverEvent hoverEvent, @Nullable String insertion, @Nullable Identifier font) {
+        this.color = color;
+        this.bold = bold;
+        this.italic = italic;
+        this.underlined = underlined;
+        this.strikethrough = strikethrough;
+        this.obfuscated = obfuscated;
+        this.clickEvent = clickEvent;
+        this.hoverEvent = hoverEvent;
+        this.insertion = insertion;
+        this.font = font;
     }
 
     @Nullable
@@ -122,47 +122,47 @@ public class Style {
         return this.font != null ? this.font : DEFAULT_FONT_ID;
     }
 
-    public Style withColor(@Nullable TextColor arg) {
-        return new Style(arg, this.bold, this.italic, this.underlined, this.strikethrough, this.obfuscated, this.clickEvent, this.hoverEvent, this.insertion, this.font);
+    public Style withColor(@Nullable TextColor color) {
+        return new Style(color, this.bold, this.italic, this.underlined, this.strikethrough, this.obfuscated, this.clickEvent, this.hoverEvent, this.insertion, this.font);
     }
 
-    public Style withColor(@Nullable Formatting arg) {
-        return this.withColor(arg != null ? TextColor.fromFormatting(arg) : null);
+    public Style withColor(@Nullable Formatting color) {
+        return this.withColor(color != null ? TextColor.fromFormatting(color) : null);
     }
 
-    public Style withBold(@Nullable Boolean boolean_) {
-        return new Style(this.color, boolean_, this.italic, this.underlined, this.strikethrough, this.obfuscated, this.clickEvent, this.hoverEvent, this.insertion, this.font);
+    public Style withBold(@Nullable Boolean bold) {
+        return new Style(this.color, bold, this.italic, this.underlined, this.strikethrough, this.obfuscated, this.clickEvent, this.hoverEvent, this.insertion, this.font);
     }
 
-    public Style withItalic(@Nullable Boolean boolean_) {
-        return new Style(this.color, this.bold, boolean_, this.underlined, this.strikethrough, this.obfuscated, this.clickEvent, this.hoverEvent, this.insertion, this.font);
+    public Style withItalic(@Nullable Boolean italic) {
+        return new Style(this.color, this.bold, italic, this.underlined, this.strikethrough, this.obfuscated, this.clickEvent, this.hoverEvent, this.insertion, this.font);
     }
 
-    public Style withClickEvent(@Nullable ClickEvent arg) {
-        return new Style(this.color, this.bold, this.italic, this.underlined, this.strikethrough, this.obfuscated, arg, this.hoverEvent, this.insertion, this.font);
+    public Style withClickEvent(@Nullable ClickEvent clickEvent) {
+        return new Style(this.color, this.bold, this.italic, this.underlined, this.strikethrough, this.obfuscated, clickEvent, this.hoverEvent, this.insertion, this.font);
     }
 
-    public Style setHoverEvent(@Nullable HoverEvent arg) {
-        return new Style(this.color, this.bold, this.italic, this.underlined, this.strikethrough, this.obfuscated, this.clickEvent, arg, this.insertion, this.font);
+    public Style withHoverEvent(@Nullable HoverEvent hoverEvent) {
+        return new Style(this.color, this.bold, this.italic, this.underlined, this.strikethrough, this.obfuscated, this.clickEvent, hoverEvent, this.insertion, this.font);
     }
 
-    public Style withInsertion(@Nullable String string) {
-        return new Style(this.color, this.bold, this.italic, this.underlined, this.strikethrough, this.obfuscated, this.clickEvent, this.hoverEvent, string, this.font);
+    public Style withInsertion(@Nullable String insertion) {
+        return new Style(this.color, this.bold, this.italic, this.underlined, this.strikethrough, this.obfuscated, this.clickEvent, this.hoverEvent, insertion, this.font);
     }
 
     @Environment(value=EnvType.CLIENT)
-    public Style withFont(@Nullable Identifier arg) {
-        return new Style(this.color, this.bold, this.italic, this.underlined, this.strikethrough, this.obfuscated, this.clickEvent, this.hoverEvent, this.insertion, arg);
+    public Style withFont(@Nullable Identifier font) {
+        return new Style(this.color, this.bold, this.italic, this.underlined, this.strikethrough, this.obfuscated, this.clickEvent, this.hoverEvent, this.insertion, font);
     }
 
-    public Style withFormatting(Formatting arg) {
+    public Style withFormatting(Formatting formatting) {
         TextColor lv = this.color;
         Boolean boolean_ = this.bold;
         Boolean boolean2 = this.italic;
         Boolean boolean3 = this.strikethrough;
         Boolean boolean4 = this.underlined;
         Boolean boolean5 = this.obfuscated;
-        switch (arg) {
+        switch (formatting) {
             case OBFUSCATED: {
                 boolean5 = true;
                 break;
@@ -187,21 +187,21 @@ public class Style {
                 return EMPTY;
             }
             default: {
-                lv = TextColor.fromFormatting(arg);
+                lv = TextColor.fromFormatting(formatting);
             }
         }
         return new Style(lv, boolean_, boolean2, boolean4, boolean3, boolean5, this.clickEvent, this.hoverEvent, this.insertion, this.font);
     }
 
     @Environment(value=EnvType.CLIENT)
-    public Style withExclusiveFormatting(Formatting arg) {
+    public Style withExclusiveFormatting(Formatting formatting) {
         TextColor lv = this.color;
         Boolean boolean_ = this.bold;
         Boolean boolean2 = this.italic;
         Boolean boolean3 = this.strikethrough;
         Boolean boolean4 = this.underlined;
         Boolean boolean5 = this.obfuscated;
-        switch (arg) {
+        switch (formatting) {
             case OBFUSCATED: {
                 boolean5 = true;
                 break;
@@ -231,20 +231,20 @@ public class Style {
                 boolean3 = false;
                 boolean4 = false;
                 boolean2 = false;
-                lv = TextColor.fromFormatting(arg);
+                lv = TextColor.fromFormatting(formatting);
             }
         }
         return new Style(lv, boolean_, boolean2, boolean4, boolean3, boolean5, this.clickEvent, this.hoverEvent, this.insertion, this.font);
     }
 
-    public Style withFormatting(Formatting ... args) {
+    public Style withFormatting(Formatting ... formattings) {
         TextColor lv = this.color;
         Boolean boolean_ = this.bold;
         Boolean boolean2 = this.italic;
         Boolean boolean3 = this.strikethrough;
         Boolean boolean4 = this.underlined;
         Boolean boolean5 = this.obfuscated;
-        block8: for (Formatting lv2 : args) {
+        block8: for (Formatting lv2 : formattings) {
             switch (lv2) {
                 case OBFUSCATED: {
                     boolean5 = true;
@@ -277,26 +277,26 @@ public class Style {
         return new Style(lv, boolean_, boolean2, boolean4, boolean3, boolean5, this.clickEvent, this.hoverEvent, this.insertion, this.font);
     }
 
-    public Style withParent(Style arg) {
+    public Style withParent(Style parent) {
         if (this == EMPTY) {
-            return arg;
+            return parent;
         }
-        if (arg == EMPTY) {
+        if (parent == EMPTY) {
             return this;
         }
-        return new Style(this.color != null ? this.color : arg.color, this.bold != null ? this.bold : arg.bold, this.italic != null ? this.italic : arg.italic, this.underlined != null ? this.underlined : arg.underlined, this.strikethrough != null ? this.strikethrough : arg.strikethrough, this.obfuscated != null ? this.obfuscated : arg.obfuscated, this.clickEvent != null ? this.clickEvent : arg.clickEvent, this.hoverEvent != null ? this.hoverEvent : arg.hoverEvent, this.insertion != null ? this.insertion : arg.insertion, this.font != null ? this.font : arg.font);
+        return new Style(this.color != null ? this.color : parent.color, this.bold != null ? this.bold : parent.bold, this.italic != null ? this.italic : parent.italic, this.underlined != null ? this.underlined : parent.underlined, this.strikethrough != null ? this.strikethrough : parent.strikethrough, this.obfuscated != null ? this.obfuscated : parent.obfuscated, this.clickEvent != null ? this.clickEvent : parent.clickEvent, this.hoverEvent != null ? this.hoverEvent : parent.hoverEvent, this.insertion != null ? this.insertion : parent.insertion, this.font != null ? this.font : parent.font);
     }
 
     public String toString() {
         return "Style{ color=" + this.color + ", bold=" + this.bold + ", italic=" + this.italic + ", underlined=" + this.underlined + ", strikethrough=" + this.strikethrough + ", obfuscated=" + this.obfuscated + ", clickEvent=" + this.getClickEvent() + ", hoverEvent=" + this.getHoverEvent() + ", insertion=" + this.getInsertion() + ", font=" + this.getFont() + '}';
     }
 
-    public boolean equals(Object object) {
-        if (this == object) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
         }
-        if (object instanceof Style) {
-            Style lv = (Style)object;
+        if (obj instanceof Style) {
+            Style lv = (Style)obj;
             return this.isBold() == lv.isBold() && Objects.equals(this.getColor(), lv.getColor()) && this.isItalic() == lv.isItalic() && this.isObfuscated() == lv.isObfuscated() && this.isStrikethrough() == lv.isStrikethrough() && this.isUnderlined() == lv.isUnderlined() && Objects.equals(this.getClickEvent(), lv.getClickEvent()) && Objects.equals(this.getHoverEvent(), lv.getHoverEvent()) && Objects.equals(this.getInsertion(), lv.getInsertion()) && Objects.equals(this.getFont(), lv.getFont());
         }
         return false;
@@ -332,9 +332,9 @@ public class Style {
         }
 
         @Nullable
-        private static Identifier getFont(JsonObject jsonObject) {
-            if (jsonObject.has("font")) {
-                String string = JsonHelper.getString(jsonObject, "font");
+        private static Identifier getFont(JsonObject root) {
+            if (root.has("font")) {
+                String string = JsonHelper.getString(root, "font");
                 try {
                     return new Identifier(string);
                 }
@@ -346,19 +346,19 @@ public class Style {
         }
 
         @Nullable
-        private static HoverEvent getHoverEvent(JsonObject jsonObject) {
+        private static HoverEvent getHoverEvent(JsonObject root) {
             JsonObject jsonObject2;
             HoverEvent lv;
-            if (jsonObject.has("hoverEvent") && (lv = HoverEvent.fromJson(jsonObject2 = JsonHelper.getObject(jsonObject, "hoverEvent"))) != null && lv.getAction().isParsable()) {
+            if (root.has("hoverEvent") && (lv = HoverEvent.fromJson(jsonObject2 = JsonHelper.getObject(root, "hoverEvent"))) != null && lv.getAction().isParsable()) {
                 return lv;
             }
             return null;
         }
 
         @Nullable
-        private static ClickEvent getClickEvent(JsonObject jsonObject) {
-            if (jsonObject.has("clickEvent")) {
-                JsonObject jsonObject2 = JsonHelper.getObject(jsonObject, "clickEvent");
+        private static ClickEvent getClickEvent(JsonObject root) {
+            if (root.has("clickEvent")) {
+                JsonObject jsonObject2 = JsonHelper.getObject(root, "clickEvent");
                 String string = JsonHelper.getString(jsonObject2, "action", null);
                 ClickEvent.Action lv = string == null ? null : ClickEvent.Action.byName(string);
                 String string2 = JsonHelper.getString(jsonObject2, "value", null);
@@ -370,23 +370,23 @@ public class Style {
         }
 
         @Nullable
-        private static String parseInsertion(JsonObject jsonObject) {
-            return JsonHelper.getString(jsonObject, "insertion", null);
+        private static String parseInsertion(JsonObject root) {
+            return JsonHelper.getString(root, "insertion", null);
         }
 
         @Nullable
-        private static TextColor parseColor(JsonObject jsonObject) {
-            if (jsonObject.has("color")) {
-                String string = JsonHelper.getString(jsonObject, "color");
+        private static TextColor parseColor(JsonObject root) {
+            if (root.has("color")) {
+                String string = JsonHelper.getString(root, "color");
                 return TextColor.parse(string);
             }
             return null;
         }
 
         @Nullable
-        private static Boolean parseNullableBoolean(JsonObject jsonObject, String string) {
-            if (jsonObject.has(string)) {
-                return jsonObject.get(string).getAsBoolean();
+        private static Boolean parseNullableBoolean(JsonObject root, String key) {
+            if (root.has(key)) {
+                return root.get(key).getAsBoolean();
             }
             return null;
         }
@@ -434,13 +434,13 @@ public class Style {
         }
 
         @Nullable
-        public /* synthetic */ JsonElement serialize(Object object, Type type, JsonSerializationContext jsonSerializationContext) {
-            return this.serialize((Style)object, type, jsonSerializationContext);
+        public /* synthetic */ JsonElement serialize(Object style, Type type, JsonSerializationContext context) {
+            return this.serialize((Style)style, type, context);
         }
 
         @Nullable
-        public /* synthetic */ Object deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
-            return this.deserialize(jsonElement, type, jsonDeserializationContext);
+        public /* synthetic */ Object deserialize(JsonElement json, Type type, JsonDeserializationContext context) throws JsonParseException {
+            return this.deserialize(json, type, context);
         }
     }
 }

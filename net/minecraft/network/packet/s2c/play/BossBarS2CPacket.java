@@ -32,8 +32,8 @@ implements Packet<ClientPlayPacketListener> {
     public BossBarS2CPacket() {
     }
 
-    public BossBarS2CPacket(Type arg, BossBar arg2) {
-        this.type = arg;
+    public BossBarS2CPacket(Type action, BossBar arg2) {
+        this.type = action;
         this.uuid = arg2.getUuid();
         this.name = arg2.getName();
         this.percent = arg2.getPercent();
@@ -45,36 +45,36 @@ implements Packet<ClientPlayPacketListener> {
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.uuid = arg.readUuid();
-        this.type = arg.readEnumConstant(Type.class);
+    public void read(PacketByteBuf buf) throws IOException {
+        this.uuid = buf.readUuid();
+        this.type = buf.readEnumConstant(Type.class);
         switch (this.type) {
             case ADD: {
-                this.name = arg.readText();
-                this.percent = arg.readFloat();
-                this.color = arg.readEnumConstant(BossBar.Color.class);
-                this.overlay = arg.readEnumConstant(BossBar.Style.class);
-                this.setFlagBitfield(arg.readUnsignedByte());
+                this.name = buf.readText();
+                this.percent = buf.readFloat();
+                this.color = buf.readEnumConstant(BossBar.Color.class);
+                this.overlay = buf.readEnumConstant(BossBar.Style.class);
+                this.setFlagBitfield(buf.readUnsignedByte());
                 break;
             }
             case REMOVE: {
                 break;
             }
             case UPDATE_PCT: {
-                this.percent = arg.readFloat();
+                this.percent = buf.readFloat();
                 break;
             }
             case UPDATE_NAME: {
-                this.name = arg.readText();
+                this.name = buf.readText();
                 break;
             }
             case UPDATE_STYLE: {
-                this.color = arg.readEnumConstant(BossBar.Color.class);
-                this.overlay = arg.readEnumConstant(BossBar.Style.class);
+                this.color = buf.readEnumConstant(BossBar.Color.class);
+                this.overlay = buf.readEnumConstant(BossBar.Style.class);
                 break;
             }
             case UPDATE_PROPERTIES: {
-                this.setFlagBitfield(arg.readUnsignedByte());
+                this.setFlagBitfield(buf.readUnsignedByte());
             }
         }
     }
@@ -86,36 +86,36 @@ implements Packet<ClientPlayPacketListener> {
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeUuid(this.uuid);
-        arg.writeEnumConstant(this.type);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeUuid(this.uuid);
+        buf.writeEnumConstant(this.type);
         switch (this.type) {
             case ADD: {
-                arg.writeText(this.name);
-                arg.writeFloat(this.percent);
-                arg.writeEnumConstant(this.color);
-                arg.writeEnumConstant(this.overlay);
-                arg.writeByte(this.getFlagBitfield());
+                buf.writeText(this.name);
+                buf.writeFloat(this.percent);
+                buf.writeEnumConstant(this.color);
+                buf.writeEnumConstant(this.overlay);
+                buf.writeByte(this.getFlagBitfield());
                 break;
             }
             case REMOVE: {
                 break;
             }
             case UPDATE_PCT: {
-                arg.writeFloat(this.percent);
+                buf.writeFloat(this.percent);
                 break;
             }
             case UPDATE_NAME: {
-                arg.writeText(this.name);
+                buf.writeText(this.name);
                 break;
             }
             case UPDATE_STYLE: {
-                arg.writeEnumConstant(this.color);
-                arg.writeEnumConstant(this.overlay);
+                buf.writeEnumConstant(this.color);
+                buf.writeEnumConstant(this.overlay);
                 break;
             }
             case UPDATE_PROPERTIES: {
-                arg.writeByte(this.getFlagBitfield());
+                buf.writeByte(this.getFlagBitfield());
             }
         }
     }

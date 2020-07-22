@@ -49,18 +49,18 @@ extends FeatureRenderer<T, M> {
         arg.pop();
     }
 
-    private void renderItem(LivingEntity arg, ItemStack arg2, ModelTransformation.Mode arg3, Arm arg4, MatrixStack arg5, VertexConsumerProvider arg6, int i) {
-        if (arg2.isEmpty()) {
+    private void renderItem(LivingEntity entity, ItemStack stack, ModelTransformation.Mode transformationMode, Arm arm, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
+        if (stack.isEmpty()) {
             return;
         }
-        arg5.push();
-        ((ModelWithArms)this.getContextModel()).setArmAngle(arg4, arg5);
-        arg5.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(-90.0f));
-        arg5.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(180.0f));
-        boolean bl = arg4 == Arm.LEFT;
-        arg5.translate((float)(bl ? -1 : 1) / 16.0f, 0.125, -0.625);
-        MinecraftClient.getInstance().getHeldItemRenderer().renderItem(arg, arg2, arg3, bl, arg5, arg6, i);
-        arg5.pop();
+        matrices.push();
+        ((ModelWithArms)this.getContextModel()).setArmAngle(arm, matrices);
+        matrices.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(-90.0f));
+        matrices.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(180.0f));
+        boolean bl = arm == Arm.LEFT;
+        matrices.translate((float)(bl ? -1 : 1) / 16.0f, 0.125, -0.625);
+        MinecraftClient.getInstance().getHeldItemRenderer().renderItem(entity, stack, transformationMode, bl, matrices, vertexConsumers, light);
+        matrices.pop();
     }
 }
 

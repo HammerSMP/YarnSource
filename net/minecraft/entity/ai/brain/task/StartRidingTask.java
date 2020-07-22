@@ -26,25 +26,25 @@ extends Task<E> {
     }
 
     @Override
-    protected boolean shouldRun(ServerWorld arg, E arg2) {
-        return !((Entity)arg2).hasVehicle();
+    protected boolean shouldRun(ServerWorld world, E entity) {
+        return !((Entity)entity).hasVehicle();
     }
 
     @Override
-    protected void run(ServerWorld arg, E arg2, long l) {
-        if (this.isRideTargetClose(arg2)) {
-            ((Entity)arg2).startRiding(this.getRideTarget(arg2));
+    protected void run(ServerWorld world, E entity, long time) {
+        if (this.isRideTargetClose(entity)) {
+            ((Entity)entity).startRiding(this.getRideTarget(entity));
         } else {
-            LookTargetUtil.walkTowards(arg2, this.getRideTarget(arg2), this.field_23132, 1);
+            LookTargetUtil.walkTowards(entity, this.getRideTarget(entity), this.field_23132, 1);
         }
     }
 
-    private boolean isRideTargetClose(E arg) {
-        return this.getRideTarget(arg).isInRange((Entity)arg, 1.0);
+    private boolean isRideTargetClose(E entity) {
+        return this.getRideTarget(entity).isInRange((Entity)entity, 1.0);
     }
 
-    private Entity getRideTarget(E arg) {
-        return ((LivingEntity)arg).getBrain().getOptionalMemory(MemoryModuleType.RIDE_TARGET).get();
+    private Entity getRideTarget(E entity) {
+        return ((LivingEntity)entity).getBrain().getOptionalMemory(MemoryModuleType.RIDE_TARGET).get();
     }
 }
 

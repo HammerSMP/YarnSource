@@ -55,8 +55,8 @@ public class GameTest {
         this.field_25301 = arg.method_29424().rotate(arg2);
     }
 
-    void setPos(BlockPos arg) {
-        this.pos = arg;
+    void setPos(BlockPos pos) {
+        this.pos = pos;
     }
 
     void startCountdown() {
@@ -164,8 +164,8 @@ public class GameTest {
         return this.getStructurePath();
     }
 
-    public void addListener(TestListener arg) {
-        this.listeners.add(arg);
+    public void addListener(TestListener listener) {
+        this.listeners.add(listener);
     }
 
     public void init(BlockPos arg2, int i) {

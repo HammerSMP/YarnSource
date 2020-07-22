@@ -27,40 +27,41 @@ implements IndexedIterable<K> {
     private int nextId;
     private int size;
 
-    public Int2ObjectBiMap(int i) {
-        i = (int)((float)i / 0.8f);
-        this.values = new Object[i];
-        this.ids = new int[i];
-        this.idToValues = new Object[i];
+    public Int2ObjectBiMap(int size) {
+        size = (int)((float)size / 0.8f);
+        this.values = new Object[size];
+        this.ids = new int[size];
+        this.idToValues = new Object[size];
     }
 
-    public int getId(@Nullable K object) {
+    @Override
+    public int getRawId(@Nullable K object) {
         return this.getIdFromIndex(this.findIndex(object, this.getIdealIndex(object)));
     }
 
     @Override
     @Nullable
-    public K get(int i) {
-        if (i < 0 || i >= this.idToValues.length) {
+    public K get(int index) {
+        if (index < 0 || index >= this.idToValues.length) {
             return null;
         }
-        return this.idToValues[i];
+        return this.idToValues[index];
     }
 
-    private int getIdFromIndex(int i) {
-        if (i == -1) {
+    private int getIdFromIndex(int index) {
+        if (index == -1) {
             return -1;
         }
-        return this.ids[i];
+        return this.ids[index];
     }
 
-    public boolean containsId(int i) {
-        return this.get(i) != null;
+    public boolean containsId(int id) {
+        return this.get(id) != null;
     }
 
-    public int add(K object) {
+    public int add(K value) {
         int i = this.nextId();
-        this.put(object, i);
+        this.put(value, i);
         return i;
     }
 
@@ -71,12 +72,12 @@ implements IndexedIterable<K> {
         return this.nextId;
     }
 
-    private void resize(int i) {
+    private void resize(int newSize) {
         K[] objects = this.values;
         int[] is = this.ids;
-        this.values = new Object[i];
-        this.ids = new int[i];
-        this.idToValues = new Object[i];
+        this.values = new Object[newSize];
+        this.ids = new int[newSize];
+        this.idToValues = new Object[newSize];
         this.nextId = 0;
         this.size = 0;
         for (int j = 0; j < objects.length; ++j) {
@@ -85,38 +86,38 @@ implements IndexedIterable<K> {
         }
     }
 
-    public void put(K object, int i) {
-        int j = Math.max(i, this.size + 1);
+    public void put(K value, int id) {
+        int j = Math.max(id, this.size + 1);
         if ((float)j >= (float)this.values.length * 0.8f) {
             int k;
-            for (k = this.values.length << 1; k < i; k <<= 1) {
+            for (k = this.values.length << 1; k < id; k <<= 1) {
             }
             this.resize(k);
         }
-        int l = this.findFree(this.getIdealIndex(object));
-        this.values[l] = object;
-        this.ids[l] = i;
-        this.idToValues[i] = object;
+        int l = this.findFree(this.getIdealIndex(value));
+        this.values[l] = value;
+        this.ids[l] = id;
+        this.idToValues[id] = value;
         ++this.size;
-        if (i == this.nextId) {
+        if (id == this.nextId) {
             ++this.nextId;
         }
     }
 
-    private int getIdealIndex(@Nullable K object) {
-        return (MathHelper.idealHash(System.identityHashCode(object)) & Integer.MAX_VALUE) % this.values.length;
+    private int getIdealIndex(@Nullable K value) {
+        return (MathHelper.idealHash(System.identityHashCode(value)) & Integer.MAX_VALUE) % this.values.length;
     }
 
-    private int findIndex(@Nullable K object, int i) {
-        for (int j = i; j < this.values.length; ++j) {
-            if (this.values[j] == object) {
+    private int findIndex(@Nullable K value, int id) {
+        for (int j = id; j < this.values.length; ++j) {
+            if (this.values[j] == value) {
                 return j;
             }
             if (this.values[j] != empty) continue;
             return -1;
         }
-        for (int k = 0; k < i; ++k) {
-            if (this.values[k] == object) {
+        for (int k = 0; k < id; ++k) {
+            if (this.values[k] == value) {
                 return k;
             }
             if (this.values[k] != empty) continue;
@@ -125,12 +126,12 @@ implements IndexedIterable<K> {
         return -1;
     }
 
-    private int findFree(int i) {
-        for (int j = i; j < this.values.length; ++j) {
+    private int findFree(int size) {
+        for (int j = size; j < this.values.length; ++j) {
             if (this.values[j] != empty) continue;
             return j;
         }
-        for (int k = 0; k < i; ++k) {
+        for (int k = 0; k < size; ++k) {
             if (this.values[k] != empty) continue;
             return k;
         }

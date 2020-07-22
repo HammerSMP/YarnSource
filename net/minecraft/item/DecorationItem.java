@@ -22,26 +22,26 @@ public class DecorationItem
 extends Item {
     private final EntityType<? extends AbstractDecorationEntity> entityType;
 
-    public DecorationItem(EntityType<? extends AbstractDecorationEntity> arg, Item.Settings arg2) {
-        super(arg2);
-        this.entityType = arg;
+    public DecorationItem(EntityType<? extends AbstractDecorationEntity> type, Item.Settings settings) {
+        super(settings);
+        this.entityType = type;
     }
 
     /*
      * WARNING - void declaration
      */
     @Override
-    public ActionResult useOnBlock(ItemUsageContext arg) {
+    public ActionResult useOnBlock(ItemUsageContext context) {
         void lv9;
-        BlockPos lv = arg.getBlockPos();
-        Direction lv2 = arg.getSide();
+        BlockPos lv = context.getBlockPos();
+        Direction lv2 = context.getSide();
         BlockPos lv3 = lv.offset(lv2);
-        PlayerEntity lv4 = arg.getPlayer();
-        ItemStack lv5 = arg.getStack();
+        PlayerEntity lv4 = context.getPlayer();
+        ItemStack lv5 = context.getStack();
         if (lv4 != null && !this.canPlaceOn(lv4, lv2, lv5, lv3)) {
             return ActionResult.FAIL;
         }
-        World lv6 = arg.getWorld();
+        World lv6 = context.getWorld();
         if (this.entityType == EntityType.PAINTING) {
             PaintingEntity lv7 = new PaintingEntity(lv6, lv3, lv2);
         } else if (this.entityType == EntityType.ITEM_FRAME) {
@@ -64,8 +64,8 @@ extends Item {
         return ActionResult.CONSUME;
     }
 
-    protected boolean canPlaceOn(PlayerEntity arg, Direction arg2, ItemStack arg3, BlockPos arg4) {
-        return !arg2.getAxis().isVertical() && arg.canPlaceOn(arg4, arg2, arg3);
+    protected boolean canPlaceOn(PlayerEntity player, Direction side, ItemStack stack, BlockPos pos) {
+        return !side.getAxis().isVertical() && player.canPlaceOn(pos, side, stack);
     }
 }
 

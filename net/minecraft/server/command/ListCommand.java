@@ -22,23 +22,23 @@ import net.minecraft.text.Texts;
 import net.minecraft.text.TranslatableText;
 
 public class ListCommand {
-    public static void register(CommandDispatcher<ServerCommandSource> commandDispatcher) {
-        commandDispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)CommandManager.literal("list").executes(commandContext -> ListCommand.executeNames((ServerCommandSource)commandContext.getSource()))).then(CommandManager.literal("uuids").executes(commandContext -> ListCommand.executeUuids((ServerCommandSource)commandContext.getSource()))));
+    public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
+        dispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)CommandManager.literal("list").executes(commandContext -> ListCommand.executeNames((ServerCommandSource)commandContext.getSource()))).then(CommandManager.literal("uuids").executes(commandContext -> ListCommand.executeUuids((ServerCommandSource)commandContext.getSource()))));
     }
 
-    private static int executeNames(ServerCommandSource arg) {
-        return ListCommand.execute(arg, PlayerEntity::getDisplayName);
+    private static int executeNames(ServerCommandSource source) {
+        return ListCommand.execute(source, PlayerEntity::getDisplayName);
     }
 
-    private static int executeUuids(ServerCommandSource arg) {
-        return ListCommand.execute(arg, PlayerEntity::getNameAndUuid);
+    private static int executeUuids(ServerCommandSource source) {
+        return ListCommand.execute(source, arg -> new TranslatableText("commands.list.nameAndId", arg.getName(), arg.getGameProfile().getId()));
     }
 
-    private static int execute(ServerCommandSource arg, Function<ServerPlayerEntity, Text> function) {
-        PlayerManager lv = arg.getMinecraftServer().getPlayerManager();
+    private static int execute(ServerCommandSource source, Function<ServerPlayerEntity, Text> nameProvider) {
+        PlayerManager lv = source.getMinecraftServer().getPlayerManager();
         List<ServerPlayerEntity> list = lv.getPlayerList();
-        MutableText lv2 = Texts.join(list, function);
-        arg.sendFeedback(new TranslatableText("commands.list.players", list.size(), lv.getMaxPlayerCount(), lv2), false);
+        MutableText lv2 = Texts.join(list, nameProvider);
+        source.sendFeedback(new TranslatableText("commands.list.players", list.size(), lv.getMaxPlayerCount(), lv2), false);
         return list.size();
     }
 }

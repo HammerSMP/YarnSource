@@ -23,10 +23,10 @@ implements SurfaceConfig {
     private final BlockState underMaterial;
     private final BlockState underwaterMaterial;
 
-    public TernarySurfaceConfig(BlockState arg, BlockState arg2, BlockState arg3) {
-        this.topMaterial = arg;
-        this.underMaterial = arg2;
-        this.underwaterMaterial = arg3;
+    public TernarySurfaceConfig(BlockState topMaterial, BlockState underMaterial, BlockState underwaterMaterial) {
+        this.topMaterial = topMaterial;
+        this.underMaterial = underMaterial;
+        this.underwaterMaterial = underwaterMaterial;
     }
 
     @Override

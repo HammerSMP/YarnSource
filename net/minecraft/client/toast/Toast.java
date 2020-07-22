@@ -28,11 +28,11 @@ public interface Toast {
         return TYPE;
     }
 
-    default public int method_29049() {
+    default public int getWidth() {
         return 160;
     }
 
-    default public int method_29050() {
+    default public int getHeight() {
         return 32;
     }
 
@@ -43,12 +43,12 @@ public interface Toast {
 
         private final SoundEvent sound;
 
-        private Visibility(SoundEvent arg) {
-            this.sound = arg;
+        private Visibility(SoundEvent sound) {
+            this.sound = sound;
         }
 
-        public void playSound(SoundManager arg) {
-            arg.play(PositionedSoundInstance.master(this.sound, 1.0f, 1.0f));
+        public void playSound(SoundManager soundManager) {
+            soundManager.play(PositionedSoundInstance.master(this.sound, 1.0f, 1.0f));
         }
     }
 }

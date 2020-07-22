@@ -16,8 +16,8 @@ public class AdvancementEntityPredicateSerializer {
     public static final AdvancementEntityPredicateSerializer INSTANCE = new AdvancementEntityPredicateSerializer();
     private final Gson gson = LootGsons.getConditionGsonBuilder().create();
 
-    public final JsonElement conditionsToJson(LootCondition[] args) {
-        return this.gson.toJsonTree((Object)args);
+    public final JsonElement conditionsToJson(LootCondition[] conditions) {
+        return this.gson.toJsonTree((Object)conditions);
     }
 }
 

@@ -22,21 +22,21 @@ implements Packet<ClientLoginPacketListener> {
     private PacketByteBuf payload;
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.queryId = arg.readVarInt();
-        this.channel = arg.readIdentifier();
-        int i = arg.readableBytes();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.queryId = buf.readVarInt();
+        this.channel = buf.readIdentifier();
+        int i = buf.readableBytes();
         if (i < 0 || i > 0x100000) {
             throw new IOException("Payload may not be larger than 1048576 bytes");
         }
-        this.payload = new PacketByteBuf(arg.readBytes(i));
+        this.payload = new PacketByteBuf(buf.readBytes(i));
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeVarInt(this.queryId);
-        arg.writeIdentifier(this.channel);
-        arg.writeBytes(this.payload.copy());
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeVarInt(this.queryId);
+        buf.writeIdentifier(this.channel);
+        buf.writeBytes(this.payload.copy());
     }
 
     @Override

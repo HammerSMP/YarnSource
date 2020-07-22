@@ -71,15 +71,15 @@ extends Feature<DefaultFeatureConfig> {
         return true;
     }
 
-    private void tryPlaceBasalt(WorldAccess arg, Random random, BlockPos arg2) {
+    private void tryPlaceBasalt(WorldAccess world, Random random, BlockPos pos) {
         if (random.nextBoolean()) {
-            arg.setBlockState(arg2, Blocks.BASALT.getDefaultState(), 2);
+            world.setBlockState(pos, Blocks.BASALT.getDefaultState(), 2);
         }
     }
 
-    private boolean stopOrPlaceBasalt(WorldAccess arg, Random random, BlockPos arg2) {
+    private boolean stopOrPlaceBasalt(WorldAccess world, Random random, BlockPos pos) {
         if (random.nextInt(10) != 0) {
-            arg.setBlockState(arg2, Blocks.BASALT.getDefaultState(), 2);
+            world.setBlockState(pos, Blocks.BASALT.getDefaultState(), 2);
             return true;
         }
         return false;

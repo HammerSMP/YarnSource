@@ -25,12 +25,12 @@ public class RailPlacementHelper {
     private final boolean allowCurves;
     private final List<BlockPos> neighbors = Lists.newArrayList();
 
-    public RailPlacementHelper(World arg, BlockPos arg2, BlockState arg3) {
-        this.world = arg;
-        this.pos = arg2;
-        this.state = arg3;
-        this.block = (AbstractRailBlock)arg3.getBlock();
-        RailShape lv = arg3.get(this.block.getShapeProperty());
+    public RailPlacementHelper(World world, BlockPos pos, BlockState state) {
+        this.world = world;
+        this.pos = pos;
+        this.state = state;
+        this.block = (AbstractRailBlock)state.getBlock();
+        RailShape lv = state.get(this.block.getShapeProperty());
         this.allowCurves = this.block.canMakeCurves();
         this.computeNeighbors(lv);
     }
@@ -39,9 +39,9 @@ public class RailPlacementHelper {
         return this.neighbors;
     }
 
-    private void computeNeighbors(RailShape arg) {
+    private void computeNeighbors(RailShape shape) {
         this.neighbors.clear();
-        switch (arg) {
+        switch (shape) {
             case NORTH_SOUTH: {
                 this.neighbors.add(this.pos.north());
                 this.neighbors.add(this.pos.south());
@@ -105,23 +105,23 @@ public class RailPlacementHelper {
         }
     }
 
-    private boolean isVerticallyNearRail(BlockPos arg) {
-        return AbstractRailBlock.isRail(this.world, arg) || AbstractRailBlock.isRail(this.world, arg.up()) || AbstractRailBlock.isRail(this.world, arg.down());
+    private boolean isVerticallyNearRail(BlockPos pos) {
+        return AbstractRailBlock.isRail(this.world, pos) || AbstractRailBlock.isRail(this.world, pos.up()) || AbstractRailBlock.isRail(this.world, pos.down());
     }
 
     @Nullable
-    private RailPlacementHelper getNeighboringRail(BlockPos arg) {
-        BlockPos lv = arg;
+    private RailPlacementHelper getNeighboringRail(BlockPos pos) {
+        BlockPos lv = pos;
         BlockState lv2 = this.world.getBlockState(lv);
         if (AbstractRailBlock.isRail(lv2)) {
             return new RailPlacementHelper(this.world, lv, lv2);
         }
-        lv = arg.up();
+        lv = pos.up();
         lv2 = this.world.getBlockState(lv);
         if (AbstractRailBlock.isRail(lv2)) {
             return new RailPlacementHelper(this.world, lv, lv2);
         }
-        lv = arg.down();
+        lv = pos.down();
         lv2 = this.world.getBlockState(lv);
         if (AbstractRailBlock.isRail(lv2)) {
             return new RailPlacementHelper(this.world, lv, lv2);
@@ -129,14 +129,14 @@ public class RailPlacementHelper {
         return null;
     }
 
-    private boolean isNeighbor(RailPlacementHelper arg) {
-        return this.isNeighbor(arg.pos);
+    private boolean isNeighbor(RailPlacementHelper other) {
+        return this.isNeighbor(other.pos);
     }
 
-    private boolean isNeighbor(BlockPos arg) {
+    private boolean isNeighbor(BlockPos pos) {
         for (int i = 0; i < this.neighbors.size(); ++i) {
             BlockPos lv = this.neighbors.get(i);
-            if (lv.getX() != arg.getX() || lv.getZ() != arg.getZ()) continue;
+            if (lv.getX() != pos.getX() || lv.getZ() != pos.getZ()) continue;
             return true;
         }
         return false;
@@ -151,12 +151,12 @@ public class RailPlacementHelper {
         return i;
     }
 
-    private boolean canConnect(RailPlacementHelper arg) {
-        return this.isNeighbor(arg) || this.neighbors.size() != 2;
+    private boolean canConnect(RailPlacementHelper placementHelper) {
+        return this.isNeighbor(placementHelper) || this.neighbors.size() != 2;
     }
 
-    private void computeRailShape(RailPlacementHelper arg) {
-        this.neighbors.add(arg.pos);
+    private void computeRailShape(RailPlacementHelper placementHelper) {
+        this.neighbors.add(placementHelper.pos);
         BlockPos lv = this.pos.north();
         BlockPos lv2 = this.pos.south();
         BlockPos lv3 = this.pos.west();
@@ -209,8 +209,8 @@ public class RailPlacementHelper {
         this.world.setBlockState(this.pos, this.state, 3);
     }
 
-    private boolean canConnect(BlockPos arg) {
-        RailPlacementHelper lv = this.getNeighboringRail(arg);
+    private boolean canConnect(BlockPos pos) {
+        RailPlacementHelper lv = this.getNeighboringRail(pos);
         if (lv == null) {
             return false;
         }
@@ -218,7 +218,7 @@ public class RailPlacementHelper {
         return lv.canConnect(this);
     }
 
-    public RailPlacementHelper updateBlockState(boolean bl, boolean bl2, RailShape arg) {
+    public RailPlacementHelper updateBlockState(boolean powered, boolean forceUpdate, RailShape arg) {
         boolean bl12;
         boolean bl8;
         BlockPos lv = this.pos.north();
@@ -231,19 +231,19 @@ public class RailPlacementHelper {
         boolean bl6 = this.canConnect(lv4);
         RailShape lv5 = null;
         boolean bl7 = bl3 || bl4;
-        boolean bl9 = bl8 = bl5 || bl6;
+        boolean bl = bl8 = bl5 || bl6;
         if (bl7 && !bl8) {
             lv5 = RailShape.NORTH_SOUTH;
         }
         if (bl8 && !bl7) {
             lv5 = RailShape.EAST_WEST;
         }
-        boolean bl92 = bl4 && bl6;
+        boolean bl9 = bl4 && bl6;
         boolean bl10 = bl4 && bl5;
         boolean bl11 = bl3 && bl6;
-        boolean bl13 = bl12 = bl3 && bl5;
+        boolean bl2 = bl12 = bl3 && bl5;
         if (!this.allowCurves) {
-            if (bl92 && !bl3 && !bl5) {
+            if (bl9 && !bl3 && !bl5) {
                 lv5 = RailShape.SOUTH_EAST;
             }
             if (bl10 && !bl3 && !bl6) {
@@ -265,8 +265,8 @@ public class RailPlacementHelper {
                 lv5 = RailShape.EAST_WEST;
             }
             if (!this.allowCurves) {
-                if (bl) {
-                    if (bl92) {
+                if (powered) {
+                    if (bl9) {
                         lv5 = RailShape.SOUTH_EAST;
                     }
                     if (bl10) {
@@ -288,7 +288,7 @@ public class RailPlacementHelper {
                     if (bl10) {
                         lv5 = RailShape.SOUTH_WEST;
                     }
-                    if (bl92) {
+                    if (bl9) {
                         lv5 = RailShape.SOUTH_EAST;
                     }
                 }
@@ -315,7 +315,7 @@ public class RailPlacementHelper {
         }
         this.computeNeighbors(lv5);
         this.state = (BlockState)this.state.with(this.block.getShapeProperty(), lv5);
-        if (bl2 || this.world.getBlockState(this.pos) != this.state) {
+        if (forceUpdate || this.world.getBlockState(this.pos) != this.state) {
             this.world.setBlockState(this.pos, this.state, 3);
             for (int i = 0; i < this.neighbors.size(); ++i) {
                 RailPlacementHelper lv6 = this.getNeighboringRail(this.neighbors.get(i));

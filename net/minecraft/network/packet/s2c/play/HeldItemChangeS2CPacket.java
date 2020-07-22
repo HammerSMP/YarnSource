@@ -21,18 +21,18 @@ implements Packet<ClientPlayPacketListener> {
     public HeldItemChangeS2CPacket() {
     }
 
-    public HeldItemChangeS2CPacket(int i) {
-        this.slot = i;
+    public HeldItemChangeS2CPacket(int slot) {
+        this.slot = slot;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.slot = arg.readByte();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.slot = buf.readByte();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeByte(this.slot);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeByte(this.slot);
     }
 
     @Override

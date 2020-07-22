@@ -31,24 +31,24 @@ public class ItemModels {
     private final Int2ObjectMap<BakedModel> models = new Int2ObjectOpenHashMap(256);
     private final BakedModelManager modelManager;
 
-    public ItemModels(BakedModelManager arg) {
-        this.modelManager = arg;
+    public ItemModels(BakedModelManager modelManager) {
+        this.modelManager = modelManager;
     }
 
     public Sprite getSprite(ItemConvertible arg) {
         return this.getSprite(new ItemStack(arg));
     }
 
-    public Sprite getSprite(ItemStack arg) {
-        BakedModel lv = this.getModel(arg);
-        if (lv == this.modelManager.getMissingModel() && arg.getItem() instanceof BlockItem) {
-            return this.modelManager.getBlockModels().getSprite(((BlockItem)arg.getItem()).getBlock().getDefaultState());
+    public Sprite getSprite(ItemStack stack) {
+        BakedModel lv = this.getModel(stack);
+        if (lv == this.modelManager.getMissingModel() && stack.getItem() instanceof BlockItem) {
+            return this.modelManager.getBlockModels().getSprite(((BlockItem)stack.getItem()).getBlock().getDefaultState());
         }
         return lv.getSprite();
     }
 
-    public BakedModel getModel(ItemStack arg) {
-        BakedModel lv = this.getModel(arg.getItem());
+    public BakedModel getModel(ItemStack stack) {
+        BakedModel lv = this.getModel(stack.getItem());
         return lv == null ? this.modelManager.getMissingModel() : lv;
     }
 
@@ -61,8 +61,8 @@ public class ItemModels {
         return Item.getRawId(arg);
     }
 
-    public void putModel(Item arg, ModelIdentifier arg2) {
-        this.modelIds.put(ItemModels.getModelId(arg), (Object)arg2);
+    public void putModel(Item item, ModelIdentifier modelId) {
+        this.modelIds.put(ItemModels.getModelId(item), (Object)modelId);
     }
 
     public BakedModelManager getModelManager() {

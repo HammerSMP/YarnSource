@@ -31,35 +31,35 @@ extends AbstractCriterion<Conditions> {
         return new Conditions(arg, lv);
     }
 
-    public void trigger(ServerPlayerEntity arg) {
-        this.test(arg, arg2 -> arg2.matches(arg));
+    public void trigger(ServerPlayerEntity player) {
+        this.test(player, arg2 -> arg2.matches(player));
     }
 
     @Override
-    public /* synthetic */ AbstractCriterionConditions conditionsFromJson(JsonObject jsonObject, EntityPredicate.Extended arg, AdvancementEntityPredicateDeserializer arg2) {
-        return this.conditionsFromJson(jsonObject, arg, arg2);
+    public /* synthetic */ AbstractCriterionConditions conditionsFromJson(JsonObject obj, EntityPredicate.Extended playerPredicate, AdvancementEntityPredicateDeserializer predicateDeserializer) {
+        return this.conditionsFromJson(obj, playerPredicate, predicateDeserializer);
     }
 
     public static class Conditions
     extends AbstractCriterionConditions {
         private final EntityEffectPredicate effects;
 
-        public Conditions(EntityPredicate.Extended arg, EntityEffectPredicate arg2) {
-            super(ID, arg);
-            this.effects = arg2;
+        public Conditions(EntityPredicate.Extended player, EntityEffectPredicate effects) {
+            super(ID, player);
+            this.effects = effects;
         }
 
-        public static Conditions create(EntityEffectPredicate arg) {
-            return new Conditions(EntityPredicate.Extended.EMPTY, arg);
+        public static Conditions create(EntityEffectPredicate effects) {
+            return new Conditions(EntityPredicate.Extended.EMPTY, effects);
         }
 
-        public boolean matches(ServerPlayerEntity arg) {
-            return this.effects.test(arg);
+        public boolean matches(ServerPlayerEntity player) {
+            return this.effects.test(player);
         }
 
         @Override
-        public JsonObject toJson(AdvancementEntityPredicateSerializer arg) {
-            JsonObject jsonObject = super.toJson(arg);
+        public JsonObject toJson(AdvancementEntityPredicateSerializer predicateSerializer) {
+            JsonObject jsonObject = super.toJson(predicateSerializer);
             jsonObject.add("effects", this.effects.toJson());
             return jsonObject;
         }

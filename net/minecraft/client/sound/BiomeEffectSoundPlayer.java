@@ -43,11 +43,11 @@ implements ClientPlayerTickable {
     private float moodPercentage;
     private Biome activeBiome;
 
-    public BiomeEffectSoundPlayer(ClientPlayerEntity arg, SoundManager arg2, BiomeAccess arg3) {
-        this.random = arg.world.getRandom();
-        this.player = arg;
-        this.soundManager = arg2;
-        this.biomeAccess = arg3;
+    public BiomeEffectSoundPlayer(ClientPlayerEntity player, SoundManager soundManager, BiomeAccess biomeAccess) {
+        this.random = player.world.getRandom();
+        this.player = player;
+        this.soundManager = soundManager;
+        this.biomeAccess = biomeAccess;
     }
 
     public float getMoodPercentage() {
@@ -109,8 +109,8 @@ implements ClientPlayerTickable {
         private int delta;
         private int strength;
 
-        public MusicLoop(SoundEvent arg) {
-            super(arg, SoundCategory.AMBIENT);
+        public MusicLoop(SoundEvent sound) {
+            super(sound, SoundCategory.AMBIENT);
             this.repeat = true;
             this.repeatDelay = 0;
             this.volume = 1.0f;

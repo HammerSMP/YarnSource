@@ -43,14 +43,14 @@ extends BiomeSource {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public BiomeSource withSeed(long l) {
-        return new TheEndBiomeSource(l);
+    public BiomeSource withSeed(long seed) {
+        return new TheEndBiomeSource(seed);
     }
 
     @Override
-    public Biome getBiomeForNoiseGen(int i, int j, int k) {
-        int l = i >> 2;
-        int m = k >> 2;
+    public Biome getBiomeForNoiseGen(int biomeX, int biomeY, int biomeZ) {
+        int l = biomeX >> 2;
+        int m = biomeZ >> 2;
         if ((long)l * (long)l + (long)m * (long)m <= 4096L) {
             return Biomes.THE_END;
         }

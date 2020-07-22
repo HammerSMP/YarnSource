@@ -2,56 +2,69 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  net.fabricmc.api.EnvType
- *  net.fabricmc.api.Environment
+ *  it.unimi.dsi.fastutil.shorts.ShortIterator
+ *  it.unimi.dsi.fastutil.shorts.ShortSet
  */
 package net.minecraft.network.packet.s2c.play;
 
+import it.unimi.dsi.fastutil.shorts.ShortIterator;
+import it.unimi.dsi.fastutil.shorts.ShortSet;
 import java.io.IOException;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import java.util.function.BiConsumer;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.util.math.ChunkSectionPos;
+import net.minecraft.world.chunk.ChunkSection;
 
 public class ChunkDeltaUpdateS2CPacket
 implements Packet<ClientPlayPacketListener> {
-    private ChunkPos chunkPos;
-    private ChunkDeltaRecord[] records;
+    private ChunkSectionPos field_26345;
+    private short[] field_26346;
+    private BlockState[] field_26347;
 
     public ChunkDeltaUpdateS2CPacket() {
     }
 
-    public ChunkDeltaUpdateS2CPacket(int i, short[] ss, WorldChunk arg) {
-        this.chunkPos = arg.getPos();
-        this.records = new ChunkDeltaRecord[i];
-        for (int j = 0; j < this.records.length; ++j) {
-            this.records[j] = new ChunkDeltaRecord(ss[j], arg);
+    public ChunkDeltaUpdateS2CPacket(ChunkSectionPos arg, ShortSet shortSet, ChunkSection arg2) {
+        this.field_26345 = arg;
+        this.method_30620(shortSet.size());
+        int i = 0;
+        ShortIterator shortIterator = shortSet.iterator();
+        while (shortIterator.hasNext()) {
+            short s;
+            this.field_26346[i] = s = ((Short)shortIterator.next()).shortValue();
+            this.field_26347[i] = arg2.getBlockState(ChunkSectionPos.method_30551(s), ChunkSectionPos.method_30552(s), ChunkSectionPos.method_30553(s));
+            ++i;
+        }
+    }
+
+    private void method_30620(int i) {
+        this.field_26346 = new short[i];
+        this.field_26347 = new BlockState[i];
+    }
+
+    @Override
+    public void read(PacketByteBuf buf) throws IOException {
+        this.field_26345 = ChunkSectionPos.from(buf.readLong());
+        int i = buf.readVarInt();
+        this.method_30620(i);
+        for (int j = 0; j < this.field_26346.length; ++j) {
+            long l = buf.readVarLong();
+            this.field_26346[j] = (short)(l & 0xFFFL);
+            this.field_26347[j] = Block.STATE_IDS.get((int)(l >>> 12));
         }
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.chunkPos = new ChunkPos(arg.readInt(), arg.readInt());
-        this.records = new ChunkDeltaRecord[arg.readVarInt()];
-        for (int i = 0; i < this.records.length; ++i) {
-            this.records[i] = new ChunkDeltaRecord(arg.readShort(), Block.STATE_IDS.get(arg.readVarInt()));
-        }
-    }
-
-    @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeInt(this.chunkPos.x);
-        arg.writeInt(this.chunkPos.z);
-        arg.writeVarInt(this.records.length);
-        for (ChunkDeltaRecord lv : this.records) {
-            arg.writeShort(lv.getPosShort());
-            arg.writeVarInt(Block.getRawIdFromState(lv.getState()));
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeLong(this.field_26345.asLong());
+        buf.writeVarInt(this.field_26346.length);
+        for (int i = 0; i < this.field_26346.length; ++i) {
+            buf.writeVarLong(Block.getRawIdFromState(this.field_26347[i]) << 12 | this.field_26346[i]);
         }
     }
 
@@ -60,35 +73,12 @@ implements Packet<ClientPlayPacketListener> {
         arg.onChunkDeltaUpdate(this);
     }
 
-    @Environment(value=EnvType.CLIENT)
-    public ChunkDeltaRecord[] getRecords() {
-        return this.records;
-    }
-
-    public class ChunkDeltaRecord {
-        private final short pos;
-        private final BlockState state;
-
-        public ChunkDeltaRecord(short s, BlockState arg2) {
-            this.pos = s;
-            this.state = arg2;
-        }
-
-        public ChunkDeltaRecord(short s, WorldChunk arg2) {
-            this.pos = s;
-            this.state = arg2.getBlockState(this.getBlockPos());
-        }
-
-        public BlockPos getBlockPos() {
-            return new BlockPos(ChunkDeltaUpdateS2CPacket.this.chunkPos.toBlockPos(this.pos >> 12 & 0xF, this.pos & 0xFF, this.pos >> 8 & 0xF));
-        }
-
-        public short getPosShort() {
-            return this.pos;
-        }
-
-        public BlockState getState() {
-            return this.state;
+    public void method_30621(BiConsumer<BlockPos, BlockState> biConsumer) {
+        BlockPos.Mutable lv = new BlockPos.Mutable();
+        for (int i = 0; i < this.field_26346.length; ++i) {
+            short s = this.field_26346[i];
+            lv.set(this.field_26345.method_30554(s), this.field_26345.method_30555(s), this.field_26345.method_30556(s));
+            biConsumer.accept(lv, this.field_26347[i]);
         }
     }
 }

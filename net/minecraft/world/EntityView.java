@@ -26,47 +26,47 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 
 public interface EntityView {
-    public List<Entity> getEntities(@Nullable Entity var1, Box var2, @Nullable Predicate<? super Entity> var3);
+    public List<Entity> getOtherEntities(@Nullable Entity var1, Box var2, @Nullable Predicate<? super Entity> var3);
 
-    public <T extends Entity> List<T> getEntities(Class<? extends T> var1, Box var2, @Nullable Predicate<? super T> var3);
+    public <T extends Entity> List<T> getEntitiesByClass(Class<? extends T> var1, Box var2, @Nullable Predicate<? super T> var3);
 
-    default public <T extends Entity> List<T> getEntitiesIncludingUngeneratedChunks(Class<? extends T> class_, Box arg, @Nullable Predicate<? super T> predicate) {
-        return this.getEntities(class_, arg, predicate);
+    default public <T extends Entity> List<T> getEntitiesIncludingUngeneratedChunks(Class<? extends T> entityClass, Box box, @Nullable Predicate<? super T> predicate) {
+        return this.getEntitiesByClass(entityClass, box, predicate);
     }
 
     public List<? extends PlayerEntity> getPlayers();
 
-    default public List<Entity> getEntities(@Nullable Entity arg, Box arg2) {
-        return this.getEntities(arg, arg2, EntityPredicates.EXCEPT_SPECTATOR);
+    default public List<Entity> getOtherEntities(@Nullable Entity except, Box box) {
+        return this.getOtherEntities(except, box, EntityPredicates.EXCEPT_SPECTATOR);
     }
 
-    default public boolean intersectsEntities(@Nullable Entity arg, VoxelShape arg2) {
-        if (arg2.isEmpty()) {
+    default public boolean intersectsEntities(@Nullable Entity entity, VoxelShape shape) {
+        if (shape.isEmpty()) {
             return true;
         }
-        for (Entity lv : this.getEntities(arg, arg2.getBoundingBox())) {
-            if (lv.removed || !lv.inanimate || arg != null && lv.isConnectedThroughVehicle(arg) || !VoxelShapes.matchesAnywhere(arg2, VoxelShapes.cuboid(lv.getBoundingBox()), BooleanBiFunction.AND)) continue;
+        for (Entity lv : this.getOtherEntities(entity, shape.getBoundingBox())) {
+            if (lv.removed || !lv.inanimate || entity != null && lv.isConnectedThroughVehicle(entity) || !VoxelShapes.matchesAnywhere(shape, VoxelShapes.cuboid(lv.getBoundingBox()), BooleanBiFunction.AND)) continue;
             return false;
         }
         return true;
     }
 
-    default public <T extends Entity> List<T> getNonSpectatingEntities(Class<? extends T> class_, Box arg) {
-        return this.getEntities(class_, arg, EntityPredicates.EXCEPT_SPECTATOR);
+    default public <T extends Entity> List<T> getNonSpectatingEntities(Class<? extends T> entityClass, Box box) {
+        return this.getEntitiesByClass(entityClass, box, EntityPredicates.EXCEPT_SPECTATOR);
     }
 
-    default public <T extends Entity> List<T> getEntitiesIncludingUngeneratedChunks(Class<? extends T> class_, Box arg) {
-        return this.getEntitiesIncludingUngeneratedChunks(class_, arg, EntityPredicates.EXCEPT_SPECTATOR);
+    default public <T extends Entity> List<T> getEntitiesIncludingUngeneratedChunks(Class<? extends T> entityClass, Box box) {
+        return this.getEntitiesIncludingUngeneratedChunks(entityClass, box, EntityPredicates.EXCEPT_SPECTATOR);
     }
 
-    default public Stream<VoxelShape> getEntityCollisions(@Nullable Entity arg, Box arg22, Predicate<Entity> predicate) {
-        if (arg22.getAverageSideLength() < 1.0E-7) {
+    default public Stream<VoxelShape> getEntityCollisions(@Nullable Entity entity, Box box, Predicate<Entity> predicate) {
+        if (box.getAverageSideLength() < 1.0E-7) {
             return Stream.empty();
         }
-        Box lv = arg22.expand(1.0E-7);
-        return this.getEntities(arg, lv, predicate.and(arg2 -> arg == null || !arg.isConnectedThroughVehicle((Entity)arg2))).stream().flatMap(arg3 -> {
+        Box lv = box.expand(1.0E-7);
+        return this.getOtherEntities(entity, lv, predicate.and(e -> entity == null || !entity.isConnectedThroughVehicle((Entity)e))).stream().flatMap(arg3 -> {
             Box lv;
-            if (arg != null && (lv = arg.getHardCollisionBox((Entity)arg3)) != null && lv.intersects(lv)) {
+            if (entity != null && (lv = entity.getHardCollisionBox((Entity)arg3)) != null && lv.intersects(lv)) {
                 return Stream.of(arg3.getCollisionBox(), lv);
             }
             return Stream.of(arg3.getCollisionBox());
@@ -74,13 +74,13 @@ public interface EntityView {
     }
 
     @Nullable
-    default public PlayerEntity getClosestPlayer(double d, double e, double f, double g, @Nullable Predicate<Entity> predicate) {
+    default public PlayerEntity getClosestPlayer(double x, double y, double z, double maxDistance, @Nullable Predicate<Entity> targetPredicate) {
         double h = -1.0;
         PlayerEntity lv = null;
         for (PlayerEntity playerEntity : this.getPlayers()) {
-            if (predicate != null && !predicate.test(playerEntity)) continue;
-            double i = playerEntity.squaredDistanceTo(d, e, f);
-            if (!(g < 0.0) && !(i < g * g) || h != -1.0 && !(i < h)) continue;
+            if (targetPredicate != null && !targetPredicate.test(playerEntity)) continue;
+            double i = playerEntity.squaredDistanceTo(x, y, z);
+            if (!(maxDistance < 0.0) && !(i < maxDistance * maxDistance) || h != -1.0 && !(i < h)) continue;
             h = i;
             lv = playerEntity;
         }
@@ -88,58 +88,58 @@ public interface EntityView {
     }
 
     @Nullable
-    default public PlayerEntity getClosestPlayer(Entity arg, double d) {
-        return this.getClosestPlayer(arg.getX(), arg.getY(), arg.getZ(), d, false);
+    default public PlayerEntity getClosestPlayer(Entity entity, double maxDistance) {
+        return this.getClosestPlayer(entity.getX(), entity.getY(), entity.getZ(), maxDistance, false);
     }
 
     @Nullable
-    default public PlayerEntity getClosestPlayer(double d, double e, double f, double g, boolean bl) {
-        Predicate<Entity> predicate = bl ? EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR : EntityPredicates.EXCEPT_SPECTATOR;
-        return this.getClosestPlayer(d, e, f, g, predicate);
+    default public PlayerEntity getClosestPlayer(double x, double y, double z, double maxDistance, boolean ignoreCreative) {
+        Predicate<Entity> predicate = ignoreCreative ? EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR : EntityPredicates.EXCEPT_SPECTATOR;
+        return this.getClosestPlayer(x, y, z, maxDistance, predicate);
     }
 
-    default public boolean isPlayerInRange(double d, double e, double f, double g) {
+    default public boolean isPlayerInRange(double x, double y, double z, double range) {
         for (PlayerEntity playerEntity : this.getPlayers()) {
             if (!EntityPredicates.EXCEPT_SPECTATOR.test(playerEntity) || !EntityPredicates.VALID_LIVING_ENTITY.test(playerEntity)) continue;
-            double h = playerEntity.squaredDistanceTo(d, e, f);
-            if (!(g < 0.0) && !(h < g * g)) continue;
+            double h = playerEntity.squaredDistanceTo(x, y, z);
+            if (!(range < 0.0) && !(h < range * range)) continue;
             return true;
         }
         return false;
     }
 
     @Nullable
-    default public PlayerEntity getClosestPlayer(TargetPredicate arg, LivingEntity arg2) {
-        return this.getClosestEntity(this.getPlayers(), arg, arg2, arg2.getX(), arg2.getY(), arg2.getZ());
+    default public PlayerEntity getClosestPlayer(TargetPredicate targetPredicate, LivingEntity entity) {
+        return this.getClosestEntity(this.getPlayers(), targetPredicate, entity, entity.getX(), entity.getY(), entity.getZ());
     }
 
     @Nullable
-    default public PlayerEntity getClosestPlayer(TargetPredicate arg, LivingEntity arg2, double d, double e, double f) {
-        return this.getClosestEntity(this.getPlayers(), arg, arg2, d, e, f);
+    default public PlayerEntity getClosestPlayer(TargetPredicate targetPredicate, LivingEntity entity, double x, double y, double z) {
+        return this.getClosestEntity(this.getPlayers(), targetPredicate, entity, x, y, z);
     }
 
     @Nullable
-    default public PlayerEntity getClosestPlayer(TargetPredicate arg, double d, double e, double f) {
-        return this.getClosestEntity(this.getPlayers(), arg, null, d, e, f);
+    default public PlayerEntity getClosestPlayer(TargetPredicate targetPredicate, double x, double y, double z) {
+        return this.getClosestEntity(this.getPlayers(), targetPredicate, null, x, y, z);
     }
 
     @Nullable
-    default public <T extends LivingEntity> T getClosestEntity(Class<? extends T> class_, TargetPredicate arg, @Nullable LivingEntity arg2, double d, double e, double f, Box arg3) {
-        return this.getClosestEntity(this.getEntities(class_, arg3, null), arg, arg2, d, e, f);
+    default public <T extends LivingEntity> T getClosestEntity(Class<? extends T> entityClass, TargetPredicate targetPredicate, @Nullable LivingEntity entity, double x, double y, double z, Box box) {
+        return this.getClosestEntity(this.getEntitiesByClass(entityClass, box, null), targetPredicate, entity, x, y, z);
     }
 
     @Nullable
-    default public <T extends LivingEntity> T getClosestEntityIncludingUngeneratedChunks(Class<? extends T> class_, TargetPredicate arg, @Nullable LivingEntity arg2, double d, double e, double f, Box arg3) {
-        return this.getClosestEntity(this.getEntitiesIncludingUngeneratedChunks(class_, arg3, null), arg, arg2, d, e, f);
+    default public <T extends LivingEntity> T getClosestEntityIncludingUngeneratedChunks(Class<? extends T> entityClass, TargetPredicate targetPredicate, @Nullable LivingEntity entity, double x, double y, double z, Box box) {
+        return this.getClosestEntity(this.getEntitiesIncludingUngeneratedChunks(entityClass, box, null), targetPredicate, entity, x, y, z);
     }
 
     @Nullable
-    default public <T extends LivingEntity> T getClosestEntity(List<? extends T> list, TargetPredicate arg, @Nullable LivingEntity arg2, double d, double e, double f) {
+    default public <T extends LivingEntity> T getClosestEntity(List<? extends T> entityList, TargetPredicate targetPredicate, @Nullable LivingEntity entity, double x, double y, double z) {
         double g = -1.0;
         LivingEntity lv = null;
-        for (LivingEntity lv2 : list) {
-            if (!arg.test(arg2, lv2)) continue;
-            double h = lv2.squaredDistanceTo(d, e, f);
+        for (LivingEntity lv2 : entityList) {
+            if (!targetPredicate.test(entity, lv2)) continue;
+            double h = lv2.squaredDistanceTo(x, y, z);
             if (g != -1.0 && !(h < g)) continue;
             g = h;
             lv = lv2;
@@ -147,30 +147,30 @@ public interface EntityView {
         return (T)lv;
     }
 
-    default public List<PlayerEntity> getPlayers(TargetPredicate arg, LivingEntity arg2, Box arg3) {
+    default public List<PlayerEntity> getPlayers(TargetPredicate targetPredicate, LivingEntity entity, Box box) {
         ArrayList list = Lists.newArrayList();
         for (PlayerEntity playerEntity : this.getPlayers()) {
-            if (!arg3.contains(playerEntity.getX(), playerEntity.getY(), playerEntity.getZ()) || !arg.test(arg2, playerEntity)) continue;
+            if (!box.contains(playerEntity.getX(), playerEntity.getY(), playerEntity.getZ()) || !targetPredicate.test(entity, playerEntity)) continue;
             list.add(playerEntity);
         }
         return list;
     }
 
-    default public <T extends LivingEntity> List<T> getTargets(Class<? extends T> class_, TargetPredicate arg, LivingEntity arg2, Box arg3) {
-        List<T> list = this.getEntities(class_, arg3, null);
+    default public <T extends LivingEntity> List<T> getTargets(Class<? extends T> entityClass, TargetPredicate targetPredicate, LivingEntity targetingEntity, Box box) {
+        List<T> list = this.getEntitiesByClass(entityClass, box, null);
         ArrayList list2 = Lists.newArrayList();
         for (LivingEntity lv : list) {
-            if (!arg.test(arg2, lv)) continue;
+            if (!targetPredicate.test(targetingEntity, lv)) continue;
             list2.add(lv);
         }
         return list2;
     }
 
     @Nullable
-    default public PlayerEntity getPlayerByUuid(UUID uUID) {
+    default public PlayerEntity getPlayerByUuid(UUID uuid) {
         for (int i = 0; i < this.getPlayers().size(); ++i) {
             PlayerEntity lv = this.getPlayers().get(i);
-            if (!uUID.equals(lv.getUuid())) continue;
+            if (!uuid.equals(lv.getUuid())) continue;
             return lv;
         }
         return null;

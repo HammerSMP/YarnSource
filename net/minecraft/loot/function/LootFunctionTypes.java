@@ -35,7 +35,7 @@ import net.minecraft.util.JsonSerializing;
 import net.minecraft.util.registry.Registry;
 
 public class LootFunctionTypes {
-    public static final BiFunction<ItemStack, LootContext, ItemStack> NOOP = (arg, arg2) -> arg;
+    public static final BiFunction<ItemStack, LootContext, ItemStack> NOOP = (stack, context) -> stack;
     public static final LootFunctionType SET_COUNT = LootFunctionTypes.register("set_count", new SetCountLootFunction.Serializer());
     public static final LootFunctionType ENCHANT_WITH_LEVELS = LootFunctionTypes.register("enchant_with_levels", new EnchantWithLevelsLootFunction.Serializer());
     public static final LootFunctionType ENCHANT_RANDOMLY = LootFunctionTypes.register("enchant_randomly", new EnchantRandomlyLootFunction.Serializer());
@@ -58,33 +58,33 @@ public class LootFunctionTypes {
     public static final LootFunctionType COPY_NBT = LootFunctionTypes.register("copy_nbt", new CopyNbtLootFunction.Serializer());
     public static final LootFunctionType COPY_STATE = LootFunctionTypes.register("copy_state", new CopyStateFunction.Serializer());
 
-    private static LootFunctionType register(String string, JsonSerializer<? extends LootFunction> arg) {
-        return Registry.register(Registry.LOOT_FUNCTION_TYPE, new Identifier(string), new LootFunctionType(arg));
+    private static LootFunctionType register(String id, JsonSerializer<? extends LootFunction> arg) {
+        return Registry.register(Registry.LOOT_FUNCTION_TYPE, new Identifier(id), new LootFunctionType(arg));
     }
 
     public static Object createGsonSerializer() {
         return JsonSerializing.createTypeHandler(Registry.LOOT_FUNCTION_TYPE, "function", "function", LootFunction::getType).createGsonSerializer();
     }
 
-    public static BiFunction<ItemStack, LootContext, ItemStack> join(BiFunction<ItemStack, LootContext, ItemStack>[] biFunctions) {
-        switch (biFunctions.length) {
+    public static BiFunction<ItemStack, LootContext, ItemStack> join(BiFunction<ItemStack, LootContext, ItemStack>[] lootFunctions) {
+        switch (lootFunctions.length) {
             case 0: {
                 return NOOP;
             }
             case 1: {
-                return biFunctions[0];
+                return lootFunctions[0];
             }
             case 2: {
-                BiFunction<ItemStack, LootContext, ItemStack> biFunction = biFunctions[0];
-                BiFunction<ItemStack, LootContext, ItemStack> biFunction2 = biFunctions[1];
-                return (arg, arg2) -> (ItemStack)biFunction2.apply((ItemStack)biFunction.apply((ItemStack)arg, (LootContext)arg2), (LootContext)arg2);
+                BiFunction<ItemStack, LootContext, ItemStack> biFunction = lootFunctions[0];
+                BiFunction<ItemStack, LootContext, ItemStack> biFunction2 = lootFunctions[1];
+                return (stack, context) -> (ItemStack)biFunction2.apply((ItemStack)biFunction.apply((ItemStack)stack, (LootContext)context), (LootContext)context);
             }
         }
-        return (arg, arg2) -> {
-            for (BiFunction biFunction : biFunctions) {
-                arg = (ItemStack)biFunction.apply(arg, arg2);
+        return (stack, context) -> {
+            for (BiFunction biFunction : lootFunctions) {
+                stack = (ItemStack)biFunction.apply(stack, context);
             }
-            return arg;
+            return stack;
         };
     }
 }

@@ -26,8 +26,8 @@ extends ItemUsageContext {
         this(arg.world, arg, arg2, arg3, arg4);
     }
 
-    public ItemPlacementContext(ItemUsageContext arg) {
-        this(arg.getWorld(), arg.getPlayer(), arg.getHand(), arg.getStack(), arg.hit);
+    public ItemPlacementContext(ItemUsageContext context) {
+        this(context.getWorld(), context.getPlayer(), context.getHand(), context.getStack(), context.method_30344());
     }
 
     protected ItemPlacementContext(World arg, @Nullable PlayerEntity arg2, Hand arg3, ItemStack arg4, BlockHitResult arg5) {
@@ -36,8 +36,8 @@ extends ItemUsageContext {
         this.canReplaceExisting = arg.getBlockState(arg5.getBlockPos()).canReplace(this);
     }
 
-    public static ItemPlacementContext offset(ItemPlacementContext arg, BlockPos arg2, Direction arg3) {
-        return new ItemPlacementContext(arg.getWorld(), arg.getPlayer(), arg.getHand(), arg.getStack(), new BlockHitResult(new Vec3d((double)arg2.getX() + 0.5 + (double)arg3.getOffsetX() * 0.5, (double)arg2.getY() + 0.5 + (double)arg3.getOffsetY() * 0.5, (double)arg2.getZ() + 0.5 + (double)arg3.getOffsetZ() * 0.5), arg3, arg2, false));
+    public static ItemPlacementContext offset(ItemPlacementContext context, BlockPos pos, Direction side) {
+        return new ItemPlacementContext(context.getWorld(), context.getPlayer(), context.getHand(), context.getStack(), new BlockHitResult(new Vec3d((double)pos.getX() + 0.5 + (double)side.getOffsetX() * 0.5, (double)pos.getY() + 0.5 + (double)side.getOffsetY() * 0.5, (double)pos.getZ() + 0.5 + (double)side.getOffsetZ() * 0.5), side, pos, false));
     }
 
     @Override
@@ -54,12 +54,12 @@ extends ItemUsageContext {
     }
 
     public Direction getPlayerLookDirection() {
-        return Direction.getEntityFacingOrder(this.player)[0];
+        return Direction.getEntityFacingOrder(this.getPlayer())[0];
     }
 
     public Direction[] getPlacementDirections() {
         int i;
-        Direction[] lvs = Direction.getEntityFacingOrder(this.player);
+        Direction[] lvs = Direction.getEntityFacingOrder(this.getPlayer());
         if (this.canReplaceExisting) {
             return lvs;
         }

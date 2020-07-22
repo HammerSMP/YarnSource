@@ -33,56 +33,56 @@ extends CaveCarver {
     }
 
     @Override
-    protected boolean isRegionUncarvable(Chunk arg, int i, int j, int k, int l, int m, int n, int o, int p) {
+    protected boolean isRegionUncarvable(Chunk arg, int mainChunkX, int mainChunkZ, int relMinX, int relMaxX, int minY, int maxY, int relMinZ, int relMaxZ) {
         return false;
     }
 
     @Override
-    protected boolean carveAtPoint(Chunk arg, Function<BlockPos, Biome> function, BitSet bitSet, Random random, BlockPos.Mutable arg2, BlockPos.Mutable arg3, BlockPos.Mutable arg4, int i, int j, int k, int l, int m, int n, int o, int p, MutableBoolean mutableBoolean) {
-        return UnderwaterCaveCarver.carveAtPoint(this, arg, bitSet, random, arg2, i, j, k, l, m, n, o, p);
+    protected boolean carveAtPoint(Chunk chunk, Function<BlockPos, Biome> posToBiome, BitSet carvingMask, Random random, BlockPos.Mutable arg2, BlockPos.Mutable arg3, BlockPos.Mutable arg4, int seaLevel, int mainChunkX, int mainChunkZ, int x, int z, int relativeX, int y, int relativeZ, MutableBoolean mutableBoolean) {
+        return UnderwaterCaveCarver.carveAtPoint(this, chunk, carvingMask, random, arg2, seaLevel, mainChunkX, mainChunkZ, x, z, relativeX, y, relativeZ);
     }
 
-    protected static boolean carveAtPoint(Carver<?> arg, Chunk arg2, BitSet bitSet, Random random, BlockPos.Mutable arg3, int i, int j, int k, int l, int m, int n, int o, int p) {
-        if (o >= i) {
+    protected static boolean carveAtPoint(Carver<?> carver, Chunk chunk, BitSet mask, Random random, BlockPos.Mutable pos, int seaLevel, int mainChunkX, int mainChunkZ, int x, int z, int relativeX, int y, int relativeZ) {
+        if (y >= seaLevel) {
             return false;
         }
-        int q = n | p << 4 | o << 8;
-        if (bitSet.get(q)) {
+        int q = relativeX | relativeZ << 4 | y << 8;
+        if (mask.get(q)) {
             return false;
         }
-        bitSet.set(q);
-        arg3.set(l, o, m);
-        BlockState lv = arg2.getBlockState(arg3);
-        if (!arg.canAlwaysCarveBlock(lv)) {
+        mask.set(q);
+        pos.set(x, y, z);
+        BlockState lv = chunk.getBlockState(pos);
+        if (!carver.canAlwaysCarveBlock(lv)) {
             return false;
         }
-        if (o == 10) {
+        if (y == 10) {
             float f = random.nextFloat();
             if ((double)f < 0.25) {
-                arg2.setBlockState(arg3, Blocks.MAGMA_BLOCK.getDefaultState(), false);
-                arg2.getBlockTickScheduler().schedule(arg3, Blocks.MAGMA_BLOCK, 0);
+                chunk.setBlockState(pos, Blocks.MAGMA_BLOCK.getDefaultState(), false);
+                chunk.getBlockTickScheduler().schedule(pos, Blocks.MAGMA_BLOCK, 0);
             } else {
-                arg2.setBlockState(arg3, Blocks.OBSIDIAN.getDefaultState(), false);
+                chunk.setBlockState(pos, Blocks.OBSIDIAN.getDefaultState(), false);
             }
             return true;
         }
-        if (o < 10) {
-            arg2.setBlockState(arg3, Blocks.LAVA.getDefaultState(), false);
+        if (y < 10) {
+            chunk.setBlockState(pos, Blocks.LAVA.getDefaultState(), false);
             return false;
         }
         boolean bl = false;
         for (Direction lv2 : Direction.Type.HORIZONTAL) {
-            int r = l + lv2.getOffsetX();
-            int s = m + lv2.getOffsetZ();
-            if (r >> 4 == j && s >> 4 == k && !arg2.getBlockState(arg3.set(r, o, s)).isAir()) continue;
-            arg2.setBlockState(arg3, WATER.getBlockState(), false);
-            arg2.getFluidTickScheduler().schedule(arg3, WATER.getFluid(), 0);
+            int r = x + lv2.getOffsetX();
+            int s = z + lv2.getOffsetZ();
+            if (r >> 4 == mainChunkX && s >> 4 == mainChunkZ && !chunk.getBlockState(pos.set(r, y, s)).isAir()) continue;
+            chunk.setBlockState(pos, WATER.getBlockState(), false);
+            chunk.getFluidTickScheduler().schedule(pos, WATER.getFluid(), 0);
             bl = true;
             break;
         }
-        arg3.set(l, o, m);
+        pos.set(x, y, z);
         if (!bl) {
-            arg2.setBlockState(arg3, WATER.getBlockState(), false);
+            chunk.setBlockState(pos, WATER.getBlockState(), false);
             return true;
         }
         return true;

@@ -23,19 +23,19 @@ public class FishingHookPredicate {
     public static final FishingHookPredicate ANY = new FishingHookPredicate(false);
     private boolean inOpenWater;
 
-    private FishingHookPredicate(boolean bl) {
-        this.inOpenWater = bl;
+    private FishingHookPredicate(boolean inOpenWater) {
+        this.inOpenWater = inOpenWater;
     }
 
-    public static FishingHookPredicate of(boolean bl) {
-        return new FishingHookPredicate(bl);
+    public static FishingHookPredicate of(boolean inOpenWater) {
+        return new FishingHookPredicate(inOpenWater);
     }
 
-    public static FishingHookPredicate fromJson(@Nullable JsonElement jsonElement) {
-        if (jsonElement == null || jsonElement.isJsonNull()) {
+    public static FishingHookPredicate fromJson(@Nullable JsonElement json) {
+        if (json == null || json.isJsonNull()) {
             return ANY;
         }
-        JsonObject jsonObject = JsonHelper.asObject(jsonElement, "fishing_hook");
+        JsonObject jsonObject = JsonHelper.asObject(json, "fishing_hook");
         JsonElement jsonElement2 = jsonObject.get("in_open_water");
         if (jsonElement2 != null) {
             return new FishingHookPredicate(JsonHelper.asBoolean(jsonElement2, "in_open_water"));
@@ -52,14 +52,14 @@ public class FishingHookPredicate {
         return jsonObject;
     }
 
-    public boolean test(Entity arg) {
+    public boolean test(Entity entity) {
         if (this == ANY) {
             return true;
         }
-        if (!(arg instanceof FishingBobberEntity)) {
+        if (!(entity instanceof FishingBobberEntity)) {
             return false;
         }
-        FishingBobberEntity lv = (FishingBobberEntity)arg;
+        FishingBobberEntity lv = (FishingBobberEntity)entity;
         return this.inOpenWater == lv.isInOpenWater();
     }
 }

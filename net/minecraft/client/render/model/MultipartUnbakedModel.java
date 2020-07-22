@@ -57,9 +57,9 @@ implements UnbakedModel {
     private final StateManager<Block, BlockState> stateFactory;
     private final List<MultipartModelComponent> components;
 
-    public MultipartUnbakedModel(StateManager<Block, BlockState> arg, List<MultipartModelComponent> list) {
-        this.stateFactory = arg;
-        this.components = list;
+    public MultipartUnbakedModel(StateManager<Block, BlockState> stateFactory, List<MultipartModelComponent> components) {
+        this.stateFactory = stateFactory;
+        this.components = components;
     }
 
     public List<MultipartModelComponent> getComponents() {
@@ -74,12 +74,12 @@ implements UnbakedModel {
         return set;
     }
 
-    public boolean equals(Object object) {
-        if (this == object) {
+    public boolean equals(Object o) {
+        if (this == o) {
             return true;
         }
-        if (object instanceof MultipartUnbakedModel) {
-            MultipartUnbakedModel lv = (MultipartUnbakedModel)object;
+        if (o instanceof MultipartUnbakedModel) {
+            MultipartUnbakedModel lv = (MultipartUnbakedModel)o;
             return Objects.equals(this.stateFactory, lv.stateFactory) && Objects.equals(this.components, lv.components);
         }
         return false;
@@ -95,16 +95,16 @@ implements UnbakedModel {
     }
 
     @Override
-    public Collection<SpriteIdentifier> getTextureDependencies(Function<Identifier, UnbakedModel> function, Set<Pair<String, String>> set) {
-        return this.getComponents().stream().flatMap(arg -> arg.getModel().getTextureDependencies(function, set).stream()).collect(Collectors.toSet());
+    public Collection<SpriteIdentifier> getTextureDependencies(Function<Identifier, UnbakedModel> unbakedModelGetter, Set<Pair<String, String>> unresolvedTextureReferences) {
+        return this.getComponents().stream().flatMap(arg -> arg.getModel().getTextureDependencies(unbakedModelGetter, unresolvedTextureReferences).stream()).collect(Collectors.toSet());
     }
 
     @Override
     @Nullable
-    public BakedModel bake(ModelLoader arg, Function<SpriteIdentifier, Sprite> function, ModelBakeSettings arg2, Identifier arg3) {
+    public BakedModel bake(ModelLoader loader, Function<SpriteIdentifier, Sprite> textureGetter, ModelBakeSettings rotationContainer, Identifier modelId) {
         MultipartBakedModel.Builder lv = new MultipartBakedModel.Builder();
         for (MultipartModelComponent lv2 : this.getComponents()) {
-            BakedModel lv3 = lv2.getModel().bake(arg, function, arg2, arg3);
+            BakedModel lv3 = lv2.getModel().bake(loader, textureGetter, rotationContainer, modelId);
             if (lv3 == null) continue;
             lv.addComponent(lv2.getPredicate(this.stateFactory), lv3);
         }
@@ -116,24 +116,24 @@ implements UnbakedModel {
     implements JsonDeserializer<MultipartUnbakedModel> {
         private final ModelVariantMap.DeserializationContext context;
 
-        public Deserializer(ModelVariantMap.DeserializationContext arg) {
-            this.context = arg;
+        public Deserializer(ModelVariantMap.DeserializationContext context) {
+            this.context = context;
         }
 
         public MultipartUnbakedModel deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
             return new MultipartUnbakedModel(this.context.getStateFactory(), this.deserializeComponents(jsonDeserializationContext, jsonElement.getAsJsonArray()));
         }
 
-        private List<MultipartModelComponent> deserializeComponents(JsonDeserializationContext jsonDeserializationContext, JsonArray jsonArray) {
+        private List<MultipartModelComponent> deserializeComponents(JsonDeserializationContext context, JsonArray array) {
             ArrayList list = Lists.newArrayList();
-            for (JsonElement jsonElement : jsonArray) {
-                list.add(jsonDeserializationContext.deserialize(jsonElement, MultipartModelComponent.class));
+            for (JsonElement jsonElement : array) {
+                list.add(context.deserialize(jsonElement, MultipartModelComponent.class));
             }
             return list;
         }
 
-        public /* synthetic */ Object deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
-            return this.deserialize(jsonElement, type, jsonDeserializationContext);
+        public /* synthetic */ Object deserialize(JsonElement json, Type type, JsonDeserializationContext context) throws JsonParseException {
+            return this.deserialize(json, type, context);
         }
     }
 }

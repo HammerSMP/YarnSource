@@ -19,6 +19,7 @@ import net.minecraft.util.BlockRotation;
 import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.DynamicRegistryManager;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.feature.OceanRuinFeatureConfig;
@@ -53,8 +54,8 @@ extends StructureFeature<OceanRuinFeatureConfig> {
         }
 
         @Nullable
-        public static BiomeType byName(String string) {
-            return nameMap.get(string);
+        public static BiomeType byName(String name) {
+            return nameMap.get(name);
         }
 
         @Override
@@ -63,7 +64,7 @@ extends StructureFeature<OceanRuinFeatureConfig> {
         }
 
         static {
-            field_24990 = StringIdentifiable.method_28140(BiomeType::values, BiomeType::byName);
+            field_24990 = StringIdentifiable.createCodec(BiomeType::values, BiomeType::byName);
             nameMap = Arrays.stream(BiomeType.values()).collect(Collectors.toMap(BiomeType::getName, arg -> arg));
         }
     }
@@ -75,12 +76,12 @@ extends StructureFeature<OceanRuinFeatureConfig> {
         }
 
         @Override
-        public void init(ChunkGenerator arg, StructureManager arg2, int i, int j, Biome arg3, OceanRuinFeatureConfig arg4) {
+        public void init(DynamicRegistryManager arg, ChunkGenerator arg2, StructureManager arg3, int i, int j, Biome arg4, OceanRuinFeatureConfig arg5) {
             int k = i * 16;
             int l = j * 16;
             BlockPos lv = new BlockPos(k, 90, l);
             BlockRotation lv2 = BlockRotation.random(this.random);
-            OceanRuinGenerator.addPieces(arg2, lv, lv2, this.children, this.random, arg4);
+            OceanRuinGenerator.addPieces(arg3, lv, lv2, this.children, this.random, arg5);
             this.setBoundingBoxFromChildren();
         }
     }

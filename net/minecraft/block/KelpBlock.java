@@ -35,8 +35,8 @@ implements FluidFillable {
     }
 
     @Override
-    protected boolean chooseStemState(BlockState arg) {
-        return arg.isOf(Blocks.WATER);
+    protected boolean chooseStemState(BlockState state) {
+        return state.isOf(Blocks.WATER);
     }
 
     @Override
@@ -45,17 +45,17 @@ implements FluidFillable {
     }
 
     @Override
-    protected boolean canAttachTo(Block arg) {
-        return arg != Blocks.MAGMA_BLOCK;
+    protected boolean canAttachTo(Block block) {
+        return block != Blocks.MAGMA_BLOCK;
     }
 
     @Override
-    public boolean canFillWithFluid(BlockView arg, BlockPos arg2, BlockState arg3, Fluid arg4) {
+    public boolean canFillWithFluid(BlockView world, BlockPos pos, BlockState state, Fluid fluid) {
         return false;
     }
 
     @Override
-    public boolean tryFillWithFluid(WorldAccess arg, BlockPos arg2, BlockState arg3, FluidState arg4) {
+    public boolean tryFillWithFluid(WorldAccess world, BlockPos pos, BlockState state, FluidState fluidState) {
         return false;
     }
 
@@ -66,16 +66,16 @@ implements FluidFillable {
 
     @Override
     @Nullable
-    public BlockState getPlacementState(ItemPlacementContext arg) {
-        FluidState lv = arg.getWorld().getFluidState(arg.getBlockPos());
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        FluidState lv = ctx.getWorld().getFluidState(ctx.getBlockPos());
         if (lv.isIn(FluidTags.WATER) && lv.getLevel() == 8) {
-            return super.getPlacementState(arg);
+            return super.getPlacementState(ctx);
         }
         return null;
     }
 
     @Override
-    public FluidState getFluidState(BlockState arg) {
+    public FluidState getFluidState(BlockState state) {
         return Fluids.WATER.getStill(false);
     }
 }

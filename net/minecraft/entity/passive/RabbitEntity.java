@@ -133,22 +133,22 @@ extends AnimalEntity {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public float getJumpProgress(float f) {
+    public float getJumpProgress(float delta) {
         if (this.jumpDuration == 0) {
             return 0.0f;
         }
-        return ((float)this.jumpTicks + f) / (float)this.jumpDuration;
+        return ((float)this.jumpTicks + delta) / (float)this.jumpDuration;
     }
 
-    public void setSpeed(double d) {
-        this.getNavigation().setSpeed(d);
-        this.moveControl.moveTo(this.moveControl.getTargetX(), this.moveControl.getTargetY(), this.moveControl.getTargetZ(), d);
+    public void setSpeed(double speed) {
+        this.getNavigation().setSpeed(speed);
+        this.moveControl.moveTo(this.moveControl.getTargetX(), this.moveControl.getTargetY(), this.moveControl.getTargetZ(), speed);
     }
 
     @Override
-    public void setJumping(boolean bl) {
-        super.setJumping(bl);
-        if (bl) {
+    public void setJumping(boolean jumping) {
+        super.setJumping(jumping);
+        if (jumping) {
             this.playSound(this.getJumpSound(), this.getSoundVolume(), ((this.random.nextFloat() - this.random.nextFloat()) * 0.2f + 1.0f) * 0.8f);
         }
     }
@@ -211,8 +211,8 @@ extends AnimalEntity {
         return false;
     }
 
-    private void lookTowards(double d, double e) {
-        this.yaw = (float)(MathHelper.atan2(e - this.getZ(), d - this.getX()) * 57.2957763671875) - 90.0f;
+    private void lookTowards(double x, double z) {
+        this.yaw = (float)(MathHelper.atan2(z - this.getZ(), x - this.getX()) * 57.2957763671875) - 90.0f;
     }
 
     private void method_6611() {
@@ -249,17 +249,17 @@ extends AnimalEntity {
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
-        arg.putInt("RabbitType", this.getRabbitType());
-        arg.putInt("MoreCarrotTicks", this.moreCarrotTicks);
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
+        tag.putInt("RabbitType", this.getRabbitType());
+        tag.putInt("MoreCarrotTicks", this.moreCarrotTicks);
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        this.setRabbitType(arg.getInt("RabbitType"));
-        this.moreCarrotTicks = arg.getInt("MoreCarrotTicks");
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        this.setRabbitType(tag.getInt("RabbitType"));
+        this.moreCarrotTicks = tag.getInt("MoreCarrotTicks");
     }
 
     protected SoundEvent getJumpSound() {
@@ -272,7 +272,7 @@ extends AnimalEntity {
     }
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource arg) {
+    protected SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.ENTITY_RABBIT_HURT;
     }
 
@@ -282,12 +282,12 @@ extends AnimalEntity {
     }
 
     @Override
-    public boolean tryAttack(Entity arg) {
+    public boolean tryAttack(Entity target) {
         if (this.getRabbitType() == 99) {
             this.playSound(SoundEvents.ENTITY_RABBIT_ATTACK, 1.0f, (this.random.nextFloat() - this.random.nextFloat()) * 0.2f + 1.0f);
-            return arg.damage(DamageSource.mob(this), 8.0f);
+            return target.damage(DamageSource.mob(this), 8.0f);
         }
-        return arg.damage(DamageSource.mob(this), 3.0f);
+        return target.damage(DamageSource.mob(this), 3.0f);
     }
 
     @Override
@@ -296,15 +296,15 @@ extends AnimalEntity {
     }
 
     @Override
-    public boolean damage(DamageSource arg, float f) {
-        if (this.isInvulnerableTo(arg)) {
+    public boolean damage(DamageSource source, float amount) {
+        if (this.isInvulnerableTo(source)) {
             return false;
         }
-        return super.damage(arg, f);
+        return super.damage(source, amount);
     }
 
-    private boolean isBreedingItem(Item arg) {
-        return arg == Items.CARROT || arg == Items.GOLDEN_CARROT || arg == Blocks.DANDELION.asItem();
+    private boolean isBreedingItem(Item item) {
+        return item == Items.CARROT || item == Items.GOLDEN_CARROT || item == Blocks.DANDELION.asItem();
     }
 
     @Override
@@ -319,16 +319,16 @@ extends AnimalEntity {
     }
 
     @Override
-    public boolean isBreedingItem(ItemStack arg) {
-        return this.isBreedingItem(arg.getItem());
+    public boolean isBreedingItem(ItemStack stack) {
+        return this.isBreedingItem(stack.getItem());
     }
 
     public int getRabbitType() {
         return this.dataTracker.get(RABBIT_TYPE);
     }
 
-    public void setRabbitType(int i) {
-        if (i == 99) {
+    public void setRabbitType(int rabbitType) {
+        if (rabbitType == 99) {
             this.getAttributeInstance(EntityAttributes.GENERIC_ARMOR).setBaseValue(8.0);
             this.goalSelector.add(4, new RabbitAttackGoal(this));
             this.targetSelector.add(1, new RevengeGoal(this, new Class[0]).setGroupRevenge(new Class[0]));
@@ -338,24 +338,24 @@ extends AnimalEntity {
                 this.setCustomName(new TranslatableText(Util.createTranslationKey("entity", KILLER_BUNNY)));
             }
         }
-        this.dataTracker.set(RABBIT_TYPE, i);
+        this.dataTracker.set(RABBIT_TYPE, rabbitType);
     }
 
     @Override
     @Nullable
-    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(class_5425 arg, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable CompoundTag entityTag) {
         int i = this.chooseType(arg);
-        if (arg4 instanceof RabbitData) {
-            i = ((RabbitData)arg4).type;
+        if (entityData instanceof RabbitData) {
+            i = ((RabbitData)entityData).type;
         } else {
-            arg4 = new RabbitData(i);
+            entityData = new RabbitData(i);
         }
         this.setRabbitType(i);
-        return super.initialize(arg, arg2, arg3, arg4, arg5);
+        return super.initialize(arg, difficulty, spawnReason, entityData, entityTag);
     }
 
-    private int chooseType(WorldAccess arg) {
-        Biome lv = arg.getBiome(this.getBlockPos());
+    private int chooseType(WorldAccess world) {
+        Biome lv = world.getBiome(this.getBlockPos());
         int i = this.random.nextInt(100);
         if (lv.getPrecipitation() == Biome.Precipitation.SNOW) {
             return i < 80 ? 1 : 3;
@@ -366,9 +366,9 @@ extends AnimalEntity {
         return i < 50 ? 0 : (i < 90 ? 5 : 2);
     }
 
-    public static boolean canSpawn(EntityType<RabbitEntity> arg, WorldAccess arg2, SpawnReason arg3, BlockPos arg4, Random random) {
-        BlockState lv = arg2.getBlockState(arg4.down());
-        return (lv.isOf(Blocks.GRASS_BLOCK) || lv.isOf(Blocks.SNOW) || lv.isOf(Blocks.SAND)) && arg2.getBaseLightLevel(arg4, 0) > 8;
+    public static boolean canSpawn(EntityType<RabbitEntity> entity, WorldAccess world, SpawnReason spawnReason, BlockPos pos, Random random) {
+        BlockState lv = world.getBlockState(pos.down());
+        return (lv.isOf(Blocks.GRASS_BLOCK) || lv.isOf(Blocks.SNOW) || lv.isOf(Blocks.SAND)) && world.getBaseLightLevel(pos, 0) > 8;
     }
 
     private boolean wantsCarrots() {
@@ -377,13 +377,13 @@ extends AnimalEntity {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void handleStatus(byte b) {
-        if (b == 1) {
+    public void handleStatus(byte status) {
+        if (status == 1) {
             this.spawnSprintingParticles();
             this.jumpDuration = 10;
             this.jumpTicks = 0;
         } else {
-            super.handleStatus(b);
+            super.handleStatus(status);
         }
     }
 
@@ -400,13 +400,13 @@ extends AnimalEntity {
 
     static class RabbitAttackGoal
     extends MeleeAttackGoal {
-        public RabbitAttackGoal(RabbitEntity arg) {
-            super(arg, 1.4, true);
+        public RabbitAttackGoal(RabbitEntity rabbit) {
+            super(rabbit, 1.4, true);
         }
 
         @Override
-        protected double getSquaredMaxAttackDistance(LivingEntity arg) {
-            return 4.0f + arg.getWidth();
+        protected double getSquaredMaxAttackDistance(LivingEntity entity) {
+            return 4.0f + entity.getWidth();
         }
     }
 
@@ -414,9 +414,9 @@ extends AnimalEntity {
     extends net.minecraft.entity.ai.goal.EscapeDangerGoal {
         private final RabbitEntity rabbit;
 
-        public EscapeDangerGoal(RabbitEntity arg, double d) {
-            super(arg, d);
-            this.rabbit = arg;
+        public EscapeDangerGoal(RabbitEntity rabbit, double speed) {
+            super(rabbit, speed);
+            this.rabbit = rabbit;
         }
 
         @Override
@@ -432,9 +432,9 @@ extends AnimalEntity {
         private boolean wantsCarrots;
         private boolean hasTarget;
 
-        public EatCarrotCropGoal(RabbitEntity arg) {
-            super(arg, 0.7f, 16);
-            this.rabbit = arg;
+        public EatCarrotCropGoal(RabbitEntity rabbit) {
+            super(rabbit, 0.7f, 16);
+            this.rabbit = rabbit;
         }
 
         @Override
@@ -481,10 +481,10 @@ extends AnimalEntity {
         }
 
         @Override
-        protected boolean isTargetPos(WorldView arg, BlockPos arg2) {
+        protected boolean isTargetPos(WorldView world, BlockPos pos) {
             BlockState lv2;
-            Block lv = arg.getBlockState(arg2).getBlock();
-            if (lv == Blocks.FARMLAND && this.wantsCarrots && !this.hasTarget && (lv = (lv2 = arg.getBlockState(arg2 = arg2.up())).getBlock()) instanceof CarrotsBlock && ((CarrotsBlock)lv).isMature(lv2)) {
+            Block lv = world.getBlockState(pos).getBlock();
+            if (lv == Blocks.FARMLAND && this.wantsCarrots && !this.hasTarget && (lv = (lv2 = world.getBlockState(pos = pos.up())).getBlock()) instanceof CarrotsBlock && ((CarrotsBlock)lv).isMature(lv2)) {
                 this.hasTarget = true;
                 return true;
             }
@@ -496,9 +496,9 @@ extends AnimalEntity {
     extends FleeEntityGoal<T> {
         private final RabbitEntity rabbit;
 
-        public FleeGoal(RabbitEntity arg, Class<T> class_, float f, double d, double e) {
-            super(arg, class_, f, d, e);
-            this.rabbit = arg;
+        public FleeGoal(RabbitEntity rabbit, Class<T> fleeFromType, float distance, double slowSpeed, double fastSpeed) {
+            super(rabbit, fleeFromType, distance, slowSpeed, fastSpeed);
+            this.rabbit = rabbit;
         }
 
         @Override
@@ -512,9 +512,9 @@ extends AnimalEntity {
         private final RabbitEntity rabbit;
         private double rabbitSpeed;
 
-        public RabbitMoveControl(RabbitEntity arg) {
-            super(arg);
-            this.rabbit = arg;
+        public RabbitMoveControl(RabbitEntity owner) {
+            super(owner);
+            this.rabbit = owner;
         }
 
         @Override
@@ -528,13 +528,13 @@ extends AnimalEntity {
         }
 
         @Override
-        public void moveTo(double d, double e, double f, double g) {
+        public void moveTo(double x, double y, double z, double speed) {
             if (this.rabbit.isTouchingWater()) {
-                g = 1.5;
+                speed = 1.5;
             }
-            super.moveTo(d, e, f, g);
-            if (g > 0.0) {
-                this.rabbitSpeed = g;
+            super.moveTo(x, y, z, speed);
+            if (speed > 0.0) {
+                this.rabbitSpeed = speed;
             }
         }
     }
@@ -544,9 +544,9 @@ extends AnimalEntity {
         private final RabbitEntity rabbit;
         private boolean field_24091;
 
-        public RabbitJumpControl(RabbitEntity arg2) {
-            super(arg2);
-            this.rabbit = arg2;
+        public RabbitJumpControl(RabbitEntity rabbit) {
+            super(rabbit);
+            this.rabbit = rabbit;
         }
 
         public boolean isActive() {
@@ -574,9 +574,9 @@ extends AnimalEntity {
     extends PassiveEntity.PassiveData {
         public final int type;
 
-        public RabbitData(int i) {
-            this.type = i;
-            this.setBabyChance(1.0f);
+        public RabbitData(int type) {
+            super(1.0f);
+            this.type = type;
         }
     }
 }

@@ -22,17 +22,17 @@ implements RecipeSerializer<T> {
     }
 
     @Override
-    public T read(Identifier arg, JsonObject jsonObject) {
-        return (T)((Recipe)this.id.apply(arg));
+    public T read(Identifier id, JsonObject json) {
+        return (T)((Recipe)this.id.apply(id));
     }
 
     @Override
-    public T read(Identifier arg, PacketByteBuf arg2) {
-        return (T)((Recipe)this.id.apply(arg));
+    public T read(Identifier id, PacketByteBuf buf) {
+        return (T)((Recipe)this.id.apply(id));
     }
 
     @Override
-    public void write(PacketByteBuf arg, T arg2) {
+    public void write(PacketByteBuf buf, T recipe) {
     }
 }
 

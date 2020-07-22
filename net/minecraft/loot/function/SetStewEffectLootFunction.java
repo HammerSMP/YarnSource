@@ -47,9 +47,9 @@ public class SetStewEffectLootFunction
 extends ConditionalLootFunction {
     private final Map<StatusEffect, UniformLootTableRange> effects;
 
-    private SetStewEffectLootFunction(LootCondition[] args, Map<StatusEffect, UniformLootTableRange> map) {
-        super(args);
-        this.effects = ImmutableMap.copyOf(map);
+    private SetStewEffectLootFunction(LootCondition[] conditions, Map<StatusEffect, UniformLootTableRange> effects) {
+        super(conditions);
+        this.effects = ImmutableMap.copyOf(effects);
     }
 
     @Override
@@ -58,11 +58,11 @@ extends ConditionalLootFunction {
     }
 
     @Override
-    public ItemStack process(ItemStack arg, LootContext arg2) {
-        if (arg.getItem() != Items.SUSPICIOUS_STEW || this.effects.isEmpty()) {
-            return arg;
+    public ItemStack process(ItemStack stack, LootContext context) {
+        if (stack.getItem() != Items.SUSPICIOUS_STEW || this.effects.isEmpty()) {
+            return stack;
         }
-        Random random = arg2.getRandom();
+        Random random = context.getRandom();
         int i = random.nextInt(this.effects.size());
         Map.Entry entry = (Map.Entry)Iterables.get(this.effects.entrySet(), (int)i);
         StatusEffect lv = (StatusEffect)entry.getKey();
@@ -70,8 +70,8 @@ extends ConditionalLootFunction {
         if (!lv.isInstant()) {
             j *= 20;
         }
-        SuspiciousStewItem.addEffectToStew(arg, lv, j);
-        return arg;
+        SuspiciousStewItem.addEffectToStew(stack, lv, j);
+        return stack;
     }
 
     public static Builder builder() {
@@ -115,8 +115,8 @@ extends ConditionalLootFunction {
         }
 
         @Override
-        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
-            return this.fromJson(jsonObject, jsonDeserializationContext, args);
+        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject json, JsonDeserializationContext context, LootCondition[] conditions) {
+            return this.fromJson(json, context, conditions);
         }
     }
 
@@ -129,8 +129,8 @@ extends ConditionalLootFunction {
             return this;
         }
 
-        public Builder withEffect(StatusEffect arg, UniformLootTableRange arg2) {
-            this.map.put(arg, arg2);
+        public Builder withEffect(StatusEffect effect, UniformLootTableRange durationRange) {
+            this.map.put(effect, durationRange);
             return this;
         }
 

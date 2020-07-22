@@ -25,8 +25,8 @@ public class WaterPathNodeMaker
 extends PathNodeMaker {
     private final boolean canJumpOutOfWater;
 
-    public WaterPathNodeMaker(boolean bl) {
-        this.canJumpOutOfWater = bl;
+    public WaterPathNodeMaker(boolean canJumpOutOfWater) {
+        this.canJumpOutOfWater = canJumpOutOfWater;
     }
 
     @Override
@@ -35,60 +35,60 @@ extends PathNodeMaker {
     }
 
     @Override
-    public TargetPathNode getNode(double d, double e, double f) {
-        return new TargetPathNode(super.getNode(MathHelper.floor(d - (double)(this.entity.getWidth() / 2.0f)), MathHelper.floor(e + 0.5), MathHelper.floor(f - (double)(this.entity.getWidth() / 2.0f))));
+    public TargetPathNode getNode(double x, double y, double z) {
+        return new TargetPathNode(super.getNode(MathHelper.floor(x - (double)(this.entity.getWidth() / 2.0f)), MathHelper.floor(y + 0.5), MathHelper.floor(z - (double)(this.entity.getWidth() / 2.0f))));
     }
 
     @Override
-    public int getSuccessors(PathNode[] args, PathNode arg) {
+    public int getSuccessors(PathNode[] successors, PathNode node) {
         int i = 0;
         for (Direction lv : Direction.values()) {
-            PathNode lv2 = this.getPathNodeInWater(arg.x + lv.getOffsetX(), arg.y + lv.getOffsetY(), arg.z + lv.getOffsetZ());
+            PathNode lv2 = this.getPathNodeInWater(node.x + lv.getOffsetX(), node.y + lv.getOffsetY(), node.z + lv.getOffsetZ());
             if (lv2 == null || lv2.visited) continue;
-            args[i++] = lv2;
+            successors[i++] = lv2;
         }
         return i;
     }
 
     @Override
-    public PathNodeType getNodeType(BlockView arg, int i, int j, int k, MobEntity arg2, int l, int m, int n, boolean bl, boolean bl2) {
-        return this.getDefaultNodeType(arg, i, j, k);
+    public PathNodeType getNodeType(BlockView world, int x, int y, int z, MobEntity mob, int sizeX, int sizeY, int sizeZ, boolean canOpenDoors, boolean canEnterOpenDoors) {
+        return this.getDefaultNodeType(world, x, y, z);
     }
 
     @Override
-    public PathNodeType getDefaultNodeType(BlockView arg, int i, int j, int k) {
-        BlockPos lv = new BlockPos(i, j, k);
-        FluidState lv2 = arg.getFluidState(lv);
-        BlockState lv3 = arg.getBlockState(lv);
-        if (lv2.isEmpty() && lv3.canPathfindThrough(arg, lv.down(), NavigationType.WATER) && lv3.isAir()) {
+    public PathNodeType getDefaultNodeType(BlockView world, int x, int y, int z) {
+        BlockPos lv = new BlockPos(x, y, z);
+        FluidState lv2 = world.getFluidState(lv);
+        BlockState lv3 = world.getBlockState(lv);
+        if (lv2.isEmpty() && lv3.canPathfindThrough(world, lv.down(), NavigationType.WATER) && lv3.isAir()) {
             return PathNodeType.BREACH;
         }
-        if (!lv2.isIn(FluidTags.WATER) || !lv3.canPathfindThrough(arg, lv, NavigationType.WATER)) {
+        if (!lv2.isIn(FluidTags.WATER) || !lv3.canPathfindThrough(world, lv, NavigationType.WATER)) {
             return PathNodeType.BLOCKED;
         }
         return PathNodeType.WATER;
     }
 
     @Nullable
-    private PathNode getPathNodeInWater(int i, int j, int k) {
-        PathNodeType lv = this.getNodeType(i, j, k);
+    private PathNode getPathNodeInWater(int x, int y, int z) {
+        PathNodeType lv = this.getNodeType(x, y, z);
         if (this.canJumpOutOfWater && lv == PathNodeType.BREACH || lv == PathNodeType.WATER) {
-            return this.getNode(i, j, k);
+            return this.getNode(x, y, z);
         }
         return null;
     }
 
     @Override
     @Nullable
-    protected PathNode getNode(int i, int j, int k) {
+    protected PathNode getNode(int x, int y, int z) {
         PathNode lv = null;
-        PathNodeType lv2 = this.getDefaultNodeType(this.entity.world, i, j, k);
+        PathNodeType lv2 = this.getDefaultNodeType(this.entity.world, x, y, z);
         float f = this.entity.getPathfindingPenalty(lv2);
         if (f >= 0.0f) {
-            lv = super.getNode(i, j, k);
+            lv = super.getNode(x, y, z);
             lv.type = lv2;
             lv.penalty = Math.max(lv.penalty, f);
-            if (this.cachedWorld.getFluidState(new BlockPos(i, j, k)).isEmpty()) {
+            if (this.cachedWorld.getFluidState(new BlockPos(x, y, z)).isEmpty()) {
                 lv.penalty += 8.0f;
             }
         }
@@ -98,11 +98,11 @@ extends PathNodeMaker {
         return lv;
     }
 
-    private PathNodeType getNodeType(int i, int j, int k) {
+    private PathNodeType getNodeType(int x, int y, int z) {
         BlockPos.Mutable lv = new BlockPos.Mutable();
-        for (int l = i; l < i + this.entityBlockXSize; ++l) {
-            for (int m = j; m < j + this.entityBlockYSize; ++m) {
-                for (int n = k; n < k + this.entityBlockZSize; ++n) {
+        for (int l = x; l < x + this.entityBlockXSize; ++l) {
+            for (int m = y; m < y + this.entityBlockYSize; ++m) {
+                for (int n = z; n < z + this.entityBlockZSize; ++n) {
                     FluidState lv2 = this.cachedWorld.getFluidState(lv.set(l, m, n));
                     BlockState lv3 = this.cachedWorld.getBlockState(lv.set(l, m, n));
                     if (lv2.isEmpty() && lv3.canPathfindThrough(this.cachedWorld, (BlockPos)lv.down(), NavigationType.WATER) && lv3.isAir()) {

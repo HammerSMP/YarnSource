@@ -53,9 +53,9 @@ implements Comparable<Identifier> {
     protected final String namespace;
     protected final String path;
 
-    protected Identifier(String[] strings) {
-        this.namespace = StringUtils.isEmpty((CharSequence)strings[0]) ? "minecraft" : strings[0];
-        this.path = strings[1];
+    protected Identifier(String[] id) {
+        this.namespace = StringUtils.isEmpty((CharSequence)id[0]) ? "minecraft" : id[0];
+        this.path = id[1];
         if (!Identifier.isNamespaceValid(this.namespace)) {
             throw new InvalidIdentifierException("Non [a-z0-9_.-] character in namespace of location: " + this.namespace + ':' + this.path);
         }
@@ -64,35 +64,35 @@ implements Comparable<Identifier> {
         }
     }
 
-    public Identifier(String string) {
-        this(Identifier.split(string, ':'));
+    public Identifier(String id) {
+        this(Identifier.split(id, ':'));
     }
 
-    public Identifier(String string, String string2) {
-        this(new String[]{string, string2});
+    public Identifier(String namespace, String path) {
+        this(new String[]{namespace, path});
     }
 
-    public static Identifier splitOn(String string, char c) {
-        return new Identifier(Identifier.split(string, c));
+    public static Identifier splitOn(String id, char delimiter) {
+        return new Identifier(Identifier.split(id, delimiter));
     }
 
     @Nullable
-    public static Identifier tryParse(String string) {
+    public static Identifier tryParse(String id) {
         try {
-            return new Identifier(string);
+            return new Identifier(id);
         }
         catch (InvalidIdentifierException lv) {
             return null;
         }
     }
 
-    protected static String[] split(String string, char c) {
-        String[] strings = new String[]{"minecraft", string};
-        int i = string.indexOf(c);
+    protected static String[] split(String id, char delimiter) {
+        String[] strings = new String[]{"minecraft", id};
+        int i = id.indexOf(delimiter);
         if (i >= 0) {
-            strings[1] = string.substring(i + 1, string.length());
+            strings[1] = id.substring(i + 1, id.length());
             if (i >= 1) {
-                strings[0] = string.substring(0, i);
+                strings[0] = id.substring(0, i);
             }
         }
         return strings;
@@ -143,18 +143,18 @@ implements Comparable<Identifier> {
         return i;
     }
 
-    public static Identifier fromCommandInput(StringReader stringReader) throws CommandSyntaxException {
-        int i = stringReader.getCursor();
-        while (stringReader.canRead() && Identifier.isCharValid(stringReader.peek())) {
-            stringReader.skip();
+    public static Identifier fromCommandInput(StringReader reader) throws CommandSyntaxException {
+        int i = reader.getCursor();
+        while (reader.canRead() && Identifier.isCharValid(reader.peek())) {
+            reader.skip();
         }
-        String string = stringReader.getString().substring(i, stringReader.getCursor());
+        String string = reader.getString().substring(i, reader.getCursor());
         try {
             return new Identifier(string);
         }
         catch (InvalidIdentifierException lv) {
-            stringReader.setCursor(i);
-            throw COMMAND_EXCEPTION.createWithContext((ImmutableStringReader)stringReader);
+            reader.setCursor(i);
+            throw COMMAND_EXCEPTION.createWithContext((ImmutableStringReader)reader);
         }
     }
 
@@ -162,33 +162,33 @@ implements Comparable<Identifier> {
         return c >= '0' && c <= '9' || c >= 'a' && c <= 'z' || c == '_' || c == ':' || c == '/' || c == '.' || c == '-';
     }
 
-    private static boolean isPathValid(String string) {
-        for (int i = 0; i < string.length(); ++i) {
-            if (Identifier.method_29184(string.charAt(i))) continue;
+    private static boolean isPathValid(String path) {
+        for (int i = 0; i < path.length(); ++i) {
+            if (Identifier.isPathCharacterValid(path.charAt(i))) continue;
             return false;
         }
         return true;
     }
 
-    private static boolean isNamespaceValid(String string) {
-        for (int i = 0; i < string.length(); ++i) {
-            if (Identifier.method_29185(string.charAt(i))) continue;
+    private static boolean isNamespaceValid(String namespace) {
+        for (int i = 0; i < namespace.length(); ++i) {
+            if (Identifier.isNamespaceCharacterValid(namespace.charAt(i))) continue;
             return false;
         }
         return true;
     }
 
-    private static boolean method_29184(char c) {
+    public static boolean isPathCharacterValid(char c) {
         return c == '_' || c == '-' || c >= 'a' && c <= 'z' || c >= '0' && c <= '9' || c == '/' || c == '.';
     }
 
-    private static boolean method_29185(char c) {
+    private static boolean isNamespaceCharacterValid(char c) {
         return c == '_' || c == '-' || c >= 'a' && c <= 'z' || c >= '0' && c <= '9' || c == '.';
     }
 
     @Environment(value=EnvType.CLIENT)
-    public static boolean isValid(String string) {
-        String[] strings = Identifier.split(string, ':');
+    public static boolean isValid(String id) {
+        String[] strings = Identifier.split(id, ':');
         return Identifier.isNamespaceValid(StringUtils.isEmpty((CharSequence)strings[0]) ? "minecraft" : strings[0]) && Identifier.isPathValid(strings[1]);
     }
 
@@ -208,12 +208,12 @@ implements Comparable<Identifier> {
             return new JsonPrimitive(arg.toString());
         }
 
-        public /* synthetic */ JsonElement serialize(Object object, Type type, JsonSerializationContext jsonSerializationContext) {
-            return this.serialize((Identifier)object, type, jsonSerializationContext);
+        public /* synthetic */ JsonElement serialize(Object id, Type type, JsonSerializationContext context) {
+            return this.serialize((Identifier)id, type, context);
         }
 
-        public /* synthetic */ Object deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
-            return this.deserialize(jsonElement, type, jsonDeserializationContext);
+        public /* synthetic */ Object deserialize(JsonElement json, Type type, JsonDeserializationContext context) throws JsonParseException {
+            return this.deserialize(json, type, context);
         }
     }
 }

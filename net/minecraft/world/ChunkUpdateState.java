@@ -22,16 +22,16 @@ extends PersistentState {
     }
 
     @Override
-    public void fromTag(CompoundTag arg) {
-        this.all = new LongOpenHashSet(arg.getLongArray("All"));
-        this.remaining = new LongOpenHashSet(arg.getLongArray("Remaining"));
+    public void fromTag(CompoundTag tag) {
+        this.all = new LongOpenHashSet(tag.getLongArray("All"));
+        this.remaining = new LongOpenHashSet(tag.getLongArray("Remaining"));
     }
 
     @Override
-    public CompoundTag toTag(CompoundTag arg) {
-        arg.putLongArray("All", this.all.toLongArray());
-        arg.putLongArray("Remaining", this.remaining.toLongArray());
-        return arg;
+    public CompoundTag toTag(CompoundTag tag) {
+        tag.putLongArray("All", this.all.toLongArray());
+        tag.putLongArray("Remaining", this.remaining.toLongArray());
+        return tag;
     }
 
     public void add(long l) {

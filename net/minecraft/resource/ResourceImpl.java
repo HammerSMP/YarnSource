@@ -37,11 +37,11 @@ implements Resource {
     @Environment(value=EnvType.CLIENT)
     private JsonObject metadata;
 
-    public ResourceImpl(String string, Identifier arg, InputStream inputStream, @Nullable InputStream inputStream2) {
-        this.packName = string;
-        this.id = arg;
+    public ResourceImpl(String packName, Identifier id, InputStream inputStream, @Nullable InputStream metaInputStream) {
+        this.packName = packName;
+        this.id = id;
         this.inputStream = inputStream;
-        this.metaInputStream = inputStream2;
+        this.metaInputStream = metaInputStream;
     }
 
     @Override
@@ -63,7 +63,7 @@ implements Resource {
     @Override
     @Nullable
     @Environment(value=EnvType.CLIENT)
-    public <T> T getMetadata(ResourceMetadataReader<T> arg) {
+    public <T> T getMetadata(ResourceMetadataReader<T> metaReader) {
         if (!this.hasMetadata()) {
             return null;
         }
@@ -83,8 +83,8 @@ implements Resource {
         if (this.metadata == null) {
             return null;
         }
-        String string = arg.getKey();
-        return this.metadata.has(string) ? (T)arg.fromJson(JsonHelper.getObject(this.metadata, string)) : null;
+        String string = metaReader.getKey();
+        return this.metadata.has(string) ? (T)metaReader.fromJson(JsonHelper.getObject(this.metadata, string)) : null;
     }
 
     @Override
@@ -92,14 +92,14 @@ implements Resource {
         return this.packName;
     }
 
-    public boolean equals(Object object) {
-        if (this == object) {
+    public boolean equals(Object o) {
+        if (this == o) {
             return true;
         }
-        if (!(object instanceof ResourceImpl)) {
+        if (!(o instanceof ResourceImpl)) {
             return false;
         }
-        ResourceImpl lv = (ResourceImpl)object;
+        ResourceImpl lv = (ResourceImpl)o;
         if (this.id != null ? !this.id.equals(lv.id) : lv.id != null) {
             return false;
         }

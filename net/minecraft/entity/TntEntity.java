@@ -35,16 +35,16 @@ extends Entity {
         this.inanimate = true;
     }
 
-    public TntEntity(World arg, double d, double e, double f, @Nullable LivingEntity arg2) {
-        this((EntityType<? extends TntEntity>)EntityType.TNT, arg);
-        this.updatePosition(d, e, f);
-        double g = arg.random.nextDouble() * 6.2831854820251465;
+    public TntEntity(World world, double x, double y, double z, @Nullable LivingEntity igniter) {
+        this((EntityType<? extends TntEntity>)EntityType.TNT, world);
+        this.updatePosition(x, y, z);
+        double g = world.random.nextDouble() * 6.2831854820251465;
         this.setVelocity(-Math.sin(g) * 0.02, 0.2f, -Math.cos(g) * 0.02);
         this.setFuse(80);
-        this.prevX = d;
-        this.prevY = e;
-        this.prevZ = f;
-        this.causingEntity = arg2;
+        this.prevX = x;
+        this.prevY = y;
+        this.prevZ = z;
+        this.causingEntity = igniter;
     }
 
     @Override
@@ -92,13 +92,13 @@ extends Entity {
     }
 
     @Override
-    protected void writeCustomDataToTag(CompoundTag arg) {
-        arg.putShort("Fuse", (short)this.getFuseTimer());
+    protected void writeCustomDataToTag(CompoundTag tag) {
+        tag.putShort("Fuse", (short)this.getFuseTimer());
     }
 
     @Override
-    protected void readCustomDataFromTag(CompoundTag arg) {
-        this.setFuse(arg.getShort("Fuse"));
+    protected void readCustomDataFromTag(CompoundTag tag) {
+        this.setFuse(tag.getShort("Fuse"));
     }
 
     @Nullable
@@ -107,18 +107,18 @@ extends Entity {
     }
 
     @Override
-    protected float getEyeHeight(EntityPose arg, EntityDimensions arg2) {
+    protected float getEyeHeight(EntityPose pose, EntityDimensions dimensions) {
         return 0.15f;
     }
 
-    public void setFuse(int i) {
-        this.dataTracker.set(FUSE, i);
-        this.fuseTimer = i;
+    public void setFuse(int fuse) {
+        this.dataTracker.set(FUSE, fuse);
+        this.fuseTimer = fuse;
     }
 
     @Override
-    public void onTrackedDataSet(TrackedData<?> arg) {
-        if (FUSE.equals(arg)) {
+    public void onTrackedDataSet(TrackedData<?> data) {
+        if (FUSE.equals(data)) {
             this.fuseTimer = this.getFuse();
         }
     }

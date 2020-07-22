@@ -45,8 +45,8 @@ extends AbstractCriterion<Conditions> {
     }
 
     @Override
-    public /* synthetic */ AbstractCriterionConditions conditionsFromJson(JsonObject jsonObject, EntityPredicate.Extended arg, AdvancementEntityPredicateDeserializer arg2) {
-        return this.conditionsFromJson(jsonObject, arg, arg2);
+    public /* synthetic */ AbstractCriterionConditions conditionsFromJson(JsonObject obj, EntityPredicate.Extended playerPredicate, AdvancementEntityPredicateDeserializer predicateDeserializer) {
+        return this.conditionsFromJson(obj, playerPredicate, predicateDeserializer);
     }
 
     public static class Conditions
@@ -82,11 +82,11 @@ extends AbstractCriterion<Conditions> {
         }
 
         @Override
-        public JsonObject toJson(AdvancementEntityPredicateSerializer arg) {
-            JsonObject jsonObject = super.toJson(arg);
-            jsonObject.add("parent", this.parent.toJson(arg));
-            jsonObject.add("partner", this.partner.toJson(arg));
-            jsonObject.add("child", this.child.toJson(arg));
+        public JsonObject toJson(AdvancementEntityPredicateSerializer predicateSerializer) {
+            JsonObject jsonObject = super.toJson(predicateSerializer);
+            jsonObject.add("parent", this.parent.toJson(predicateSerializer));
+            jsonObject.add("partner", this.partner.toJson(predicateSerializer));
+            jsonObject.add("child", this.child.toJson(predicateSerializer));
             return jsonObject;
         }
     }

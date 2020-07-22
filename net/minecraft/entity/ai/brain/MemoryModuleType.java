@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import net.minecraft.class_5418;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
@@ -20,6 +19,7 @@ import net.minecraft.entity.ai.brain.Memory;
 import net.minecraft.entity.ai.brain.WalkTarget;
 import net.minecraft.entity.ai.pathing.Path;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.mob.AbstractPiglinEntity;
 import net.minecraft.entity.mob.HoglinEntity;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.passive.PassiveEntity;
@@ -71,6 +71,8 @@ public class MemoryModuleType<U> {
     public static final MemoryModuleType<UUID> ANGRY_AT = MemoryModuleType.register("angry_at", DynamicSerializableUuid.field_25122);
     public static final MemoryModuleType<Boolean> UNIVERSAL_ANGER = MemoryModuleType.register("universal_anger", Codec.BOOL);
     public static final MemoryModuleType<Boolean> ADMIRING_ITEM = MemoryModuleType.register("admiring_item", Codec.BOOL);
+    public static final MemoryModuleType<Integer> TIME_TRYING_TO_REACH_ADMIRE_ITEM = MemoryModuleType.register("time_trying_to_reach_admire_item");
+    public static final MemoryModuleType<Boolean> DISABLE_WALK_TO_ADMIRE_ITEM = MemoryModuleType.register("disable_walk_to_admire_item");
     public static final MemoryModuleType<Boolean> ADMIRING_DISABLED = MemoryModuleType.register("admiring_disabled", Codec.BOOL);
     public static final MemoryModuleType<Boolean> HUNTED_RECENTLY = MemoryModuleType.register("hunted_recently", Codec.BOOL);
     public static final MemoryModuleType<BlockPos> CELEBRATE_LOCATION = MemoryModuleType.register("celebrate_location");
@@ -78,10 +80,10 @@ public class MemoryModuleType<U> {
     public static final MemoryModuleType<HoglinEntity> NEAREST_VISIBLE_HUNTABLE_HOGLIN = MemoryModuleType.register("nearest_visible_huntable_hoglin");
     public static final MemoryModuleType<HoglinEntity> NEAREST_VISIBLE_BABY_HOGLIN = MemoryModuleType.register("nearest_visible_baby_hoglin");
     public static final MemoryModuleType<PlayerEntity> NEAREST_TARGETABLE_PLAYER_NOT_WEARING_GOLD = MemoryModuleType.register("nearest_targetable_player_not_wearing_gold");
-    public static final MemoryModuleType<List<class_5418>> NEARBY_ADULT_PIGLINS = MemoryModuleType.register("nearby_adult_piglins");
-    public static final MemoryModuleType<List<class_5418>> NEAREST_VISIBLE_ADULT_PIGLINS = MemoryModuleType.register("nearest_visible_adult_piglins");
+    public static final MemoryModuleType<List<AbstractPiglinEntity>> NEARBY_ADULT_PIGLINS = MemoryModuleType.register("nearby_adult_piglins");
+    public static final MemoryModuleType<List<AbstractPiglinEntity>> NEAREST_VISIBLE_ADULT_PIGLINS = MemoryModuleType.register("nearest_visible_adult_piglins");
     public static final MemoryModuleType<List<HoglinEntity>> NEAREST_VISIBLE_ADULT_HOGLINS = MemoryModuleType.register("nearest_visible_adult_hoglins");
-    public static final MemoryModuleType<class_5418> NEAREST_VISIBLE_ADULT_PIGLIN = MemoryModuleType.register("nearest_visible_adult_piglin");
+    public static final MemoryModuleType<AbstractPiglinEntity> NEAREST_VISIBLE_ADULT_PIGLIN = MemoryModuleType.register("nearest_visible_adult_piglin");
     public static final MemoryModuleType<LivingEntity> NEAREST_VISIBLE_ZOMBIFIED = MemoryModuleType.register("nearest_visible_zombified");
     public static final MemoryModuleType<Integer> VISIBLE_ADULT_PIGLIN_COUNT = MemoryModuleType.register("visible_adult_piglin_count");
     public static final MemoryModuleType<Integer> VISIBLE_ADULT_HOGLIN_COUNT = MemoryModuleType.register("visible_adult_hoglin_count");
@@ -91,8 +93,8 @@ public class MemoryModuleType<U> {
     public static final MemoryModuleType<Boolean> PACIFIED = MemoryModuleType.register("pacified");
     private final Optional<Codec<Memory<U>>> field_24668;
 
-    private MemoryModuleType(Optional<Codec<U>> optional) {
-        this.field_24668 = optional.map(Memory::method_28353);
+    private MemoryModuleType(Optional<Codec<U>> factory) {
+        this.field_24668 = factory.map(Memory::method_28353);
     }
 
     public String toString() {
@@ -103,12 +105,12 @@ public class MemoryModuleType<U> {
         return this.field_24668;
     }
 
-    private static <U> MemoryModuleType<U> register(String string, Codec<U> codec) {
-        return Registry.register(Registry.MEMORY_MODULE_TYPE, new Identifier(string), new MemoryModuleType<U>(Optional.of(codec)));
+    private static <U> MemoryModuleType<U> register(String id, Codec<U> codec) {
+        return Registry.register(Registry.MEMORY_MODULE_TYPE, new Identifier(id), new MemoryModuleType<U>(Optional.of(codec)));
     }
 
-    private static <U> MemoryModuleType<U> register(String string) {
-        return Registry.register(Registry.MEMORY_MODULE_TYPE, new Identifier(string), new MemoryModuleType<U>(Optional.empty()));
+    private static <U> MemoryModuleType<U> register(String id) {
+        return Registry.register(Registry.MEMORY_MODULE_TYPE, new Identifier(id), new MemoryModuleType<U>(Optional.empty()));
     }
 }
 

@@ -18,20 +18,19 @@ import java.util.Set;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.ModifiableTestableWorld;
+import net.minecraft.world.gen.UniformIntDistribution;
 import net.minecraft.world.gen.feature.TreeFeatureConfig;
 import net.minecraft.world.gen.foliage.FoliagePlacer;
 import net.minecraft.world.gen.foliage.FoliagePlacerType;
 
 public class SpruceFoliagePlacer
 extends FoliagePlacer {
-    public static final Codec<SpruceFoliagePlacer> field_24936 = RecordCodecBuilder.create(instance -> SpruceFoliagePlacer.method_28846(instance).and(instance.group((App)Codec.INT.fieldOf("trunk_height").forGetter(arg -> arg.trunkHeight), (App)Codec.INT.fieldOf("trunk_height_random").forGetter(arg -> arg.randomTrunkHeight))).apply((Applicative)instance, SpruceFoliagePlacer::new));
-    private final int trunkHeight;
-    private final int randomTrunkHeight;
+    public static final Codec<SpruceFoliagePlacer> field_24936 = RecordCodecBuilder.create(instance -> SpruceFoliagePlacer.method_30411(instance).and((App)UniformIntDistribution.createValidatedCodec(0, 16, 8).fieldOf("trunk_height").forGetter(arg -> arg.trunkHeight)).apply((Applicative)instance, SpruceFoliagePlacer::new));
+    private final UniformIntDistribution trunkHeight;
 
-    public SpruceFoliagePlacer(int i, int j, int k, int l, int m, int n) {
-        super(i, j, k, l);
-        this.trunkHeight = m;
-        this.randomTrunkHeight = n;
+    public SpruceFoliagePlacer(UniformIntDistribution arg, UniformIntDistribution arg2, UniformIntDistribution arg3) {
+        super(arg, arg2);
+        this.trunkHeight = arg3;
     }
 
     @Override
@@ -40,17 +39,17 @@ extends FoliagePlacer {
     }
 
     @Override
-    protected void generate(ModifiableTestableWorld arg, Random random, TreeFeatureConfig arg2, int i, FoliagePlacer.TreeNode arg3, int j, int k, Set<BlockPos> set, int l, BlockBox arg4) {
+    protected void generate(ModifiableTestableWorld world, Random random, TreeFeatureConfig config, int trunkHeight, FoliagePlacer.TreeNode arg3, int foliageHeight, int radius, Set<BlockPos> leaves, int l, BlockBox arg4) {
         BlockPos lv = arg3.getCenter();
         int m = random.nextInt(2);
         int n = 1;
         int o = 0;
-        for (int p = l; p >= -j; --p) {
-            this.generate(arg, random, arg2, lv, m, set, p, arg3.isGiantTrunk(), arg4);
+        for (int p = l; p >= -foliageHeight; --p) {
+            this.generate(world, random, config, lv, m, leaves, p, arg3.isGiantTrunk(), arg4);
             if (m >= n) {
                 m = o;
                 o = 1;
-                n = Math.min(n + 1, k + arg3.getFoliageRadius());
+                n = Math.min(n + 1, radius + arg3.getFoliageRadius());
                 continue;
             }
             ++m;
@@ -58,13 +57,13 @@ extends FoliagePlacer {
     }
 
     @Override
-    public int getHeight(Random random, int i, TreeFeatureConfig arg) {
-        return Math.max(4, i - this.trunkHeight - random.nextInt(this.randomTrunkHeight + 1));
+    public int getHeight(Random random, int trunkHeight, TreeFeatureConfig config) {
+        return Math.max(4, trunkHeight - this.trunkHeight.getValue(random));
     }
 
     @Override
-    protected boolean isInvalidForLeaves(Random random, int i, int j, int k, int l, boolean bl) {
-        return i == l && k == l && l > 0;
+    protected boolean isInvalidForLeaves(Random random, int baseHeight, int dx, int dy, int dz, boolean bl) {
+        return baseHeight == dz && dy == dz && dz > 0;
     }
 }
 

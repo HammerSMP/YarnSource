@@ -33,22 +33,22 @@ extends MiningToolItem {
     private static final Set<Block> EFFECTIVE_BLOCKS = ImmutableSet.of((Object)Blocks.NETHER_WART_BLOCK, (Object)Blocks.WARPED_WART_BLOCK, (Object)Blocks.HAY_BLOCK, (Object)Blocks.DRIED_KELP_BLOCK, (Object)Blocks.TARGET, (Object)Blocks.SHROOMLIGHT, (Object[])new Block[]{Blocks.SPONGE, Blocks.WET_SPONGE, Blocks.JUNGLE_LEAVES, Blocks.OAK_LEAVES, Blocks.SPRUCE_LEAVES, Blocks.DARK_OAK_LEAVES, Blocks.ACACIA_LEAVES, Blocks.BIRCH_LEAVES});
     protected static final Map<Block, BlockState> TILLED_BLOCKS = Maps.newHashMap((Map)ImmutableMap.of((Object)Blocks.GRASS_BLOCK, (Object)Blocks.FARMLAND.getDefaultState(), (Object)Blocks.GRASS_PATH, (Object)Blocks.FARMLAND.getDefaultState(), (Object)Blocks.DIRT, (Object)Blocks.FARMLAND.getDefaultState(), (Object)Blocks.COARSE_DIRT, (Object)Blocks.DIRT.getDefaultState()));
 
-    protected HoeItem(ToolMaterial arg, int i, float f, Item.Settings arg2) {
-        super(i, f, arg, EFFECTIVE_BLOCKS, arg2);
+    protected HoeItem(ToolMaterial material, int attackDamage, float attackSpeed, Item.Settings settings) {
+        super(attackDamage, attackSpeed, material, EFFECTIVE_BLOCKS, settings);
     }
 
     @Override
-    public ActionResult useOnBlock(ItemUsageContext arg) {
+    public ActionResult useOnBlock(ItemUsageContext context) {
         BlockState lv3;
-        World lv = arg.getWorld();
-        BlockPos lv2 = arg.getBlockPos();
-        if (arg.getSide() != Direction.DOWN && lv.getBlockState(lv2.up()).isAir() && (lv3 = TILLED_BLOCKS.get(lv.getBlockState(lv2).getBlock())) != null) {
-            PlayerEntity lv4 = arg.getPlayer();
+        World lv = context.getWorld();
+        BlockPos lv2 = context.getBlockPos();
+        if (context.getSide() != Direction.DOWN && lv.getBlockState(lv2.up()).isAir() && (lv3 = TILLED_BLOCKS.get(lv.getBlockState(lv2).getBlock())) != null) {
+            PlayerEntity lv4 = context.getPlayer();
             lv.playSound(lv4, lv2, SoundEvents.ITEM_HOE_TILL, SoundCategory.BLOCKS, 1.0f, 1.0f);
             if (!lv.isClient) {
                 lv.setBlockState(lv2, lv3, 11);
                 if (lv4 != null) {
-                    arg.getStack().damage(1, lv4, arg2 -> arg2.sendToolBreakStatus(arg.getHand()));
+                    context.getStack().damage(1, lv4, p -> p.sendToolBreakStatus(context.getHand()));
                 }
             }
             return ActionResult.success(lv.isClient);

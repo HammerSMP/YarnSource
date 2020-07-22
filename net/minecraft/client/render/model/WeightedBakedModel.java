@@ -31,15 +31,15 @@ implements BakedModel {
     private final List<Entry> models;
     private final BakedModel defaultModel;
 
-    public WeightedBakedModel(List<Entry> list) {
-        this.models = list;
-        this.totalWeight = WeightedPicker.getWeightSum(list);
-        this.defaultModel = list.get((int)0).model;
+    public WeightedBakedModel(List<Entry> models) {
+        this.models = models;
+        this.totalWeight = WeightedPicker.getWeightSum(models);
+        this.defaultModel = models.get((int)0).model;
     }
 
     @Override
-    public List<BakedQuad> getQuads(@Nullable BlockState arg, @Nullable Direction arg2, Random random) {
-        return WeightedPicker.getAt(this.models, (int)(Math.abs((int)((int)random.nextLong())) % this.totalWeight)).model.getQuads(arg, arg2, random);
+    public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction face, Random random) {
+        return WeightedPicker.getAt(this.models, (int)(Math.abs((int)((int)random.nextLong())) % this.totalWeight)).model.getQuads(state, face, random);
     }
 
     @Override
@@ -82,9 +82,9 @@ implements BakedModel {
     extends WeightedPicker.Entry {
         protected final BakedModel model;
 
-        public Entry(BakedModel arg, int i) {
-            super(i);
-            this.model = arg;
+        public Entry(BakedModel model, int weight) {
+            super(weight);
+            this.model = model;
         }
     }
 
@@ -92,9 +92,9 @@ implements BakedModel {
     public static class Builder {
         private final List<Entry> models = Lists.newArrayList();
 
-        public Builder add(@Nullable BakedModel arg, int i) {
-            if (arg != null) {
-                this.models.add(new Entry(arg, i));
+        public Builder add(@Nullable BakedModel model, int weight) {
+            if (model != null) {
+                this.models.add(new Entry(model, weight));
             }
             return this;
         }

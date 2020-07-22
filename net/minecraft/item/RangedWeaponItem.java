@@ -13,8 +13,8 @@ import net.minecraft.util.Hand;
 
 public abstract class RangedWeaponItem
 extends Item {
-    public static final Predicate<ItemStack> BOW_PROJECTILES = arg -> arg.getItem().isIn(ItemTags.ARROWS);
-    public static final Predicate<ItemStack> CROSSBOW_HELD_PROJECTILES = BOW_PROJECTILES.or(arg -> arg.getItem() == Items.FIREWORK_ROCKET);
+    public static final Predicate<ItemStack> BOW_PROJECTILES = stack -> stack.getItem().isIn(ItemTags.ARROWS);
+    public static final Predicate<ItemStack> CROSSBOW_HELD_PROJECTILES = BOW_PROJECTILES.or(stack -> stack.getItem() == Items.FIREWORK_ROCKET);
 
     public RangedWeaponItem(Item.Settings arg) {
         super(arg);
@@ -26,12 +26,12 @@ extends Item {
 
     public abstract Predicate<ItemStack> getProjectiles();
 
-    public static ItemStack getHeldProjectile(LivingEntity arg, Predicate<ItemStack> predicate) {
-        if (predicate.test(arg.getStackInHand(Hand.OFF_HAND))) {
-            return arg.getStackInHand(Hand.OFF_HAND);
+    public static ItemStack getHeldProjectile(LivingEntity entity, Predicate<ItemStack> predicate) {
+        if (predicate.test(entity.getStackInHand(Hand.OFF_HAND))) {
+            return entity.getStackInHand(Hand.OFF_HAND);
         }
-        if (predicate.test(arg.getStackInHand(Hand.MAIN_HAND))) {
-            return arg.getStackInHand(Hand.MAIN_HAND);
+        if (predicate.test(entity.getStackInHand(Hand.MAIN_HAND))) {
+            return entity.getStackInHand(Hand.MAIN_HAND);
         }
         return ItemStack.EMPTY;
     }

@@ -51,9 +51,9 @@ public class HoverEvent {
     private final Action<?> action;
     private final Object contents;
 
-    public <T> HoverEvent(Action<T> arg, T object) {
-        this.action = arg;
-        this.contents = object;
+    public <T> HoverEvent(Action<T> action, T contents) {
+        this.action = action;
+        this.contents = contents;
     }
 
     public Action<?> getAction() {
@@ -61,21 +61,21 @@ public class HoverEvent {
     }
 
     @Nullable
-    public <T> T getValue(Action<T> arg) {
-        if (this.action == arg) {
-            return (T)((Action)arg).cast(this.contents);
+    public <T> T getValue(Action<T> action) {
+        if (this.action == action) {
+            return (T)((Action)action).cast(this.contents);
         }
         return null;
     }
 
-    public boolean equals(Object object) {
-        if (this == object) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
         }
-        if (object == null || this.getClass() != object.getClass()) {
+        if (obj == null || this.getClass() != obj.getClass()) {
             return false;
         }
-        HoverEvent lv = (HoverEvent)object;
+        HoverEvent lv = (HoverEvent)obj;
         return this.action == lv.action && Objects.equals(this.contents, lv.contents);
     }
 
@@ -90,8 +90,8 @@ public class HoverEvent {
     }
 
     @Nullable
-    public static HoverEvent fromJson(JsonObject jsonObject) {
-        String string = JsonHelper.getString(jsonObject, "action", null);
+    public static HoverEvent fromJson(JsonObject json) {
+        String string = JsonHelper.getString(json, "action", null);
         if (string == null) {
             return null;
         }
@@ -99,11 +99,11 @@ public class HoverEvent {
         if (lv == null) {
             return null;
         }
-        JsonElement jsonElement = jsonObject.get("contents");
+        JsonElement jsonElement = json.get("contents");
         if (jsonElement != null) {
             return lv.buildHoverEvent(jsonElement);
         }
-        MutableText lv2 = Text.Serializer.fromJson(jsonObject.get("value"));
+        MutableText lv2 = Text.Serializer.fromJson(json.get("value"));
         if (lv2 != null) {
             return lv.buildHoverEvent(lv2);
         }
@@ -128,12 +128,12 @@ public class HoverEvent {
         private final Function<T, JsonElement> serializer;
         private final Function<Text, T> legacyDeserializer;
 
-        public Action(String string, boolean bl, Function<JsonElement, T> function, Function<T, JsonElement> function2, Function<Text, T> function3) {
-            this.name = string;
-            this.parsable = bl;
-            this.deserializer = function;
-            this.serializer = function2;
-            this.legacyDeserializer = function3;
+        public Action(String name, boolean parsable, Function<JsonElement, T> deserializer, Function<T, JsonElement> serializer, Function<Text, T> legacyDeserializer) {
+            this.name = name;
+            this.parsable = parsable;
+            this.deserializer = deserializer;
+            this.serializer = serializer;
+            this.legacyDeserializer = legacyDeserializer;
         }
 
         public boolean isParsable() {
@@ -145,17 +145,17 @@ public class HoverEvent {
         }
 
         @Nullable
-        public static Action byName(String string) {
-            return BY_NAME.get(string);
+        public static Action byName(String name) {
+            return BY_NAME.get(name);
         }
 
-        private T cast(Object object) {
-            return (T)object;
+        private T cast(Object o) {
+            return (T)o;
         }
 
         @Nullable
-        public HoverEvent buildHoverEvent(JsonElement jsonElement) {
-            T object = this.deserializer.apply(jsonElement);
+        public HoverEvent buildHoverEvent(JsonElement contents) {
+            T object = this.deserializer.apply(contents);
             if (object == null) {
                 return null;
             }
@@ -163,16 +163,16 @@ public class HoverEvent {
         }
 
         @Nullable
-        public HoverEvent buildHoverEvent(Text arg) {
-            T object = this.legacyDeserializer.apply(arg);
+        public HoverEvent buildHoverEvent(Text value) {
+            T object = this.legacyDeserializer.apply(value);
             if (object == null) {
                 return null;
             }
             return new HoverEvent(this, object);
         }
 
-        public JsonElement contentsToJson(Object object) {
-            return this.serializer.apply(this.cast(object));
+        public JsonElement contentsToJson(Object contents) {
+            return this.serializer.apply(this.cast(contents));
         }
 
         public String toString() {
@@ -189,14 +189,14 @@ public class HoverEvent {
         @Environment(value=EnvType.CLIENT)
         private ItemStack stack;
 
-        ItemStackContent(Item arg, int i, @Nullable CompoundTag arg2) {
-            this.item = arg;
-            this.count = i;
-            this.tag = arg2;
+        ItemStackContent(Item item, int count, @Nullable CompoundTag tag) {
+            this.item = item;
+            this.count = count;
+            this.tag = tag;
         }
 
-        public ItemStackContent(ItemStack arg) {
-            this(arg.getItem(), arg.getCount(), arg.getTag() != null ? arg.getTag().copy() : null);
+        public ItemStackContent(ItemStack stack) {
+            this(stack.getItem(), stack.getCount(), stack.getTag() != null ? stack.getTag().copy() : null);
         }
 
         public boolean equals(Object object) {
@@ -228,11 +228,11 @@ public class HoverEvent {
             return this.stack;
         }
 
-        private static ItemStackContent parse(JsonElement jsonElement) {
-            if (jsonElement.isJsonPrimitive()) {
-                return new ItemStackContent(Registry.ITEM.get(new Identifier(jsonElement.getAsString())), 1, null);
+        private static ItemStackContent parse(JsonElement json) {
+            if (json.isJsonPrimitive()) {
+                return new ItemStackContent(Registry.ITEM.get(new Identifier(json.getAsString())), 1, null);
             }
-            JsonObject jsonObject = JsonHelper.asObject(jsonElement, "item");
+            JsonObject jsonObject = JsonHelper.asObject(json, "item");
             Item lv = Registry.ITEM.get(new Identifier(JsonHelper.getString(jsonObject, "id")));
             int i = JsonHelper.getInt(jsonObject, "count", 1);
             if (jsonObject.has("tag")) {
@@ -249,13 +249,13 @@ public class HoverEvent {
         }
 
         @Nullable
-        private static ItemStackContent parse(Text arg) {
+        private static ItemStackContent parse(Text text) {
             try {
-                CompoundTag lv = StringNbtReader.parse(arg.getString());
+                CompoundTag lv = StringNbtReader.parse(text.getString());
                 return new ItemStackContent(ItemStack.fromTag(lv));
             }
             catch (CommandSyntaxException commandSyntaxException) {
-                LOGGER.warn("Failed to parse item tag: {}", (Object)arg, (Object)commandSyntaxException);
+                LOGGER.warn("Failed to parse item tag: {}", (Object)text, (Object)commandSyntaxException);
                 return null;
             }
         }
@@ -282,18 +282,18 @@ public class HoverEvent {
         @Environment(value=EnvType.CLIENT)
         private List<Text> tooltip;
 
-        public EntityContent(EntityType<?> arg, UUID uUID, @Nullable Text arg2) {
-            this.entityType = arg;
-            this.uuid = uUID;
-            this.name = arg2;
+        public EntityContent(EntityType<?> entityType, UUID uuid, @Nullable Text name) {
+            this.entityType = entityType;
+            this.uuid = uuid;
+            this.name = name;
         }
 
         @Nullable
-        public static EntityContent parse(JsonElement jsonElement) {
-            if (!jsonElement.isJsonObject()) {
+        public static EntityContent parse(JsonElement json) {
+            if (!json.isJsonObject()) {
                 return null;
             }
-            JsonObject jsonObject = jsonElement.getAsJsonObject();
+            JsonObject jsonObject = json.getAsJsonObject();
             EntityType<?> lv = Registry.ENTITY_TYPE.get(new Identifier(JsonHelper.getString(jsonObject, "type")));
             UUID uUID = UUID.fromString(JsonHelper.getString(jsonObject, "id"));
             MutableText lv2 = Text.Serializer.fromJson(jsonObject.get("name"));
@@ -301,9 +301,9 @@ public class HoverEvent {
         }
 
         @Nullable
-        public static EntityContent parse(Text arg) {
+        public static EntityContent parse(Text text) {
             try {
-                CompoundTag lv = StringNbtReader.parse(arg.getString());
+                CompoundTag lv = StringNbtReader.parse(text.getString());
                 MutableText lv2 = Text.Serializer.fromJson(lv.getString("name"));
                 EntityType<?> lv3 = Registry.ENTITY_TYPE.get(new Identifier(lv.getString("type")));
                 UUID uUID = UUID.fromString(lv.getString("id"));

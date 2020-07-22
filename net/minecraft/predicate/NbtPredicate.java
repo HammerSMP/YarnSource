@@ -31,29 +31,29 @@ public class NbtPredicate {
     @Nullable
     private final CompoundTag tag;
 
-    public NbtPredicate(@Nullable CompoundTag arg) {
-        this.tag = arg;
+    public NbtPredicate(@Nullable CompoundTag tag) {
+        this.tag = tag;
     }
 
-    public boolean test(ItemStack arg) {
+    public boolean test(ItemStack stack) {
         if (this == ANY) {
             return true;
         }
-        return this.test(arg.getTag());
+        return this.test(stack.getTag());
     }
 
-    public boolean test(Entity arg) {
+    public boolean test(Entity entity) {
         if (this == ANY) {
             return true;
         }
-        return this.test(NbtPredicate.entityToTag(arg));
+        return this.test(NbtPredicate.entityToTag(entity));
     }
 
-    public boolean test(@Nullable Tag arg) {
-        if (arg == null) {
+    public boolean test(@Nullable Tag tag) {
+        if (tag == null) {
             return this == ANY;
         }
-        return this.tag == null || NbtHelper.matches(this.tag, arg, true);
+        return this.tag == null || NbtHelper.matches(this.tag, tag, true);
     }
 
     public JsonElement toJson() {
@@ -66,13 +66,13 @@ public class NbtPredicate {
     /*
      * WARNING - void declaration
      */
-    public static NbtPredicate fromJson(@Nullable JsonElement jsonElement) {
+    public static NbtPredicate fromJson(@Nullable JsonElement json) {
         void lv2;
-        if (jsonElement == null || jsonElement.isJsonNull()) {
+        if (json == null || json.isJsonNull()) {
             return ANY;
         }
         try {
-            CompoundTag lv = StringNbtReader.parse(JsonHelper.asString(jsonElement, "nbt"));
+            CompoundTag lv = StringNbtReader.parse(JsonHelper.asString(json, "nbt"));
         }
         catch (CommandSyntaxException commandSyntaxException) {
             throw new JsonSyntaxException("Invalid nbt tag: " + commandSyntaxException.getMessage());
@@ -80,10 +80,10 @@ public class NbtPredicate {
         return new NbtPredicate((CompoundTag)lv2);
     }
 
-    public static CompoundTag entityToTag(Entity arg) {
+    public static CompoundTag entityToTag(Entity entity) {
         ItemStack lv2;
-        CompoundTag lv = arg.toTag(new CompoundTag());
-        if (arg instanceof PlayerEntity && !(lv2 = ((PlayerEntity)arg).inventory.getMainHandStack()).isEmpty()) {
+        CompoundTag lv = entity.toTag(new CompoundTag());
+        if (entity instanceof PlayerEntity && !(lv2 = ((PlayerEntity)entity).inventory.getMainHandStack()).isEmpty()) {
             lv.put("SelectedItem", lv2.toTag(new CompoundTag()));
         }
         return lv;

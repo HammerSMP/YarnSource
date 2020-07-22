@@ -44,11 +44,11 @@ extends Block {
     }
 
     @Override
-    public void onStacksDropped(BlockState arg, ServerWorld arg2, BlockPos arg3, ItemStack arg4) {
+    public void onStacksDropped(BlockState state, ServerWorld arg2, BlockPos pos, ItemStack stack) {
         int i;
-        super.onStacksDropped(arg, arg2, arg3, arg4);
-        if (EnchantmentHelper.getLevel(Enchantments.SILK_TOUCH, arg4) == 0 && (i = this.getExperienceWhenMined(arg2.random)) > 0) {
-            this.dropExperience(arg2, arg3, i);
+        super.onStacksDropped(state, arg2, pos, stack);
+        if (EnchantmentHelper.getLevel(Enchantments.SILK_TOUCH, stack) == 0 && (i = this.getExperienceWhenMined(arg2.random)) > 0) {
+            this.dropExperience(arg2, pos, i);
         }
     }
 }

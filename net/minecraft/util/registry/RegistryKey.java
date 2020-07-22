@@ -18,22 +18,22 @@ public class RegistryKey<T> {
     private final Identifier registry;
     private final Identifier value;
 
-    public static <T> RegistryKey<T> of(RegistryKey<Registry<T>> arg, Identifier arg2) {
-        return RegistryKey.of(arg.value, arg2);
+    public static <T> RegistryKey<T> of(RegistryKey<? extends Registry<T>> registry, Identifier value) {
+        return RegistryKey.of(registry.value, value);
     }
 
-    public static <T> RegistryKey<Registry<T>> ofRegistry(Identifier arg) {
-        return RegistryKey.of(Registry.ROOT_KEY, arg);
+    public static <T> RegistryKey<Registry<T>> ofRegistry(Identifier registry) {
+        return RegistryKey.of(Registry.ROOT_KEY, registry);
     }
 
-    private static <T> RegistryKey<T> of(Identifier arg, Identifier arg2) {
-        String string2 = (arg + ":" + arg2).intern();
-        return INSTANCES.computeIfAbsent(string2, string -> new RegistryKey(arg, arg2));
+    private static <T> RegistryKey<T> of(Identifier registry, Identifier value) {
+        String string2 = (registry + ":" + value).intern();
+        return INSTANCES.computeIfAbsent(string2, string -> new RegistryKey(registry, value));
     }
 
-    private RegistryKey(Identifier arg, Identifier arg2) {
-        this.registry = arg;
-        this.value = arg2;
+    private RegistryKey(Identifier registry, Identifier value) {
+        this.registry = registry;
+        this.value = value;
     }
 
     public String toString() {
@@ -44,8 +44,8 @@ public class RegistryKey<T> {
         return this.value;
     }
 
-    public static <T> Function<Identifier, RegistryKey<T>> createKeyFactory(RegistryKey<Registry<T>> arg) {
-        return arg2 -> RegistryKey.of(arg, arg2);
+    public static <T> Function<Identifier, RegistryKey<T>> createKeyFactory(RegistryKey<? extends Registry<T>> registry) {
+        return arg2 -> RegistryKey.of(registry, arg2);
     }
 }
 

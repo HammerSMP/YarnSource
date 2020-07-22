@@ -20,13 +20,13 @@ public class FoodComponent {
     private final boolean snack;
     private final List<Pair<StatusEffectInstance, Float>> statusEffects;
 
-    private FoodComponent(int i, float f, boolean bl, boolean bl2, boolean bl3, List<Pair<StatusEffectInstance, Float>> list) {
-        this.hunger = i;
-        this.saturationModifier = f;
-        this.meat = bl;
-        this.alwaysEdible = bl2;
-        this.snack = bl3;
-        this.statusEffects = list;
+    private FoodComponent(int hunger, float saturationModifier, boolean meat, boolean alwaysEdible, boolean snack, List<Pair<StatusEffectInstance, Float>> statusEffects) {
+        this.hunger = hunger;
+        this.saturationModifier = saturationModifier;
+        this.meat = meat;
+        this.alwaysEdible = alwaysEdible;
+        this.snack = snack;
+        this.statusEffects = statusEffects;
     }
 
     public int getHunger() {
@@ -61,13 +61,13 @@ public class FoodComponent {
         private boolean snack;
         private final List<Pair<StatusEffectInstance, Float>> statusEffects = Lists.newArrayList();
 
-        public Builder hunger(int i) {
-            this.hunger = i;
+        public Builder hunger(int hunger) {
+            this.hunger = hunger;
             return this;
         }
 
-        public Builder saturationModifier(float f) {
-            this.saturationModifier = f;
+        public Builder saturationModifier(float saturationModifier) {
+            this.saturationModifier = saturationModifier;
             return this;
         }
 
@@ -86,8 +86,8 @@ public class FoodComponent {
             return this;
         }
 
-        public Builder statusEffect(StatusEffectInstance arg, float f) {
-            this.statusEffects.add((Pair<StatusEffectInstance, Float>)Pair.of((Object)arg, (Object)Float.valueOf(f)));
+        public Builder statusEffect(StatusEffectInstance effect, float chance) {
+            this.statusEffects.add((Pair<StatusEffectInstance, Float>)Pair.of((Object)effect, (Object)Float.valueOf(chance)));
             return this;
         }
 

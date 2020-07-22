@@ -24,8 +24,8 @@ public class OrMultipartModelSelector
 implements MultipartModelSelector {
     private final Iterable<? extends MultipartModelSelector> selectors;
 
-    public OrMultipartModelSelector(Iterable<? extends MultipartModelSelector> iterable) {
-        this.selectors = iterable;
+    public OrMultipartModelSelector(Iterable<? extends MultipartModelSelector> selectors) {
+        this.selectors = selectors;
     }
 
     @Override

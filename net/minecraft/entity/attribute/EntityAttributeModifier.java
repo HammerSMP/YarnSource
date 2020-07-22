@@ -27,19 +27,19 @@ public class EntityAttributeModifier {
     private final Supplier<String> nameGetter;
     private final UUID uuid;
 
-    public EntityAttributeModifier(String string, double d, Operation arg) {
-        this(MathHelper.randomUuid((Random)ThreadLocalRandom.current()), () -> string, d, arg);
+    public EntityAttributeModifier(String name, double value, Operation operation) {
+        this(MathHelper.randomUuid((Random)ThreadLocalRandom.current()), () -> name, value, operation);
     }
 
-    public EntityAttributeModifier(UUID uUID, String string, double d, Operation arg) {
-        this(uUID, () -> string, d, arg);
+    public EntityAttributeModifier(UUID uuid, String name, double value, Operation operation) {
+        this(uuid, () -> name, value, operation);
     }
 
-    public EntityAttributeModifier(UUID uUID, Supplier<String> supplier, double d, Operation arg) {
-        this.uuid = uUID;
-        this.nameGetter = supplier;
-        this.value = d;
-        this.operation = arg;
+    public EntityAttributeModifier(UUID uuid, Supplier<String> nameGetter, double value, Operation operation) {
+        this.uuid = uuid;
+        this.nameGetter = nameGetter;
+        this.value = value;
+        this.operation = operation;
     }
 
     public UUID getId() {
@@ -58,14 +58,14 @@ public class EntityAttributeModifier {
         return this.value;
     }
 
-    public boolean equals(Object object) {
-        if (this == object) {
+    public boolean equals(Object o) {
+        if (this == o) {
             return true;
         }
-        if (object == null || this.getClass() != object.getClass()) {
+        if (o == null || this.getClass() != o.getClass()) {
             return false;
         }
-        EntityAttributeModifier lv = (EntityAttributeModifier)object;
+        EntityAttributeModifier lv = (EntityAttributeModifier)o;
         return Objects.equals(this.uuid, lv.uuid);
     }
 
@@ -87,11 +87,11 @@ public class EntityAttributeModifier {
     }
 
     @Nullable
-    public static EntityAttributeModifier fromTag(CompoundTag arg) {
+    public static EntityAttributeModifier fromTag(CompoundTag tag) {
         try {
-            UUID uUID = arg.getUuid("UUID");
-            Operation lv = Operation.fromId(arg.getInt("Operation"));
-            return new EntityAttributeModifier(uUID, arg.getString("Name"), arg.getDouble("Amount"), lv);
+            UUID uUID = tag.getUuid("UUID");
+            Operation lv = Operation.fromId(tag.getInt("Operation"));
+            return new EntityAttributeModifier(uUID, tag.getString("Name"), tag.getDouble("Amount"), lv);
         }
         catch (Exception exception) {
             LOGGER.warn("Unable to create attribute: {}", (Object)exception.getMessage());
@@ -107,19 +107,19 @@ public class EntityAttributeModifier {
         private static final Operation[] VALUES;
         private final int id;
 
-        private Operation(int j) {
-            this.id = j;
+        private Operation(int id) {
+            this.id = id;
         }
 
         public int getId() {
             return this.id;
         }
 
-        public static Operation fromId(int i) {
-            if (i < 0 || i >= VALUES.length) {
-                throw new IllegalArgumentException("No operation with value " + i);
+        public static Operation fromId(int id) {
+            if (id < 0 || id >= VALUES.length) {
+                throw new IllegalArgumentException("No operation with value " + id);
             }
-            return VALUES[i];
+            return VALUES[id];
         }
 
         static {

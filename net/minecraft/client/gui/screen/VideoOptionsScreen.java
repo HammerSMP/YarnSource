@@ -18,9 +18,8 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.class_5407;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.GraphicsConfirmationScreen;
+import net.minecraft.client.gui.screen.DialogScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ScreenTexts;
 import net.minecraft.client.gui.screen.options.GameOptionsScreen;
@@ -32,6 +31,7 @@ import net.minecraft.client.options.FullScreenOption;
 import net.minecraft.client.options.GameOptions;
 import net.minecraft.client.options.GraphicsMode;
 import net.minecraft.client.options.Option;
+import net.minecraft.client.resource.VideoWarningManager;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.StringRenderable;
@@ -52,17 +52,17 @@ extends GameOptionsScreen {
     @Nullable
     private List<StringRenderable> tooltip;
     private ButtonListWidget list;
-    private final class_5407 field_25688;
+    private final VideoWarningManager warningManager;
     private final int mipmapLevels;
 
-    public VideoOptionsScreen(Screen arg, GameOptions arg2) {
-        super(arg, arg2, new TranslatableText("options.videoTitle"));
-        this.field_25688 = arg.client.method_30049();
-        this.field_25688.method_30143();
-        if (arg2.graphicsMode == GraphicsMode.FABULOUS) {
-            this.field_25688.method_30139();
+    public VideoOptionsScreen(Screen parent, GameOptions options) {
+        super(parent, options, new TranslatableText("options.videoTitle"));
+        this.warningManager = parent.client.getVideoWarningManager();
+        this.warningManager.reset();
+        if (options.graphicsMode == GraphicsMode.FABULOUS) {
+            this.warningManager.acceptAfterWarnings();
         }
-        this.mipmapLevels = arg2.mipmapLevels;
+        this.mipmapLevels = options.mipmapLevels;
     }
 
     @Override
@@ -72,7 +72,7 @@ extends GameOptionsScreen {
         this.list.addSingleOptionEntry(Option.BIOME_BLEND_RADIUS);
         this.list.addAll(OPTIONS);
         this.children.add(this.list);
-        this.addButton(new ButtonWidget(this.width / 2 - 100, this.height - 27, 200, 20, ScreenTexts.DONE, arg -> {
+        this.addButton(new ButtonWidget(this.width / 2 - 100, this.height - 27, 200, 20, ScreenTexts.DONE, button -> {
             this.client.options.write();
             this.client.getWindow().applyVideoMode();
             this.client.openScreen(this.parent);
@@ -89,37 +89,37 @@ extends GameOptionsScreen {
     }
 
     @Override
-    public boolean mouseClicked(double d, double e, int i) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button2) {
         int j = this.gameOptions.guiScale;
         GraphicsMode lv = this.gameOptions.graphicsMode;
-        if (super.mouseClicked(d, e, i)) {
+        if (super.mouseClicked(mouseX, mouseY, button2)) {
             if (this.gameOptions.guiScale != j) {
                 this.client.onResolutionChanged();
             }
-            if (this.field_25688.method_30141()) {
+            if (this.warningManager.shouldWarn()) {
                 String string3;
                 String string2;
                 ArrayList list = Lists.newArrayList((Object[])new StringRenderable[]{GRAPHICS_WARNING_MESSAGE_TEXT, NEWLINE_TEXT});
-                String string = this.field_25688.method_30060();
+                String string = this.warningManager.getRendererWarning();
                 if (string != null) {
                     list.add(NEWLINE_TEXT);
                     list.add(new TranslatableText("options.graphics.warning.renderer", string).formatted(Formatting.GRAY));
                 }
-                if ((string2 = this.field_25688.method_30063()) != null) {
+                if ((string2 = this.warningManager.getVendorWarning()) != null) {
                     list.add(NEWLINE_TEXT);
                     list.add(new TranslatableText("options.graphics.warning.vendor", string2).formatted(Formatting.GRAY));
                 }
-                if ((string3 = this.field_25688.method_30062()) != null) {
+                if ((string3 = this.warningManager.getVersionWarning()) != null) {
                     list.add(NEWLINE_TEXT);
                     list.add(new TranslatableText("options.graphics.warning.version", string3).formatted(Formatting.GRAY));
                 }
-                this.client.openScreen(new GraphicsConfirmationScreen(GRAPHICS_WARNING_TITLE_TEXT, list, (ImmutableList<GraphicsConfirmationScreen.ChoiceButton>)ImmutableList.of((Object)new GraphicsConfirmationScreen.ChoiceButton(GRAPHICS_WARNING_ACCEPT_TEXT, arg -> {
+                this.client.openScreen(new DialogScreen(GRAPHICS_WARNING_TITLE_TEXT, list, (ImmutableList<DialogScreen.ChoiceButton>)ImmutableList.of((Object)new DialogScreen.ChoiceButton(GRAPHICS_WARNING_ACCEPT_TEXT, button -> {
                     this.gameOptions.graphicsMode = GraphicsMode.FABULOUS;
                     MinecraftClient.getInstance().worldRenderer.reload();
-                    this.field_25688.method_30139();
+                    this.warningManager.acceptAfterWarnings();
                     this.client.openScreen(this);
-                }), (Object)new GraphicsConfirmationScreen.ChoiceButton(GRAPHICS_WARNING_CANCEL_TEXT, arg -> {
-                    this.field_25688.method_30140();
+                }), (Object)new DialogScreen.ChoiceButton(GRAPHICS_WARNING_CANCEL_TEXT, button -> {
+                    this.warningManager.cancelAfterWarnings();
                     this.client.openScreen(this);
                 }))));
             }
@@ -129,12 +129,12 @@ extends GameOptionsScreen {
     }
 
     @Override
-    public boolean mouseReleased(double d, double e, int i) {
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
         int j = this.gameOptions.guiScale;
-        if (super.mouseReleased(d, e, i)) {
+        if (super.mouseReleased(mouseX, mouseY, button)) {
             return true;
         }
-        if (this.list.mouseReleased(d, e, i)) {
+        if (this.list.mouseReleased(mouseX, mouseY, button)) {
             if (this.gameOptions.guiScale != j) {
                 this.client.onResolutionChanged();
             }
@@ -144,21 +144,21 @@ extends GameOptionsScreen {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         this.tooltip = null;
-        Optional<AbstractButtonWidget> optional = this.list.getHoveredButton(i, j);
+        Optional<AbstractButtonWidget> optional = this.list.getHoveredButton(mouseX, mouseY);
         if (optional.isPresent() && optional.get() instanceof OptionButtonWidget) {
             Optional<List<StringRenderable>> optional2 = ((OptionButtonWidget)optional.get()).getOption().getTooltip();
-            optional2.ifPresent(list -> {
-                this.tooltip = list;
+            optional2.ifPresent(tooltip -> {
+                this.tooltip = tooltip;
             });
         }
-        this.renderBackground(arg);
-        this.list.render(arg, i, j, f);
-        this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 5, 0xFFFFFF);
-        super.render(arg, i, j, f);
+        this.renderBackground(matrices);
+        this.list.render(matrices, mouseX, mouseY, delta);
+        this.drawCenteredText(matrices, this.textRenderer, this.title, this.width / 2, 5, 0xFFFFFF);
+        super.render(matrices, mouseX, mouseY, delta);
         if (this.tooltip != null) {
-            this.renderTooltip(arg, this.tooltip, i, j);
+            this.renderTooltip(matrices, this.tooltip, mouseX, mouseY);
         }
     }
 }

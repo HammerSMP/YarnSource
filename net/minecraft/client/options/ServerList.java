@@ -30,8 +30,8 @@ public class ServerList {
     private final MinecraftClient client;
     private final List<ServerInfo> servers = Lists.newArrayList();
 
-    public ServerList(MinecraftClient arg) {
-        this.client = arg;
+    public ServerList(MinecraftClient client) {
+        this.client = client;
         this.loadFile();
     }
 
@@ -64,7 +64,7 @@ public class ServerList {
             NbtIo.write(lv3, file);
             File file2 = new File(this.client.runDirectory, "servers.dat_old");
             File file3 = new File(this.client.runDirectory, "servers.dat");
-            Util.method_27760(file3, file, file2);
+            Util.backupAndReplace(file3, file, file2);
         }
         catch (Exception exception) {
             LOGGER.error("Couldn't save server list", (Throwable)exception);
@@ -87,24 +87,24 @@ public class ServerList {
         return this.servers.size();
     }
 
-    public void swapEntries(int i, int j) {
-        ServerInfo lv = this.get(i);
-        this.servers.set(i, this.get(j));
+    public void swapEntries(int index1, int j) {
+        ServerInfo lv = this.get(index1);
+        this.servers.set(index1, this.get(j));
         this.servers.set(j, lv);
         this.saveFile();
     }
 
-    public void set(int i, ServerInfo arg) {
-        this.servers.set(i, arg);
+    public void set(int index, ServerInfo arg) {
+        this.servers.set(index, arg);
     }
 
-    public static void updateServerListEntry(ServerInfo arg) {
+    public static void updateServerListEntry(ServerInfo e) {
         ServerList lv = new ServerList(MinecraftClient.getInstance());
         lv.loadFile();
         for (int i = 0; i < lv.size(); ++i) {
             ServerInfo lv2 = lv.get(i);
-            if (!lv2.name.equals(arg.name) || !lv2.address.equals(arg.address)) continue;
-            lv.set(i, arg);
+            if (!lv2.name.equals(e.name) || !lv2.address.equals(e.address)) continue;
+            lv.set(i, e);
             break;
         }
         lv.saveFile();

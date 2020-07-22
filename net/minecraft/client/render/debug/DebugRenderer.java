@@ -72,23 +72,23 @@ public class DebugRenderer {
     public final GameTestDebugRenderer gameTestDebugRenderer;
     private boolean showChunkBorder;
 
-    public DebugRenderer(MinecraftClient arg) {
-        this.waterDebugRenderer = new WaterDebugRenderer(arg);
-        this.chunkBorderDebugRenderer = new ChunkBorderDebugRenderer(arg);
-        this.heightmapDebugRenderer = new HeightmapDebugRenderer(arg);
-        this.collisionDebugRenderer = new CollisionDebugRenderer(arg);
-        this.neighborUpdateDebugRenderer = new NeighborUpdateDebugRenderer(arg);
+    public DebugRenderer(MinecraftClient client) {
+        this.waterDebugRenderer = new WaterDebugRenderer(client);
+        this.chunkBorderDebugRenderer = new ChunkBorderDebugRenderer(client);
+        this.heightmapDebugRenderer = new HeightmapDebugRenderer(client);
+        this.collisionDebugRenderer = new CollisionDebugRenderer(client);
+        this.neighborUpdateDebugRenderer = new NeighborUpdateDebugRenderer(client);
         this.caveDebugRenderer = new CaveDebugRenderer();
-        this.structureDebugRenderer = new StructureDebugRenderer(arg);
-        this.skyLightDebugRenderer = new SkyLightDebugRenderer(arg);
+        this.structureDebugRenderer = new StructureDebugRenderer(client);
+        this.skyLightDebugRenderer = new SkyLightDebugRenderer(client);
         this.worldGenAttemptDebugRenderer = new WorldGenAttemptDebugRenderer();
-        this.blockOutlineDebugRenderer = new BlockOutlineDebugRenderer(arg);
-        this.chunkLoadingDebugRenderer = new ChunkLoadingDebugRenderer(arg);
-        this.villageDebugRenderer = new VillageDebugRenderer(arg);
+        this.blockOutlineDebugRenderer = new BlockOutlineDebugRenderer(client);
+        this.chunkLoadingDebugRenderer = new ChunkLoadingDebugRenderer(client);
+        this.villageDebugRenderer = new VillageDebugRenderer(client);
         this.villageSectionsDebugRenderer = new VillageSectionsDebugRenderer();
-        this.beeDebugRenderer = new BeeDebugRenderer(arg);
-        this.raidCenterDebugRenderer = new RaidCenterDebugRenderer(arg);
-        this.goalSelectorDebugRenderer = new GoalSelectorDebugRenderer(arg);
+        this.beeDebugRenderer = new BeeDebugRenderer(client);
+        this.raidCenterDebugRenderer = new RaidCenterDebugRenderer(client);
+        this.goalSelectorDebugRenderer = new GoalSelectorDebugRenderer(client);
         this.gameTestDebugRenderer = new GameTestDebugRenderer();
     }
 
@@ -118,24 +118,24 @@ public class DebugRenderer {
         return this.showChunkBorder;
     }
 
-    public void render(MatrixStack arg, VertexConsumerProvider.Immediate arg2, double d, double e, double f) {
+    public void render(MatrixStack matrices, VertexConsumerProvider.Immediate vertexConsumers, double cameraX, double cameraY, double cameraZ) {
         if (this.showChunkBorder && !MinecraftClient.getInstance().hasReducedDebugInfo()) {
-            this.chunkBorderDebugRenderer.render(arg, arg2, d, e, f);
+            this.chunkBorderDebugRenderer.render(matrices, vertexConsumers, cameraX, cameraY, cameraZ);
         }
-        this.gameTestDebugRenderer.render(arg, arg2, d, e, f);
+        this.gameTestDebugRenderer.render(matrices, vertexConsumers, cameraX, cameraY, cameraZ);
     }
 
-    public static Optional<Entity> getTargetedEntity(@Nullable Entity arg2, int i) {
+    public static Optional<Entity> getTargetedEntity(@Nullable Entity entity, int maxDistance) {
         int j;
         Predicate<Entity> predicate;
         Box lv4;
         Vec3d lv2;
         Vec3d lv3;
-        if (arg2 == null) {
+        if (entity == null) {
             return Optional.empty();
         }
-        Vec3d lv = arg2.getCameraPosVec(1.0f);
-        EntityHitResult lv5 = ProjectileUtil.rayTrace(arg2, lv, lv3 = lv.add(lv2 = arg2.getRotationVec(1.0f).multiply(i)), lv4 = arg2.getBoundingBox().stretch(lv2).expand(1.0), predicate = arg -> !arg.isSpectator() && arg.collides(), j = i * i);
+        Vec3d lv = entity.getCameraPosVec(1.0f);
+        EntityHitResult lv5 = ProjectileUtil.rayTrace(entity, lv, lv3 = lv.add(lv2 = entity.getRotationVec(1.0f).multiply(maxDistance)), lv4 = entity.getBoundingBox().stretch(lv2).expand(1.0), predicate = arg -> !arg.isSpectator() && arg.collides(), j = maxDistance * maxDistance);
         if (lv5 == null) {
             return Optional.empty();
         }
@@ -145,51 +145,51 @@ public class DebugRenderer {
         return Optional.of(lv5.getEntity());
     }
 
-    public static void drawBox(BlockPos arg, BlockPos arg2, float f, float g, float h, float i) {
+    public static void drawBox(BlockPos pos1, BlockPos pos2, float red, float green, float blue, float alpha) {
         Camera lv = MinecraftClient.getInstance().gameRenderer.getCamera();
         if (!lv.isReady()) {
             return;
         }
         Vec3d lv2 = lv.getPos().negate();
-        Box lv3 = new Box(arg, arg2).offset(lv2);
-        DebugRenderer.drawBox(lv3, f, g, h, i);
+        Box lv3 = new Box(pos1, pos2).offset(lv2);
+        DebugRenderer.drawBox(lv3, red, green, blue, alpha);
     }
 
-    public static void drawBox(BlockPos arg, float f, float g, float h, float i, float j) {
+    public static void drawBox(BlockPos pos, float expand, float red, float green, float blue, float alpha) {
         Camera lv = MinecraftClient.getInstance().gameRenderer.getCamera();
         if (!lv.isReady()) {
             return;
         }
         Vec3d lv2 = lv.getPos().negate();
-        Box lv3 = new Box(arg).offset(lv2).expand(f);
-        DebugRenderer.drawBox(lv3, g, h, i, j);
+        Box lv3 = new Box(pos).offset(lv2).expand(expand);
+        DebugRenderer.drawBox(lv3, red, green, blue, alpha);
     }
 
-    public static void drawBox(Box arg, float f, float g, float h, float i) {
-        DebugRenderer.drawBox(arg.minX, arg.minY, arg.minZ, arg.maxX, arg.maxY, arg.maxZ, f, g, h, i);
+    public static void drawBox(Box box, float red, float green, float blue, float alpha) {
+        DebugRenderer.drawBox(box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ, red, green, blue, alpha);
     }
 
-    public static void drawBox(double d, double e, double f, double g, double h, double i, float j, float k, float l, float m) {
+    public static void drawBox(double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float red, float green, float blue, float alpha) {
         Tessellator lv = Tessellator.getInstance();
         BufferBuilder lv2 = lv.getBuffer();
         lv2.begin(5, VertexFormats.POSITION_COLOR);
-        WorldRenderer.drawBox(lv2, d, e, f, g, h, i, j, k, l, m);
+        WorldRenderer.drawBox(lv2, minX, minY, minZ, maxX, maxY, maxZ, red, green, blue, alpha);
         lv.draw();
     }
 
-    public static void drawString(String string, int i, int j, int k, int l) {
-        DebugRenderer.drawString(string, (double)i + 0.5, (double)j + 0.5, (double)k + 0.5, l);
+    public static void drawString(String string, int x, int y, int z, int color) {
+        DebugRenderer.drawString(string, (double)x + 0.5, (double)y + 0.5, (double)z + 0.5, color);
     }
 
-    public static void drawString(String string, double d, double e, double f, int i) {
-        DebugRenderer.drawString(string, d, e, f, i, 0.02f);
+    public static void drawString(String string, double x, double y, double z, int color) {
+        DebugRenderer.drawString(string, x, y, z, color, 0.02f);
     }
 
-    public static void drawString(String string, double d, double e, double f, int i, float g) {
-        DebugRenderer.drawString(string, d, e, f, i, g, true, 0.0f, false);
+    public static void drawString(String string, double x, double y, double z, int color, float size) {
+        DebugRenderer.drawString(string, x, y, z, color, size, true, 0.0f, false);
     }
 
-    public static void drawString(String string, double d, double e, double f, int i, float g, boolean bl, float h, boolean bl2) {
+    public static void drawString(String string, double x, double y, double z, int color, float size, boolean center, float offset, boolean visibleThroughObjects) {
         MinecraftClient lv = MinecraftClient.getInstance();
         Camera lv2 = lv.gameRenderer.getCamera();
         if (!lv2.isReady() || lv.getEntityRenderManager().gameOptions == null) {
@@ -200,22 +200,22 @@ public class DebugRenderer {
         double k = lv2.getPos().y;
         double l = lv2.getPos().z;
         RenderSystem.pushMatrix();
-        RenderSystem.translatef((float)(d - j), (float)(e - k) + 0.07f, (float)(f - l));
+        RenderSystem.translatef((float)(x - j), (float)(y - k) + 0.07f, (float)(z - l));
         RenderSystem.normal3f(0.0f, 1.0f, 0.0f);
         RenderSystem.multMatrix(new Matrix4f(lv2.getRotation()));
-        RenderSystem.scalef(g, -g, g);
+        RenderSystem.scalef(size, -size, size);
         RenderSystem.enableTexture();
-        if (bl2) {
+        if (visibleThroughObjects) {
             RenderSystem.disableDepthTest();
         } else {
             RenderSystem.enableDepthTest();
         }
         RenderSystem.depthMask(true);
         RenderSystem.scalef(-1.0f, 1.0f, 1.0f);
-        float m = bl ? (float)(-lv3.getWidth(string)) / 2.0f : 0.0f;
+        float m = center ? (float)(-lv3.getWidth(string)) / 2.0f : 0.0f;
         RenderSystem.enableAlphaTest();
         VertexConsumerProvider.Immediate lv4 = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
-        lv3.draw(string, m -= h / g, 0.0f, i, false, AffineTransformation.identity().getMatrix(), (VertexConsumerProvider)lv4, bl2, 0, 0xF000F0);
+        lv3.draw(string, m -= offset / size, 0.0f, color, false, AffineTransformation.identity().getMatrix(), (VertexConsumerProvider)lv4, visibleThroughObjects, 0, 0xF000F0);
         lv4.draw();
         RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
         RenderSystem.enableDepthTest();

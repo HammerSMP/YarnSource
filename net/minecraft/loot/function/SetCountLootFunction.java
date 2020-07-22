@@ -24,9 +24,9 @@ public class SetCountLootFunction
 extends ConditionalLootFunction {
     private final LootTableRange countRange;
 
-    private SetCountLootFunction(LootCondition[] args, LootTableRange arg) {
-        super(args);
-        this.countRange = arg;
+    private SetCountLootFunction(LootCondition[] conditions, LootTableRange countRange) {
+        super(conditions);
+        this.countRange = countRange;
     }
 
     @Override
@@ -35,13 +35,13 @@ extends ConditionalLootFunction {
     }
 
     @Override
-    public ItemStack process(ItemStack arg, LootContext arg2) {
-        arg.setCount(this.countRange.next(arg2.getRandom()));
-        return arg;
+    public ItemStack process(ItemStack stack, LootContext context) {
+        stack.setCount(this.countRange.next(context.getRandom()));
+        return stack;
     }
 
-    public static ConditionalLootFunction.Builder<?> builder(LootTableRange arg) {
-        return SetCountLootFunction.builder((LootCondition[] args) -> new SetCountLootFunction((LootCondition[])args, arg));
+    public static ConditionalLootFunction.Builder<?> builder(LootTableRange countRange) {
+        return SetCountLootFunction.builder((LootCondition[] conditions) -> new SetCountLootFunction((LootCondition[])conditions, countRange));
     }
 
     public static class Serializer
@@ -59,8 +59,8 @@ extends ConditionalLootFunction {
         }
 
         @Override
-        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
-            return this.fromJson(jsonObject, jsonDeserializationContext, args);
+        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject json, JsonDeserializationContext context, LootCondition[] conditions) {
+            return this.fromJson(json, context, conditions);
         }
     }
 }

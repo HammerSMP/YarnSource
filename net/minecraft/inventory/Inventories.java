@@ -12,47 +12,47 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.util.collection.DefaultedList;
 
 public class Inventories {
-    public static ItemStack splitStack(List<ItemStack> list, int i, int j) {
-        if (i < 0 || i >= list.size() || list.get(i).isEmpty() || j <= 0) {
+    public static ItemStack splitStack(List<ItemStack> stacks, int slot, int amount) {
+        if (slot < 0 || slot >= stacks.size() || stacks.get(slot).isEmpty() || amount <= 0) {
             return ItemStack.EMPTY;
         }
-        return list.get(i).split(j);
+        return stacks.get(slot).split(amount);
     }
 
-    public static ItemStack removeStack(List<ItemStack> list, int i) {
-        if (i < 0 || i >= list.size()) {
+    public static ItemStack removeStack(List<ItemStack> stacks, int slot) {
+        if (slot < 0 || slot >= stacks.size()) {
             return ItemStack.EMPTY;
         }
-        return list.set(i, ItemStack.EMPTY);
+        return stacks.set(slot, ItemStack.EMPTY);
     }
 
-    public static CompoundTag toTag(CompoundTag arg, DefaultedList<ItemStack> arg2) {
-        return Inventories.toTag(arg, arg2, true);
+    public static CompoundTag toTag(CompoundTag tag, DefaultedList<ItemStack> stacks) {
+        return Inventories.toTag(tag, stacks, true);
     }
 
-    public static CompoundTag toTag(CompoundTag arg, DefaultedList<ItemStack> arg2, boolean bl) {
+    public static CompoundTag toTag(CompoundTag tag, DefaultedList<ItemStack> stacks, boolean setIfEmpty) {
         ListTag lv = new ListTag();
-        for (int i = 0; i < arg2.size(); ++i) {
-            ItemStack lv2 = arg2.get(i);
+        for (int i = 0; i < stacks.size(); ++i) {
+            ItemStack lv2 = stacks.get(i);
             if (lv2.isEmpty()) continue;
             CompoundTag lv3 = new CompoundTag();
             lv3.putByte("Slot", (byte)i);
             lv2.toTag(lv3);
             lv.add(lv3);
         }
-        if (!lv.isEmpty() || bl) {
-            arg.put("Items", lv);
+        if (!lv.isEmpty() || setIfEmpty) {
+            tag.put("Items", lv);
         }
-        return arg;
+        return tag;
     }
 
-    public static void fromTag(CompoundTag arg, DefaultedList<ItemStack> arg2) {
-        ListTag lv = arg.getList("Items", 10);
+    public static void fromTag(CompoundTag tag, DefaultedList<ItemStack> stacks) {
+        ListTag lv = tag.getList("Items", 10);
         for (int i = 0; i < lv.size(); ++i) {
             CompoundTag lv2 = lv.getCompound(i);
             int j = lv2.getByte("Slot") & 0xFF;
-            if (j < 0 || j >= arg2.size()) continue;
-            arg2.set(j, ItemStack.fromTag(lv2));
+            if (j < 0 || j >= stacks.size()) continue;
+            stacks.set(j, ItemStack.fromTag(lv2));
         }
     }
 

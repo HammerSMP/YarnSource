@@ -37,24 +37,24 @@ extends ArrowItem {
     }
 
     @Override
-    public void appendStacks(ItemGroup arg, DefaultedList<ItemStack> arg2) {
-        if (this.isIn(arg)) {
+    public void appendStacks(ItemGroup group, DefaultedList<ItemStack> stacks) {
+        if (this.isIn(group)) {
             for (Potion lv : Registry.POTION) {
                 if (lv.getEffects().isEmpty()) continue;
-                arg2.add(PotionUtil.setPotion(new ItemStack(this), lv));
+                stacks.add(PotionUtil.setPotion(new ItemStack(this), lv));
             }
         }
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void appendTooltip(ItemStack arg, @Nullable World arg2, List<Text> list, TooltipContext arg3) {
-        PotionUtil.buildTooltip(arg, list, 0.125f);
+    public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
+        PotionUtil.buildTooltip(stack, tooltip, 0.125f);
     }
 
     @Override
-    public String getTranslationKey(ItemStack arg) {
-        return PotionUtil.getPotion(arg).finishTranslationKey(this.getTranslationKey() + ".effect.");
+    public String getTranslationKey(ItemStack stack) {
+        return PotionUtil.getPotion(stack).finishTranslationKey(this.getTranslationKey() + ".effect.");
     }
 }
 

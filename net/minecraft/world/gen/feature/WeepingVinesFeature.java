@@ -42,32 +42,32 @@ extends Feature<DefaultFeatureConfig> {
         return true;
     }
 
-    private void generateNetherWartBlocksInArea(WorldAccess arg, Random random, BlockPos arg2) {
-        arg.setBlockState(arg2, Blocks.NETHER_WART_BLOCK.getDefaultState(), 2);
+    private void generateNetherWartBlocksInArea(WorldAccess world, Random random, BlockPos pos) {
+        world.setBlockState(pos, Blocks.NETHER_WART_BLOCK.getDefaultState(), 2);
         BlockPos.Mutable lv = new BlockPos.Mutable();
         BlockPos.Mutable lv2 = new BlockPos.Mutable();
         for (int i = 0; i < 200; ++i) {
-            lv.set(arg2, random.nextInt(6) - random.nextInt(6), random.nextInt(2) - random.nextInt(5), random.nextInt(6) - random.nextInt(6));
-            if (!arg.isAir(lv)) continue;
+            lv.set(pos, random.nextInt(6) - random.nextInt(6), random.nextInt(2) - random.nextInt(5), random.nextInt(6) - random.nextInt(6));
+            if (!world.isAir(lv)) continue;
             int j = 0;
             for (Direction lv3 : DIRECTIONS) {
-                BlockState lv4 = arg.getBlockState(lv2.set(lv, lv3));
+                BlockState lv4 = world.getBlockState(lv2.set(lv, lv3));
                 if (lv4.isOf(Blocks.NETHERRACK) || lv4.isOf(Blocks.NETHER_WART_BLOCK)) {
                     ++j;
                 }
                 if (j > 1) break;
             }
             if (j != true) continue;
-            arg.setBlockState(lv, Blocks.NETHER_WART_BLOCK.getDefaultState(), 2);
+            world.setBlockState(lv, Blocks.NETHER_WART_BLOCK.getDefaultState(), 2);
         }
     }
 
-    private void generateVinesInArea(WorldAccess arg, Random random, BlockPos arg2) {
+    private void generateVinesInArea(WorldAccess world, Random random, BlockPos pos) {
         BlockPos.Mutable lv = new BlockPos.Mutable();
         for (int i = 0; i < 100; ++i) {
             BlockState lv2;
-            lv.set(arg2, random.nextInt(8) - random.nextInt(8), random.nextInt(2) - random.nextInt(7), random.nextInt(8) - random.nextInt(8));
-            if (!arg.isAir(lv) || !(lv2 = arg.getBlockState(lv.up())).isOf(Blocks.NETHERRACK) && !lv2.isOf(Blocks.NETHER_WART_BLOCK)) continue;
+            lv.set(pos, random.nextInt(8) - random.nextInt(8), random.nextInt(2) - random.nextInt(7), random.nextInt(8) - random.nextInt(8));
+            if (!world.isAir(lv) || !(lv2 = world.getBlockState(lv.up())).isOf(Blocks.NETHERRACK) && !lv2.isOf(Blocks.NETHER_WART_BLOCK)) continue;
             int j = MathHelper.nextInt(random, 1, 8);
             if (random.nextInt(6) == 0) {
                 j *= 2;
@@ -77,20 +77,20 @@ extends Feature<DefaultFeatureConfig> {
             }
             int k = 17;
             int l = 25;
-            WeepingVinesFeature.generateVineColumn(arg, random, lv, j, 17, 25);
+            WeepingVinesFeature.generateVineColumn(world, random, lv, j, 17, 25);
         }
     }
 
-    public static void generateVineColumn(WorldAccess arg, Random random, BlockPos.Mutable arg2, int i, int j, int k) {
-        for (int l = 0; l <= i; ++l) {
-            if (arg.isAir(arg2)) {
-                if (l == i || !arg.isAir((BlockPos)arg2.down())) {
-                    arg.setBlockState(arg2, (BlockState)Blocks.WEEPING_VINES.getDefaultState().with(AbstractPlantStemBlock.AGE, MathHelper.nextInt(random, j, k)), 2);
+    public static void generateVineColumn(WorldAccess world, Random random, BlockPos.Mutable pos, int length, int minAge, int maxAge) {
+        for (int l = 0; l <= length; ++l) {
+            if (world.isAir(pos)) {
+                if (l == length || !world.isAir((BlockPos)pos.down())) {
+                    world.setBlockState(pos, (BlockState)Blocks.WEEPING_VINES.getDefaultState().with(AbstractPlantStemBlock.AGE, MathHelper.nextInt(random, minAge, maxAge)), 2);
                     break;
                 }
-                arg.setBlockState(arg2, Blocks.WEEPING_VINES_PLANT.getDefaultState(), 2);
+                world.setBlockState(pos, Blocks.WEEPING_VINES_PLANT.getDefaultState(), 2);
             }
-            arg2.move(Direction.DOWN);
+            pos.move(Direction.DOWN);
         }
     }
 }

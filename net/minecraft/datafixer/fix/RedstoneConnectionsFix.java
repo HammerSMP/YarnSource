@@ -19,8 +19,8 @@ import net.minecraft.datafixer.TypeReferences;
 
 public class RedstoneConnectionsFix
 extends DataFix {
-    public RedstoneConnectionsFix(Schema schema) {
-        super(schema, false);
+    public RedstoneConnectionsFix(Schema outputSchema) {
+        super(outputSchema, false);
     }
 
     protected TypeRewriteRule makeRule() {

@@ -17,8 +17,8 @@ implements LookTarget {
     private final Entity entity;
     private final boolean field_24382;
 
-    public EntityLookTarget(Entity arg, boolean bl) {
-        this.entity = arg;
+    public EntityLookTarget(Entity entity, boolean bl) {
+        this.entity = entity;
         this.field_24382 = bl;
     }
 
@@ -33,9 +33,9 @@ implements LookTarget {
     }
 
     @Override
-    public boolean isSeenBy(LivingEntity arg) {
+    public boolean isSeenBy(LivingEntity entity) {
         if (this.entity instanceof LivingEntity) {
-            Optional<List<LivingEntity>> optional = arg.getBrain().getOptionalMemory(MemoryModuleType.VISIBLE_MOBS);
+            Optional<List<LivingEntity>> optional = entity.getBrain().getOptionalMemory(MemoryModuleType.VISIBLE_MOBS);
             return this.entity.isAlive() && optional.isPresent() && optional.get().contains(this.entity);
         }
         return true;

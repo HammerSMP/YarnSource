@@ -25,12 +25,12 @@ extends Item {
     }
 
     @Override
-    public ActionResult useOnBlock(ItemUsageContext arg) {
+    public ActionResult useOnBlock(ItemUsageContext context) {
         double f;
         double e;
         BlockPos lv2;
-        World lv = arg.getWorld();
-        BlockState lv3 = lv.getBlockState(lv2 = arg.getBlockPos());
+        World lv = context.getWorld();
+        BlockState lv3 = lv.getBlockState(lv2 = context.getBlockPos());
         if (!lv3.isOf(Blocks.OBSIDIAN) && !lv3.isOf(Blocks.BEDROCK)) {
             return ActionResult.FAIL;
         }
@@ -39,7 +39,7 @@ extends Item {
             return ActionResult.FAIL;
         }
         double d = lv4.getX();
-        List<Entity> list = lv.getEntities(null, new Box(d, e = (double)lv4.getY(), f = (double)lv4.getZ(), d + 1.0, e + 2.0, f + 1.0));
+        List<Entity> list = lv.getOtherEntities(null, new Box(d, e = (double)lv4.getY(), f = (double)lv4.getZ(), d + 1.0, e + 2.0, f + 1.0));
         if (!list.isEmpty()) {
             return ActionResult.FAIL;
         }
@@ -52,12 +52,12 @@ extends Item {
                 lv6.respawnDragon();
             }
         }
-        arg.getStack().decrement(1);
+        context.getStack().decrement(1);
         return ActionResult.success(lv.isClient);
     }
 
     @Override
-    public boolean hasGlint(ItemStack arg) {
+    public boolean hasGlint(ItemStack stack) {
         return true;
     }
 }

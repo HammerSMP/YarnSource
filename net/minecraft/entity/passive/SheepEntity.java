@@ -97,18 +97,18 @@ implements Shearable {
     private int eatGrassTimer;
     private EatGrassGoal eatGrassGoal;
 
-    private static float[] getDyedColor(DyeColor arg) {
-        if (arg == DyeColor.WHITE) {
+    private static float[] getDyedColor(DyeColor color) {
+        if (color == DyeColor.WHITE) {
             return new float[]{0.9019608f, 0.9019608f, 0.9019608f};
         }
-        float[] fs = arg.getColorComponents();
+        float[] fs = color.getColorComponents();
         float f = 0.75f;
         return new float[]{fs[0] * 0.75f, fs[1] * 0.75f, fs[2] * 0.75f};
     }
 
     @Environment(value=EnvType.CLIENT)
-    public static float[] getRgbColor(DyeColor arg) {
-        return COLORS.get(arg);
+    public static float[] getRgbColor(DyeColor dyeColor) {
+        return COLORS.get(dyeColor);
     }
 
     public SheepEntity(EntityType<? extends SheepEntity> arg, World arg2) {
@@ -211,16 +211,16 @@ implements Shearable {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void handleStatus(byte b) {
-        if (b == 10) {
+    public void handleStatus(byte status) {
+        if (status == 10) {
             this.eatGrassTimer = 40;
         } else {
-            super.handleStatus(b);
+            super.handleStatus(status);
         }
     }
 
     @Environment(value=EnvType.CLIENT)
-    public float getNeckAngle(float f) {
+    public float getNeckAngle(float delta) {
         if (this.eatGrassTimer <= 0) {
             return 0.0f;
         }
@@ -228,15 +228,15 @@ implements Shearable {
             return 1.0f;
         }
         if (this.eatGrassTimer < 4) {
-            return ((float)this.eatGrassTimer - f) / 4.0f;
+            return ((float)this.eatGrassTimer - delta) / 4.0f;
         }
-        return -((float)(this.eatGrassTimer - 40) - f) / 4.0f;
+        return -((float)(this.eatGrassTimer - 40) - delta) / 4.0f;
     }
 
     @Environment(value=EnvType.CLIENT)
-    public float getHeadAngle(float f) {
+    public float getHeadAngle(float delta) {
         if (this.eatGrassTimer > 4 && this.eatGrassTimer <= 36) {
-            float g = ((float)(this.eatGrassTimer - 4) - f) / 32.0f;
+            float g = ((float)(this.eatGrassTimer - 4) - delta) / 32.0f;
             return 0.62831855f + 0.21991149f * MathHelper.sin(g * 28.7f);
         }
         if (this.eatGrassTimer > 0) {
@@ -246,22 +246,22 @@ implements Shearable {
     }
 
     @Override
-    public ActionResult interactMob(PlayerEntity arg, Hand arg22) {
-        ItemStack lv = arg.getStackInHand(arg22);
+    public ActionResult interactMob(PlayerEntity player, Hand hand) {
+        ItemStack lv = player.getStackInHand(hand);
         if (lv.getItem() == Items.SHEARS) {
             if (!this.world.isClient && this.isShearable()) {
                 this.sheared(SoundCategory.PLAYERS);
-                lv.damage(1, arg, arg2 -> arg2.sendToolBreakStatus(arg22));
+                lv.damage(1, player, arg2 -> arg2.sendToolBreakStatus(hand));
                 return ActionResult.SUCCESS;
             }
             return ActionResult.CONSUME;
         }
-        return super.interactMob(arg, arg22);
+        return super.interactMob(player, hand);
     }
 
     @Override
-    public void sheared(SoundCategory arg) {
-        this.world.playSoundFromEntity(null, this, SoundEvents.ENTITY_SHEEP_SHEAR, arg, 1.0f, 1.0f);
+    public void sheared(SoundCategory shearedSoundCategory) {
+        this.world.playSoundFromEntity(null, this, SoundEvents.ENTITY_SHEEP_SHEAR, shearedSoundCategory, 1.0f, 1.0f);
         this.setSheared(true);
         int i = 1 + this.random.nextInt(3);
         for (int j = 0; j < i; ++j) {
@@ -277,17 +277,17 @@ implements Shearable {
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
-        arg.putBoolean("Sheared", this.isSheared());
-        arg.putByte("Color", (byte)this.getColor().getId());
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
+        tag.putBoolean("Sheared", this.isSheared());
+        tag.putByte("Color", (byte)this.getColor().getId());
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        this.setSheared(arg.getBoolean("Sheared"));
-        this.setColor(DyeColor.byId(arg.getByte("Color")));
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        this.setSheared(tag.getBoolean("Sheared"));
+        this.setColor(DyeColor.byId(tag.getByte("Color")));
     }
 
     @Override
@@ -296,7 +296,7 @@ implements Shearable {
     }
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource arg) {
+    protected SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.ENTITY_SHEEP_HURT;
     }
 
@@ -306,7 +306,7 @@ implements Shearable {
     }
 
     @Override
-    protected void playStepSound(BlockPos arg, BlockState arg2) {
+    protected void playStepSound(BlockPos pos, BlockState state) {
         this.playSound(SoundEvents.ENTITY_SHEEP_STEP, 0.15f, 1.0f);
     }
 
@@ -314,18 +314,18 @@ implements Shearable {
         return DyeColor.byId(this.dataTracker.get(COLOR) & 0xF);
     }
 
-    public void setColor(DyeColor arg) {
+    public void setColor(DyeColor color) {
         byte b = this.dataTracker.get(COLOR);
-        this.dataTracker.set(COLOR, (byte)(b & 0xF0 | arg.getId() & 0xF));
+        this.dataTracker.set(COLOR, (byte)(b & 0xF0 | color.getId() & 0xF));
     }
 
     public boolean isSheared() {
         return (this.dataTracker.get(COLOR) & 0x10) != 0;
     }
 
-    public void setSheared(boolean bl) {
+    public void setSheared(boolean sheared) {
         byte b = this.dataTracker.get(COLOR);
-        if (bl) {
+        if (sheared) {
             this.dataTracker.set(COLOR, (byte)(b | 0x10));
         } else {
             this.dataTracker.set(COLOR, (byte)(b & 0xFFFFFFEF));
@@ -370,34 +370,34 @@ implements Shearable {
 
     @Override
     @Nullable
-    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(class_5425 arg, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable CompoundTag entityTag) {
         this.setColor(SheepEntity.generateDefaultColor(arg.getRandom()));
-        return super.initialize(arg, arg2, arg3, arg4, arg5);
+        return super.initialize(arg, difficulty, spawnReason, entityData, entityTag);
     }
 
-    private DyeColor getChildColor(AnimalEntity arg, AnimalEntity arg22) {
-        DyeColor lv = ((SheepEntity)arg).getColor();
-        DyeColor lv2 = ((SheepEntity)arg22).getColor();
+    private DyeColor getChildColor(AnimalEntity firstParent, AnimalEntity secondParent) {
+        DyeColor lv = ((SheepEntity)firstParent).getColor();
+        DyeColor lv2 = ((SheepEntity)secondParent).getColor();
         CraftingInventory lv3 = SheepEntity.createDyeMixingCraftingInventory(lv, lv2);
         return this.world.getRecipeManager().getFirstMatch(RecipeType.CRAFTING, lv3, this.world).map(arg2 -> arg2.craft(lv3)).map(ItemStack::getItem).filter(DyeItem.class::isInstance).map(DyeItem.class::cast).map(DyeItem::getColor).orElseGet(() -> this.world.random.nextBoolean() ? lv : lv2);
     }
 
-    private static CraftingInventory createDyeMixingCraftingInventory(DyeColor arg, DyeColor arg2) {
+    private static CraftingInventory createDyeMixingCraftingInventory(DyeColor firstColor, DyeColor secondColor) {
         CraftingInventory lv = new CraftingInventory(new ScreenHandler(null, -1){
 
             @Override
-            public boolean canUse(PlayerEntity arg) {
+            public boolean canUse(PlayerEntity player) {
                 return false;
             }
         }, 2, 1);
-        lv.setStack(0, new ItemStack(DyeItem.byColor(arg)));
-        lv.setStack(1, new ItemStack(DyeItem.byColor(arg2)));
+        lv.setStack(0, new ItemStack(DyeItem.byColor(firstColor)));
+        lv.setStack(1, new ItemStack(DyeItem.byColor(secondColor)));
         return lv;
     }
 
     @Override
-    protected float getActiveEyeHeight(EntityPose arg, EntityDimensions arg2) {
-        return 0.95f * arg2.height;
+    protected float getActiveEyeHeight(EntityPose pose, EntityDimensions dimensions) {
+        return 0.95f * dimensions.height;
     }
 
     @Override

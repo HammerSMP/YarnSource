@@ -27,9 +27,9 @@ implements Fertilizable {
     public static final IntProperty AGE = Properties.AGE_25;
     private final double growthChance;
 
-    protected AbstractPlantStemBlock(AbstractBlock.Settings arg, Direction arg2, VoxelShape arg3, boolean bl, double d) {
-        super(arg, arg2, arg3, bl);
-        this.growthChance = d;
+    protected AbstractPlantStemBlock(AbstractBlock.Settings settings, Direction growthDirection, VoxelShape outlineShape, boolean tickWater, double growthChance) {
+        super(settings, growthDirection, outlineShape, tickWater);
+        this.growthChance = growthChance;
         this.setDefaultState((BlockState)((BlockState)this.stateManager.getDefaultState()).with(AGE, 0));
     }
 
@@ -39,54 +39,54 @@ implements Fertilizable {
     }
 
     @Override
-    public boolean hasRandomTicks(BlockState arg) {
-        return arg.get(AGE) < 25;
+    public boolean hasRandomTicks(BlockState state) {
+        return state.get(AGE) < 25;
     }
 
     @Override
-    public void randomTick(BlockState arg, ServerWorld arg2, BlockPos arg3, Random random) {
+    public void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
         BlockPos lv;
-        if (arg.get(AGE) < 25 && random.nextDouble() < this.growthChance && this.chooseStemState(arg2.getBlockState(lv = arg3.offset(this.growthDirection)))) {
-            arg2.setBlockState(lv, (BlockState)arg.cycle(AGE));
+        if (state.get(AGE) < 25 && random.nextDouble() < this.growthChance && this.chooseStemState(world.getBlockState(lv = pos.offset(this.growthDirection)))) {
+            world.setBlockState(lv, (BlockState)state.cycle(AGE));
         }
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
-        if (arg2 == this.growthDirection.getOpposite() && !arg.canPlaceAt(arg4, arg5)) {
-            arg4.getBlockTickScheduler().schedule(arg5, this, 1);
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
+        if (direction == this.growthDirection.getOpposite() && !state.canPlaceAt(world, pos)) {
+            world.getBlockTickScheduler().schedule(pos, this, 1);
         }
-        if (arg2 == this.growthDirection && (arg3.isOf(this) || arg3.isOf(this.getPlant()))) {
+        if (direction == this.growthDirection && (newState.isOf(this) || newState.isOf(this.getPlant()))) {
             return this.getPlant().getDefaultState();
         }
         if (this.tickWater) {
-            arg4.getFluidTickScheduler().schedule(arg5, Fluids.WATER, Fluids.WATER.getTickRate(arg4));
+            world.getFluidTickScheduler().schedule(pos, Fluids.WATER, Fluids.WATER.getTickRate(world));
         }
-        return super.getStateForNeighborUpdate(arg, arg2, arg3, arg4, arg5, arg6);
+        return super.getStateForNeighborUpdate(state, direction, newState, world, pos, posFrom);
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(AGE);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(AGE);
     }
 
     @Override
-    public boolean isFertilizable(BlockView arg, BlockPos arg2, BlockState arg3, boolean bl) {
-        return this.chooseStemState(arg.getBlockState(arg2.offset(this.growthDirection)));
+    public boolean isFertilizable(BlockView world, BlockPos pos, BlockState state, boolean isClient) {
+        return this.chooseStemState(world.getBlockState(pos.offset(this.growthDirection)));
     }
 
     @Override
-    public boolean canGrow(World arg, Random random, BlockPos arg2, BlockState arg3) {
+    public boolean canGrow(World world, Random random, BlockPos pos, BlockState state) {
         return true;
     }
 
     @Override
-    public void grow(ServerWorld arg, Random random, BlockPos arg2, BlockState arg3) {
-        BlockPos lv = arg2.offset(this.growthDirection);
-        int i = Math.min(arg3.get(AGE) + 1, 25);
+    public void grow(ServerWorld world, Random random, BlockPos pos, BlockState state) {
+        BlockPos lv = pos.offset(this.growthDirection);
+        int i = Math.min(state.get(AGE) + 1, 25);
         int j = this.method_26376(random);
-        for (int k = 0; k < j && this.chooseStemState(arg.getBlockState(lv)); ++k) {
-            arg.setBlockState(lv, (BlockState)arg3.with(AGE, i));
+        for (int k = 0; k < j && this.chooseStemState(world.getBlockState(lv)); ++k) {
+            world.setBlockState(lv, (BlockState)state.with(AGE, i));
             lv = lv.offset(this.growthDirection);
             i = Math.min(i + 1, 25);
         }

@@ -35,33 +35,33 @@ implements Stainable {
     }
 
     @Override
-    public BlockEntity createBlockEntity(BlockView arg) {
+    public BlockEntity createBlockEntity(BlockView world) {
         return new BeaconBlockEntity();
     }
 
     @Override
-    public ActionResult onUse(BlockState arg, World arg2, BlockPos arg3, PlayerEntity arg4, Hand arg5, BlockHitResult arg6) {
-        if (arg2.isClient) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        if (world.isClient) {
             return ActionResult.SUCCESS;
         }
-        BlockEntity lv = arg2.getBlockEntity(arg3);
+        BlockEntity lv = world.getBlockEntity(pos);
         if (lv instanceof BeaconBlockEntity) {
-            arg4.openHandledScreen((BeaconBlockEntity)lv);
-            arg4.incrementStat(Stats.INTERACT_WITH_BEACON);
+            player.openHandledScreen((BeaconBlockEntity)lv);
+            player.incrementStat(Stats.INTERACT_WITH_BEACON);
         }
         return ActionResult.CONSUME;
     }
 
     @Override
-    public BlockRenderType getRenderType(BlockState arg) {
+    public BlockRenderType getRenderType(BlockState state) {
         return BlockRenderType.MODEL;
     }
 
     @Override
-    public void onPlaced(World arg, BlockPos arg2, BlockState arg3, LivingEntity arg4, ItemStack arg5) {
+    public void onPlaced(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack) {
         BlockEntity lv;
-        if (arg5.hasCustomName() && (lv = arg.getBlockEntity(arg2)) instanceof BeaconBlockEntity) {
-            ((BeaconBlockEntity)lv).setCustomName(arg5.getName());
+        if (itemStack.hasCustomName() && (lv = world.getBlockEntity(pos)) instanceof BeaconBlockEntity) {
+            ((BeaconBlockEntity)lv).setCustomName(itemStack.getName());
         }
     }
 }

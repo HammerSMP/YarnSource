@@ -112,22 +112,22 @@ extends SurfaceBuilder<TernarySurfaceConfig> {
     }
 
     @Override
-    public void initSeed(long l) {
-        if (this.seed != l || this.layerBlocks == null) {
-            this.initLayerBlocks(l);
+    public void initSeed(long seed) {
+        if (this.seed != seed || this.layerBlocks == null) {
+            this.initLayerBlocks(seed);
         }
-        if (this.seed != l || this.heightCutoffNoise == null || this.heightNoise == null) {
-            ChunkRandom lv = new ChunkRandom(l);
+        if (this.seed != seed || this.heightCutoffNoise == null || this.heightNoise == null) {
+            ChunkRandom lv = new ChunkRandom(seed);
             this.heightCutoffNoise = new OctaveSimplexNoiseSampler(lv, IntStream.rangeClosed(-3, 0));
             this.heightNoise = new OctaveSimplexNoiseSampler(lv, (List<Integer>)ImmutableList.of((Object)0));
         }
-        this.seed = l;
+        this.seed = seed;
     }
 
-    protected void initLayerBlocks(long l) {
+    protected void initLayerBlocks(long seed) {
         this.layerBlocks = new BlockState[64];
         Arrays.fill(this.layerBlocks, TERRACOTTA);
-        ChunkRandom lv = new ChunkRandom(l);
+        ChunkRandom lv = new ChunkRandom(seed);
         this.layerNoise = new OctaveSimplexNoiseSampler(lv, (List<Integer>)ImmutableList.of((Object)0));
         for (int i = 0; i < 64; ++i) {
             if ((i += lv.nextInt(5) + 1) >= 64) continue;
@@ -172,9 +172,9 @@ extends SurfaceBuilder<TernarySurfaceConfig> {
         }
     }
 
-    protected BlockState calculateLayerBlockState(int i, int j, int k) {
-        int l = (int)Math.round(this.layerNoise.sample((double)i / 512.0, (double)k / 512.0, false) * 2.0);
-        return this.layerBlocks[(j + l + 64) % 64];
+    protected BlockState calculateLayerBlockState(int x, int y, int z) {
+        int l = (int)Math.round(this.layerNoise.sample((double)x / 512.0, (double)z / 512.0, false) * 2.0);
+        return this.layerBlocks[(y + l + 64) % 64];
     }
 }
 

@@ -21,14 +21,14 @@ extends PersistentState {
     }
 
     @Override
-    public void fromTag(CompoundTag arg) {
-        this.chunks = new LongOpenHashSet(arg.getLongArray("Forced"));
+    public void fromTag(CompoundTag tag) {
+        this.chunks = new LongOpenHashSet(tag.getLongArray("Forced"));
     }
 
     @Override
-    public CompoundTag toTag(CompoundTag arg) {
-        arg.putLongArray("Forced", this.chunks.toLongArray());
-        return arg;
+    public CompoundTag toTag(CompoundTag tag) {
+        tag.putLongArray("Forced", this.chunks.toLongArray());
+        return tag;
     }
 
     public LongSet getChunks() {

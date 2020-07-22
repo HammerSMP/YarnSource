@@ -31,28 +31,28 @@ extends HorizontalFacingBlock {
     }
 
     @Override
-    public ActionResult onUse(BlockState arg, World arg2, BlockPos arg3, PlayerEntity arg4, Hand arg5, BlockHitResult arg6) {
-        if (arg2.isClient) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        if (world.isClient) {
             return ActionResult.SUCCESS;
         }
-        arg4.openHandledScreen(arg.createScreenHandlerFactory(arg2, arg3));
-        arg4.incrementStat(Stats.INTERACT_WITH_LOOM);
+        player.openHandledScreen(state.createScreenHandlerFactory(world, pos));
+        player.incrementStat(Stats.INTERACT_WITH_LOOM);
         return ActionResult.CONSUME;
     }
 
     @Override
-    public NamedScreenHandlerFactory createScreenHandlerFactory(BlockState arg, World arg2, BlockPos arg32) {
-        return new SimpleNamedScreenHandlerFactory((i, arg3, arg4) -> new LoomScreenHandler(i, arg3, ScreenHandlerContext.create(arg2, arg32)), TITLE);
+    public NamedScreenHandlerFactory createScreenHandlerFactory(BlockState state, World world, BlockPos pos) {
+        return new SimpleNamedScreenHandlerFactory((i, arg3, arg4) -> new LoomScreenHandler(i, arg3, ScreenHandlerContext.create(world, pos)), TITLE);
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext arg) {
-        return (BlockState)this.getDefaultState().with(FACING, arg.getPlayerFacing().getOpposite());
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        return (BlockState)this.getDefaultState().with(FACING, ctx.getPlayerFacing().getOpposite());
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(FACING);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(FACING);
     }
 }
 

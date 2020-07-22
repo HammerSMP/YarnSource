@@ -44,52 +44,52 @@ extends DeadCoralFanBlock {
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
-        return FACING_TO_SHAPE.get(arg.get(FACING));
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        return FACING_TO_SHAPE.get(state.get(FACING));
     }
 
     @Override
-    public BlockState rotate(BlockState arg, BlockRotation arg2) {
-        return (BlockState)arg.with(FACING, arg2.rotate(arg.get(FACING)));
+    public BlockState rotate(BlockState state, BlockRotation rotation) {
+        return (BlockState)state.with(FACING, rotation.rotate(state.get(FACING)));
     }
 
     @Override
-    public BlockState mirror(BlockState arg, BlockMirror arg2) {
-        return arg.rotate(arg2.getRotation(arg.get(FACING)));
+    public BlockState mirror(BlockState state, BlockMirror mirror) {
+        return state.rotate(mirror.getRotation(state.get(FACING)));
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(FACING, WATERLOGGED);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(FACING, WATERLOGGED);
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
-        if (arg.get(WATERLOGGED).booleanValue()) {
-            arg4.getFluidTickScheduler().schedule(arg5, Fluids.WATER, Fluids.WATER.getTickRate(arg4));
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
+        if (state.get(WATERLOGGED).booleanValue()) {
+            world.getFluidTickScheduler().schedule(pos, Fluids.WATER, Fluids.WATER.getTickRate(world));
         }
-        if (arg2.getOpposite() == arg.get(FACING) && !arg.canPlaceAt(arg4, arg5)) {
+        if (direction.getOpposite() == state.get(FACING) && !state.canPlaceAt(world, pos)) {
             return Blocks.AIR.getDefaultState();
         }
-        return arg;
+        return state;
     }
 
     @Override
-    public boolean canPlaceAt(BlockState arg, WorldView arg2, BlockPos arg3) {
-        Direction lv = arg.get(FACING);
-        BlockPos lv2 = arg3.offset(lv.getOpposite());
-        BlockState lv3 = arg2.getBlockState(lv2);
-        return lv3.isSideSolidFullSquare(arg2, lv2, lv);
+    public boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
+        Direction lv = state.get(FACING);
+        BlockPos lv2 = pos.offset(lv.getOpposite());
+        BlockState lv3 = world.getBlockState(lv2);
+        return lv3.isSideSolidFullSquare(world, lv2, lv);
     }
 
     @Override
     @Nullable
-    public BlockState getPlacementState(ItemPlacementContext arg) {
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
         Direction[] lvs;
-        BlockState lv = super.getPlacementState(arg);
-        World lv2 = arg.getWorld();
-        BlockPos lv3 = arg.getBlockPos();
-        for (Direction lv4 : lvs = arg.getPlacementDirections()) {
+        BlockState lv = super.getPlacementState(ctx);
+        World lv2 = ctx.getWorld();
+        BlockPos lv3 = ctx.getBlockPos();
+        for (Direction lv4 : lvs = ctx.getPlacementDirections()) {
             if (!lv4.getAxis().isHorizontal() || !(lv = (BlockState)lv.with(FACING, lv4.getOpposite())).canPlaceAt(lv2, lv3)) continue;
             return lv;
         }

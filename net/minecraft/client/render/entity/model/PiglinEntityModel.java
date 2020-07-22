@@ -9,14 +9,14 @@ package net.minecraft.client.render.entity.model;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.class_4837;
-import net.minecraft.class_5418;
 import net.minecraft.client.model.ModelPart;
 import net.minecraft.client.render.entity.model.CrossbowPosing;
 import net.minecraft.client.render.entity.model.PlayerEntityModel;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.mob.AbstractPiglinEntity;
 import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.mob.PiglinActivity;
 import net.minecraft.entity.mob.PiglinEntity;
 import net.minecraft.util.math.MathHelper;
 
@@ -30,24 +30,24 @@ extends PlayerEntityModel<T> {
     private final ModelPart field_25632;
     private final ModelPart field_25633;
 
-    public PiglinEntityModel(float f, int i, int j) {
-        super(f, false);
-        this.textureWidth = i;
-        this.textureHeight = j;
+    public PiglinEntityModel(float scale, int textureWidth, int textureHeight) {
+        super(scale, false);
+        this.textureWidth = textureWidth;
+        this.textureHeight = textureHeight;
         this.torso = new ModelPart(this, 16, 16);
-        this.torso.addCuboid(-4.0f, 0.0f, -2.0f, 8.0f, 12.0f, 4.0f, f);
+        this.torso.addCuboid(-4.0f, 0.0f, -2.0f, 8.0f, 12.0f, 4.0f, scale);
         this.head = new ModelPart(this);
-        this.head.setTextureOffset(0, 0).addCuboid(-5.0f, -8.0f, -4.0f, 10.0f, 8.0f, 8.0f, f);
-        this.head.setTextureOffset(31, 1).addCuboid(-2.0f, -4.0f, -5.0f, 4.0f, 4.0f, 1.0f, f);
-        this.head.setTextureOffset(2, 4).addCuboid(2.0f, -2.0f, -5.0f, 1.0f, 2.0f, 1.0f, f);
-        this.head.setTextureOffset(2, 0).addCuboid(-3.0f, -2.0f, -5.0f, 1.0f, 2.0f, 1.0f, f);
+        this.head.setTextureOffset(0, 0).addCuboid(-5.0f, -8.0f, -4.0f, 10.0f, 8.0f, 8.0f, scale);
+        this.head.setTextureOffset(31, 1).addCuboid(-2.0f, -4.0f, -5.0f, 4.0f, 4.0f, 1.0f, scale);
+        this.head.setTextureOffset(2, 4).addCuboid(2.0f, -2.0f, -5.0f, 1.0f, 2.0f, 1.0f, scale);
+        this.head.setTextureOffset(2, 0).addCuboid(-3.0f, -2.0f, -5.0f, 1.0f, 2.0f, 1.0f, scale);
         this.rightEar = new ModelPart(this);
         this.rightEar.setPivot(4.5f, -6.0f, 0.0f);
-        this.rightEar.setTextureOffset(51, 6).addCuboid(0.0f, 0.0f, -2.0f, 1.0f, 5.0f, 4.0f, f);
+        this.rightEar.setTextureOffset(51, 6).addCuboid(0.0f, 0.0f, -2.0f, 1.0f, 5.0f, 4.0f, scale);
         this.head.addChild(this.rightEar);
         this.leftEar = new ModelPart(this);
         this.leftEar.setPivot(-4.5f, -6.0f, 0.0f);
-        this.leftEar.setTextureOffset(39, 6).addCuboid(-1.0f, 0.0f, -2.0f, 1.0f, 5.0f, 4.0f, f);
+        this.leftEar.setTextureOffset(39, 6).addCuboid(-1.0f, 0.0f, -2.0f, 1.0f, 5.0f, 4.0f, scale);
         this.head.addChild(this.leftEar);
         this.helmet = new ModelPart(this);
         this.field_25634 = this.torso.method_29991();
@@ -68,10 +68,10 @@ extends PlayerEntityModel<T> {
         float m = 0.08f + g * 0.4f;
         this.rightEar.roll = -0.5235988f - MathHelper.cos(l * 1.2f) * m;
         this.leftEar.roll = 0.5235988f + MathHelper.cos(l) * m;
-        if (arg instanceof class_5418) {
-            class_5418 lv = (class_5418)arg;
-            class_4837 lv2 = lv.getActivity();
-            if (lv2 == class_4837.DANCING) {
+        if (arg instanceof AbstractPiglinEntity) {
+            AbstractPiglinEntity lv = (AbstractPiglinEntity)arg;
+            PiglinActivity lv2 = lv.getActivity();
+            if (lv2 == PiglinActivity.DANCING) {
                 float n = h / 60.0f;
                 this.leftEar.roll = 0.5235988f + (float)Math.PI / 180 * MathHelper.sin(n * 30.0f) * 10.0f;
                 this.rightEar.roll = -0.5235988f - (float)Math.PI / 180 * MathHelper.cos(n * 30.0f) * 10.0f;
@@ -82,13 +82,13 @@ extends PlayerEntityModel<T> {
                 this.rightArm.pivotY = MathHelper.sin(n * 40.0f) * 0.5f + 1.5f;
                 this.leftArm.pivotY = MathHelper.sin(n * 40.0f) * 0.5f + 1.5f;
                 this.torso.pivotY = MathHelper.sin(n * 40.0f) * 0.35f;
-            } else if (lv2 == class_4837.ATTACKING_WITH_MELEE_WEAPON && this.handSwingProgress == 0.0f) {
+            } else if (lv2 == PiglinActivity.ATTACKING_WITH_MELEE_WEAPON && this.handSwingProgress == 0.0f) {
                 this.method_29354(arg);
-            } else if (lv2 == class_4837.CROSSBOW_HOLD) {
+            } else if (lv2 == PiglinActivity.CROSSBOW_HOLD) {
                 CrossbowPosing.hold(this.rightArm, this.leftArm, this.head, !((MobEntity)arg).isLeftHanded());
-            } else if (lv2 == class_4837.CROSSBOW_CHARGE) {
+            } else if (lv2 == PiglinActivity.CROSSBOW_CHARGE) {
                 CrossbowPosing.charge(this.rightArm, this.leftArm, arg, !((MobEntity)arg).isLeftHanded());
-            } else if (lv2 == class_4837.ADMIRING_ITEM) {
+            } else if (lv2 == PiglinActivity.ADMIRING_ITEM) {
                 this.head.pitch = 0.5f;
                 this.head.yaw = 0.0f;
                 if (((MobEntity)arg).isLeftHanded()) {
@@ -111,7 +111,7 @@ extends PlayerEntityModel<T> {
 
     @Override
     protected void method_29353(T arg, float f) {
-        if (this.handSwingProgress > 0.0f && arg instanceof PiglinEntity && ((PiglinEntity)arg).getActivity() == class_4837.ATTACKING_WITH_MELEE_WEAPON) {
+        if (this.handSwingProgress > 0.0f && arg instanceof PiglinEntity && ((PiglinEntity)arg).getActivity() == PiglinActivity.ATTACKING_WITH_MELEE_WEAPON) {
             CrossbowPosing.method_29351(this.rightArm, this.leftArm, arg, this.handSwingProgress, f);
             return;
         }

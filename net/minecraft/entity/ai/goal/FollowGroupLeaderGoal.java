@@ -14,13 +14,13 @@ extends Goal {
     private int moveDelay;
     private int checkSurroundingDelay;
 
-    public FollowGroupLeaderGoal(SchoolingFishEntity arg) {
-        this.fish = arg;
-        this.checkSurroundingDelay = this.getSurroundingSearchDelay(arg);
+    public FollowGroupLeaderGoal(SchoolingFishEntity fish) {
+        this.fish = fish;
+        this.checkSurroundingDelay = this.getSurroundingSearchDelay(fish);
     }
 
-    protected int getSurroundingSearchDelay(SchoolingFishEntity arg) {
-        return 200 + arg.getRandom().nextInt(200) % 20;
+    protected int getSurroundingSearchDelay(SchoolingFishEntity fish) {
+        return 200 + fish.getRandom().nextInt(200) % 20;
     }
 
     @Override
@@ -37,7 +37,7 @@ extends Goal {
         }
         this.checkSurroundingDelay = this.getSurroundingSearchDelay(this.fish);
         Predicate<SchoolingFishEntity> predicate = arg -> arg.canHaveMoreFishInGroup() || !arg.hasLeader();
-        List<SchoolingFishEntity> list = this.fish.world.getEntities(this.fish.getClass(), this.fish.getBoundingBox().expand(8.0, 8.0, 8.0), predicate);
+        List<SchoolingFishEntity> list = this.fish.world.getEntitiesByClass(this.fish.getClass(), this.fish.getBoundingBox().expand(8.0, 8.0, 8.0), predicate);
         SchoolingFishEntity lv = list.stream().filter(SchoolingFishEntity::canHaveMoreFishInGroup).findAny().orElse(this.fish);
         lv.pullInOtherFish(list.stream().filter(arg -> !arg.hasLeader()));
         return this.fish.hasLeader();

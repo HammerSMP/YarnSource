@@ -19,7 +19,7 @@ import net.minecraft.world.gen.feature.FeatureConfig;
 
 public class HugeFungusFeatureConfig
 implements FeatureConfig {
-    public static final Codec<HugeFungusFeatureConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)BlockState.CODEC.fieldOf("valid_base_block").forGetter(arg -> arg.validBaseBlock), (App)BlockState.CODEC.fieldOf("stem_state").forGetter(arg -> arg.stemState), (App)BlockState.CODEC.fieldOf("hat_state").forGetter(arg -> arg.hatState), (App)BlockState.CODEC.fieldOf("decor_state").forGetter(arg -> arg.decorationState), (App)Codec.BOOL.fieldOf("planted").withDefault((Object)false).forGetter(arg -> arg.planted)).apply((Applicative)instance, HugeFungusFeatureConfig::new));
+    public static final Codec<HugeFungusFeatureConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)BlockState.CODEC.fieldOf("valid_base_block").forGetter(arg -> arg.validBaseBlock), (App)BlockState.CODEC.fieldOf("stem_state").forGetter(arg -> arg.stemState), (App)BlockState.CODEC.fieldOf("hat_state").forGetter(arg -> arg.hatState), (App)BlockState.CODEC.fieldOf("decor_state").forGetter(arg -> arg.decorationState), (App)Codec.BOOL.fieldOf("planted").orElse((Object)false).forGetter(arg -> arg.planted)).apply((Applicative)instance, HugeFungusFeatureConfig::new));
     public static final HugeFungusFeatureConfig CRIMSON_FUNGUS_CONFIG = new HugeFungusFeatureConfig(Blocks.CRIMSON_NYLIUM.getDefaultState(), Blocks.CRIMSON_STEM.getDefaultState(), Blocks.NETHER_WART_BLOCK.getDefaultState(), Blocks.SHROOMLIGHT.getDefaultState(), true);
     public static final HugeFungusFeatureConfig CRIMSON_FUNGUS_NOT_PLANTED_CONFIG = new HugeFungusFeatureConfig(HugeFungusFeatureConfig.CRIMSON_FUNGUS_CONFIG.validBaseBlock, HugeFungusFeatureConfig.CRIMSON_FUNGUS_CONFIG.stemState, HugeFungusFeatureConfig.CRIMSON_FUNGUS_CONFIG.hatState, HugeFungusFeatureConfig.CRIMSON_FUNGUS_CONFIG.decorationState, false);
     public static final HugeFungusFeatureConfig WARPED_FUNGUS_CONFIG = new HugeFungusFeatureConfig(Blocks.WARPED_NYLIUM.getDefaultState(), Blocks.WARPED_STEM.getDefaultState(), Blocks.WARPED_WART_BLOCK.getDefaultState(), Blocks.SHROOMLIGHT.getDefaultState(), true);
@@ -30,12 +30,12 @@ implements FeatureConfig {
     public final BlockState decorationState;
     public final boolean planted;
 
-    public HugeFungusFeatureConfig(BlockState arg, BlockState arg2, BlockState arg3, BlockState arg4, boolean bl) {
-        this.validBaseBlock = arg;
-        this.stemState = arg2;
-        this.hatState = arg3;
-        this.decorationState = arg4;
-        this.planted = bl;
+    public HugeFungusFeatureConfig(BlockState validBaseBlock, BlockState stemState, BlockState hatState, BlockState decorationState, boolean planted) {
+        this.validBaseBlock = validBaseBlock;
+        this.stemState = stemState;
+        this.hatState = hatState;
+        this.decorationState = decorationState;
+        this.planted = planted;
     }
 }
 

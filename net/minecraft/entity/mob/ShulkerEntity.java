@@ -116,7 +116,7 @@ implements Monster {
     }
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource arg) {
+    protected SoundEvent getHurtSound(DamageSource source) {
         if (this.isClosed()) {
             return SoundEvents.ENTITY_SHULKER_HURT_CLOSED;
         }
@@ -142,15 +142,15 @@ implements Monster {
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        this.dataTracker.set(ATTACHED_FACE, Direction.byId(arg.getByte("AttachFace")));
-        this.dataTracker.set(PEEK_AMOUNT, arg.getByte("Peek"));
-        this.dataTracker.set(COLOR, arg.getByte("Color"));
-        if (arg.contains("APX")) {
-            int i = arg.getInt("APX");
-            int j = arg.getInt("APY");
-            int k = arg.getInt("APZ");
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        this.dataTracker.set(ATTACHED_FACE, Direction.byId(tag.getByte("AttachFace")));
+        this.dataTracker.set(PEEK_AMOUNT, tag.getByte("Peek"));
+        this.dataTracker.set(COLOR, tag.getByte("Color"));
+        if (tag.contains("APX")) {
+            int i = tag.getInt("APX");
+            int j = tag.getInt("APY");
+            int k = tag.getInt("APZ");
             this.dataTracker.set(ATTACHED_BLOCK, Optional.of(new BlockPos(i, j, k)));
         } else {
             this.dataTracker.set(ATTACHED_BLOCK, Optional.empty());
@@ -158,16 +158,16 @@ implements Monster {
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
-        arg.putByte("AttachFace", (byte)this.dataTracker.get(ATTACHED_FACE).getId());
-        arg.putByte("Peek", this.dataTracker.get(PEEK_AMOUNT));
-        arg.putByte("Color", this.dataTracker.get(COLOR));
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
+        tag.putByte("AttachFace", (byte)this.dataTracker.get(ATTACHED_FACE).getId());
+        tag.putByte("Peek", this.dataTracker.get(PEEK_AMOUNT));
+        tag.putByte("Color", this.dataTracker.get(COLOR));
         BlockPos lv = this.getAttachedBlock();
         if (lv != null) {
-            arg.putInt("APX", lv.getX());
-            arg.putInt("APY", lv.getY());
-            arg.putInt("APZ", lv.getZ());
+            tag.putInt("APX", lv.getX());
+            tag.putInt("APY", lv.getY());
+            tag.putInt("APZ", lv.getZ());
         }
     }
 
@@ -241,7 +241,7 @@ implements Monster {
             Direction lv7 = this.getAttachedFace().getOpposite();
             this.setBoundingBox(new Box(this.getX() - 0.5, this.getY(), this.getZ() - 0.5, this.getX() + 0.5, this.getY() + 1.0, this.getZ() + 0.5).stretch((double)lv7.getOffsetX() * d, (double)lv7.getOffsetY() * d, (double)lv7.getOffsetZ() * d));
             double h = d - e;
-            if (h > 0.0 && !(list = this.world.getEntities(this, this.getBoundingBox())).isEmpty()) {
+            if (h > 0.0 && !(list = this.world.getOtherEntities(this, this.getBoundingBox())).isEmpty()) {
                 for (Entity lv8 : list) {
                     if (lv8 instanceof ShulkerEntity || lv8.noClip) continue;
                     lv8.move(MovementType.SHULKER, new Vec3d(h * (double)lv7.getOffsetX(), h * (double)lv7.getOffsetY(), h * (double)lv7.getOffsetZ()));
@@ -251,22 +251,22 @@ implements Monster {
     }
 
     @Override
-    public void move(MovementType arg, Vec3d arg2) {
-        if (arg == MovementType.SHULKER_BOX) {
+    public void move(MovementType type, Vec3d movement) {
+        if (type == MovementType.SHULKER_BOX) {
             this.tryTeleport();
         } else {
-            super.move(arg, arg2);
+            super.move(type, movement);
         }
     }
 
     @Override
-    public void updatePosition(double d, double e, double f) {
-        super.updatePosition(d, e, f);
+    public void updatePosition(double x, double y, double z) {
+        super.updatePosition(x, y, z);
         if (this.dataTracker == null || this.age == 0) {
             return;
         }
         Optional<BlockPos> optional = this.dataTracker.get(ATTACHED_BLOCK);
-        Optional<BlockPos> optional2 = Optional.of(new BlockPos(d, e, f));
+        Optional<BlockPos> optional2 = Optional.of(new BlockPos(x, y, z));
         if (!optional2.equals(optional)) {
             this.dataTracker.set(ATTACHED_BLOCK, optional2);
             this.dataTracker.set(PEEK_AMOUNT, (byte)0);
@@ -275,16 +275,16 @@ implements Monster {
     }
 
     @Nullable
-    protected Direction findAttachSide(BlockPos arg) {
+    protected Direction findAttachSide(BlockPos pos) {
         for (Direction lv : Direction.values()) {
-            if (!this.canStay(arg, lv)) continue;
+            if (!this.canStay(pos, lv)) continue;
             return lv;
         }
         return null;
     }
 
-    private boolean canStay(BlockPos arg, Direction arg2) {
-        return this.world.isDirectionSolid(arg.offset(arg2), this, arg2.getOpposite()) && this.world.doesNotCollide(this, ShulkerLidCollisions.getLidCollisionBox(arg, arg2.getOpposite()));
+    private boolean canStay(BlockPos pos, Direction attachSide) {
+        return this.world.isDirectionSolid(pos.offset(attachSide), this, attachSide.getOpposite()) && this.world.doesNotCollide(this, ShulkerLidCollisions.getLidCollisionBox(pos, attachSide.getOpposite()));
     }
 
     protected boolean tryTeleport() {
@@ -317,9 +317,9 @@ implements Monster {
     }
 
     @Override
-    public void onTrackedDataSet(TrackedData<?> arg) {
+    public void onTrackedDataSet(TrackedData<?> data) {
         BlockPos lv;
-        if (ATTACHED_BLOCK.equals(arg) && this.world.isClient && !this.hasVehicle() && (lv = this.getAttachedBlock()) != null) {
+        if (ATTACHED_BLOCK.equals(data) && this.world.isClient && !this.hasVehicle() && (lv = this.getAttachedBlock()) != null) {
             if (this.prevAttachedBlock == null) {
                 this.prevAttachedBlock = lv;
             } else {
@@ -327,22 +327,22 @@ implements Monster {
             }
             this.resetPosition((double)lv.getX() + 0.5, lv.getY(), (double)lv.getZ() + 0.5);
         }
-        super.onTrackedDataSet(arg);
+        super.onTrackedDataSet(data);
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void updateTrackedPositionAndAngles(double d, double e, double f, float g, float h, int i, boolean bl) {
+    public void updateTrackedPositionAndAngles(double x, double y, double z, float yaw, float pitch, int interpolationSteps, boolean interpolate) {
         this.bodyTrackingIncrements = 0;
     }
 
     @Override
-    public boolean damage(DamageSource arg, float f) {
+    public boolean damage(DamageSource source, float amount) {
         Entity lv;
-        if (this.isClosed() && (lv = arg.getSource()) instanceof PersistentProjectileEntity) {
+        if (this.isClosed() && (lv = source.getSource()) instanceof PersistentProjectileEntity) {
             return false;
         }
-        if (super.damage(arg, f)) {
+        if (super.damage(source, amount)) {
             if ((double)this.getHealth() < (double)this.getMaxHealth() * 0.5 && this.random.nextInt(4) == 0) {
                 this.tryTeleport();
             }
@@ -370,30 +370,30 @@ implements Monster {
         return this.dataTracker.get(ATTACHED_BLOCK).orElse(null);
     }
 
-    public void setAttachedBlock(@Nullable BlockPos arg) {
-        this.dataTracker.set(ATTACHED_BLOCK, Optional.ofNullable(arg));
+    public void setAttachedBlock(@Nullable BlockPos pos) {
+        this.dataTracker.set(ATTACHED_BLOCK, Optional.ofNullable(pos));
     }
 
     public int getPeekAmount() {
         return this.dataTracker.get(PEEK_AMOUNT).byteValue();
     }
 
-    public void setPeekAmount(int i) {
+    public void setPeekAmount(int peekAmount) {
         if (!this.world.isClient) {
             this.getAttributeInstance(EntityAttributes.GENERIC_ARMOR).removeModifier(COVERED_ARMOR_BONUS);
-            if (i == 0) {
+            if (peekAmount == 0) {
                 this.getAttributeInstance(EntityAttributes.GENERIC_ARMOR).addPersistentModifier(COVERED_ARMOR_BONUS);
                 this.playSound(SoundEvents.ENTITY_SHULKER_CLOSE, 1.0f, 1.0f);
             } else {
                 this.playSound(SoundEvents.ENTITY_SHULKER_OPEN, 1.0f, 1.0f);
             }
         }
-        this.dataTracker.set(PEEK_AMOUNT, (byte)i);
+        this.dataTracker.set(PEEK_AMOUNT, (byte)peekAmount);
     }
 
     @Environment(value=EnvType.CLIENT)
-    public float getOpenProgress(float f) {
-        return MathHelper.lerp(f, this.prevOpenProgress, this.openProgress);
+    public float getOpenProgress(float delta) {
+        return MathHelper.lerp(delta, this.prevOpenProgress, this.openProgress);
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -407,7 +407,7 @@ implements Monster {
     }
 
     @Override
-    protected float getActiveEyeHeight(EntityPose arg, EntityDimensions arg2) {
+    protected float getActiveEyeHeight(EntityPose pose, EntityDimensions dimensions) {
         return 0.5f;
     }
 
@@ -422,7 +422,7 @@ implements Monster {
     }
 
     @Override
-    public void pushAwayFrom(Entity arg) {
+    public void pushAwayFrom(Entity entity) {
     }
 
     @Override
@@ -447,8 +447,8 @@ implements Monster {
 
     static class SearchForTargetGoal
     extends FollowTargetGoal<LivingEntity> {
-        public SearchForTargetGoal(ShulkerEntity arg2) {
-            super(arg2, LivingEntity.class, 10, true, false, arg -> arg instanceof Monster);
+        public SearchForTargetGoal(ShulkerEntity shulker) {
+            super(shulker, LivingEntity.class, 10, true, false, entity -> entity instanceof Monster);
         }
 
         @Override
@@ -460,22 +460,22 @@ implements Monster {
         }
 
         @Override
-        protected Box getSearchBox(double d) {
+        protected Box getSearchBox(double distance) {
             Direction lv = ((ShulkerEntity)this.mob).getAttachedFace();
             if (lv.getAxis() == Direction.Axis.X) {
-                return this.mob.getBoundingBox().expand(4.0, d, d);
+                return this.mob.getBoundingBox().expand(4.0, distance, distance);
             }
             if (lv.getAxis() == Direction.Axis.Z) {
-                return this.mob.getBoundingBox().expand(d, d, 4.0);
+                return this.mob.getBoundingBox().expand(distance, distance, 4.0);
             }
-            return this.mob.getBoundingBox().expand(d, 4.0, d);
+            return this.mob.getBoundingBox().expand(distance, 4.0, distance);
         }
     }
 
     class SearchForPlayerGoal
     extends FollowTargetGoal<PlayerEntity> {
-        public SearchForPlayerGoal(ShulkerEntity arg2) {
-            super((MobEntity)arg2, PlayerEntity.class, true);
+        public SearchForPlayerGoal(ShulkerEntity shulker) {
+            super((MobEntity)shulker, PlayerEntity.class, true);
         }
 
         @Override
@@ -487,15 +487,15 @@ implements Monster {
         }
 
         @Override
-        protected Box getSearchBox(double d) {
+        protected Box getSearchBox(double distance) {
             Direction lv = ((ShulkerEntity)this.mob).getAttachedFace();
             if (lv.getAxis() == Direction.Axis.X) {
-                return this.mob.getBoundingBox().expand(4.0, d, d);
+                return this.mob.getBoundingBox().expand(4.0, distance, distance);
             }
             if (lv.getAxis() == Direction.Axis.Z) {
-                return this.mob.getBoundingBox().expand(d, d, 4.0);
+                return this.mob.getBoundingBox().expand(distance, distance, 4.0);
             }
-            return this.mob.getBoundingBox().expand(d, 4.0, d);
+            return this.mob.getBoundingBox().expand(distance, 4.0, distance);
         }
     }
 
@@ -587,8 +587,8 @@ implements Monster {
 
     class ShulkerBodyControl
     extends BodyControl {
-        public ShulkerBodyControl(MobEntity arg2) {
-            super(arg2);
+        public ShulkerBodyControl(MobEntity entity) {
+            super(entity);
         }
 
         @Override

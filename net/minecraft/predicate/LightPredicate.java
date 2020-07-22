@@ -22,18 +22,18 @@ public class LightPredicate {
     public static final LightPredicate ANY = new LightPredicate(NumberRange.IntRange.ANY);
     private final NumberRange.IntRange range;
 
-    private LightPredicate(NumberRange.IntRange arg) {
-        this.range = arg;
+    private LightPredicate(NumberRange.IntRange range) {
+        this.range = range;
     }
 
-    public boolean test(ServerWorld arg, BlockPos arg2) {
+    public boolean test(ServerWorld world, BlockPos pos) {
         if (this == ANY) {
             return true;
         }
-        if (!arg.canSetBlock(arg2)) {
+        if (!world.canSetBlock(pos)) {
             return false;
         }
-        return this.range.test(arg.getLightLevel(arg2));
+        return this.range.test(world.getLightLevel(pos));
     }
 
     public JsonElement toJson() {
@@ -45,11 +45,11 @@ public class LightPredicate {
         return jsonObject;
     }
 
-    public static LightPredicate fromJson(@Nullable JsonElement jsonElement) {
-        if (jsonElement == null || jsonElement.isJsonNull()) {
+    public static LightPredicate fromJson(@Nullable JsonElement json) {
+        if (json == null || json.isJsonNull()) {
             return ANY;
         }
-        JsonObject jsonObject = JsonHelper.asObject(jsonElement, "light");
+        JsonObject jsonObject = JsonHelper.asObject(json, "light");
         NumberRange.IntRange lv = NumberRange.IntRange.fromJson(jsonObject.get("light"));
         return new LightPredicate(lv);
     }

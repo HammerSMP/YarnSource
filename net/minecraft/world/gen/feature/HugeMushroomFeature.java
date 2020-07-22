@@ -25,11 +25,11 @@ extends Feature<HugeMushroomFeatureConfig> {
         super(codec);
     }
 
-    protected void generateStem(WorldAccess arg, Random random, BlockPos arg2, HugeMushroomFeatureConfig arg3, int i, BlockPos.Mutable arg4) {
-        for (int j = 0; j < i; ++j) {
-            arg4.set(arg2).move(Direction.UP, j);
-            if (arg.getBlockState(arg4).isOpaqueFullCube(arg, arg4)) continue;
-            this.setBlockState(arg, arg4, arg3.stemProvider.getBlockState(random, arg2));
+    protected void generateStem(WorldAccess world, Random random, BlockPos pos, HugeMushroomFeatureConfig config, int height, BlockPos.Mutable arg4) {
+        for (int j = 0; j < height; ++j) {
+            arg4.set(pos).move(Direction.UP, j);
+            if (world.getBlockState(arg4).isOpaqueFullCube(world, arg4)) continue;
+            this.setBlockState(world, arg4, config.stemProvider.getBlockState(random, pos));
         }
     }
 
@@ -41,20 +41,20 @@ extends Feature<HugeMushroomFeatureConfig> {
         return i;
     }
 
-    protected boolean canGenerate(WorldAccess arg, BlockPos arg2, int i, BlockPos.Mutable arg3, HugeMushroomFeatureConfig arg4) {
-        int j = arg2.getY();
-        if (j < 1 || j + i + 1 >= 256) {
+    protected boolean canGenerate(WorldAccess world, BlockPos pos, int height, BlockPos.Mutable arg3, HugeMushroomFeatureConfig config) {
+        int j = pos.getY();
+        if (j < 1 || j + height + 1 >= 256) {
             return false;
         }
-        Block lv = arg.getBlockState(arg2.down()).getBlock();
+        Block lv = world.getBlockState(pos.down()).getBlock();
         if (!HugeMushroomFeature.isSoil(lv) && !lv.isIn(BlockTags.MUSHROOM_GROW_BLOCK)) {
             return false;
         }
-        for (int k = 0; k <= i; ++k) {
-            int l = this.getCapSize(-1, -1, arg4.capSize, k);
+        for (int k = 0; k <= height; ++k) {
+            int l = this.getCapSize(-1, -1, config.capSize, k);
             for (int m = -l; m <= l; ++m) {
                 for (int n = -l; n <= l; ++n) {
-                    BlockState lv2 = arg.getBlockState(arg3.set(arg2, m, k, n));
+                    BlockState lv2 = world.getBlockState(arg3.set(pos, m, k, n));
                     if (lv2.isAir() || lv2.isIn(BlockTags.LEAVES)) continue;
                     return false;
                 }

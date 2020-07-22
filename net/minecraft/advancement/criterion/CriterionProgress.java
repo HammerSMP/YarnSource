@@ -42,10 +42,10 @@ public class CriterionProgress {
         return "CriterionProgress{obtained=" + (this.obtained == null ? "false" : this.obtained) + '}';
     }
 
-    public void toPacket(PacketByteBuf arg) {
-        arg.writeBoolean(this.obtained != null);
+    public void toPacket(PacketByteBuf buf) {
+        buf.writeBoolean(this.obtained != null);
         if (this.obtained != null) {
-            arg.writeDate(this.obtained);
+            buf.writeDate(this.obtained);
         }
     }
 
@@ -56,21 +56,21 @@ public class CriterionProgress {
         return JsonNull.INSTANCE;
     }
 
-    public static CriterionProgress fromPacket(PacketByteBuf arg) {
+    public static CriterionProgress fromPacket(PacketByteBuf buf) {
         CriterionProgress lv = new CriterionProgress();
-        if (arg.readBoolean()) {
-            lv.obtained = arg.readDate();
+        if (buf.readBoolean()) {
+            lv.obtained = buf.readDate();
         }
         return lv;
     }
 
-    public static CriterionProgress obtainedAt(String string) {
+    public static CriterionProgress obtainedAt(String datetime) {
         CriterionProgress lv = new CriterionProgress();
         try {
-            lv.obtained = FORMAT.parse(string);
+            lv.obtained = FORMAT.parse(datetime);
         }
         catch (ParseException parseException) {
-            throw new JsonSyntaxException("Invalid datetime: " + string, (Throwable)parseException);
+            throw new JsonSyntaxException("Invalid datetime: " + datetime, (Throwable)parseException);
         }
         return lv;
     }

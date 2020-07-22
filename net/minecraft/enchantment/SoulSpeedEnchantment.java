@@ -9,18 +9,18 @@ import net.minecraft.entity.EquipmentSlot;
 
 public class SoulSpeedEnchantment
 extends Enchantment {
-    public SoulSpeedEnchantment(Enchantment.Rarity arg, EquipmentSlot ... args) {
-        super(arg, EnchantmentTarget.ARMOR_FEET, args);
+    public SoulSpeedEnchantment(Enchantment.Rarity weight, EquipmentSlot ... slotTypes) {
+        super(weight, EnchantmentTarget.ARMOR_FEET, slotTypes);
     }
 
     @Override
-    public int getMinPower(int i) {
-        return i * 10;
+    public int getMinPower(int level) {
+        return level * 10;
     }
 
     @Override
-    public int getMaxPower(int i) {
-        return this.getMinPower(i) + 15;
+    public int getMaxPower(int level) {
+        return this.getMinPower(level) + 15;
     }
 
     @Override

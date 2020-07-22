@@ -29,31 +29,31 @@ implements Packet<ServerPlayPacketListener> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public UpdateCommandBlockC2SPacket(BlockPos arg, String string, CommandBlockBlockEntity.Type arg2, boolean bl, boolean bl2, boolean bl3) {
-        this.pos = arg;
-        this.command = string;
-        this.trackOutput = bl;
-        this.conditional = bl2;
-        this.alwaysActive = bl3;
-        this.type = arg2;
+    public UpdateCommandBlockC2SPacket(BlockPos pos, String command, CommandBlockBlockEntity.Type type, boolean trackOutput, boolean conditional, boolean alwaysActive) {
+        this.pos = pos;
+        this.command = command;
+        this.trackOutput = trackOutput;
+        this.conditional = conditional;
+        this.alwaysActive = alwaysActive;
+        this.type = type;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.pos = arg.readBlockPos();
-        this.command = arg.readString(32767);
-        this.type = arg.readEnumConstant(CommandBlockBlockEntity.Type.class);
-        byte i = arg.readByte();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.pos = buf.readBlockPos();
+        this.command = buf.readString(32767);
+        this.type = buf.readEnumConstant(CommandBlockBlockEntity.Type.class);
+        byte i = buf.readByte();
         this.trackOutput = (i & 1) != 0;
         this.conditional = (i & 2) != 0;
         this.alwaysActive = (i & 4) != 0;
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeBlockPos(this.pos);
-        arg.writeString(this.command);
-        arg.writeEnumConstant(this.type);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeBlockPos(this.pos);
+        buf.writeString(this.command);
+        buf.writeEnumConstant(this.type);
         int i = 0;
         if (this.trackOutput) {
             i |= 1;
@@ -64,7 +64,7 @@ implements Packet<ServerPlayPacketListener> {
         if (this.alwaysActive) {
             i |= 4;
         }
-        arg.writeByte(i);
+        buf.writeByte(i);
     }
 
     @Override

@@ -21,13 +21,13 @@ public interface StringRenderable {
     public static final StringRenderable EMPTY = new StringRenderable(){
 
         @Override
-        public <T> Optional<T> visit(Visitor<T> arg) {
+        public <T> Optional<T> visit(Visitor<T> visitor) {
             return Optional.empty();
         }
 
         @Override
         @Environment(value=EnvType.CLIENT)
-        public <T> Optional<T> visit(StyledVisitor<T> arg, Style arg2) {
+        public <T> Optional<T> visit(StyledVisitor<T> styledVisitor, Style style) {
             return Optional.empty();
         }
     };
@@ -41,47 +41,47 @@ public interface StringRenderable {
         return new StringRenderable(){
 
             @Override
-            public <T> Optional<T> visit(Visitor<T> arg) {
-                return arg.accept(string);
+            public <T> Optional<T> visit(Visitor<T> visitor) {
+                return visitor.accept(string);
             }
 
             @Override
             @Environment(value=EnvType.CLIENT)
-            public <T> Optional<T> visit(StyledVisitor<T> arg, Style arg2) {
-                return arg.accept(arg2, string);
+            public <T> Optional<T> visit(StyledVisitor<T> styledVisitor, Style style) {
+                return styledVisitor.accept(style, string);
             }
         };
     }
 
     @Environment(value=EnvType.CLIENT)
-    public static StringRenderable styled(final String string, final Style arg) {
+    public static StringRenderable styled(final String string, final Style style) {
         return new StringRenderable(){
 
             @Override
-            public <T> Optional<T> visit(Visitor<T> arg2) {
-                return arg2.accept(string);
+            public <T> Optional<T> visit(Visitor<T> visitor) {
+                return visitor.accept(string);
             }
 
             @Override
-            public <T> Optional<T> visit(StyledVisitor<T> arg3, Style arg2) {
-                return arg3.accept(arg.withParent(arg2), string);
+            public <T> Optional<T> visit(StyledVisitor<T> styledVisitor, Style style2) {
+                return styledVisitor.accept(style.withParent(style2), string);
             }
         };
     }
 
     @Environment(value=EnvType.CLIENT)
-    public static StringRenderable concat(StringRenderable ... args) {
-        return StringRenderable.concat((List<StringRenderable>)ImmutableList.copyOf((Object[])args));
+    public static StringRenderable concat(StringRenderable ... visitables) {
+        return StringRenderable.concat((List<StringRenderable>)ImmutableList.copyOf((Object[])visitables));
     }
 
     @Environment(value=EnvType.CLIENT)
-    public static StringRenderable concat(final List<StringRenderable> list) {
+    public static StringRenderable concat(final List<StringRenderable> visitables) {
         return new StringRenderable(){
 
             @Override
-            public <T> Optional<T> visit(Visitor<T> arg) {
-                for (StringRenderable lv : list) {
-                    Optional<T> optional = lv.visit(arg);
+            public <T> Optional<T> visit(Visitor<T> visitor) {
+                for (StringRenderable lv : visitables) {
+                    Optional<T> optional = lv.visit(visitor);
                     if (!optional.isPresent()) continue;
                     return optional;
                 }
@@ -89,9 +89,9 @@ public interface StringRenderable {
             }
 
             @Override
-            public <T> Optional<T> visit(StyledVisitor<T> arg, Style arg2) {
-                for (StringRenderable lv : list) {
-                    Optional<T> optional = lv.visit(arg, arg2);
+            public <T> Optional<T> visit(StyledVisitor<T> styledVisitor, Style style) {
+                for (StringRenderable lv : visitables) {
+                    Optional<T> optional = lv.visit(styledVisitor, style);
                     if (!optional.isPresent()) continue;
                     return optional;
                 }

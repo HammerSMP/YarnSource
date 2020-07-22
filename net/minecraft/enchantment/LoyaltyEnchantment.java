@@ -9,17 +9,17 @@ import net.minecraft.entity.EquipmentSlot;
 
 public class LoyaltyEnchantment
 extends Enchantment {
-    public LoyaltyEnchantment(Enchantment.Rarity arg, EquipmentSlot ... args) {
-        super(arg, EnchantmentTarget.TRIDENT, args);
+    public LoyaltyEnchantment(Enchantment.Rarity weight, EquipmentSlot ... slotTypes) {
+        super(weight, EnchantmentTarget.TRIDENT, slotTypes);
     }
 
     @Override
-    public int getMinPower(int i) {
-        return 5 + i * 7;
+    public int getMinPower(int level) {
+        return 5 + level * 7;
     }
 
     @Override
-    public int getMaxPower(int i) {
+    public int getMaxPower(int level) {
         return 50;
     }
 
@@ -29,8 +29,8 @@ extends Enchantment {
     }
 
     @Override
-    public boolean canAccept(Enchantment arg) {
-        return super.canAccept(arg);
+    public boolean canAccept(Enchantment other) {
+        return super.canAccept(other);
     }
 }
 

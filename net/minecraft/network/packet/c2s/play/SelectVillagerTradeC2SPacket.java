@@ -22,18 +22,18 @@ implements Packet<ServerPlayPacketListener> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public SelectVillagerTradeC2SPacket(int i) {
-        this.tradeId = i;
+    public SelectVillagerTradeC2SPacket(int tradeId) {
+        this.tradeId = tradeId;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.tradeId = arg.readVarInt();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.tradeId = buf.readVarInt();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeVarInt(this.tradeId);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeVarInt(this.tradeId);
     }
 
     @Override

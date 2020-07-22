@@ -106,20 +106,20 @@ public class Models {
     public static final Model TEMPLATE_BANNER = Models.item("template_banner", new TextureKey[0]);
     public static final Model TEMPLATE_SKULL = Models.item("template_skull", new TextureKey[0]);
 
-    private static Model make(TextureKey ... args) {
-        return new Model(Optional.empty(), Optional.empty(), args);
+    private static Model make(TextureKey ... requiredTextures) {
+        return new Model(Optional.empty(), Optional.empty(), requiredTextures);
     }
 
-    private static Model block(String string, TextureKey ... args) {
-        return new Model(Optional.of(new Identifier("minecraft", "block/" + string)), Optional.empty(), args);
+    private static Model block(String parent, TextureKey ... requiredTextures) {
+        return new Model(Optional.of(new Identifier("minecraft", "block/" + parent)), Optional.empty(), requiredTextures);
     }
 
-    private static Model item(String string, TextureKey ... args) {
-        return new Model(Optional.of(new Identifier("minecraft", "item/" + string)), Optional.empty(), args);
+    private static Model item(String parent, TextureKey ... requiredTextures) {
+        return new Model(Optional.of(new Identifier("minecraft", "item/" + parent)), Optional.empty(), requiredTextures);
     }
 
-    private static Model block(String string, String string2, TextureKey ... args) {
-        return new Model(Optional.of(new Identifier("minecraft", "block/" + string)), Optional.of(string2), args);
+    private static Model block(String parent, String variant, TextureKey ... requiredTextures) {
+        return new Model(Optional.of(new Identifier("minecraft", "block/" + parent)), Optional.of(variant), requiredTextures);
     }
 }
 

@@ -15,9 +15,9 @@ implements NamedScreenHandlerFactory {
     private final Text name;
     private final ScreenHandlerFactory baseFactory;
 
-    public SimpleNamedScreenHandlerFactory(ScreenHandlerFactory arg, Text arg2) {
-        this.baseFactory = arg;
-        this.name = arg2;
+    public SimpleNamedScreenHandlerFactory(ScreenHandlerFactory baseFactory, Text name) {
+        this.baseFactory = baseFactory;
+        this.name = name;
     }
 
     @Override

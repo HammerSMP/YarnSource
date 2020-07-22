@@ -24,8 +24,8 @@ import net.minecraft.text.TranslatableText;
 @Environment(value=EnvType.CLIENT)
 public class SkinOptionsScreen
 extends GameOptionsScreen {
-    public SkinOptionsScreen(Screen arg, GameOptions arg2) {
-        super(arg, arg2, new TranslatableText("options.skinCustomisation.title"));
+    public SkinOptionsScreen(Screen parent, GameOptions gameOptions) {
+        super(parent, gameOptions, new TranslatableText("options.skinCustomisation.title"));
     }
 
     @Override
@@ -51,14 +51,14 @@ extends GameOptionsScreen {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.renderBackground(arg);
-        this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 20, 0xFFFFFF);
-        super.render(arg, i, j, f);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.renderBackground(matrices);
+        this.drawCenteredText(matrices, this.textRenderer, this.title, this.width / 2, 20, 0xFFFFFF);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 
-    private Text getPlayerModelPartDisplayString(PlayerModelPart arg) {
-        return arg.getOptionName().shallowCopy().append(": ").append(ScreenTexts.getToggleText(this.gameOptions.getEnabledPlayerModelParts().contains((Object)arg)));
+    private Text getPlayerModelPartDisplayString(PlayerModelPart part) {
+        return ScreenTexts.method_30619(part.getOptionName(), this.gameOptions.getEnabledPlayerModelParts().contains((Object)part));
     }
 }
 

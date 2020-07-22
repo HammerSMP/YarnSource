@@ -23,13 +23,13 @@ public final class GlobalPos {
     private final RegistryKey<World> dimension;
     private final BlockPos pos;
 
-    private GlobalPos(RegistryKey<World> arg, BlockPos arg2) {
+    private GlobalPos(RegistryKey<World> arg, BlockPos pos) {
         this.dimension = arg;
-        this.pos = arg2;
+        this.pos = pos;
     }
 
-    public static GlobalPos create(RegistryKey<World> arg, BlockPos arg2) {
-        return new GlobalPos(arg, arg2);
+    public static GlobalPos create(RegistryKey<World> arg, BlockPos pos) {
+        return new GlobalPos(arg, pos);
     }
 
     public RegistryKey<World> getDimension() {
@@ -40,14 +40,14 @@ public final class GlobalPos {
         return this.pos;
     }
 
-    public boolean equals(Object object) {
-        if (this == object) {
+    public boolean equals(Object o) {
+        if (this == o) {
             return true;
         }
-        if (object == null || this.getClass() != object.getClass()) {
+        if (o == null || this.getClass() != o.getClass()) {
             return false;
         }
-        GlobalPos lv = (GlobalPos)object;
+        GlobalPos lv = (GlobalPos)o;
         return Objects.equals(this.dimension, lv.dimension) && Objects.equals(this.pos, lv.pos);
     }
 

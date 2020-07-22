@@ -42,19 +42,19 @@ extends Entity {
         super(arg, arg2);
     }
 
-    protected AbstractDecorationEntity(EntityType<? extends AbstractDecorationEntity> arg, World arg2, BlockPos arg3) {
-        this(arg, arg2);
-        this.attachmentPos = arg3;
+    protected AbstractDecorationEntity(EntityType<? extends AbstractDecorationEntity> type, World world, BlockPos pos) {
+        this(type, world);
+        this.attachmentPos = pos;
     }
 
     @Override
     protected void initDataTracker() {
     }
 
-    protected void setFacing(Direction arg) {
-        Validate.notNull((Object)arg);
-        Validate.isTrue((boolean)arg.getAxis().isHorizontal());
-        this.facing = arg;
+    protected void setFacing(Direction facing) {
+        Validate.notNull((Object)facing);
+        Validate.isTrue((boolean)facing.getAxis().isHorizontal());
+        this.facing = facing;
         this.prevYaw = this.yaw = (float)(this.facing.getHorizontal() * 90);
         this.updateAttachmentPosition();
     }
@@ -123,7 +123,7 @@ extends Entity {
                 return false;
             }
         }
-        return this.world.getEntities(this, this.getBoundingBox(), PREDICATE).isEmpty();
+        return this.world.getOtherEntities(this, this.getBoundingBox(), PREDICATE).isEmpty();
     }
 
     @Override
@@ -132,9 +132,9 @@ extends Entity {
     }
 
     @Override
-    public boolean handleAttack(Entity arg) {
-        if (arg instanceof PlayerEntity) {
-            PlayerEntity lv = (PlayerEntity)arg;
+    public boolean handleAttack(Entity attacker) {
+        if (attacker instanceof PlayerEntity) {
+            PlayerEntity lv = (PlayerEntity)attacker;
             if (!this.world.canPlayerModifyAt(lv, this.attachmentPos)) {
                 return true;
             }
@@ -149,47 +149,47 @@ extends Entity {
     }
 
     @Override
-    public boolean damage(DamageSource arg, float f) {
-        if (this.isInvulnerableTo(arg)) {
+    public boolean damage(DamageSource source, float amount) {
+        if (this.isInvulnerableTo(source)) {
             return false;
         }
         if (!this.removed && !this.world.isClient) {
             this.remove();
             this.scheduleVelocityUpdate();
-            this.onBreak(arg.getAttacker());
+            this.onBreak(source.getAttacker());
         }
         return true;
     }
 
     @Override
-    public void move(MovementType arg, Vec3d arg2) {
-        if (!this.world.isClient && !this.removed && arg2.lengthSquared() > 0.0) {
+    public void move(MovementType type, Vec3d movement) {
+        if (!this.world.isClient && !this.removed && movement.lengthSquared() > 0.0) {
             this.remove();
             this.onBreak(null);
         }
     }
 
     @Override
-    public void addVelocity(double d, double e, double f) {
-        if (!this.world.isClient && !this.removed && d * d + e * e + f * f > 0.0) {
+    public void addVelocity(double deltaX, double deltaY, double deltaZ) {
+        if (!this.world.isClient && !this.removed && deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ > 0.0) {
             this.remove();
             this.onBreak(null);
         }
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        arg.putByte("Facing", (byte)this.facing.getHorizontal());
+    public void writeCustomDataToTag(CompoundTag tag) {
+        tag.putByte("Facing", (byte)this.facing.getHorizontal());
         BlockPos lv = this.getDecorationBlockPos();
-        arg.putInt("TileX", lv.getX());
-        arg.putInt("TileY", lv.getY());
-        arg.putInt("TileZ", lv.getZ());
+        tag.putInt("TileX", lv.getX());
+        tag.putInt("TileY", lv.getY());
+        tag.putInt("TileZ", lv.getZ());
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        this.attachmentPos = new BlockPos(arg.getInt("TileX"), arg.getInt("TileY"), arg.getInt("TileZ"));
-        this.facing = Direction.fromHorizontal(arg.getByte("Facing"));
+    public void readCustomDataFromTag(CompoundTag tag) {
+        this.attachmentPos = new BlockPos(tag.getInt("TileX"), tag.getInt("TileY"), tag.getInt("TileZ"));
+        this.facing = Direction.fromHorizontal(tag.getByte("Facing"));
     }
 
     public abstract int getWidthPixels();
@@ -201,8 +201,8 @@ extends Entity {
     public abstract void onPlace();
 
     @Override
-    public ItemEntity dropStack(ItemStack arg, float f) {
-        ItemEntity lv = new ItemEntity(this.world, this.getX() + (double)((float)this.facing.getOffsetX() * 0.15f), this.getY() + (double)f, this.getZ() + (double)((float)this.facing.getOffsetZ() * 0.15f), arg);
+    public ItemEntity dropStack(ItemStack stack, float yOffset) {
+        ItemEntity lv = new ItemEntity(this.world, this.getX() + (double)((float)this.facing.getOffsetX() * 0.15f), this.getY() + (double)yOffset, this.getZ() + (double)((float)this.facing.getOffsetZ() * 0.15f), stack);
         lv.setToDefaultPickupDelay();
         this.world.spawnEntity(lv);
         return lv;
@@ -214,8 +214,8 @@ extends Entity {
     }
 
     @Override
-    public void updatePosition(double d, double e, double f) {
-        this.attachmentPos = new BlockPos(d, e, f);
+    public void updatePosition(double x, double y, double z) {
+        this.attachmentPos = new BlockPos(x, y, z);
         this.updateAttachmentPosition();
         this.velocityDirty = true;
     }
@@ -225,9 +225,9 @@ extends Entity {
     }
 
     @Override
-    public float applyRotation(BlockRotation arg) {
+    public float applyRotation(BlockRotation rotation) {
         if (this.facing.getAxis() != Direction.Axis.Y) {
-            switch (arg) {
+            switch (rotation) {
                 case CLOCKWISE_180: {
                     this.facing = this.facing.getOpposite();
                     break;
@@ -243,7 +243,7 @@ extends Entity {
             }
         }
         float f = MathHelper.wrapDegrees(this.yaw);
-        switch (arg) {
+        switch (rotation) {
             case CLOCKWISE_180: {
                 return f + 180.0f;
             }
@@ -258,8 +258,8 @@ extends Entity {
     }
 
     @Override
-    public float applyMirror(BlockMirror arg) {
-        return this.applyRotation(arg.getRotation(this.facing));
+    public float applyMirror(BlockMirror mirror) {
+        return this.applyRotation(mirror.getRotation(this.facing));
     }
 
     @Override

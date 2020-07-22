@@ -35,10 +35,10 @@ public class ServerInfo {
     private String icon;
     private boolean local;
 
-    public ServerInfo(String string, String string2, boolean bl) {
-        this.name = string;
-        this.address = string2;
-        this.local = bl;
+    public ServerInfo(String name, String address, boolean local) {
+        this.name = name;
+        this.address = address;
+        this.local = local;
     }
 
     public CompoundTag serialize() {
@@ -64,13 +64,13 @@ public class ServerInfo {
         this.resourcePackState = arg;
     }
 
-    public static ServerInfo deserialize(CompoundTag arg) {
-        ServerInfo lv = new ServerInfo(arg.getString("name"), arg.getString("ip"), false);
-        if (arg.contains("icon", 8)) {
-            lv.setIcon(arg.getString("icon"));
+    public static ServerInfo deserialize(CompoundTag tag) {
+        ServerInfo lv = new ServerInfo(tag.getString("name"), tag.getString("ip"), false);
+        if (tag.contains("icon", 8)) {
+            lv.setIcon(tag.getString("icon"));
         }
-        if (arg.contains("acceptTextures", 1)) {
-            if (arg.getBoolean("acceptTextures")) {
+        if (tag.contains("acceptTextures", 1)) {
+            if (tag.getBoolean("acceptTextures")) {
                 lv.setResourcePackState(ResourcePackState.ENABLED);
             } else {
                 lv.setResourcePackState(ResourcePackState.DISABLED);
@@ -110,8 +110,8 @@ public class ServerInfo {
 
         private final Text name;
 
-        private ResourcePackState(String string2) {
-            this.name = new TranslatableText("addServer.resourcePack." + string2);
+        private ResourcePackState(String name) {
+            this.name = new TranslatableText("addServer.resourcePack." + name);
         }
 
         public Text getName() {

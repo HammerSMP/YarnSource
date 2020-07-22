@@ -64,53 +64,53 @@ extends ChunkGenerator {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public ChunkGenerator withSeed(long l) {
+    public ChunkGenerator withSeed(long seed) {
         return this;
     }
 
     @Override
-    public void buildSurface(ChunkRegion arg, Chunk arg2) {
+    public void buildSurface(ChunkRegion region, Chunk chunk) {
     }
 
     @Override
-    public void carve(long l, BiomeAccess arg, Chunk arg2, GenerationStep.Carver arg3) {
+    public void carve(long seed, BiomeAccess access, Chunk chunk, GenerationStep.Carver carver) {
     }
 
     @Override
-    public void generateFeatures(ChunkRegion arg, StructureAccessor arg2) {
+    public void generateFeatures(ChunkRegion region, StructureAccessor accessor) {
         BlockPos.Mutable lv = new BlockPos.Mutable();
-        int i = arg.getCenterChunkX();
-        int j = arg.getCenterChunkZ();
+        int i = region.getCenterChunkX();
+        int j = region.getCenterChunkZ();
         for (int k = 0; k < 16; ++k) {
             for (int l = 0; l < 16; ++l) {
                 int m = (i << 4) + k;
                 int n = (j << 4) + l;
-                arg.setBlockState(lv.set(m, 60, n), BARRIER, 2);
+                region.setBlockState(lv.set(m, 60, n), BARRIER, 2);
                 BlockState lv2 = DebugChunkGenerator.getBlockState(m, n);
                 if (lv2 == null) continue;
-                arg.setBlockState(lv.set(m, 70, n), lv2, 2);
+                region.setBlockState(lv.set(m, 70, n), lv2, 2);
             }
         }
     }
 
     @Override
-    public void populateNoise(WorldAccess arg, StructureAccessor arg2, Chunk arg3) {
+    public void populateNoise(WorldAccess world, StructureAccessor accessor, Chunk chunk) {
     }
 
     @Override
-    public int getHeight(int i, int j, Heightmap.Type arg) {
+    public int getHeight(int x, int z, Heightmap.Type heightmapType) {
         return 0;
     }
 
     @Override
-    public BlockView getColumnSample(int i, int j) {
+    public BlockView getColumnSample(int x, int z) {
         return new VerticalBlockSample(new BlockState[0]);
     }
 
-    public static BlockState getBlockState(int i, int j) {
+    public static BlockState getBlockState(int x, int z) {
         int k;
         BlockState lv = AIR;
-        if (i > 0 && j > 0 && i % 2 != 0 && j % 2 != 0 && (i /= 2) <= X_SIDE_LENGTH && (j /= 2) <= Z_SIDE_LENGTH && (k = MathHelper.abs(i * X_SIDE_LENGTH + j)) < BLOCK_STATES.size()) {
+        if (x > 0 && z > 0 && x % 2 != 0 && z % 2 != 0 && (x /= 2) <= X_SIDE_LENGTH && (z /= 2) <= Z_SIDE_LENGTH && (k = MathHelper.abs(x * X_SIDE_LENGTH + z)) < BLOCK_STATES.size()) {
             lv = BLOCK_STATES.get(k);
         }
         return lv;

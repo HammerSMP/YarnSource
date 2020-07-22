@@ -16,23 +16,23 @@ implements Packet<ServerPlayPacketListener> {
     public UpdatePlayerAbilitiesC2SPacket() {
     }
 
-    public UpdatePlayerAbilitiesC2SPacket(PlayerAbilities arg) {
-        this.flying = arg.flying;
+    public UpdatePlayerAbilitiesC2SPacket(PlayerAbilities abilities) {
+        this.flying = abilities.flying;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        byte b = arg.readByte();
+    public void read(PacketByteBuf buf) throws IOException {
+        byte b = buf.readByte();
         this.flying = (b & 2) != 0;
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
+    public void write(PacketByteBuf buf) throws IOException {
         int b = 0;
         if (this.flying) {
             b = (byte)(b | 2);
         }
-        arg.writeByte(b);
+        buf.writeByte(b);
     }
 
     @Override

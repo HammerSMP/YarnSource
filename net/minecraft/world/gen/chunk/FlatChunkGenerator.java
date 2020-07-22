@@ -31,9 +31,9 @@ extends ChunkGenerator {
     public static final Codec<FlatChunkGenerator> field_24769 = FlatChunkGeneratorConfig.CODEC.fieldOf("settings").xmap(FlatChunkGenerator::new, FlatChunkGenerator::method_28545).codec();
     private final FlatChunkGeneratorConfig generatorConfig;
 
-    public FlatChunkGenerator(FlatChunkGeneratorConfig arg) {
-        super(new FixedBiomeSource(arg.method_28917()), new FixedBiomeSource(arg.getBiome()), arg.getConfig(), 0L);
-        this.generatorConfig = arg;
+    public FlatChunkGenerator(FlatChunkGeneratorConfig config) {
+        super(new FixedBiomeSource(config.method_28917()), new FixedBiomeSource(config.getBiome()), config.getConfig(), 0L);
+        this.generatorConfig = config;
     }
 
     @Override
@@ -43,7 +43,7 @@ extends ChunkGenerator {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public ChunkGenerator withSeed(long l) {
+    public ChunkGenerator withSeed(long seed) {
         return this;
     }
 
@@ -52,7 +52,7 @@ extends ChunkGenerator {
     }
 
     @Override
-    public void buildSurface(ChunkRegion arg, Chunk arg2) {
+    public void buildSurface(ChunkRegion region, Chunk chunk) {
     }
 
     @Override
@@ -68,17 +68,17 @@ extends ChunkGenerator {
     }
 
     @Override
-    public void populateNoise(WorldAccess arg, StructureAccessor arg2, Chunk arg3) {
+    public void populateNoise(WorldAccess world, StructureAccessor accessor, Chunk chunk) {
         BlockState[] lvs = this.generatorConfig.getLayerBlocks();
         BlockPos.Mutable lv = new BlockPos.Mutable();
-        Heightmap lv2 = arg3.getHeightmap(Heightmap.Type.OCEAN_FLOOR_WG);
-        Heightmap lv3 = arg3.getHeightmap(Heightmap.Type.WORLD_SURFACE_WG);
+        Heightmap lv2 = chunk.getHeightmap(Heightmap.Type.OCEAN_FLOOR_WG);
+        Heightmap lv3 = chunk.getHeightmap(Heightmap.Type.WORLD_SURFACE_WG);
         for (int i = 0; i < lvs.length; ++i) {
             BlockState lv4 = lvs[i];
             if (lv4 == null) continue;
             for (int j = 0; j < 16; ++j) {
                 for (int k = 0; k < 16; ++k) {
-                    arg3.setBlockState(lv.set(j, i, k), lv4, false);
+                    chunk.setBlockState(lv.set(j, i, k), lv4, false);
                     lv2.trackUpdate(j, i, k, lv4);
                     lv3.trackUpdate(j, i, k, lv4);
                 }
@@ -87,19 +87,19 @@ extends ChunkGenerator {
     }
 
     @Override
-    public int getHeight(int i, int j, Heightmap.Type arg) {
+    public int getHeight(int x, int z, Heightmap.Type heightmapType) {
         BlockState[] lvs = this.generatorConfig.getLayerBlocks();
         for (int k = lvs.length - 1; k >= 0; --k) {
             BlockState lv = lvs[k];
-            if (lv == null || !arg.getBlockPredicate().test(lv)) continue;
+            if (lv == null || !heightmapType.getBlockPredicate().test(lv)) continue;
             return k + 1;
         }
         return 0;
     }
 
     @Override
-    public BlockView getColumnSample(int i, int j) {
-        return new VerticalBlockSample((BlockState[])Arrays.stream(this.generatorConfig.getLayerBlocks()).map(arg -> arg == null ? Blocks.AIR.getDefaultState() : arg).toArray(BlockState[]::new));
+    public BlockView getColumnSample(int x, int z) {
+        return new VerticalBlockSample((BlockState[])Arrays.stream(this.generatorConfig.getLayerBlocks()).map(state -> state == null ? Blocks.AIR.getDefaultState() : state).toArray(BlockState[]::new));
     }
 }
 

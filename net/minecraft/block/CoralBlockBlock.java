@@ -24,29 +24,29 @@ public class CoralBlockBlock
 extends Block {
     private final Block deadCoralBlock;
 
-    public CoralBlockBlock(Block arg, AbstractBlock.Settings arg2) {
-        super(arg2);
-        this.deadCoralBlock = arg;
+    public CoralBlockBlock(Block deadCoralBlock, AbstractBlock.Settings settings) {
+        super(settings);
+        this.deadCoralBlock = deadCoralBlock;
     }
 
     @Override
-    public void scheduledTick(BlockState arg, ServerWorld arg2, BlockPos arg3, Random random) {
-        if (!this.isInWater(arg2, arg3)) {
-            arg2.setBlockState(arg3, this.deadCoralBlock.getDefaultState(), 2);
+    public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        if (!this.isInWater(world, pos)) {
+            world.setBlockState(pos, this.deadCoralBlock.getDefaultState(), 2);
         }
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
-        if (!this.isInWater(arg4, arg5)) {
-            arg4.getBlockTickScheduler().schedule(arg5, this, 60 + arg4.getRandom().nextInt(40));
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
+        if (!this.isInWater(world, pos)) {
+            world.getBlockTickScheduler().schedule(pos, this, 60 + world.getRandom().nextInt(40));
         }
-        return super.getStateForNeighborUpdate(arg, arg2, arg3, arg4, arg5, arg6);
+        return super.getStateForNeighborUpdate(state, direction, newState, world, pos, posFrom);
     }
 
-    protected boolean isInWater(BlockView arg, BlockPos arg2) {
+    protected boolean isInWater(BlockView world, BlockPos pos) {
         for (Direction lv : Direction.values()) {
-            FluidState lv2 = arg.getFluidState(arg2.offset(lv));
+            FluidState lv2 = world.getFluidState(pos.offset(lv));
             if (!lv2.isIn(FluidTags.WATER)) continue;
             return true;
         }
@@ -55,9 +55,9 @@ extends Block {
 
     @Override
     @Nullable
-    public BlockState getPlacementState(ItemPlacementContext arg) {
-        if (!this.isInWater(arg.getWorld(), arg.getBlockPos())) {
-            arg.getWorld().getBlockTickScheduler().schedule(arg.getBlockPos(), this, 60 + arg.getWorld().getRandom().nextInt(40));
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        if (!this.isInWater(ctx.getWorld(), ctx.getBlockPos())) {
+            ctx.getWorld().getBlockTickScheduler().schedule(ctx.getBlockPos(), this, 60 + ctx.getWorld().getRandom().nextInt(40));
         }
         return this.getDefaultState();
     }

@@ -24,11 +24,11 @@ extends Sensor<LivingEntity> {
     }
 
     @Override
-    protected void sense(ServerWorld arg, LivingEntity arg2) {
-        Brain<?> lv = arg2.getBrain();
-        DamageSource lv2 = arg2.getRecentDamageSource();
+    protected void sense(ServerWorld world, LivingEntity entity) {
+        Brain<?> lv = entity.getBrain();
+        DamageSource lv2 = entity.getRecentDamageSource();
         if (lv2 != null) {
-            lv.remember(MemoryModuleType.HURT_BY, arg2.getRecentDamageSource());
+            lv.remember(MemoryModuleType.HURT_BY, entity.getRecentDamageSource());
             Entity lv3 = lv2.getAttacker();
             if (lv3 instanceof LivingEntity) {
                 lv.remember(MemoryModuleType.HURT_BY_ENTITY, (LivingEntity)lv3);
@@ -37,7 +37,7 @@ extends Sensor<LivingEntity> {
             lv.forget(MemoryModuleType.HURT_BY);
         }
         lv.getOptionalMemory(MemoryModuleType.HURT_BY_ENTITY).ifPresent(arg3 -> {
-            if (!arg3.isAlive() || arg3.world != arg) {
+            if (!arg3.isAlive() || arg3.world != world) {
                 lv.forget(MemoryModuleType.HURT_BY_ENTITY);
             }
         });

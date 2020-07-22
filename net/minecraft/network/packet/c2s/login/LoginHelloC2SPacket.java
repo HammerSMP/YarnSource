@@ -19,18 +19,18 @@ implements Packet<ServerLoginPacketListener> {
     public LoginHelloC2SPacket() {
     }
 
-    public LoginHelloC2SPacket(GameProfile gameProfile) {
-        this.profile = gameProfile;
+    public LoginHelloC2SPacket(GameProfile profile) {
+        this.profile = profile;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.profile = new GameProfile(null, arg.readString(16));
+    public void read(PacketByteBuf buf) throws IOException {
+        this.profile = new GameProfile(null, buf.readString(16));
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeString(this.profile.getName());
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeString(this.profile.getName());
     }
 
     @Override

@@ -134,24 +134,24 @@ implements Angerable {
     }
 
     @Override
-    protected void playStepSound(BlockPos arg, BlockState arg2) {
+    protected void playStepSound(BlockPos pos, BlockState state) {
         this.playSound(SoundEvents.ENTITY_WOLF_STEP, 0.15f, 1.0f);
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
-        arg.putByte("CollarColor", (byte)this.getCollarColor().getId());
-        this.angerToTag(arg);
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
+        tag.putByte("CollarColor", (byte)this.getCollarColor().getId());
+        this.angerToTag(tag);
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        if (arg.contains("CollarColor", 99)) {
-            this.setCollarColor(DyeColor.byId(arg.getInt("CollarColor")));
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        if (tag.contains("CollarColor", 99)) {
+            this.setCollarColor(DyeColor.byId(tag.getInt("CollarColor")));
         }
-        this.angerFromTag((ServerWorld)this.world, arg);
+        this.angerFromTag((ServerWorld)this.world, tag);
     }
 
     @Override
@@ -169,7 +169,7 @@ implements Angerable {
     }
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource arg) {
+    protected SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.ENTITY_WOLF_HURT;
     }
 
@@ -236,12 +236,12 @@ implements Angerable {
     }
 
     @Override
-    public void onDeath(DamageSource arg) {
+    public void onDeath(DamageSource source) {
         this.furWet = false;
         this.canShakeWaterOff = false;
         this.lastShakeProgress = 0.0f;
         this.shakeProgress = 0.0f;
-        super.onDeath(arg);
+        super.onDeath(source);
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -250,13 +250,13 @@ implements Angerable {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public float getFurWetBrightnessMultiplier(float f) {
-        return 0.75f + MathHelper.lerp(f, this.lastShakeProgress, this.shakeProgress) / 2.0f * 0.25f;
+    public float getFurWetBrightnessMultiplier(float tickDelta) {
+        return 0.75f + MathHelper.lerp(tickDelta, this.lastShakeProgress, this.shakeProgress) / 2.0f * 0.25f;
     }
 
     @Environment(value=EnvType.CLIENT)
-    public float getShakeAnimationProgress(float f, float g) {
-        float h = (MathHelper.lerp(f, this.lastShakeProgress, this.shakeProgress) + g) / 1.8f;
+    public float getShakeAnimationProgress(float tickDelta, float g) {
+        float h = (MathHelper.lerp(tickDelta, this.lastShakeProgress, this.shakeProgress) + g) / 1.8f;
         if (h < 0.0f) {
             h = 0.0f;
         } else if (h > 1.0f) {
@@ -266,13 +266,13 @@ implements Angerable {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public float getBegAnimationProgress(float f) {
-        return MathHelper.lerp(f, this.lastBegAnimationProgress, this.begAnimationProgress) * 0.15f * (float)Math.PI;
+    public float getBegAnimationProgress(float tickDelta) {
+        return MathHelper.lerp(tickDelta, this.lastBegAnimationProgress, this.begAnimationProgress) * 0.15f * (float)Math.PI;
     }
 
     @Override
-    protected float getActiveEyeHeight(EntityPose arg, EntityDimensions arg2) {
-        return arg2.height * 0.8f;
+    protected float getActiveEyeHeight(EntityPose pose, EntityDimensions dimensions) {
+        return dimensions.height * 0.8f;
     }
 
     @Override
@@ -284,31 +284,31 @@ implements Angerable {
     }
 
     @Override
-    public boolean damage(DamageSource arg, float f) {
-        if (this.isInvulnerableTo(arg)) {
+    public boolean damage(DamageSource source, float amount) {
+        if (this.isInvulnerableTo(source)) {
             return false;
         }
-        Entity lv = arg.getAttacker();
+        Entity lv = source.getAttacker();
         this.setSitting(false);
         if (lv != null && !(lv instanceof PlayerEntity) && !(lv instanceof PersistentProjectileEntity)) {
-            f = (f + 1.0f) / 2.0f;
+            amount = (amount + 1.0f) / 2.0f;
         }
-        return super.damage(arg, f);
+        return super.damage(source, amount);
     }
 
     @Override
-    public boolean tryAttack(Entity arg) {
-        boolean bl = arg.damage(DamageSource.mob(this), (int)this.getAttributeValue(EntityAttributes.GENERIC_ATTACK_DAMAGE));
+    public boolean tryAttack(Entity target) {
+        boolean bl = target.damage(DamageSource.mob(this), (int)this.getAttributeValue(EntityAttributes.GENERIC_ATTACK_DAMAGE));
         if (bl) {
-            this.dealDamage(this, arg);
+            this.dealDamage(this, target);
         }
         return bl;
     }
 
     @Override
-    public void setTamed(boolean bl) {
-        super.setTamed(bl);
-        if (bl) {
+    public void setTamed(boolean tamed) {
+        super.setTamed(tamed);
+        if (tamed) {
             this.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH).setBaseValue(20.0);
             this.setHealth(20.0f);
         } else {
@@ -322,16 +322,16 @@ implements Angerable {
      * Lifted jumps to return sites
      */
     @Override
-    public ActionResult interactMob(PlayerEntity arg, Hand arg2) {
-        ItemStack lv = arg.getStackInHand(arg2);
+    public ActionResult interactMob(PlayerEntity player, Hand hand) {
+        ItemStack lv = player.getStackInHand(hand);
         Item lv2 = lv.getItem();
         if (this.world.isClient) {
-            boolean bl = this.isOwner(arg) || this.isTamed() || lv2 == Items.BONE && !this.isTamed() && !this.hasAngerTime();
+            boolean bl = this.isOwner(player) || this.isTamed() || lv2 == Items.BONE && !this.isTamed() && !this.hasAngerTime();
             return bl ? ActionResult.CONSUME : ActionResult.PASS;
         }
         if (this.isTamed()) {
             if (this.isBreedingItem(lv) && this.getHealth() < this.getMaxHealth()) {
-                if (!arg.abilities.creativeMode) {
+                if (!player.abilities.creativeMode) {
                     lv.decrement(1);
                 }
                 this.heal(lv2.getFoodComponent().getHunger());
@@ -339,26 +339,26 @@ implements Angerable {
             }
             if (lv2 instanceof DyeItem) {
                 DyeColor lv3 = ((DyeItem)lv2).getColor();
-                if (lv3 == this.getCollarColor()) return super.interactMob(arg, arg2);
+                if (lv3 == this.getCollarColor()) return super.interactMob(player, hand);
                 this.setCollarColor(lv3);
-                if (arg.abilities.creativeMode) return ActionResult.SUCCESS;
+                if (player.abilities.creativeMode) return ActionResult.SUCCESS;
                 lv.decrement(1);
                 return ActionResult.SUCCESS;
             }
-            ActionResult lv4 = super.interactMob(arg, arg2);
-            if (lv4.isAccepted() && !this.isBaby() || !this.isOwner(arg)) return lv4;
+            ActionResult lv4 = super.interactMob(player, hand);
+            if (lv4.isAccepted() && !this.isBaby() || !this.isOwner(player)) return lv4;
             this.setSitting(!this.isSitting());
             this.jumping = false;
             this.navigation.stop();
             this.setTarget(null);
             return ActionResult.SUCCESS;
         }
-        if (lv2 != Items.BONE || this.hasAngerTime()) return super.interactMob(arg, arg2);
-        if (!arg.abilities.creativeMode) {
+        if (lv2 != Items.BONE || this.hasAngerTime()) return super.interactMob(player, hand);
+        if (!player.abilities.creativeMode) {
             lv.decrement(1);
         }
         if (this.random.nextInt(3) == 0) {
-            this.setOwner(arg);
+            this.setOwner(player);
             this.navigation.stop();
             this.setTarget(null);
             this.setSitting(true);
@@ -372,13 +372,13 @@ implements Angerable {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void handleStatus(byte b) {
-        if (b == 8) {
+    public void handleStatus(byte status) {
+        if (status == 8) {
             this.canShakeWaterOff = true;
             this.shakeProgress = 0.0f;
             this.lastShakeProgress = 0.0f;
         } else {
-            super.handleStatus(b);
+            super.handleStatus(status);
         }
     }
 
@@ -394,8 +394,8 @@ implements Angerable {
     }
 
     @Override
-    public boolean isBreedingItem(ItemStack arg) {
-        Item lv = arg.getItem();
+    public boolean isBreedingItem(ItemStack stack) {
+        Item lv = stack.getItem();
         return lv.isFood() && lv.getFoodComponent().isMeat();
     }
 
@@ -410,8 +410,8 @@ implements Angerable {
     }
 
     @Override
-    public void setAngerTime(int i) {
-        this.dataTracker.set(ANGER_TIME, i);
+    public void setAngerTime(int ticks) {
+        this.dataTracker.set(ANGER_TIME, ticks);
     }
 
     @Override
@@ -426,16 +426,16 @@ implements Angerable {
     }
 
     @Override
-    public void setAngryAt(@Nullable UUID uUID) {
-        this.targetUuid = uUID;
+    public void setAngryAt(@Nullable UUID uuid) {
+        this.targetUuid = uuid;
     }
 
     public DyeColor getCollarColor() {
         return DyeColor.byId(this.dataTracker.get(COLLAR_COLOR));
     }
 
-    public void setCollarColor(DyeColor arg) {
-        this.dataTracker.set(COLLAR_COLOR, arg.getId());
+    public void setCollarColor(DyeColor color) {
+        this.dataTracker.set(COLLAR_COLOR, color.getId());
     }
 
     @Override
@@ -449,22 +449,22 @@ implements Angerable {
         return lv;
     }
 
-    public void setBegging(boolean bl) {
-        this.dataTracker.set(BEGGING, bl);
+    public void setBegging(boolean begging) {
+        this.dataTracker.set(BEGGING, begging);
     }
 
     @Override
-    public boolean canBreedWith(AnimalEntity arg) {
-        if (arg == this) {
+    public boolean canBreedWith(AnimalEntity other) {
+        if (other == this) {
             return false;
         }
         if (!this.isTamed()) {
             return false;
         }
-        if (!(arg instanceof WolfEntity)) {
+        if (!(other instanceof WolfEntity)) {
             return false;
         }
-        WolfEntity lv = (WolfEntity)arg;
+        WolfEntity lv = (WolfEntity)other;
         if (!lv.isTamed()) {
             return false;
         }
@@ -479,26 +479,26 @@ implements Angerable {
     }
 
     @Override
-    public boolean canAttackWithOwner(LivingEntity arg, LivingEntity arg2) {
-        if (arg instanceof CreeperEntity || arg instanceof GhastEntity) {
+    public boolean canAttackWithOwner(LivingEntity target, LivingEntity owner) {
+        if (target instanceof CreeperEntity || target instanceof GhastEntity) {
             return false;
         }
-        if (arg instanceof WolfEntity) {
-            WolfEntity lv = (WolfEntity)arg;
-            return !lv.isTamed() || lv.getOwner() != arg2;
+        if (target instanceof WolfEntity) {
+            WolfEntity lv = (WolfEntity)target;
+            return !lv.isTamed() || lv.getOwner() != owner;
         }
-        if (arg instanceof PlayerEntity && arg2 instanceof PlayerEntity && !((PlayerEntity)arg2).shouldDamagePlayer((PlayerEntity)arg)) {
+        if (target instanceof PlayerEntity && owner instanceof PlayerEntity && !((PlayerEntity)owner).shouldDamagePlayer((PlayerEntity)target)) {
             return false;
         }
-        if (arg instanceof HorseBaseEntity && ((HorseBaseEntity)arg).isTame()) {
+        if (target instanceof HorseBaseEntity && ((HorseBaseEntity)target).isTame()) {
             return false;
         }
-        return !(arg instanceof TameableEntity) || !((TameableEntity)arg).isTamed();
+        return !(target instanceof TameableEntity) || !((TameableEntity)target).isTamed();
     }
 
     @Override
-    public boolean canBeLeashedBy(PlayerEntity arg) {
-        return !this.hasAngerTime() && super.canBeLeashedBy(arg);
+    public boolean canBeLeashedBy(PlayerEntity player) {
+        return !this.hasAngerTime() && super.canBeLeashedBy(player);
     }
 
     @Override
@@ -516,9 +516,9 @@ implements Angerable {
     extends FleeEntityGoal<T> {
         private final WolfEntity wolf;
 
-        public AvoidLlamaGoal(WolfEntity arg2, Class<T> class_, float f, double d, double e) {
-            super(arg2, class_, f, d, e);
-            this.wolf = arg2;
+        public AvoidLlamaGoal(WolfEntity wolf, Class<T> fleeFromType, float distance, double slowSpeed, double fastSpeed) {
+            super(wolf, fleeFromType, distance, slowSpeed, fastSpeed);
+            this.wolf = wolf;
         }
 
         @Override
@@ -529,8 +529,8 @@ implements Angerable {
             return false;
         }
 
-        private boolean isScaredOf(LlamaEntity arg) {
-            return arg.getStrength() >= WolfEntity.this.random.nextInt(5);
+        private boolean isScaredOf(LlamaEntity llama) {
+            return llama.getStrength() >= WolfEntity.this.random.nextInt(5);
         }
 
         @Override

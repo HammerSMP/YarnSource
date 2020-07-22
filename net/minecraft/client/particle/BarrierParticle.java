@@ -22,8 +22,8 @@ import net.minecraft.particle.DefaultParticleType;
 @Environment(value=EnvType.CLIENT)
 public class BarrierParticle
 extends SpriteBillboardParticle {
-    private BarrierParticle(ClientWorld arg, double d, double e, double f, ItemConvertible arg2) {
-        super(arg, d, e, f);
+    private BarrierParticle(ClientWorld world, double x, double y, double z, ItemConvertible arg2) {
+        super(world, x, y, z);
         this.setSprite(MinecraftClient.getInstance().getItemRenderer().getModels().getSprite(arg2));
         this.gravityStrength = 0.0f;
         this.maxAge = 80;
@@ -36,7 +36,7 @@ extends SpriteBillboardParticle {
     }
 
     @Override
-    public float getSize(float f) {
+    public float getSize(float tickDelta) {
         return 0.5f;
     }
 

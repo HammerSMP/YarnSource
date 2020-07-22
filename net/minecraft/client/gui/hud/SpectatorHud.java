@@ -32,14 +32,14 @@ implements SpectatorMenuCloseCallback {
     private long lastInteractionTime;
     private SpectatorMenu spectatorMenu;
 
-    public SpectatorHud(MinecraftClient arg) {
-        this.client = arg;
+    public SpectatorHud(MinecraftClient client) {
+        this.client = client;
     }
 
-    public void selectSlot(int i) {
+    public void selectSlot(int slot) {
         this.lastInteractionTime = Util.getMeasuringTimeMs();
         if (this.spectatorMenu != null) {
-            this.spectatorMenu.useCommand(i);
+            this.spectatorMenu.useCommand(slot);
         } else {
             this.spectatorMenu = new SpectatorMenu(this);
         }
@@ -122,7 +122,7 @@ implements SpectatorMenuCloseCallback {
     }
 
     @Override
-    public void close(SpectatorMenu arg) {
+    public void close(SpectatorMenu menu) {
         this.spectatorMenu = null;
         this.lastInteractionTime = 0L;
     }
@@ -131,10 +131,10 @@ implements SpectatorMenuCloseCallback {
         return this.spectatorMenu != null;
     }
 
-    public void cycleSlot(double d) {
-        int i = this.spectatorMenu.getSelectedSlot() + (int)d;
+    public void cycleSlot(double offset) {
+        int i = this.spectatorMenu.getSelectedSlot() + (int)offset;
         while (!(i < 0 || i > 8 || this.spectatorMenu.getCommand(i) != SpectatorMenu.BLANK_COMMAND && this.spectatorMenu.getCommand(i).isEnabled())) {
-            i = (int)((double)i + d);
+            i = (int)((double)i + offset);
         }
         if (i >= 0 && i <= 8) {
             this.spectatorMenu.useCommand(i);

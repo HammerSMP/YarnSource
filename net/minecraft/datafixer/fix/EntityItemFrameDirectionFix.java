@@ -18,8 +18,8 @@ import net.minecraft.datafixer.fix.ChoiceFix;
 
 public class EntityItemFrameDirectionFix
 extends ChoiceFix {
-    public EntityItemFrameDirectionFix(Schema schema, boolean bl) {
-        super(schema, bl, "EntityItemFrameDirectionFix", TypeReferences.ENTITY, "minecraft:item_frame");
+    public EntityItemFrameDirectionFix(Schema outputSchema, boolean changesType) {
+        super(outputSchema, changesType, "EntityItemFrameDirectionFix", TypeReferences.ENTITY, "minecraft:item_frame");
     }
 
     public Dynamic<?> fixDirection(Dynamic<?> dynamic) {
@@ -27,8 +27,8 @@ extends ChoiceFix {
     }
 
     @Override
-    protected Typed<?> transform(Typed<?> typed) {
-        return typed.update(DSL.remainderFinder(), this::fixDirection);
+    protected Typed<?> transform(Typed<?> inputType) {
+        return inputType.update(DSL.remainderFinder(), this::fixDirection);
     }
 
     private static byte updateDirection(byte b) {

@@ -21,8 +21,8 @@ implements Packet<ClientPlayPacketListener> {
     public KeepAliveS2CPacket() {
     }
 
-    public KeepAliveS2CPacket(long l) {
-        this.id = l;
+    public KeepAliveS2CPacket(long id) {
+        this.id = id;
     }
 
     @Override
@@ -31,13 +31,13 @@ implements Packet<ClientPlayPacketListener> {
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.id = arg.readLong();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.id = buf.readLong();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeLong(this.id);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeLong(this.id);
     }
 
     @Environment(value=EnvType.CLIENT)

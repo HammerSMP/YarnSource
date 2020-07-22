@@ -42,7 +42,7 @@ implements DebugRenderer.Renderer {
     }
 
     @Override
-    public void render(MatrixStack arg, VertexConsumerProvider arg2, double d, double e, double f) {
+    public void render(MatrixStack matrices, VertexConsumerProvider vertexConsumers, double cameraX, double cameraY, double cameraZ) {
         RenderSystem.pushMatrix();
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
@@ -54,7 +54,7 @@ implements DebugRenderer.Renderer {
             BlockPos lv3 = this.field_4640.get(i);
             Float float_ = this.field_4635.get(i);
             float g = float_.floatValue() / 2.0f;
-            WorldRenderer.drawBox(lv2, (double)((float)lv3.getX() + 0.5f - g) - d, (double)((float)lv3.getY() + 0.5f - g) - e, (double)((float)lv3.getZ() + 0.5f - g) - f, (double)((float)lv3.getX() + 0.5f + g) - d, (double)((float)lv3.getY() + 0.5f + g) - e, (double)((float)lv3.getZ() + 0.5f + g) - f, this.field_4639.get(i).floatValue(), this.field_4636.get(i).floatValue(), this.field_4638.get(i).floatValue(), this.field_4637.get(i).floatValue());
+            WorldRenderer.drawBox(lv2, (double)((float)lv3.getX() + 0.5f - g) - cameraX, (double)((float)lv3.getY() + 0.5f - g) - cameraY, (double)((float)lv3.getZ() + 0.5f - g) - cameraZ, (double)((float)lv3.getX() + 0.5f + g) - cameraX, (double)((float)lv3.getY() + 0.5f + g) - cameraY, (double)((float)lv3.getZ() + 0.5f + g) - cameraZ, this.field_4639.get(i).floatValue(), this.field_4636.get(i).floatValue(), this.field_4638.get(i).floatValue(), this.field_4637.get(i).floatValue());
         }
         lv.draw();
         RenderSystem.enableTexture();

@@ -32,37 +32,37 @@ extends AbstractCriterion<Conditions> {
         return new Conditions(arg, lv);
     }
 
-    public void trigger(ServerPlayerEntity arg, Recipe<?> arg22) {
-        this.test(arg, arg2 -> arg2.matches(arg22));
+    public void trigger(ServerPlayerEntity player, Recipe<?> recipe) {
+        this.test(player, arg2 -> arg2.matches(recipe));
     }
 
-    public static Conditions create(Identifier arg) {
-        return new Conditions(EntityPredicate.Extended.EMPTY, arg);
+    public static Conditions create(Identifier id) {
+        return new Conditions(EntityPredicate.Extended.EMPTY, id);
     }
 
     @Override
-    public /* synthetic */ AbstractCriterionConditions conditionsFromJson(JsonObject jsonObject, EntityPredicate.Extended arg, AdvancementEntityPredicateDeserializer arg2) {
-        return this.conditionsFromJson(jsonObject, arg, arg2);
+    public /* synthetic */ AbstractCriterionConditions conditionsFromJson(JsonObject obj, EntityPredicate.Extended playerPredicate, AdvancementEntityPredicateDeserializer predicateDeserializer) {
+        return this.conditionsFromJson(obj, playerPredicate, predicateDeserializer);
     }
 
     public static class Conditions
     extends AbstractCriterionConditions {
         private final Identifier recipe;
 
-        public Conditions(EntityPredicate.Extended arg, Identifier arg2) {
-            super(ID, arg);
-            this.recipe = arg2;
+        public Conditions(EntityPredicate.Extended player, Identifier recipe) {
+            super(ID, player);
+            this.recipe = recipe;
         }
 
         @Override
-        public JsonObject toJson(AdvancementEntityPredicateSerializer arg) {
-            JsonObject jsonObject = super.toJson(arg);
+        public JsonObject toJson(AdvancementEntityPredicateSerializer predicateSerializer) {
+            JsonObject jsonObject = super.toJson(predicateSerializer);
             jsonObject.addProperty("recipe", this.recipe.toString());
             return jsonObject;
         }
 
-        public boolean matches(Recipe<?> arg) {
-            return this.recipe.equals(arg.getId());
+        public boolean matches(Recipe<?> recipe) {
+            return this.recipe.equals(recipe.getId());
         }
     }
 }

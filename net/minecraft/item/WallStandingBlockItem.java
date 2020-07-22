@@ -22,22 +22,22 @@ public class WallStandingBlockItem
 extends BlockItem {
     protected final Block wallBlock;
 
-    public WallStandingBlockItem(Block arg, Block arg2, Item.Settings arg3) {
-        super(arg, arg3);
-        this.wallBlock = arg2;
+    public WallStandingBlockItem(Block standingBlock, Block wallBlock, Item.Settings settings) {
+        super(standingBlock, settings);
+        this.wallBlock = wallBlock;
     }
 
     @Override
     @Nullable
-    protected BlockState getPlacementState(ItemPlacementContext arg) {
-        BlockState lv = this.wallBlock.getPlacementState(arg);
+    protected BlockState getPlacementState(ItemPlacementContext context) {
+        BlockState lv = this.wallBlock.getPlacementState(context);
         BlockState lv2 = null;
-        World lv3 = arg.getWorld();
-        BlockPos lv4 = arg.getBlockPos();
-        for (Direction lv5 : arg.getPlacementDirections()) {
+        World lv3 = context.getWorld();
+        BlockPos lv4 = context.getBlockPos();
+        for (Direction lv5 : context.getPlacementDirections()) {
             BlockState lv6;
             if (lv5 == Direction.UP) continue;
-            BlockState blockState = lv6 = lv5 == Direction.DOWN ? this.getBlock().getPlacementState(arg) : lv;
+            BlockState blockState = lv6 = lv5 == Direction.DOWN ? this.getBlock().getPlacementState(context) : lv;
             if (lv6 == null || !lv6.canPlaceAt(lv3, lv4)) continue;
             lv2 = lv6;
             break;
@@ -46,9 +46,9 @@ extends BlockItem {
     }
 
     @Override
-    public void appendBlocks(Map<Block, Item> map, Item arg) {
-        super.appendBlocks(map, arg);
-        map.put(this.wallBlock, arg);
+    public void appendBlocks(Map<Block, Item> map, Item item) {
+        super.appendBlocks(map, item);
+        map.put(this.wallBlock, item);
     }
 }
 

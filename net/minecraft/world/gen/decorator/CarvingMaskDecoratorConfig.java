@@ -22,9 +22,9 @@ implements DecoratorConfig {
     protected final GenerationStep.Carver step;
     protected final float probability;
 
-    public CarvingMaskDecoratorConfig(GenerationStep.Carver arg, float f) {
-        this.step = arg;
-        this.probability = f;
+    public CarvingMaskDecoratorConfig(GenerationStep.Carver step, float probability) {
+        this.step = step;
+        this.probability = probability;
     }
 }
 

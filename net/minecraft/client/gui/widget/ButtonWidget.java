@@ -16,18 +16,18 @@ import net.minecraft.text.Text;
 @Environment(value=EnvType.CLIENT)
 public class ButtonWidget
 extends AbstractPressableButtonWidget {
-    public static final TooltipSupplier EMPTY = (arg, arg2, i, j) -> {};
+    public static final TooltipSupplier EMPTY = (button, matrices, mouseX, mouseY) -> {};
     protected final PressAction onPress;
     protected final TooltipSupplier tooltipSupplier;
 
-    public ButtonWidget(int i, int j, int k, int l, Text arg, PressAction arg2) {
-        this(i, j, k, l, arg, arg2, EMPTY);
+    public ButtonWidget(int x, int y, int width, int height, Text message, PressAction onPress) {
+        this(x, y, width, height, message, onPress, EMPTY);
     }
 
-    public ButtonWidget(int i, int j, int k, int l, Text arg, PressAction arg2, TooltipSupplier arg3) {
-        super(i, j, k, l, arg);
-        this.onPress = arg2;
-        this.tooltipSupplier = arg3;
+    public ButtonWidget(int x, int y, int width, int height, Text message, PressAction onPress, TooltipSupplier tooltipSupplier) {
+        super(x, y, width, height, message);
+        this.onPress = onPress;
+        this.tooltipSupplier = tooltipSupplier;
     }
 
     @Override
@@ -36,16 +36,16 @@ extends AbstractPressableButtonWidget {
     }
 
     @Override
-    public void renderButton(MatrixStack arg, int i, int j, float f) {
-        super.renderButton(arg, i, j, f);
+    public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        super.renderButton(matrices, mouseX, mouseY, delta);
         if (this.isHovered()) {
-            this.renderToolTip(arg, i, j);
+            this.renderToolTip(matrices, mouseX, mouseY);
         }
     }
 
     @Override
-    public void renderToolTip(MatrixStack arg, int i, int j) {
-        this.tooltipSupplier.onTooltip(this, arg, i, j);
+    public void renderToolTip(MatrixStack matrices, int mouseX, int mouseY) {
+        this.tooltipSupplier.onTooltip(this, matrices, mouseX, mouseY);
     }
 
     @Environment(value=EnvType.CLIENT)

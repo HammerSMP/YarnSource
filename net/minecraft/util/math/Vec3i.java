@@ -30,14 +30,14 @@ implements Comparable<Vec3i> {
     private int y;
     private int z;
 
-    public Vec3i(int i, int j, int k) {
-        this.x = i;
-        this.y = j;
-        this.z = k;
+    public Vec3i(int x, int y, int z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
     }
 
-    public Vec3i(double d, double e, double f) {
-        this(MathHelper.floor(d), MathHelper.floor(e), MathHelper.floor(f));
+    public Vec3i(double x, double y, double z) {
+        this(MathHelper.floor(x), MathHelper.floor(y), MathHelper.floor(z));
     }
 
     public boolean equals(Object object) {
@@ -84,16 +84,16 @@ implements Comparable<Vec3i> {
         return this.z;
     }
 
-    protected void setX(int i) {
-        this.x = i;
+    protected void setX(int x) {
+        this.x = x;
     }
 
-    protected void setY(int i) {
-        this.y = i;
+    protected void setY(int y) {
+        this.y = y;
     }
 
-    protected void setZ(int i) {
-        this.z = i;
+    protected void setZ(int z) {
+        this.z = z;
     }
 
     public Vec3i down() {
@@ -104,46 +104,50 @@ implements Comparable<Vec3i> {
         return this.offset(Direction.DOWN, i);
     }
 
-    public Vec3i offset(Direction arg, int i) {
-        if (i == 0) {
+    public Vec3i offset(Direction direction, int distance) {
+        if (distance == 0) {
             return this;
         }
-        return new Vec3i(this.getX() + arg.getOffsetX() * i, this.getY() + arg.getOffsetY() * i, this.getZ() + arg.getOffsetZ() * i);
+        return new Vec3i(this.getX() + direction.getOffsetX() * distance, this.getY() + direction.getOffsetY() * distance, this.getZ() + direction.getOffsetZ() * distance);
     }
 
-    public Vec3i crossProduct(Vec3i arg) {
-        return new Vec3i(this.getY() * arg.getZ() - this.getZ() * arg.getY(), this.getZ() * arg.getX() - this.getX() * arg.getZ(), this.getX() * arg.getY() - this.getY() * arg.getX());
+    public Vec3i crossProduct(Vec3i vec) {
+        return new Vec3i(this.getY() * vec.getZ() - this.getZ() * vec.getY(), this.getZ() * vec.getX() - this.getX() * vec.getZ(), this.getX() * vec.getY() - this.getY() * vec.getX());
     }
 
-    public boolean isWithinDistance(Vec3i arg, double d) {
-        return this.getSquaredDistance(arg.getX(), arg.getY(), arg.getZ(), false) < d * d;
+    public boolean isWithinDistance(Vec3i vec, double distance) {
+        return this.getSquaredDistance(vec.getX(), vec.getY(), vec.getZ(), false) < distance * distance;
     }
 
-    public boolean isWithinDistance(Position arg, double d) {
-        return this.getSquaredDistance(arg.getX(), arg.getY(), arg.getZ(), true) < d * d;
+    public boolean isWithinDistance(Position pos, double distance) {
+        return this.getSquaredDistance(pos.getX(), pos.getY(), pos.getZ(), true) < distance * distance;
     }
 
-    public double getSquaredDistance(Vec3i arg) {
-        return this.getSquaredDistance(arg.getX(), arg.getY(), arg.getZ(), true);
+    public double getSquaredDistance(Vec3i vec) {
+        return this.getSquaredDistance(vec.getX(), vec.getY(), vec.getZ(), true);
     }
 
-    public double getSquaredDistance(Position arg, boolean bl) {
-        return this.getSquaredDistance(arg.getX(), arg.getY(), arg.getZ(), bl);
+    public double getSquaredDistance(Position pos, boolean treatAsBlockPos) {
+        return this.getSquaredDistance(pos.getX(), pos.getY(), pos.getZ(), treatAsBlockPos);
     }
 
-    public double getSquaredDistance(double d, double e, double f, boolean bl) {
-        double g = bl ? 0.5 : 0.0;
-        double h = (double)this.getX() + g - d;
-        double i = (double)this.getY() + g - e;
-        double j = (double)this.getZ() + g - f;
+    public double getSquaredDistance(double x, double y, double z, boolean treatAsBlockPos) {
+        double g = treatAsBlockPos ? 0.5 : 0.0;
+        double h = (double)this.getX() + g - x;
+        double i = (double)this.getY() + g - y;
+        double j = (double)this.getZ() + g - z;
         return h * h + i * i + j * j;
     }
 
-    public int getManhattanDistance(Vec3i arg) {
-        float f = Math.abs(arg.getX() - this.getX());
-        float g = Math.abs(arg.getY() - this.getY());
-        float h = Math.abs(arg.getZ() - this.getZ());
+    public int getManhattanDistance(Vec3i vec) {
+        float f = Math.abs(vec.getX() - this.getX());
+        float g = Math.abs(vec.getY() - this.getY());
+        float h = Math.abs(vec.getZ() - this.getZ());
         return (int)(f + g + h);
+    }
+
+    public int method_30558(Direction.Axis arg) {
+        return arg.choose(this.x, this.y, this.z);
     }
 
     public String toString() {

@@ -29,13 +29,13 @@ implements Packet<ServerPlayPacketListener> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public ClickWindowC2SPacket(int i, int j, int k, SlotActionType arg, ItemStack arg2, short s) {
-        this.syncId = i;
-        this.slot = j;
-        this.clickData = k;
-        this.stack = arg2.copy();
-        this.actionId = s;
-        this.actionType = arg;
+    public ClickWindowC2SPacket(int syncId, int slot, int clickData, SlotActionType actionType, ItemStack stack, short actionId) {
+        this.syncId = syncId;
+        this.slot = slot;
+        this.clickData = clickData;
+        this.stack = stack.copy();
+        this.actionId = actionId;
+        this.actionType = actionType;
     }
 
     @Override
@@ -44,23 +44,23 @@ implements Packet<ServerPlayPacketListener> {
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.syncId = arg.readByte();
-        this.slot = arg.readShort();
-        this.clickData = arg.readByte();
-        this.actionId = arg.readShort();
-        this.actionType = arg.readEnumConstant(SlotActionType.class);
-        this.stack = arg.readItemStack();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.syncId = buf.readByte();
+        this.slot = buf.readShort();
+        this.clickData = buf.readByte();
+        this.actionId = buf.readShort();
+        this.actionType = buf.readEnumConstant(SlotActionType.class);
+        this.stack = buf.readItemStack();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeByte(this.syncId);
-        arg.writeShort(this.slot);
-        arg.writeByte(this.clickData);
-        arg.writeShort(this.actionId);
-        arg.writeEnumConstant(this.actionType);
-        arg.writeItemStack(this.stack);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeByte(this.syncId);
+        buf.writeShort(this.slot);
+        buf.writeByte(this.clickData);
+        buf.writeShort(this.actionId);
+        buf.writeEnumConstant(this.actionType);
+        buf.writeItemStack(this.stack);
     }
 
     public int getSyncId() {

@@ -18,8 +18,8 @@ import net.minecraft.datafixer.fix.ChoiceFix;
 
 public class StriderGravityFix
 extends ChoiceFix {
-    public StriderGravityFix(Schema schema, boolean bl) {
-        super(schema, bl, "StriderGravityFix", TypeReferences.ENTITY, "minecraft:strider");
+    public StriderGravityFix(Schema outputSchema, boolean changesType) {
+        super(outputSchema, changesType, "StriderGravityFix", TypeReferences.ENTITY, "minecraft:strider");
     }
 
     public Dynamic<?> updateNoGravityTag(Dynamic<?> dynamic) {
@@ -30,8 +30,8 @@ extends ChoiceFix {
     }
 
     @Override
-    protected Typed<?> transform(Typed<?> typed) {
-        return typed.update(DSL.remainderFinder(), this::updateNoGravityTag);
+    protected Typed<?> transform(Typed<?> inputType) {
+        return inputType.update(DSL.remainderFinder(), this::updateNoGravityTag);
     }
 }
 

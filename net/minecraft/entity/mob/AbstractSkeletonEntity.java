@@ -97,7 +97,7 @@ implements RangedAttackMob {
     }
 
     @Override
-    protected void playStepSound(BlockPos arg, BlockState arg2) {
+    protected void playStepSound(BlockPos pos, BlockState state) {
         this.playSound(this.getStepSound(), 0.15f, 1.0f);
     }
 
@@ -140,19 +140,19 @@ implements RangedAttackMob {
     }
 
     @Override
-    protected void initEquipment(LocalDifficulty arg) {
-        super.initEquipment(arg);
+    protected void initEquipment(LocalDifficulty difficulty) {
+        super.initEquipment(difficulty);
         this.equipStack(EquipmentSlot.MAINHAND, new ItemStack(Items.BOW));
     }
 
     @Override
     @Nullable
-    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
-        arg4 = super.initialize(arg, arg2, arg3, arg4, arg5);
-        this.initEquipment(arg2);
-        this.updateEnchantments(arg2);
+    public EntityData initialize(class_5425 arg, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable CompoundTag entityTag) {
+        entityData = super.initialize(arg, difficulty, spawnReason, entityData, entityTag);
+        this.initEquipment(difficulty);
+        this.updateEnchantments(difficulty);
         this.updateAttackType();
-        this.setCanPickUpLoot(this.random.nextFloat() < 0.55f * arg2.getClampedLocalDifficulty());
+        this.setCanPickUpLoot(this.random.nextFloat() < 0.55f * difficulty.getClampedLocalDifficulty());
         if (this.getEquippedStack(EquipmentSlot.HEAD).isEmpty()) {
             LocalDate localDate = LocalDate.now();
             int i = localDate.get(ChronoField.DAY_OF_MONTH);
@@ -162,7 +162,7 @@ implements RangedAttackMob {
                 this.armorDropChances[EquipmentSlot.HEAD.getEntitySlotId()] = 0.0f;
             }
         }
-        return arg4;
+        return entityData;
     }
 
     public void updateAttackType() {
@@ -185,43 +185,43 @@ implements RangedAttackMob {
     }
 
     @Override
-    public void attack(LivingEntity arg, float f) {
+    public void attack(LivingEntity target, float pullProgress) {
         ItemStack lv = this.getArrowType(this.getStackInHand(ProjectileUtil.getHandPossiblyHolding(this, Items.BOW)));
-        PersistentProjectileEntity lv2 = this.createArrowProjectile(lv, f);
-        double d = arg.getX() - this.getX();
-        double e = arg.getBodyY(0.3333333333333333) - lv2.getY();
-        double g = arg.getZ() - this.getZ();
+        PersistentProjectileEntity lv2 = this.createArrowProjectile(lv, pullProgress);
+        double d = target.getX() - this.getX();
+        double e = target.getBodyY(0.3333333333333333) - lv2.getY();
+        double g = target.getZ() - this.getZ();
         double h = MathHelper.sqrt(d * d + g * g);
         lv2.setVelocity(d, e + h * (double)0.2f, g, 1.6f, 14 - this.world.getDifficulty().getId() * 4);
         this.playSound(SoundEvents.ENTITY_SKELETON_SHOOT, 1.0f, 1.0f / (this.getRandom().nextFloat() * 0.4f + 0.8f));
         this.world.spawnEntity(lv2);
     }
 
-    protected PersistentProjectileEntity createArrowProjectile(ItemStack arg, float f) {
-        return ProjectileUtil.createArrowProjectile(this, arg, f);
+    protected PersistentProjectileEntity createArrowProjectile(ItemStack arrow, float damageModifier) {
+        return ProjectileUtil.createArrowProjectile(this, arrow, damageModifier);
     }
 
     @Override
-    public boolean canUseRangedWeapon(RangedWeaponItem arg) {
-        return arg == Items.BOW;
+    public boolean canUseRangedWeapon(RangedWeaponItem weapon) {
+        return weapon == Items.BOW;
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
         this.updateAttackType();
     }
 
     @Override
-    public void equipStack(EquipmentSlot arg, ItemStack arg2) {
-        super.equipStack(arg, arg2);
+    public void equipStack(EquipmentSlot slot, ItemStack stack) {
+        super.equipStack(slot, stack);
         if (!this.world.isClient) {
             this.updateAttackType();
         }
     }
 
     @Override
-    protected float getActiveEyeHeight(EntityPose arg, EntityDimensions arg2) {
+    protected float getActiveEyeHeight(EntityPose pose, EntityDimensions dimensions) {
         return 1.74f;
     }
 

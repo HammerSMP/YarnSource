@@ -19,11 +19,11 @@ import net.minecraft.world.gen.feature.FeatureConfig;
 public class ProbabilityConfig
 implements CarverConfig,
 FeatureConfig {
-    public static final Codec<ProbabilityConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Codec.FLOAT.fieldOf("probability").withDefault((Object)Float.valueOf(0.0f)).forGetter(arg -> Float.valueOf(arg.probability))).apply((Applicative)instance, ProbabilityConfig::new));
+    public static final Codec<ProbabilityConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Codec.floatRange((float)0.0f, (float)1.0f).fieldOf("probability").forGetter(arg -> Float.valueOf(arg.probability))).apply((Applicative)instance, ProbabilityConfig::new));
     public final float probability;
 
-    public ProbabilityConfig(float f) {
-        this.probability = f;
+    public ProbabilityConfig(float probability) {
+        this.probability = probability;
     }
 }
 

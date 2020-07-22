@@ -16,9 +16,9 @@ public class TickTimeTracker {
     private final IntSupplier tickGetter;
     private ReadableProfiler profiler = DummyProfiler.INSTANCE;
 
-    public TickTimeTracker(LongSupplier longSupplier, IntSupplier intSupplier) {
-        this.timeGetter = longSupplier;
-        this.tickGetter = intSupplier;
+    public TickTimeTracker(LongSupplier timeGetter, IntSupplier tickGetter) {
+        this.timeGetter = timeGetter;
+        this.tickGetter = tickGetter;
     }
 
     public boolean isActive() {

@@ -27,14 +27,14 @@ extends ConfirmScreen {
     private final String link;
     private final boolean drawWarning;
 
-    public ConfirmChatLinkScreen(BooleanConsumer booleanConsumer, String string, boolean bl) {
-        super(booleanConsumer, new TranslatableText(bl ? "chat.link.confirmTrusted" : "chat.link.confirm"), new LiteralText(string));
-        this.yesTranslated = bl ? new TranslatableText("chat.link.open") : ScreenTexts.YES;
-        this.noTranslated = bl ? ScreenTexts.CANCEL : ScreenTexts.NO;
+    public ConfirmChatLinkScreen(BooleanConsumer callback, String link, boolean trusted) {
+        super(callback, new TranslatableText(trusted ? "chat.link.confirmTrusted" : "chat.link.confirm"), new LiteralText(link));
+        this.yesTranslated = trusted ? new TranslatableText("chat.link.open") : ScreenTexts.YES;
+        this.noTranslated = trusted ? ScreenTexts.CANCEL : ScreenTexts.NO;
         this.copy = new TranslatableText("chat.copy");
         this.warning = new TranslatableText("chat.link.warning");
-        this.drawWarning = !bl;
-        this.link = string;
+        this.drawWarning = !trusted;
+        this.link = link;
     }
 
     @Override
@@ -55,10 +55,10 @@ extends ConfirmScreen {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        super.render(arg, i, j, f);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        super.render(matrices, mouseX, mouseY, delta);
         if (this.drawWarning) {
-            this.drawCenteredText(arg, this.textRenderer, this.warning, this.width / 2, 110, 0xFFCCCC);
+            this.drawCenteredText(matrices, this.textRenderer, this.warning, this.width / 2, 110, 0xFFCCCC);
         }
     }
 }

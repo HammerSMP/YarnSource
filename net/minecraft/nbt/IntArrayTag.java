@@ -49,18 +49,18 @@ extends AbstractListTag<IntTag> {
         }
 
         @Override
-        public /* synthetic */ Tag read(DataInput dataInput, int i, PositionTracker arg) throws IOException {
-            return this.read(dataInput, i, arg);
+        public /* synthetic */ Tag read(DataInput input, int depth, PositionTracker tracker) throws IOException {
+            return this.read(input, depth, tracker);
         }
     };
     private int[] value;
 
-    public IntArrayTag(int[] is) {
-        this.value = is;
+    public IntArrayTag(int[] value) {
+        this.value = value;
     }
 
-    public IntArrayTag(List<Integer> list) {
-        this(IntArrayTag.toArray(list));
+    public IntArrayTag(List<Integer> value) {
+        this(IntArrayTag.toArray(value));
     }
 
     private static int[] toArray(List<Integer> list) {
@@ -73,10 +73,10 @@ extends AbstractListTag<IntTag> {
     }
 
     @Override
-    public void write(DataOutput dataOutput) throws IOException {
-        dataOutput.writeInt(this.value.length);
+    public void write(DataOutput output) throws IOException {
+        output.writeInt(this.value.length);
         for (int i : this.value) {
-            dataOutput.writeInt(i);
+            output.writeInt(i);
         }
     }
 
@@ -109,11 +109,11 @@ extends AbstractListTag<IntTag> {
     }
 
     @Override
-    public boolean equals(Object object) {
-        if (this == object) {
+    public boolean equals(Object o) {
+        if (this == o) {
             return true;
         }
-        return object instanceof IntArrayTag && Arrays.equals(this.value, ((IntArrayTag)object).value);
+        return o instanceof IntArrayTag && Arrays.equals(this.value, ((IntArrayTag)o).value);
     }
 
     @Override
@@ -126,7 +126,7 @@ extends AbstractListTag<IntTag> {
     }
 
     @Override
-    public Text toText(String string, int i) {
+    public Text toText(String indent, int depth) {
         MutableText lv = new LiteralText("I").formatted(RED);
         MutableText lv2 = new LiteralText("[").append(lv).append(";");
         for (int j = 0; j < this.value.length; ++j) {
@@ -161,18 +161,18 @@ extends AbstractListTag<IntTag> {
     }
 
     @Override
-    public boolean setTag(int i, Tag arg) {
-        if (arg instanceof AbstractNumberTag) {
-            this.value[i] = ((AbstractNumberTag)arg).getInt();
+    public boolean setTag(int index, Tag tag) {
+        if (tag instanceof AbstractNumberTag) {
+            this.value[index] = ((AbstractNumberTag)tag).getInt();
             return true;
         }
         return false;
     }
 
     @Override
-    public boolean addTag(int i, Tag arg) {
-        if (arg instanceof AbstractNumberTag) {
-            this.value = ArrayUtils.add((int[])this.value, (int)i, (int)((AbstractNumberTag)arg).getInt());
+    public boolean addTag(int index, Tag tag) {
+        if (tag instanceof AbstractNumberTag) {
+            this.value = ArrayUtils.add((int[])this.value, (int)index, (int)((AbstractNumberTag)tag).getInt());
             return true;
         }
         return false;

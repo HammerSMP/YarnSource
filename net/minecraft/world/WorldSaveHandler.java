@@ -11,8 +11,6 @@ package net.minecraft.world;
 
 import com.mojang.datafixers.DataFixer;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import javax.annotation.Nullable;
 import net.minecraft.datafixer.DataFixTypes;
 import net.minecraft.entity.player.PlayerEntity;
@@ -40,10 +38,10 @@ public class WorldSaveHandler {
         try {
             CompoundTag lv = arg.toTag(new CompoundTag());
             File file = File.createTempFile(arg.getUuidAsString() + "-", ".dat", this.playerDataDir);
-            NbtIo.writeCompressed(lv, new FileOutputStream(file));
+            NbtIo.method_30614(lv, file);
             File file2 = new File(this.playerDataDir, arg.getUuidAsString() + ".dat");
             File file3 = new File(this.playerDataDir, arg.getUuidAsString() + ".dat_old");
-            Util.method_27760(file2, file, file3);
+            Util.backupAndReplace(file2, file, file3);
         }
         catch (Exception exception) {
             LOGGER.warn("Failed to save player data for {}", (Object)arg.getName().getString());
@@ -56,7 +54,7 @@ public class WorldSaveHandler {
         try {
             File file = new File(this.playerDataDir, arg.getUuidAsString() + ".dat");
             if (file.exists() && file.isFile()) {
-                lv = NbtIo.readCompressed(new FileInputStream(file));
+                lv = NbtIo.method_30613(file);
             }
         }
         catch (Exception exception) {

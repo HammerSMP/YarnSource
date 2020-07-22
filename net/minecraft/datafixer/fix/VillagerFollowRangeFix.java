@@ -23,8 +23,8 @@ extends ChoiceFix {
     }
 
     @Override
-    protected Typed<?> transform(Typed<?> typed) {
-        return typed.update(DSL.remainderFinder(), VillagerFollowRangeFix::method_27914);
+    protected Typed<?> transform(Typed<?> inputType) {
+        return inputType.update(DSL.remainderFinder(), VillagerFollowRangeFix::method_27914);
     }
 
     private static Dynamic<?> method_27914(Dynamic<?> dynamic) {

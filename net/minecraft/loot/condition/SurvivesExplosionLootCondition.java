@@ -56,8 +56,8 @@ implements LootCondition {
     }
 
     @Override
-    public /* synthetic */ boolean test(Object object) {
-        return this.test((LootContext)object);
+    public /* synthetic */ boolean test(Object context) {
+        return this.test((LootContext)context);
     }
 
     public static class Serializer
@@ -72,8 +72,8 @@ implements LootCondition {
         }
 
         @Override
-        public /* synthetic */ Object fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext) {
-            return this.fromJson(jsonObject, jsonDeserializationContext);
+        public /* synthetic */ Object fromJson(JsonObject json, JsonDeserializationContext context) {
+            return this.fromJson(json, context);
         }
     }
 }

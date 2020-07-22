@@ -32,7 +32,7 @@ public class EnchantingPhrases {
         return INSTANCE;
     }
 
-    public StringRenderable generatePhrase(TextRenderer arg, int i) {
+    public StringRenderable generatePhrase(TextRenderer fontRenderer, int width) {
         StringBuilder stringBuilder = new StringBuilder();
         int j = this.random.nextInt(2) + 3;
         for (int k = 0; k < j; ++k) {
@@ -41,11 +41,11 @@ public class EnchantingPhrases {
             }
             stringBuilder.append(Util.getRandom(this.phrases, this.random));
         }
-        return arg.getTextHandler().trimToWidth(new LiteralText(stringBuilder.toString()).fillStyle(field_24284), i, Style.EMPTY);
+        return fontRenderer.getTextHandler().trimToWidth(new LiteralText(stringBuilder.toString()).fillStyle(field_24284), width, Style.EMPTY);
     }
 
-    public void setSeed(long l) {
-        this.random.setSeed(l);
+    public void setSeed(long seed) {
+        this.random.setSeed(seed);
     }
 }
 

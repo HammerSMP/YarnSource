@@ -22,8 +22,8 @@ implements ClientPlayerTickable {
     private final SoundManager soundManager;
     private int ticksUntilPlay = 0;
 
-    public AmbientSoundPlayer(ClientPlayerEntity arg, SoundManager arg2) {
-        this.player = arg;
+    public AmbientSoundPlayer(ClientPlayerEntity player, SoundManager arg2) {
+        this.player = player;
         this.soundManager = arg2;
     }
 

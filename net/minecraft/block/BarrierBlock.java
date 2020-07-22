@@ -23,18 +23,18 @@ extends Block {
     }
 
     @Override
-    public boolean isTranslucent(BlockState arg, BlockView arg2, BlockPos arg3) {
+    public boolean isTranslucent(BlockState state, BlockView world, BlockPos pos) {
         return true;
     }
 
     @Override
-    public BlockRenderType getRenderType(BlockState arg) {
+    public BlockRenderType getRenderType(BlockState state) {
         return BlockRenderType.INVISIBLE;
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public float getAmbientOcclusionLightLevel(BlockState arg, BlockView arg2, BlockPos arg3) {
+    public float getAmbientOcclusionLightLevel(BlockState state, BlockView world, BlockPos pos) {
         return 1.0f;
     }
 }

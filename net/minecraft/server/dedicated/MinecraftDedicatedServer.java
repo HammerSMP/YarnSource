@@ -66,7 +66,7 @@ import net.minecraft.util.logging.UncaughtExceptionHandler;
 import net.minecraft.util.logging.UncaughtExceptionLogger;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.registry.RegistryTracker;
+import net.minecraft.util.registry.DynamicRegistryManager;
 import net.minecraft.util.snooper.Snooper;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
@@ -89,7 +89,7 @@ implements DedicatedServer {
     @Nullable
     private DedicatedServerGui gui;
 
-    public MinecraftDedicatedServer(Thread thread, RegistryTracker.Modifiable arg, LevelStorage.Session arg2, ResourcePackManager arg3, ServerResourceManager arg4, SaveProperties arg5, ServerPropertiesLoader arg6, DataFixer dataFixer, MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository, UserCache arg7, WorldGenerationProgressListenerFactory arg8) {
+    public MinecraftDedicatedServer(Thread thread, DynamicRegistryManager.Impl arg, LevelStorage.Session arg2, ResourcePackManager arg3, ServerResourceManager arg4, SaveProperties arg5, ServerPropertiesLoader arg6, DataFixer dataFixer, MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository, UserCache arg7, WorldGenerationProgressListenerFactory arg8) {
         super(thread, arg, arg2, arg5, arg3, Proxy.NO_PROXY, dataFixer, arg4, minecraftSessionService, gameProfileRepository, arg7, arg8);
         this.propertiesLoader = arg6;
         this.rconCommandOutput = new RconCommandOutput(this);
@@ -169,7 +169,7 @@ implements DedicatedServer {
         if (!ServerConfigHandler.checkSuccess(this)) {
             return false;
         }
-        this.setPlayerManager(new DedicatedPlayerManager(this, this.dimensionTracker, this.field_24371));
+        this.setPlayerManager(new DedicatedPlayerManager(this, this.registryManager, this.field_24371));
         long l = Util.getMeasuringTimeNano();
         this.setWorldHeight(lv.maxBuildHeight);
         SkullBlockEntity.setUserCache(this.getUserCache());
@@ -261,11 +261,11 @@ implements DedicatedServer {
     }
 
     @Override
-    public CrashReport populateCrashReport(CrashReport arg) {
-        arg = super.populateCrashReport(arg);
-        arg.getSystemDetailsSection().add("Is Modded", () -> this.getModdedStatusMessage().orElse("Unknown (can't tell)"));
-        arg.getSystemDetailsSection().add("Type", () -> "Dedicated Server (map_server.txt)");
-        return arg;
+    public CrashReport populateCrashReport(CrashReport report) {
+        report = super.populateCrashReport(report);
+        report.getSystemDetailsSection().add("Is Modded", () -> this.getModdedStatusMessage().orElse("Unknown (can't tell)"));
+        report.getSystemDetailsSection().add("Type", () -> "Dedicated Server (map_server.txt)");
+        return report;
     }
 
     @Override
@@ -291,8 +291,8 @@ implements DedicatedServer {
     }
 
     @Override
-    public void tickWorlds(BooleanSupplier booleanSupplier) {
-        super.tickWorlds(booleanSupplier);
+    public void tickWorlds(BooleanSupplier shouldKeepTicking) {
+        super.tickWorlds(shouldKeepTicking);
         this.executeQueuedCommands();
     }
 
@@ -302,10 +302,10 @@ implements DedicatedServer {
     }
 
     @Override
-    public void addSnooperInfo(Snooper arg) {
-        arg.addInfo("whitelist_enabled", this.getPlayerManager().isWhitelistEnabled());
-        arg.addInfo("whitelist_count", this.getPlayerManager().getWhitelistedNames().length);
-        super.addSnooperInfo(arg);
+    public void addSnooperInfo(Snooper snooper) {
+        snooper.addInfo("whitelist_enabled", this.getPlayerManager().isWhitelistEnabled());
+        snooper.addInfo("whitelist_count", this.getPlayerManager().getWhitelistedNames().length);
+        super.addSnooperInfo(snooper);
     }
 
     public void enqueueCommand(String string, ServerCommandSource arg) {
@@ -322,6 +322,11 @@ implements DedicatedServer {
     @Override
     public boolean isDedicated() {
         return true;
+    }
+
+    @Override
+    public int getRateLimit() {
+        return this.getProperties().rateLimit;
     }
 
     @Override
@@ -366,7 +371,7 @@ implements DedicatedServer {
     }
 
     @Override
-    public boolean openToLan(GameMode arg, boolean bl, int i) {
+    public boolean openToLan(GameMode gameMode, boolean cheatsAllowed, int port) {
         return false;
     }
 
@@ -381,23 +386,23 @@ implements DedicatedServer {
     }
 
     @Override
-    public boolean isSpawnProtected(ServerWorld arg, BlockPos arg2, PlayerEntity arg3) {
+    public boolean isSpawnProtected(ServerWorld world, BlockPos pos, PlayerEntity player) {
         int j;
-        if (arg.getRegistryKey() != World.OVERWORLD) {
+        if (world.getRegistryKey() != World.OVERWORLD) {
             return false;
         }
         if (this.getPlayerManager().getOpList().isEmpty()) {
             return false;
         }
-        if (this.getPlayerManager().isOperator(arg3.getGameProfile())) {
+        if (this.getPlayerManager().isOperator(player.getGameProfile())) {
             return false;
         }
         if (this.getSpawnProtectionRadius() <= 0) {
             return false;
         }
-        BlockPos lv = arg.getSpawnPos();
-        int i = MathHelper.abs(arg2.getX() - lv.getX());
-        int k = Math.max(i, j = MathHelper.abs(arg2.getZ() - lv.getZ()));
+        BlockPos lv = world.getSpawnPos();
+        int i = MathHelper.abs(pos.getX() - lv.getX());
+        int k = Math.max(i, j = MathHelper.abs(pos.getZ() - lv.getZ()));
         return k <= this.getSpawnProtectionRadius();
     }
 
@@ -417,9 +422,9 @@ implements DedicatedServer {
     }
 
     @Override
-    public void setPlayerIdleTimeout(int i) {
-        super.setPlayerIdleTimeout(i);
-        this.propertiesLoader.apply(arg -> (ServerPropertiesHandler)arg.playerIdleTimeout.set(i));
+    public void setPlayerIdleTimeout(int playerIdleTimeout) {
+        super.setPlayerIdleTimeout(playerIdleTimeout);
+        this.propertiesLoader.apply(arg -> (ServerPropertiesHandler)arg.playerIdleTimeout.set(playerIdleTimeout));
     }
 
     @Override
@@ -506,9 +511,9 @@ implements DedicatedServer {
     }
 
     @Override
-    public String executeRconCommand(String string) {
+    public String executeRconCommand(String command) {
         this.rconCommandOutput.clear();
-        this.submitAndJoin(() -> this.getCommandManager().execute(this.rconCommandOutput.createRconCommandSource(), string));
+        this.submitAndJoin(() -> this.getCommandManager().execute(this.rconCommandOutput.createRconCommandSource(), command));
         return this.rconCommandOutput.asString();
     }
 
@@ -523,13 +528,13 @@ implements DedicatedServer {
     }
 
     @Override
-    public boolean isHost(GameProfile gameProfile) {
+    public boolean isHost(GameProfile profile) {
         return false;
     }
 
     @Override
-    public int adjustTrackingDistance(int i) {
-        return this.getProperties().entityBroadcastRangePercentage * i / 100;
+    public int adjustTrackingDistance(int initialDistance) {
+        return this.getProperties().entityBroadcastRangePercentage * initialDistance / 100;
     }
 
     @Override

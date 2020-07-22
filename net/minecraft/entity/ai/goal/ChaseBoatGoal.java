@@ -23,8 +23,8 @@ extends Goal {
     private PlayerEntity passenger;
     private ChaseBoatState state;
 
-    public ChaseBoatGoal(PathAwareEntity arg) {
-        this.mob = arg;
+    public ChaseBoatGoal(PathAwareEntity mob) {
+        this.mob = mob;
     }
 
     @Override

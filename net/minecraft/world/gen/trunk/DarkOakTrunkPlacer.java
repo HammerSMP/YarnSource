@@ -41,23 +41,23 @@ extends TrunkPlacer {
     }
 
     @Override
-    public List<FoliagePlacer.TreeNode> generate(ModifiableTestableWorld arg, Random random, int i, BlockPos arg2, Set<BlockPos> set, BlockBox arg3, TreeFeatureConfig arg4) {
+    public List<FoliagePlacer.TreeNode> generate(ModifiableTestableWorld world, Random random, int trunkHeight, BlockPos pos, Set<BlockPos> set, BlockBox arg3, TreeFeatureConfig arg4) {
         ArrayList list = Lists.newArrayList();
-        BlockPos lv = arg2.down();
-        DarkOakTrunkPlacer.method_27400(arg, lv);
-        DarkOakTrunkPlacer.method_27400(arg, lv.east());
-        DarkOakTrunkPlacer.method_27400(arg, lv.south());
-        DarkOakTrunkPlacer.method_27400(arg, lv.south().east());
+        BlockPos lv = pos.down();
+        DarkOakTrunkPlacer.method_27400(world, lv);
+        DarkOakTrunkPlacer.method_27400(world, lv.east());
+        DarkOakTrunkPlacer.method_27400(world, lv.south());
+        DarkOakTrunkPlacer.method_27400(world, lv.south().east());
         Direction lv2 = Direction.Type.HORIZONTAL.random(random);
-        int j = i - random.nextInt(4);
+        int j = trunkHeight - random.nextInt(4);
         int k = 2 - random.nextInt(3);
-        int l = arg2.getX();
-        int m = arg2.getY();
-        int n = arg2.getZ();
+        int l = pos.getX();
+        int m = pos.getY();
+        int n = pos.getZ();
         int o = l;
         int p = n;
-        int q = m + i - 1;
-        for (int r = 0; r < i; ++r) {
+        int q = m + trunkHeight - 1;
+        for (int r = 0; r < trunkHeight; ++r) {
             int s;
             BlockPos lv3;
             if (r >= j && k > 0) {
@@ -65,11 +65,11 @@ extends TrunkPlacer {
                 p += lv2.getOffsetZ();
                 --k;
             }
-            if (!TreeFeature.isAirOrLeaves(arg, lv3 = new BlockPos(o, s = m + r, p))) continue;
-            DarkOakTrunkPlacer.method_27402(arg, random, lv3, set, arg3, arg4);
-            DarkOakTrunkPlacer.method_27402(arg, random, lv3.east(), set, arg3, arg4);
-            DarkOakTrunkPlacer.method_27402(arg, random, lv3.south(), set, arg3, arg4);
-            DarkOakTrunkPlacer.method_27402(arg, random, lv3.east().south(), set, arg3, arg4);
+            if (!TreeFeature.isAirOrLeaves(world, lv3 = new BlockPos(o, s = m + r, p))) continue;
+            DarkOakTrunkPlacer.method_27402(world, random, lv3, set, arg3, arg4);
+            DarkOakTrunkPlacer.method_27402(world, random, lv3.east(), set, arg3, arg4);
+            DarkOakTrunkPlacer.method_27402(world, random, lv3.south(), set, arg3, arg4);
+            DarkOakTrunkPlacer.method_27402(world, random, lv3.east().south(), set, arg3, arg4);
         }
         list.add(new FoliagePlacer.TreeNode(new BlockPos(o, q, p), 0, true));
         for (int t = -1; t <= 2; ++t) {
@@ -77,7 +77,7 @@ extends TrunkPlacer {
                 if (t >= 0 && t <= 1 && u >= 0 && u <= 1 || random.nextInt(3) > 0) continue;
                 int v = random.nextInt(3) + 2;
                 for (int w = 0; w < v; ++w) {
-                    DarkOakTrunkPlacer.method_27402(arg, random, new BlockPos(l + t, q - w - 1, n + u), set, arg3, arg4);
+                    DarkOakTrunkPlacer.method_27402(world, random, new BlockPos(l + t, q - w - 1, n + u), set, arg3, arg4);
                 }
                 list.add(new FoliagePlacer.TreeNode(new BlockPos(o + t, q, p + u), 0, false));
             }

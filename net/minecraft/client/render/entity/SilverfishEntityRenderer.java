@@ -37,13 +37,13 @@ extends MobEntityRenderer<SilverfishEntity, SilverfishEntityModel<SilverfishEnti
     }
 
     @Override
-    protected /* synthetic */ float getLyingAngle(LivingEntity arg) {
-        return this.getLyingAngle((SilverfishEntity)arg);
+    protected /* synthetic */ float getLyingAngle(LivingEntity entity) {
+        return this.getLyingAngle((SilverfishEntity)entity);
     }
 
     @Override
-    public /* synthetic */ Identifier getTexture(Entity arg) {
-        return this.getTexture((SilverfishEntity)arg);
+    public /* synthetic */ Identifier getTexture(Entity entity) {
+        return this.getTexture((SilverfishEntity)entity);
     }
 }
 

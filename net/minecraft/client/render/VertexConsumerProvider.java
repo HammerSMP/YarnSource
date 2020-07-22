@@ -23,12 +23,12 @@ import net.minecraft.client.render.VertexConsumer;
 
 @Environment(value=EnvType.CLIENT)
 public interface VertexConsumerProvider {
-    public static Immediate immediate(BufferBuilder arg) {
-        return VertexConsumerProvider.immediate((Map<RenderLayer, BufferBuilder>)ImmutableMap.of(), arg);
+    public static Immediate immediate(BufferBuilder buffer) {
+        return VertexConsumerProvider.immediate((Map<RenderLayer, BufferBuilder>)ImmutableMap.of(), buffer);
     }
 
-    public static Immediate immediate(Map<RenderLayer, BufferBuilder> map, BufferBuilder arg) {
-        return new Immediate(arg, map);
+    public static Immediate immediate(Map<RenderLayer, BufferBuilder> layerBuffers, BufferBuilder fallbackBuffer) {
+        return new Immediate(fallbackBuffer, layerBuffers);
     }
 
     public VertexConsumer getBuffer(RenderLayer var1);
@@ -41,9 +41,9 @@ public interface VertexConsumerProvider {
         protected Optional<RenderLayer> currentLayer = Optional.empty();
         protected final Set<BufferBuilder> activeConsumers = Sets.newHashSet();
 
-        protected Immediate(BufferBuilder arg, Map<RenderLayer, BufferBuilder> map) {
-            this.fallbackBuffer = arg;
-            this.layerBuffers = map;
+        protected Immediate(BufferBuilder fallbackBuffer, Map<RenderLayer, BufferBuilder> layerBuffers) {
+            this.fallbackBuffer = fallbackBuffer;
+            this.layerBuffers = layerBuffers;
         }
 
         @Override
@@ -63,8 +63,8 @@ public interface VertexConsumerProvider {
             return lv;
         }
 
-        private BufferBuilder getBufferInternal(RenderLayer arg) {
-            return this.layerBuffers.getOrDefault(arg, this.fallbackBuffer);
+        private BufferBuilder getBufferInternal(RenderLayer layer) {
+            return this.layerBuffers.getOrDefault(layer, this.fallbackBuffer);
         }
 
         public void draw() {
@@ -79,16 +79,16 @@ public interface VertexConsumerProvider {
             }
         }
 
-        public void draw(RenderLayer arg) {
-            BufferBuilder lv = this.getBufferInternal(arg);
-            boolean bl = Objects.equals(this.currentLayer, arg.asOptional());
+        public void draw(RenderLayer layer) {
+            BufferBuilder lv = this.getBufferInternal(layer);
+            boolean bl = Objects.equals(this.currentLayer, layer.asOptional());
             if (!bl && lv == this.fallbackBuffer) {
                 return;
             }
             if (!this.activeConsumers.remove(lv)) {
                 return;
             }
-            arg.draw(lv, 0, 0, 0);
+            layer.draw(lv, 0, 0, 0);
             if (bl) {
                 this.currentLayer = Optional.empty();
             }

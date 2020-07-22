@@ -13,10 +13,10 @@ extends LoggerPrintStream {
     }
 
     @Override
-    protected void log(String string) {
+    protected void log(String message) {
         StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
         StackTraceElement stackTraceElement = stackTraceElements[Math.min(3, stackTraceElements.length)];
-        LOGGER.info("[{}]@.({}:{}): {}", (Object)this.name, (Object)stackTraceElement.getFileName(), (Object)stackTraceElement.getLineNumber(), (Object)string);
+        LOGGER.info("[{}]@.({}:{}): {}", (Object)this.name, (Object)stackTraceElement.getFileName(), (Object)stackTraceElement.getLineNumber(), (Object)message);
     }
 }
 

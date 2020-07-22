@@ -43,8 +43,8 @@ implements Wearable {
     public static final DispenserBehavior DISPENSER_BEHAVIOR = new ItemDispenserBehavior(){
 
         @Override
-        protected ItemStack dispenseSilently(BlockPointer arg, ItemStack arg2) {
-            return ArmorItem.dispenseArmor(arg, arg2) ? arg2 : super.dispenseSilently(arg, arg2);
+        protected ItemStack dispenseSilently(BlockPointer pointer, ItemStack stack) {
+            return ArmorItem.dispenseArmor(pointer, stack) ? stack : super.dispenseSilently(pointer, stack);
         }
     };
     protected final EquipmentSlot slot;
@@ -54,15 +54,15 @@ implements Wearable {
     protected final ArmorMaterial type;
     private final Multimap<EntityAttribute, EntityAttributeModifier> attributeModifiers;
 
-    public static boolean dispenseArmor(BlockPointer arg, ItemStack arg2) {
-        BlockPos lv = arg.getBlockPos().offset(arg.getBlockState().get(DispenserBlock.FACING));
-        List<Entity> list = arg.getWorld().getEntities(LivingEntity.class, new Box(lv), EntityPredicates.EXCEPT_SPECTATOR.and(new EntityPredicates.CanPickup(arg2)));
+    public static boolean dispenseArmor(BlockPointer pointer, ItemStack armor) {
+        BlockPos lv = pointer.getBlockPos().offset(pointer.getBlockState().get(DispenserBlock.FACING));
+        List<Entity> list = pointer.getWorld().getEntitiesByClass(LivingEntity.class, new Box(lv), EntityPredicates.EXCEPT_SPECTATOR.and(new EntityPredicates.CanPickup(armor)));
         if (list.isEmpty()) {
             return false;
         }
         LivingEntity lv2 = (LivingEntity)list.get(0);
-        EquipmentSlot lv3 = MobEntity.getPreferredEquipmentSlot(arg2);
-        ItemStack lv4 = arg2.split(1);
+        EquipmentSlot lv3 = MobEntity.getPreferredEquipmentSlot(armor);
+        ItemStack lv4 = armor.split(1);
         lv2.equipStack(lv3, lv4);
         if (lv2 instanceof MobEntity) {
             ((MobEntity)lv2).setEquipmentDropChance(lv3, 2.0f);
@@ -71,19 +71,19 @@ implements Wearable {
         return true;
     }
 
-    public ArmorItem(ArmorMaterial arg, EquipmentSlot arg2, Item.Settings arg3) {
-        super(arg3.maxDamageIfAbsent(arg.getDurability(arg2)));
-        this.type = arg;
-        this.slot = arg2;
-        this.protection = arg.getProtectionAmount(arg2);
-        this.toughness = arg.getToughness();
-        this.knockbackResistance = arg.getKnockbackResistance();
+    public ArmorItem(ArmorMaterial material, EquipmentSlot slot, Item.Settings settings) {
+        super(settings.maxDamageIfAbsent(material.getDurability(slot)));
+        this.type = material;
+        this.slot = slot;
+        this.protection = material.getProtectionAmount(slot);
+        this.toughness = material.getToughness();
+        this.knockbackResistance = material.getKnockbackResistance();
         DispenserBlock.registerBehavior(this, DISPENSER_BEHAVIOR);
         ImmutableMultimap.Builder builder = ImmutableMultimap.builder();
-        UUID uUID = MODIFIERS[arg2.getEntitySlotId()];
+        UUID uUID = MODIFIERS[slot.getEntitySlotId()];
         builder.put((Object)EntityAttributes.GENERIC_ARMOR, (Object)new EntityAttributeModifier(uUID, "Armor modifier", (double)this.protection, EntityAttributeModifier.Operation.ADDITION));
         builder.put((Object)EntityAttributes.GENERIC_ARMOR_TOUGHNESS, (Object)new EntityAttributeModifier(uUID, "Armor toughness", (double)this.toughness, EntityAttributeModifier.Operation.ADDITION));
-        if (arg == ArmorMaterials.NETHERITE) {
+        if (material == ArmorMaterials.NETHERITE) {
             builder.put((Object)EntityAttributes.GENERIC_KNOCKBACK_RESISTANCE, (Object)new EntityAttributeModifier(uUID, "Armor knockback resistance", (double)this.knockbackResistance, EntityAttributeModifier.Operation.ADDITION));
         }
         this.attributeModifiers = builder.build();
@@ -103,29 +103,29 @@ implements Wearable {
     }
 
     @Override
-    public boolean canRepair(ItemStack arg, ItemStack arg2) {
-        return this.type.getRepairIngredient().test(arg2) || super.canRepair(arg, arg2);
+    public boolean canRepair(ItemStack stack, ItemStack ingredient) {
+        return this.type.getRepairIngredient().test(ingredient) || super.canRepair(stack, ingredient);
     }
 
     @Override
-    public TypedActionResult<ItemStack> use(World arg, PlayerEntity arg2, Hand arg3) {
-        ItemStack lv = arg2.getStackInHand(arg3);
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+        ItemStack lv = user.getStackInHand(hand);
         EquipmentSlot lv2 = MobEntity.getPreferredEquipmentSlot(lv);
-        ItemStack lv3 = arg2.getEquippedStack(lv2);
+        ItemStack lv3 = user.getEquippedStack(lv2);
         if (lv3.isEmpty()) {
-            arg2.equipStack(lv2, lv.copy());
+            user.equipStack(lv2, lv.copy());
             lv.setCount(0);
-            return TypedActionResult.method_29237(lv, arg.isClient());
+            return TypedActionResult.method_29237(lv, world.isClient());
         }
         return TypedActionResult.fail(lv);
     }
 
     @Override
-    public Multimap<EntityAttribute, EntityAttributeModifier> getAttributeModifiers(EquipmentSlot arg) {
-        if (arg == this.slot) {
+    public Multimap<EntityAttribute, EntityAttributeModifier> getAttributeModifiers(EquipmentSlot slot) {
+        if (slot == this.slot) {
             return this.attributeModifiers;
         }
-        return super.getAttributeModifiers(arg);
+        return super.getAttributeModifiers(slot);
     }
 
     public int getProtection() {

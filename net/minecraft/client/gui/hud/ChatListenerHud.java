@@ -20,19 +20,19 @@ public class ChatListenerHud
 implements ClientChatListener {
     private final MinecraftClient client;
 
-    public ChatListenerHud(MinecraftClient arg) {
-        this.client = arg;
+    public ChatListenerHud(MinecraftClient client) {
+        this.client = client;
     }
 
     @Override
-    public void onChatMessage(MessageType arg, Text arg2, UUID uUID) {
-        if (this.client.shouldBlockMessages(uUID)) {
+    public void onChatMessage(MessageType messageType, Text message, UUID senderUuid) {
+        if (this.client.shouldBlockMessages(senderUuid)) {
             return;
         }
-        if (arg != MessageType.CHAT) {
-            this.client.inGameHud.getChatHud().addMessage(arg2);
+        if (messageType != MessageType.CHAT) {
+            this.client.inGameHud.getChatHud().addMessage(message);
         } else {
-            this.client.inGameHud.getChatHud().method_27147(arg2);
+            this.client.inGameHud.getChatHud().method_27147(message);
         }
     }
 }

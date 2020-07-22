@@ -31,39 +31,39 @@ extends EntityModel<T> {
     private final ModelPart rightChest;
     private final ModelPart leftChest;
 
-    public LlamaEntityModel(float f) {
+    public LlamaEntityModel(float scale) {
         this.textureWidth = 128;
         this.textureHeight = 64;
         this.head = new ModelPart(this, 0, 0);
-        this.head.addCuboid(-2.0f, -14.0f, -10.0f, 4.0f, 4.0f, 9.0f, f);
+        this.head.addCuboid(-2.0f, -14.0f, -10.0f, 4.0f, 4.0f, 9.0f, scale);
         this.head.setPivot(0.0f, 7.0f, -6.0f);
-        this.head.setTextureOffset(0, 14).addCuboid(-4.0f, -16.0f, -6.0f, 8.0f, 18.0f, 6.0f, f);
-        this.head.setTextureOffset(17, 0).addCuboid(-4.0f, -19.0f, -4.0f, 3.0f, 3.0f, 2.0f, f);
-        this.head.setTextureOffset(17, 0).addCuboid(1.0f, -19.0f, -4.0f, 3.0f, 3.0f, 2.0f, f);
+        this.head.setTextureOffset(0, 14).addCuboid(-4.0f, -16.0f, -6.0f, 8.0f, 18.0f, 6.0f, scale);
+        this.head.setTextureOffset(17, 0).addCuboid(-4.0f, -19.0f, -4.0f, 3.0f, 3.0f, 2.0f, scale);
+        this.head.setTextureOffset(17, 0).addCuboid(1.0f, -19.0f, -4.0f, 3.0f, 3.0f, 2.0f, scale);
         this.torso = new ModelPart(this, 29, 0);
-        this.torso.addCuboid(-6.0f, -10.0f, -7.0f, 12.0f, 18.0f, 10.0f, f);
+        this.torso.addCuboid(-6.0f, -10.0f, -7.0f, 12.0f, 18.0f, 10.0f, scale);
         this.torso.setPivot(0.0f, 5.0f, 2.0f);
         this.rightChest = new ModelPart(this, 45, 28);
-        this.rightChest.addCuboid(-3.0f, 0.0f, 0.0f, 8.0f, 8.0f, 3.0f, f);
+        this.rightChest.addCuboid(-3.0f, 0.0f, 0.0f, 8.0f, 8.0f, 3.0f, scale);
         this.rightChest.setPivot(-8.5f, 3.0f, 3.0f);
         this.rightChest.yaw = 1.5707964f;
         this.leftChest = new ModelPart(this, 45, 41);
-        this.leftChest.addCuboid(-3.0f, 0.0f, 0.0f, 8.0f, 8.0f, 3.0f, f);
+        this.leftChest.addCuboid(-3.0f, 0.0f, 0.0f, 8.0f, 8.0f, 3.0f, scale);
         this.leftChest.setPivot(5.5f, 3.0f, 3.0f);
         this.leftChest.yaw = 1.5707964f;
         int i = 4;
         int j = 14;
         this.rightBackLeg = new ModelPart(this, 29, 29);
-        this.rightBackLeg.addCuboid(-2.0f, 0.0f, -2.0f, 4.0f, 14.0f, 4.0f, f);
+        this.rightBackLeg.addCuboid(-2.0f, 0.0f, -2.0f, 4.0f, 14.0f, 4.0f, scale);
         this.rightBackLeg.setPivot(-2.5f, 10.0f, 6.0f);
         this.leftBackLeg = new ModelPart(this, 29, 29);
-        this.leftBackLeg.addCuboid(-2.0f, 0.0f, -2.0f, 4.0f, 14.0f, 4.0f, f);
+        this.leftBackLeg.addCuboid(-2.0f, 0.0f, -2.0f, 4.0f, 14.0f, 4.0f, scale);
         this.leftBackLeg.setPivot(2.5f, 10.0f, 6.0f);
         this.rightFrontLeg = new ModelPart(this, 29, 29);
-        this.rightFrontLeg.addCuboid(-2.0f, 0.0f, -2.0f, 4.0f, 14.0f, 4.0f, f);
+        this.rightFrontLeg.addCuboid(-2.0f, 0.0f, -2.0f, 4.0f, 14.0f, 4.0f, scale);
         this.rightFrontLeg.setPivot(-2.5f, 10.0f, -4.0f);
         this.leftFrontLeg = new ModelPart(this, 29, 29);
-        this.leftFrontLeg.addCuboid(-2.0f, 0.0f, -2.0f, 4.0f, 14.0f, 4.0f, f);
+        this.leftFrontLeg.addCuboid(-2.0f, 0.0f, -2.0f, 4.0f, 14.0f, 4.0f, scale);
         this.leftFrontLeg.setPivot(2.5f, 10.0f, -4.0f);
         this.rightBackLeg.pivotX -= 1.0f;
         this.leftBackLeg.pivotX += 1.0f;
@@ -90,28 +90,28 @@ extends EntityModel<T> {
     }
 
     @Override
-    public void render(MatrixStack arg, VertexConsumer arg2, int i, int j, float f, float g, float h, float k) {
+    public void render(MatrixStack matrices, VertexConsumer vertices, int light, int overlay, float red, float green, float blue, float alpha) {
         if (this.child) {
             float l = 2.0f;
-            arg.push();
+            matrices.push();
             float m = 0.7f;
-            arg.scale(0.71428573f, 0.64935064f, 0.7936508f);
-            arg.translate(0.0, 1.3125, 0.22f);
-            this.head.render(arg, arg2, i, j, f, g, h, k);
-            arg.pop();
-            arg.push();
+            matrices.scale(0.71428573f, 0.64935064f, 0.7936508f);
+            matrices.translate(0.0, 1.3125, 0.22f);
+            this.head.render(matrices, vertices, light, overlay, red, green, blue, alpha);
+            matrices.pop();
+            matrices.push();
             float n = 1.1f;
-            arg.scale(0.625f, 0.45454544f, 0.45454544f);
-            arg.translate(0.0, 2.0625, 0.0);
-            this.torso.render(arg, arg2, i, j, f, g, h, k);
-            arg.pop();
-            arg.push();
-            arg.scale(0.45454544f, 0.41322312f, 0.45454544f);
-            arg.translate(0.0, 2.0625, 0.0);
-            ImmutableList.of((Object)this.rightBackLeg, (Object)this.leftBackLeg, (Object)this.rightFrontLeg, (Object)this.leftFrontLeg, (Object)this.rightChest, (Object)this.leftChest).forEach(arg3 -> arg3.render(arg, arg2, i, j, f, g, h, k));
-            arg.pop();
+            matrices.scale(0.625f, 0.45454544f, 0.45454544f);
+            matrices.translate(0.0, 2.0625, 0.0);
+            this.torso.render(matrices, vertices, light, overlay, red, green, blue, alpha);
+            matrices.pop();
+            matrices.push();
+            matrices.scale(0.45454544f, 0.41322312f, 0.45454544f);
+            matrices.translate(0.0, 2.0625, 0.0);
+            ImmutableList.of((Object)this.rightBackLeg, (Object)this.leftBackLeg, (Object)this.rightFrontLeg, (Object)this.leftFrontLeg, (Object)this.rightChest, (Object)this.leftChest).forEach(arg3 -> arg3.render(matrices, vertices, light, overlay, red, green, blue, alpha));
+            matrices.pop();
         } else {
-            ImmutableList.of((Object)this.head, (Object)this.torso, (Object)this.rightBackLeg, (Object)this.leftBackLeg, (Object)this.rightFrontLeg, (Object)this.leftFrontLeg, (Object)this.rightChest, (Object)this.leftChest).forEach(arg3 -> arg3.render(arg, arg2, i, j, f, g, h, k));
+            ImmutableList.of((Object)this.head, (Object)this.torso, (Object)this.rightBackLeg, (Object)this.leftBackLeg, (Object)this.rightFrontLeg, (Object)this.leftFrontLeg, (Object)this.rightChest, (Object)this.leftChest).forEach(arg3 -> arg3.render(matrices, vertices, light, overlay, red, green, blue, alpha));
         }
     }
 }

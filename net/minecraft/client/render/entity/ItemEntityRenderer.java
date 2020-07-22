@@ -32,22 +32,22 @@ extends EntityRenderer<ItemEntity> {
     private final ItemRenderer itemRenderer;
     private final Random random = new Random();
 
-    public ItemEntityRenderer(EntityRenderDispatcher arg, ItemRenderer arg2) {
-        super(arg);
-        this.itemRenderer = arg2;
+    public ItemEntityRenderer(EntityRenderDispatcher dispatcher, ItemRenderer itemRenderer) {
+        super(dispatcher);
+        this.itemRenderer = itemRenderer;
         this.shadowRadius = 0.15f;
         this.shadowOpacity = 0.75f;
     }
 
-    private int getRenderedAmount(ItemStack arg) {
+    private int getRenderedAmount(ItemStack stack) {
         int i = 1;
-        if (arg.getCount() > 48) {
+        if (stack.getCount() > 48) {
             i = 5;
-        } else if (arg.getCount() > 32) {
+        } else if (stack.getCount() > 32) {
             i = 4;
-        } else if (arg.getCount() > 16) {
+        } else if (stack.getCount() > 16) {
             i = 3;
-        } else if (arg.getCount() > 1) {
+        } else if (stack.getCount() > 1) {
             i = 2;
         }
         return i;

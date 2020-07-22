@@ -24,24 +24,24 @@ implements Wearable {
         DispenserBlock.registerBehavior(this, ArmorItem.DISPENSER_BEHAVIOR);
     }
 
-    public static boolean isUsable(ItemStack arg) {
-        return arg.getDamage() < arg.getMaxDamage() - 1;
+    public static boolean isUsable(ItemStack stack) {
+        return stack.getDamage() < stack.getMaxDamage() - 1;
     }
 
     @Override
-    public boolean canRepair(ItemStack arg, ItemStack arg2) {
-        return arg2.getItem() == Items.PHANTOM_MEMBRANE;
+    public boolean canRepair(ItemStack stack, ItemStack ingredient) {
+        return ingredient.getItem() == Items.PHANTOM_MEMBRANE;
     }
 
     @Override
-    public TypedActionResult<ItemStack> use(World arg, PlayerEntity arg2, Hand arg3) {
-        ItemStack lv = arg2.getStackInHand(arg3);
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+        ItemStack lv = user.getStackInHand(hand);
         EquipmentSlot lv2 = MobEntity.getPreferredEquipmentSlot(lv);
-        ItemStack lv3 = arg2.getEquippedStack(lv2);
+        ItemStack lv3 = user.getEquippedStack(lv2);
         if (lv3.isEmpty()) {
-            arg2.equipStack(lv2, lv.copy());
+            user.equipStack(lv2, lv.copy());
             lv.setCount(0);
-            return TypedActionResult.method_29237(lv, arg.isClient());
+            return TypedActionResult.method_29237(lv, world.isClient());
         }
         return TypedActionResult.fail(lv);
     }

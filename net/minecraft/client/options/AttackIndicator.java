@@ -23,9 +23,9 @@ public enum AttackIndicator {
     private final int id;
     private final String translationKey;
 
-    private AttackIndicator(int j, String string2) {
-        this.id = j;
-        this.translationKey = string2;
+    private AttackIndicator(int id, String translationKey) {
+        this.id = id;
+        this.translationKey = translationKey;
     }
 
     public int getId() {
@@ -36,8 +36,8 @@ public enum AttackIndicator {
         return this.translationKey;
     }
 
-    public static AttackIndicator byId(int i) {
-        return VALUES[MathHelper.floorMod(i, VALUES.length)];
+    public static AttackIndicator byId(int id) {
+        return VALUES[MathHelper.floorMod(id, VALUES.length)];
     }
 
     static {

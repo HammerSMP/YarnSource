@@ -54,13 +54,13 @@ implements ParticleEffect {
         }
 
         @Override
-        public /* synthetic */ ParticleEffect read(ParticleType arg, PacketByteBuf arg2) {
-            return this.read(arg, arg2);
+        public /* synthetic */ ParticleEffect read(ParticleType type, PacketByteBuf buf) {
+            return this.read(type, buf);
         }
 
         @Override
-        public /* synthetic */ ParticleEffect read(ParticleType arg, StringReader stringReader) throws CommandSyntaxException {
-            return this.read(arg, stringReader);
+        public /* synthetic */ ParticleEffect read(ParticleType type, StringReader reader) throws CommandSyntaxException {
+            return this.read(type, reader);
         }
     };
     private final float red;
@@ -68,19 +68,19 @@ implements ParticleEffect {
     private final float blue;
     private final float scale;
 
-    public DustParticleEffect(float f, float g, float h, float i) {
-        this.red = f;
-        this.green = g;
-        this.blue = h;
-        this.scale = MathHelper.clamp(i, 0.01f, 4.0f);
+    public DustParticleEffect(float red, float green, float blue, float scale) {
+        this.red = red;
+        this.green = green;
+        this.blue = blue;
+        this.scale = MathHelper.clamp(scale, 0.01f, 4.0f);
     }
 
     @Override
-    public void write(PacketByteBuf arg) {
-        arg.writeFloat(this.red);
-        arg.writeFloat(this.green);
-        arg.writeFloat(this.blue);
-        arg.writeFloat(this.scale);
+    public void write(PacketByteBuf buf) {
+        buf.writeFloat(this.red);
+        buf.writeFloat(this.green);
+        buf.writeFloat(this.blue);
+        buf.writeFloat(this.scale);
     }
 
     @Override

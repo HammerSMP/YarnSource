@@ -19,25 +19,25 @@ extends MobNavigation {
     }
 
     @Override
-    public Path findPathTo(BlockPos arg, int i) {
-        this.targetPos = arg;
-        return super.findPathTo(arg, i);
+    public Path findPathTo(BlockPos target, int distance) {
+        this.targetPos = target;
+        return super.findPathTo(target, distance);
     }
 
     @Override
-    public Path findPathTo(Entity arg, int i) {
-        this.targetPos = arg.getBlockPos();
-        return super.findPathTo(arg, i);
+    public Path findPathTo(Entity entity, int distance) {
+        this.targetPos = entity.getBlockPos();
+        return super.findPathTo(entity, distance);
     }
 
     @Override
-    public boolean startMovingTo(Entity arg, double d) {
-        Path lv = this.findPathTo(arg, 0);
+    public boolean startMovingTo(Entity entity, double speed) {
+        Path lv = this.findPathTo(entity, 0);
         if (lv != null) {
-            return this.startMovingAlong(lv, d);
+            return this.startMovingAlong(lv, speed);
         }
-        this.targetPos = arg.getBlockPos();
-        this.speed = d;
+        this.targetPos = entity.getBlockPos();
+        this.speed = speed;
         return true;
     }
 

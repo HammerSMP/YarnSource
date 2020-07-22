@@ -24,11 +24,11 @@ public class ScoreboardObjective {
     private Text field_24194;
     private ScoreboardCriterion.RenderType renderType;
 
-    public ScoreboardObjective(Scoreboard arg, String string, ScoreboardCriterion arg2, Text arg3, ScoreboardCriterion.RenderType arg4) {
-        this.scoreboard = arg;
-        this.name = string;
-        this.criterion = arg2;
-        this.displayName = arg3;
+    public ScoreboardObjective(Scoreboard scoreboard, String name, ScoreboardCriterion criterion, Text displayName, ScoreboardCriterion.RenderType arg4) {
+        this.scoreboard = scoreboard;
+        this.name = name;
+        this.criterion = criterion;
+        this.displayName = displayName;
         this.field_24194 = this.method_27441();
         this.renderType = arg4;
     }
@@ -51,15 +51,15 @@ public class ScoreboardObjective {
     }
 
     private Text method_27441() {
-        return Texts.bracketed(this.displayName.shallowCopy().styled(arg -> arg.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText(this.name)))));
+        return Texts.bracketed(this.displayName.shallowCopy().styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText(this.name)))));
     }
 
     public Text toHoverableText() {
         return this.field_24194;
     }
 
-    public void setDisplayName(Text arg) {
-        this.displayName = arg;
+    public void setDisplayName(Text name) {
+        this.displayName = name;
         this.field_24194 = this.method_27441();
         this.scoreboard.updateExistingObjective(this);
     }
@@ -68,8 +68,8 @@ public class ScoreboardObjective {
         return this.renderType;
     }
 
-    public void setRenderType(ScoreboardCriterion.RenderType arg) {
-        this.renderType = arg;
+    public void setRenderType(ScoreboardCriterion.RenderType renderType) {
+        this.renderType = renderType;
         this.scoreboard.updateExistingObjective(this);
     }
 }

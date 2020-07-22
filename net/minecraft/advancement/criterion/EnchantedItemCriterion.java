@@ -34,13 +34,13 @@ extends AbstractCriterion<Conditions> {
         return new Conditions(arg, lv, lv2);
     }
 
-    public void trigger(ServerPlayerEntity arg, ItemStack arg22, int i) {
-        this.test(arg, arg2 -> arg2.matches(arg22, i));
+    public void trigger(ServerPlayerEntity player, ItemStack stack, int levels) {
+        this.test(player, arg2 -> arg2.matches(stack, levels));
     }
 
     @Override
-    public /* synthetic */ AbstractCriterionConditions conditionsFromJson(JsonObject jsonObject, EntityPredicate.Extended arg, AdvancementEntityPredicateDeserializer arg2) {
-        return this.conditionsFromJson(jsonObject, arg, arg2);
+    public /* synthetic */ AbstractCriterionConditions conditionsFromJson(JsonObject obj, EntityPredicate.Extended playerPredicate, AdvancementEntityPredicateDeserializer predicateDeserializer) {
+        return this.conditionsFromJson(obj, playerPredicate, predicateDeserializer);
     }
 
     public static class Conditions
@@ -48,26 +48,26 @@ extends AbstractCriterion<Conditions> {
         private final ItemPredicate item;
         private final NumberRange.IntRange levels;
 
-        public Conditions(EntityPredicate.Extended arg, ItemPredicate arg2, NumberRange.IntRange arg3) {
-            super(ID, arg);
-            this.item = arg2;
-            this.levels = arg3;
+        public Conditions(EntityPredicate.Extended player, ItemPredicate item, NumberRange.IntRange levels) {
+            super(ID, player);
+            this.item = item;
+            this.levels = levels;
         }
 
         public static Conditions any() {
             return new Conditions(EntityPredicate.Extended.EMPTY, ItemPredicate.ANY, NumberRange.IntRange.ANY);
         }
 
-        public boolean matches(ItemStack arg, int i) {
-            if (!this.item.test(arg)) {
+        public boolean matches(ItemStack stack, int levels) {
+            if (!this.item.test(stack)) {
                 return false;
             }
-            return this.levels.test(i);
+            return this.levels.test(levels);
         }
 
         @Override
-        public JsonObject toJson(AdvancementEntityPredicateSerializer arg) {
-            JsonObject jsonObject = super.toJson(arg);
+        public JsonObject toJson(AdvancementEntityPredicateSerializer predicateSerializer) {
+            JsonObject jsonObject = super.toJson(predicateSerializer);
             jsonObject.add("item", this.item.toJson());
             jsonObject.add("levels", this.levels.toJson());
             return jsonObject;

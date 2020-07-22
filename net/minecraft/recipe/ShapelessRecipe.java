@@ -36,11 +36,11 @@ implements CraftingRecipe {
     private final ItemStack output;
     private final DefaultedList<Ingredient> input;
 
-    public ShapelessRecipe(Identifier arg, String string, ItemStack arg2, DefaultedList<Ingredient> arg3) {
-        this.id = arg;
-        this.group = string;
-        this.output = arg2;
-        this.input = arg3;
+    public ShapelessRecipe(Identifier id, String group, ItemStack output, DefaultedList<Ingredient> input) {
+        this.id = id;
+        this.group = group;
+        this.output = output;
+        this.input = input;
     }
 
     @Override
@@ -89,8 +89,8 @@ implements CraftingRecipe {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public boolean fits(int i, int j) {
-        return i * j >= this.input.size();
+    public boolean fits(int width, int height) {
+        return width * height >= this.input.size();
     }
 
     public static class Serializer
@@ -109,10 +109,10 @@ implements CraftingRecipe {
             return new ShapelessRecipe(arg, string, lv2, lv);
         }
 
-        private static DefaultedList<Ingredient> getIngredients(JsonArray jsonArray) {
+        private static DefaultedList<Ingredient> getIngredients(JsonArray json) {
             DefaultedList<Ingredient> lv = DefaultedList.of();
-            for (int i = 0; i < jsonArray.size(); ++i) {
-                Ingredient lv2 = Ingredient.fromJson(jsonArray.get(i));
+            for (int i = 0; i < json.size(); ++i) {
+                Ingredient lv2 = Ingredient.fromJson(json.get(i));
                 if (lv2.isEmpty()) continue;
                 lv.add(lv2);
             }
@@ -142,13 +142,13 @@ implements CraftingRecipe {
         }
 
         @Override
-        public /* synthetic */ Recipe read(Identifier arg, PacketByteBuf arg2) {
-            return this.read(arg, arg2);
+        public /* synthetic */ Recipe read(Identifier id, PacketByteBuf buf) {
+            return this.read(id, buf);
         }
 
         @Override
-        public /* synthetic */ Recipe read(Identifier arg, JsonObject jsonObject) {
-            return this.read(arg, jsonObject);
+        public /* synthetic */ Recipe read(Identifier id, JsonObject json) {
+            return this.read(id, json);
         }
     }
 }

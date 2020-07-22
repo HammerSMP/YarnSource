@@ -19,9 +19,9 @@ public class CatSitOnBlockGoal
 extends MoveToTargetPosGoal {
     private final CatEntity cat;
 
-    public CatSitOnBlockGoal(CatEntity arg, double d) {
-        super(arg, d, 8);
-        this.cat = arg;
+    public CatSitOnBlockGoal(CatEntity cat, double speed) {
+        super(cat, speed, 8);
+        this.cat = cat;
     }
 
     @Override
@@ -48,13 +48,13 @@ extends MoveToTargetPosGoal {
     }
 
     @Override
-    protected boolean isTargetPos(WorldView arg, BlockPos arg22) {
-        if (!arg.isAir(arg22.up())) {
+    protected boolean isTargetPos(WorldView world, BlockPos pos) {
+        if (!world.isAir(pos.up())) {
             return false;
         }
-        BlockState lv = arg.getBlockState(arg22);
+        BlockState lv = world.getBlockState(pos);
         if (lv.isOf(Blocks.CHEST)) {
-            return ChestBlockEntity.getPlayersLookingInChestCount(arg, arg22) < 1;
+            return ChestBlockEntity.getPlayersLookingInChestCount(world, pos) < 1;
         }
         if (lv.isOf(Blocks.FURNACE) && lv.get(FurnaceBlock.LIT).booleanValue()) {
             return true;

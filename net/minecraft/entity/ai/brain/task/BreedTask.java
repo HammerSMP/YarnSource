@@ -26,9 +26,9 @@ extends Task<AnimalEntity> {
     private final float field_23129;
     private long breedTime;
 
-    public BreedTask(EntityType<? extends AnimalEntity> arg, float f) {
+    public BreedTask(EntityType<? extends AnimalEntity> targetType, float f) {
         super((Map<MemoryModuleType<?>, MemoryModuleState>)ImmutableMap.of(MemoryModuleType.VISIBLE_MOBS, (Object)((Object)MemoryModuleState.VALUE_PRESENT), MemoryModuleType.BREED_TARGET, (Object)((Object)MemoryModuleState.VALUE_ABSENT), MemoryModuleType.WALK_TARGET, (Object)((Object)MemoryModuleState.REGISTERED), MemoryModuleType.LOOK_TARGET, (Object)((Object)MemoryModuleState.REGISTERED)), 325);
-        this.targetType = arg;
+        this.targetType = targetType;
         this.field_23129 = f;
     }
 
@@ -78,27 +78,27 @@ extends Task<AnimalEntity> {
         this.breedTime = 0L;
     }
 
-    private AnimalEntity getBreedTarget(AnimalEntity arg) {
-        return (AnimalEntity)arg.getBrain().getOptionalMemory(MemoryModuleType.BREED_TARGET).get();
+    private AnimalEntity getBreedTarget(AnimalEntity animal) {
+        return (AnimalEntity)animal.getBrain().getOptionalMemory(MemoryModuleType.BREED_TARGET).get();
     }
 
-    private boolean hasBreedTarget(AnimalEntity arg) {
-        Brain<PassiveEntity> lv = arg.getBrain();
+    private boolean hasBreedTarget(AnimalEntity animal) {
+        Brain<PassiveEntity> lv = animal.getBrain();
         return lv.hasMemoryModule(MemoryModuleType.BREED_TARGET) && lv.getOptionalMemory(MemoryModuleType.BREED_TARGET).get().getType() == this.targetType;
     }
 
-    private Optional<? extends AnimalEntity> findBreedTarget(AnimalEntity arg2) {
-        return arg2.getBrain().getOptionalMemory(MemoryModuleType.VISIBLE_MOBS).get().stream().filter(arg -> arg.getType() == this.targetType).map(arg -> (AnimalEntity)arg).filter(arg2::canBreedWith).findFirst();
+    private Optional<? extends AnimalEntity> findBreedTarget(AnimalEntity animal) {
+        return animal.getBrain().getOptionalMemory(MemoryModuleType.VISIBLE_MOBS).get().stream().filter(arg -> arg.getType() == this.targetType).map(arg -> (AnimalEntity)arg).filter(animal::canBreedWith).findFirst();
     }
 
     @Override
-    protected /* synthetic */ void finishRunning(ServerWorld arg, LivingEntity arg2, long l) {
-        this.finishRunning(arg, (AnimalEntity)arg2, l);
+    protected /* synthetic */ void finishRunning(ServerWorld world, LivingEntity entity, long time) {
+        this.finishRunning(world, (AnimalEntity)entity, time);
     }
 
     @Override
-    protected /* synthetic */ void keepRunning(ServerWorld arg, LivingEntity arg2, long l) {
-        this.keepRunning(arg, (AnimalEntity)arg2, l);
+    protected /* synthetic */ void keepRunning(ServerWorld world, LivingEntity entity, long time) {
+        this.keepRunning(world, (AnimalEntity)entity, time);
     }
 }
 

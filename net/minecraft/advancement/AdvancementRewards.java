@@ -41,38 +41,38 @@ public class AdvancementRewards {
     private final Identifier[] recipes;
     private final CommandFunction.LazyContainer function;
 
-    public AdvancementRewards(int i, Identifier[] args, Identifier[] args2, CommandFunction.LazyContainer arg) {
-        this.experience = i;
-        this.loot = args;
-        this.recipes = args2;
-        this.function = arg;
+    public AdvancementRewards(int experience, Identifier[] loot, Identifier[] recipes, CommandFunction.LazyContainer function) {
+        this.experience = experience;
+        this.loot = loot;
+        this.recipes = recipes;
+        this.function = function;
     }
 
-    public void apply(ServerPlayerEntity arg) {
-        arg.addExperience(this.experience);
-        LootContext lv = new LootContext.Builder(arg.getServerWorld()).parameter(LootContextParameters.THIS_ENTITY, arg).parameter(LootContextParameters.POSITION, arg.getBlockPos()).random(arg.getRandom()).build(LootContextTypes.ADVANCEMENT_REWARD);
+    public void apply(ServerPlayerEntity player) {
+        player.addExperience(this.experience);
+        LootContext lv = new LootContext.Builder(player.getServerWorld()).parameter(LootContextParameters.THIS_ENTITY, player).parameter(LootContextParameters.POSITION, player.getBlockPos()).random(player.getRandom()).build(LootContextTypes.ADVANCEMENT_REWARD);
         boolean bl = false;
         for (Identifier lv2 : this.loot) {
-            for (ItemStack lv3 : arg.server.getLootManager().getTable(lv2).generateLoot(lv)) {
-                if (arg.giveItemStack(lv3)) {
-                    arg.world.playSound(null, arg.getX(), arg.getY(), arg.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, 0.2f, ((arg.getRandom().nextFloat() - arg.getRandom().nextFloat()) * 0.7f + 1.0f) * 2.0f);
+            for (ItemStack lv3 : player.server.getLootManager().getTable(lv2).generateLoot(lv)) {
+                if (player.giveItemStack(lv3)) {
+                    player.world.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, 0.2f, ((player.getRandom().nextFloat() - player.getRandom().nextFloat()) * 0.7f + 1.0f) * 2.0f);
                     bl = true;
                     continue;
                 }
-                ItemEntity lv4 = arg.dropItem(lv3, false);
+                ItemEntity lv4 = player.dropItem(lv3, false);
                 if (lv4 == null) continue;
                 lv4.resetPickupDelay();
-                lv4.setOwner(arg.getUuid());
+                lv4.setOwner(player.getUuid());
             }
         }
         if (bl) {
-            arg.playerScreenHandler.sendContentUpdates();
+            player.playerScreenHandler.sendContentUpdates();
         }
         if (this.recipes.length > 0) {
-            arg.unlockRecipes(this.recipes);
+            player.unlockRecipes(this.recipes);
         }
-        MinecraftServer minecraftServer = arg.server;
-        this.function.get(minecraftServer.getCommandFunctionManager()).ifPresent(arg2 -> minecraftServer.getCommandFunctionManager().execute((CommandFunction)arg2, arg.getCommandSource().withSilent().withLevel(2)));
+        MinecraftServer minecraftServer = player.server;
+        this.function.get(minecraftServer.getCommandFunctionManager()).ifPresent(arg2 -> minecraftServer.getCommandFunctionManager().execute((CommandFunction)arg2, player.getCommandSource().withSilent().withLevel(2)));
     }
 
     public String toString() {
@@ -107,21 +107,21 @@ public class AdvancementRewards {
         return jsonObject;
     }
 
-    public static AdvancementRewards fromJson(JsonObject jsonObject) throws JsonParseException {
+    public static AdvancementRewards fromJson(JsonObject json) throws JsonParseException {
         CommandFunction.LazyContainer lv2;
-        int i = JsonHelper.getInt(jsonObject, "experience", 0);
-        JsonArray jsonArray = JsonHelper.getArray(jsonObject, "loot", new JsonArray());
+        int i = JsonHelper.getInt(json, "experience", 0);
+        JsonArray jsonArray = JsonHelper.getArray(json, "loot", new JsonArray());
         Identifier[] lvs = new Identifier[jsonArray.size()];
         for (int j = 0; j < lvs.length; ++j) {
             lvs[j] = new Identifier(JsonHelper.asString(jsonArray.get(j), "loot[" + j + "]"));
         }
-        JsonArray jsonArray2 = JsonHelper.getArray(jsonObject, "recipes", new JsonArray());
+        JsonArray jsonArray2 = JsonHelper.getArray(json, "recipes", new JsonArray());
         Identifier[] lvs2 = new Identifier[jsonArray2.size()];
         for (int k = 0; k < lvs2.length; ++k) {
             lvs2[k] = new Identifier(JsonHelper.asString(jsonArray2.get(k), "recipes[" + k + "]"));
         }
-        if (jsonObject.has("function")) {
-            CommandFunction.LazyContainer lv = new CommandFunction.LazyContainer(new Identifier(JsonHelper.getString(jsonObject, "function")));
+        if (json.has("function")) {
+            CommandFunction.LazyContainer lv = new CommandFunction.LazyContainer(new Identifier(JsonHelper.getString(json, "function")));
         } else {
             lv2 = CommandFunction.LazyContainer.EMPTY;
         }
@@ -135,21 +135,21 @@ public class AdvancementRewards {
         @Nullable
         private Identifier function;
 
-        public static Builder experience(int i) {
-            return new Builder().setExperience(i);
+        public static Builder experience(int experience) {
+            return new Builder().setExperience(experience);
         }
 
-        public Builder setExperience(int i) {
-            this.experience += i;
+        public Builder setExperience(int experience) {
+            this.experience += experience;
             return this;
         }
 
-        public static Builder recipe(Identifier arg) {
-            return new Builder().addRecipe(arg);
+        public static Builder recipe(Identifier recipe) {
+            return new Builder().addRecipe(recipe);
         }
 
-        public Builder addRecipe(Identifier arg) {
-            this.recipes.add(arg);
+        public Builder addRecipe(Identifier recipe) {
+            this.recipes.add(recipe);
             return this;
         }
 

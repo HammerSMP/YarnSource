@@ -87,25 +87,25 @@ public enum DirectionTransformation implements StringIdentifiable
     private static final DirectionTransformation[][] COMBINATIONS;
     private static final DirectionTransformation[] INVERSES;
 
-    private DirectionTransformation(String string2, AxisTransformation arg, boolean bl, boolean bl2, boolean bl3) {
-        this.name = string2;
-        this.flipX = bl;
-        this.flipY = bl2;
-        this.flipZ = bl3;
-        this.axisTransformation = arg;
+    private DirectionTransformation(String name, AxisTransformation axisTransformation, boolean flipX, boolean flipY, boolean flipZ) {
+        this.name = name;
+        this.flipX = flipX;
+        this.flipY = flipY;
+        this.flipZ = flipZ;
+        this.axisTransformation = axisTransformation;
         this.matrix = new Matrix3f();
-        this.matrix.a00 = bl ? -1.0f : 1.0f;
-        this.matrix.a11 = bl2 ? -1.0f : 1.0f;
-        this.matrix.a22 = bl3 ? -1.0f : 1.0f;
-        this.matrix.multiply(arg.getMatrix());
+        this.matrix.a00 = flipX ? -1.0f : 1.0f;
+        this.matrix.a11 = flipY ? -1.0f : 1.0f;
+        this.matrix.a22 = flipZ ? -1.0f : 1.0f;
+        this.matrix.multiply(axisTransformation.getMatrix());
     }
 
     private BooleanList getAxisFlips() {
         return new BooleanArrayList(new boolean[]{this.flipX, this.flipY, this.flipZ});
     }
 
-    public DirectionTransformation prepend(DirectionTransformation arg) {
-        return COMBINATIONS[this.ordinal()][arg.ordinal()];
+    public DirectionTransformation prepend(DirectionTransformation transformation) {
+        return COMBINATIONS[this.ordinal()][transformation.ordinal()];
     }
 
     public String toString() {
@@ -117,7 +117,7 @@ public enum DirectionTransformation implements StringIdentifiable
         return this.name;
     }
 
-    public Direction map(Direction arg) {
+    public Direction map(Direction direction) {
         if (this.mappings == null) {
             this.mappings = Maps.newEnumMap(Direction.class);
             for (Direction lv : Direction.values()) {
@@ -129,11 +129,11 @@ public enum DirectionTransformation implements StringIdentifiable
                 this.mappings.put(lv, lv6);
             }
         }
-        return this.mappings.get(arg);
+        return this.mappings.get(direction);
     }
 
-    public boolean shouldFlipDirection(Direction.Axis arg) {
-        switch (arg) {
+    public boolean shouldFlipDirection(Direction.Axis axis) {
+        switch (axis) {
             case X: {
                 return this.flipX;
             }
@@ -144,8 +144,8 @@ public enum DirectionTransformation implements StringIdentifiable
         return this.flipZ;
     }
 
-    public JigsawOrientation mapJigsawOrientation(JigsawOrientation arg) {
-        return JigsawOrientation.byDirections(this.map(arg.getFacing()), this.map(arg.getRotation()));
+    public JigsawOrientation mapJigsawOrientation(JigsawOrientation orientation) {
+        return JigsawOrientation.byDirections(this.map(orientation.getFacing()), this.map(orientation.getRotation()));
     }
 
     static {

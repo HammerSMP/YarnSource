@@ -26,9 +26,9 @@ public enum NarratorOption {
     private final int id;
     private final Text translationKey;
 
-    private NarratorOption(int j, String string2) {
-        this.id = j;
-        this.translationKey = new TranslatableText(string2);
+    private NarratorOption(int id, String translationKey) {
+        this.id = id;
+        this.translationKey = new TranslatableText(translationKey);
     }
 
     public int getId() {
@@ -39,8 +39,8 @@ public enum NarratorOption {
         return this.translationKey;
     }
 
-    public static NarratorOption byId(int i) {
-        return VALUES[MathHelper.floorMod(i, VALUES.length)];
+    public static NarratorOption byId(int id) {
+        return VALUES[MathHelper.floorMod(id, VALUES.length)];
     }
 
     static {

@@ -32,13 +32,13 @@ implements ParticleEffect {
         }
 
         @Override
-        public /* synthetic */ ParticleEffect read(ParticleType arg, PacketByteBuf arg2) {
-            return this.read(arg, arg2);
+        public /* synthetic */ ParticleEffect read(ParticleType type, PacketByteBuf buf) {
+            return this.read(type, buf);
         }
 
         @Override
-        public /* synthetic */ ParticleEffect read(ParticleType arg, StringReader stringReader) throws CommandSyntaxException {
-            return this.read(arg, stringReader);
+        public /* synthetic */ ParticleEffect read(ParticleType type, StringReader reader) throws CommandSyntaxException {
+            return this.read(type, reader);
         }
     };
     private final Codec<DefaultParticleType> field_25127 = Codec.unit(this::getType);
@@ -57,7 +57,7 @@ implements ParticleEffect {
     }
 
     @Override
-    public void write(PacketByteBuf arg) {
+    public void write(PacketByteBuf buf) {
     }
 
     @Override

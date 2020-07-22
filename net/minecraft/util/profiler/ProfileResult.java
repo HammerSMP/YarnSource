@@ -35,8 +35,8 @@ public interface ProfileResult {
         return this.getEndTick() - this.getStartTick();
     }
 
-    public static String getHumanReadableName(String string) {
-        return string.replace('\u001e', '.');
+    public static String getHumanReadableName(String path) {
+        return path.replace('\u001e', '.');
     }
 }
 

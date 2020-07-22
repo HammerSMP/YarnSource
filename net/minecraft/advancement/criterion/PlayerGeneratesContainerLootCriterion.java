@@ -31,35 +31,35 @@ extends AbstractCriterion<Conditions> {
         return new Conditions(arg, lv);
     }
 
-    public void test(ServerPlayerEntity arg, Identifier arg22) {
-        this.test(arg, (T arg2) -> arg2.test(arg22));
+    public void test(ServerPlayerEntity player, Identifier id) {
+        this.test(player, (T arg2) -> arg2.test(id));
     }
 
     @Override
-    protected /* synthetic */ AbstractCriterionConditions conditionsFromJson(JsonObject jsonObject, EntityPredicate.Extended arg, AdvancementEntityPredicateDeserializer arg2) {
-        return this.conditionsFromJson(jsonObject, arg, arg2);
+    protected /* synthetic */ AbstractCriterionConditions conditionsFromJson(JsonObject obj, EntityPredicate.Extended playerPredicate, AdvancementEntityPredicateDeserializer predicateDeserializer) {
+        return this.conditionsFromJson(obj, playerPredicate, predicateDeserializer);
     }
 
     public static class Conditions
     extends AbstractCriterionConditions {
         private final Identifier lootTable;
 
-        public Conditions(EntityPredicate.Extended arg, Identifier arg2) {
-            super(ID, arg);
-            this.lootTable = arg2;
+        public Conditions(EntityPredicate.Extended entity, Identifier lootTable) {
+            super(ID, entity);
+            this.lootTable = lootTable;
         }
 
-        public static Conditions create(Identifier arg) {
-            return new Conditions(EntityPredicate.Extended.EMPTY, arg);
+        public static Conditions create(Identifier lootTable) {
+            return new Conditions(EntityPredicate.Extended.EMPTY, lootTable);
         }
 
-        public boolean test(Identifier arg) {
-            return this.lootTable.equals(arg);
+        public boolean test(Identifier lootTable) {
+            return this.lootTable.equals(lootTable);
         }
 
         @Override
-        public JsonObject toJson(AdvancementEntityPredicateSerializer arg) {
-            JsonObject jsonObject = super.toJson(arg);
+        public JsonObject toJson(AdvancementEntityPredicateSerializer predicateSerializer) {
+            JsonObject jsonObject = super.toJson(predicateSerializer);
             jsonObject.addProperty("loot_table", this.lootTable.toString());
             return jsonObject;
         }

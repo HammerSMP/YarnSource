@@ -38,21 +38,21 @@ extends TrunkPlacer {
     }
 
     @Override
-    public List<FoliagePlacer.TreeNode> generate(ModifiableTestableWorld arg, Random random, int i, BlockPos arg2, Set<BlockPos> set, BlockBox arg3, TreeFeatureConfig arg4) {
-        BlockPos lv = arg2.down();
-        GiantTrunkPlacer.method_27400(arg, lv);
-        GiantTrunkPlacer.method_27400(arg, lv.east());
-        GiantTrunkPlacer.method_27400(arg, lv.south());
-        GiantTrunkPlacer.method_27400(arg, lv.south().east());
+    public List<FoliagePlacer.TreeNode> generate(ModifiableTestableWorld world, Random random, int trunkHeight, BlockPos pos, Set<BlockPos> set, BlockBox arg3, TreeFeatureConfig arg4) {
+        BlockPos lv = pos.down();
+        GiantTrunkPlacer.method_27400(world, lv);
+        GiantTrunkPlacer.method_27400(world, lv.east());
+        GiantTrunkPlacer.method_27400(world, lv.south());
+        GiantTrunkPlacer.method_27400(world, lv.south().east());
         BlockPos.Mutable lv2 = new BlockPos.Mutable();
-        for (int j = 0; j < i; ++j) {
-            GiantTrunkPlacer.method_27399(arg, random, lv2, set, arg3, arg4, arg2, 0, j, 0);
-            if (j >= i - 1) continue;
-            GiantTrunkPlacer.method_27399(arg, random, lv2, set, arg3, arg4, arg2, 1, j, 0);
-            GiantTrunkPlacer.method_27399(arg, random, lv2, set, arg3, arg4, arg2, 1, j, 1);
-            GiantTrunkPlacer.method_27399(arg, random, lv2, set, arg3, arg4, arg2, 0, j, 1);
+        for (int j = 0; j < trunkHeight; ++j) {
+            GiantTrunkPlacer.method_27399(world, random, lv2, set, arg3, arg4, pos, 0, j, 0);
+            if (j >= trunkHeight - 1) continue;
+            GiantTrunkPlacer.method_27399(world, random, lv2, set, arg3, arg4, pos, 1, j, 0);
+            GiantTrunkPlacer.method_27399(world, random, lv2, set, arg3, arg4, pos, 1, j, 1);
+            GiantTrunkPlacer.method_27399(world, random, lv2, set, arg3, arg4, pos, 0, j, 1);
         }
-        return ImmutableList.of((Object)new FoliagePlacer.TreeNode(arg2.up(i), 0, true));
+        return ImmutableList.of((Object)new FoliagePlacer.TreeNode(pos.up(trunkHeight), 0, true));
     }
 
     private static void method_27399(ModifiableTestableWorld arg, Random random, BlockPos.Mutable arg2, Set<BlockPos> set, BlockBox arg3, TreeFeatureConfig arg4, BlockPos arg5, int i, int j, int k) {

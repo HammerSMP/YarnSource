@@ -13,6 +13,7 @@ import java.util.Optional;
 import net.minecraft.block.Blocks;
 import net.minecraft.datafixer.NbtOps;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
@@ -41,61 +42,64 @@ implements Vanishable {
         super(arg);
     }
 
-    public static boolean hasLodestone(ItemStack arg) {
-        CompoundTag lv = arg.getTag();
+    public static boolean hasLodestone(ItemStack stack) {
+        CompoundTag lv = stack.getTag();
         return lv != null && (lv.contains("LodestoneDimension") || lv.contains("LodestonePos"));
     }
 
     @Override
-    public boolean hasGlint(ItemStack arg) {
-        return CompassItem.hasLodestone(arg) || super.hasGlint(arg);
+    public boolean hasGlint(ItemStack stack) {
+        return CompassItem.hasLodestone(stack) || super.hasGlint(stack);
     }
 
-    public static Optional<RegistryKey<World>> getLodestoneDimension(CompoundTag arg) {
-        return World.CODEC.parse((DynamicOps)NbtOps.INSTANCE, (Object)arg.get("LodestoneDimension")).result();
+    public static Optional<RegistryKey<World>> getLodestoneDimension(CompoundTag tag) {
+        return World.CODEC.parse((DynamicOps)NbtOps.INSTANCE, (Object)tag.get("LodestoneDimension")).result();
     }
 
     @Override
-    public void inventoryTick(ItemStack arg, World arg2, Entity arg3, int i, boolean bl) {
-        if (arg2.isClient) {
+    public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
+        if (world.isClient) {
             return;
         }
-        if (CompassItem.hasLodestone(arg)) {
-            CompoundTag lv = arg.getOrCreateTag();
+        if (CompassItem.hasLodestone(stack)) {
+            CompoundTag lv = stack.getOrCreateTag();
             if (lv.contains("LodestoneTracked") && !lv.getBoolean("LodestoneTracked")) {
                 return;
             }
             Optional<RegistryKey<World>> optional = CompassItem.getLodestoneDimension(lv);
-            if (optional.isPresent() && optional.get() == arg2.getRegistryKey() && lv.contains("LodestonePos") && !((ServerWorld)arg2).getPointOfInterestStorage().method_26339(PointOfInterestType.LODESTONE, NbtHelper.toBlockPos(lv.getCompound("LodestonePos")))) {
+            if (optional.isPresent() && optional.get() == world.getRegistryKey() && lv.contains("LodestonePos") && !((ServerWorld)world).getPointOfInterestStorage().method_26339(PointOfInterestType.LODESTONE, NbtHelper.toBlockPos(lv.getCompound("LodestonePos")))) {
                 lv.remove("LodestonePos");
             }
         }
     }
 
     @Override
-    public ActionResult useOnBlock(ItemUsageContext arg) {
-        BlockPos lv = arg.hit.getBlockPos();
-        if (arg.world.getBlockState(lv).isOf(Blocks.LODESTONE)) {
+    public ActionResult useOnBlock(ItemUsageContext context) {
+        BlockPos lv = context.getBlockPos();
+        World lv2 = context.getWorld();
+        if (lv2.getBlockState(lv).isOf(Blocks.LODESTONE)) {
             boolean bl;
-            arg.world.playSound(null, lv, SoundEvents.ITEM_LODESTONE_COMPASS_LOCK, SoundCategory.PLAYERS, 1.0f, 1.0f);
-            boolean bl2 = bl = !arg.player.abilities.creativeMode && arg.stack.getCount() == 1;
+            lv2.playSound(null, lv, SoundEvents.ITEM_LODESTONE_COMPASS_LOCK, SoundCategory.PLAYERS, 1.0f, 1.0f);
+            PlayerEntity lv3 = context.getPlayer();
+            ItemStack lv4 = context.getStack();
+            boolean bl2 = bl = !lv3.abilities.creativeMode && lv4.getCount() == 1;
             if (bl) {
-                this.method_27315(arg.world.getRegistryKey(), lv, arg.stack.getOrCreateTag());
+                this.method_27315(lv2.getRegistryKey(), lv, lv4.getOrCreateTag());
             } else {
-                ItemStack lv2 = new ItemStack(Items.COMPASS, 1);
-                CompoundTag lv3 = arg.stack.hasTag() ? arg.stack.getTag().copy() : new CompoundTag();
-                lv2.setTag(lv3);
-                if (!arg.player.abilities.creativeMode) {
-                    arg.stack.decrement(1);
+                ItemStack lv5 = new ItemStack(Items.COMPASS, 1);
+                CompoundTag lv6 = lv4.hasTag() ? lv4.getTag().copy() : new CompoundTag();
+                lv5.setTag(lv6);
+                if (!lv3.abilities.creativeMode) {
+                    lv4.decrement(1);
                 }
-                this.method_27315(arg.world.getRegistryKey(), lv, lv3);
-                if (!arg.player.inventory.insertStack(lv2)) {
-                    arg.player.dropItem(lv2, false);
+                this.method_27315(lv2.getRegistryKey(), lv, lv6);
+                if (!lv3.inventory.insertStack(lv5)) {
+                    lv3.dropItem(lv5, false);
                 }
             }
-            return ActionResult.success(arg.world.isClient);
+            return ActionResult.success(lv2.isClient);
         }
-        return super.useOnBlock(arg);
+        return super.useOnBlock(context);
     }
 
     private void method_27315(RegistryKey<World> arg, BlockPos arg22, CompoundTag arg3) {
@@ -105,8 +109,8 @@ implements Vanishable {
     }
 
     @Override
-    public String getTranslationKey(ItemStack arg) {
-        return CompassItem.hasLodestone(arg) ? "item.minecraft.lodestone_compass" : super.getTranslationKey(arg);
+    public String getTranslationKey(ItemStack stack) {
+        return CompassItem.hasLodestone(stack) ? "item.minecraft.lodestone_compass" : super.getTranslationKey(stack);
     }
 }
 

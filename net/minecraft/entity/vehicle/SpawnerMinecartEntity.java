@@ -23,8 +23,8 @@ extends AbstractMinecartEntity {
     private final MobSpawnerLogic logic = new MobSpawnerLogic(){
 
         @Override
-        public void sendStatus(int i) {
-            SpawnerMinecartEntity.this.world.sendEntityStatus(SpawnerMinecartEntity.this, (byte)i);
+        public void sendStatus(int status) {
+            SpawnerMinecartEntity.this.world.sendEntityStatus(SpawnerMinecartEntity.this, (byte)status);
         }
 
         @Override
@@ -42,8 +42,8 @@ extends AbstractMinecartEntity {
         super(arg, arg2);
     }
 
-    public SpawnerMinecartEntity(World arg, double d, double e, double f) {
-        super(EntityType.SPAWNER_MINECART, arg, d, e, f);
+    public SpawnerMinecartEntity(World world, double x, double y, double z) {
+        super(EntityType.SPAWNER_MINECART, world, x, y, z);
     }
 
     @Override
@@ -57,21 +57,21 @@ extends AbstractMinecartEntity {
     }
 
     @Override
-    protected void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        this.logic.fromTag(arg);
+    protected void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        this.logic.fromTag(tag);
     }
 
     @Override
-    protected void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
-        this.logic.toTag(arg);
+    protected void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
+        this.logic.toTag(tag);
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void handleStatus(byte b) {
-        this.logic.method_8275(b);
+    public void handleStatus(byte status) {
+        this.logic.method_8275(status);
     }
 
     @Override

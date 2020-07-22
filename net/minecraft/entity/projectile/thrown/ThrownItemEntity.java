@@ -42,9 +42,9 @@ implements FlyingItemEntity {
         super(arg, arg2, arg3);
     }
 
-    public void setItem(ItemStack arg2) {
-        if (arg2.getItem() != this.getDefaultItem() || arg2.hasTag()) {
-            this.getDataTracker().set(ITEM, Util.make(arg2.copy(), arg -> arg.setCount(1)));
+    public void setItem(ItemStack item) {
+        if (item.getItem() != this.getDefaultItem() || item.hasTag()) {
+            this.getDataTracker().set(ITEM, Util.make(item.copy(), arg -> arg.setCount(1)));
         }
     }
 
@@ -66,18 +66,18 @@ implements FlyingItemEntity {
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
         ItemStack lv = this.getItem();
         if (!lv.isEmpty()) {
-            arg.put("Item", lv.toTag(new CompoundTag()));
+            tag.put("Item", lv.toTag(new CompoundTag()));
         }
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        ItemStack lv = ItemStack.fromTag(arg.getCompound("Item"));
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        ItemStack lv = ItemStack.fromTag(tag.getCompound("Item"));
         this.setItem(lv);
     }
 }

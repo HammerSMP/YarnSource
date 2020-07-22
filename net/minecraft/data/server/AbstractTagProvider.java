@@ -48,15 +48,15 @@ implements DataProvider {
     protected final Registry<T> registry;
     private final Map<Identifier, Tag.Builder> tagBuilders = Maps.newLinkedHashMap();
 
-    protected AbstractTagProvider(DataGenerator arg, Registry<T> arg2) {
-        this.root = arg;
+    protected AbstractTagProvider(DataGenerator root, Registry<T> arg2) {
+        this.root = root;
         this.registry = arg2;
     }
 
     protected abstract void configure();
 
     @Override
-    public void run(DataCache arg4) {
+    public void run(DataCache cache) {
         this.tagBuilders.clear();
         this.configure();
         SetTag lv = SetTag.empty();
@@ -72,13 +72,13 @@ implements DataProvider {
             try {
                 String string = GSON.toJson((JsonElement)jsonObject);
                 String string2 = SHA1.hashUnencodedChars((CharSequence)string).toString();
-                if (!Objects.equals(arg4.getOldSha1(path), string2) || !Files.exists(path, new LinkOption[0])) {
+                if (!Objects.equals(cache.getOldSha1(path), string2) || !Files.exists(path, new LinkOption[0])) {
                     Files.createDirectories(path.getParent(), new FileAttribute[0]);
                     try (BufferedWriter bufferedWriter = Files.newBufferedWriter(path, new OpenOption[0]);){
                         bufferedWriter.write(string);
                     }
                 }
-                arg4.updateSha1(path, string2);
+                cache.updateSha1(path, string2);
             }
             catch (IOException iOException) {
                 LOGGER.error("Couldn't save tags to {}", (Object)path, (Object)iOException);
@@ -108,13 +108,13 @@ implements DataProvider {
             this.field_23962 = string;
         }
 
-        public ObjectBuilder<T> add(T object) {
-            this.field_23960.add(this.field_23961.getId(object), this.field_23962);
+        public ObjectBuilder<T> add(T element) {
+            this.field_23960.add(this.field_23961.getId(element), this.field_23962);
             return this;
         }
 
-        public ObjectBuilder<T> addTag(Tag.Identified<T> arg) {
-            this.field_23960.addTag(arg.getId(), this.field_23962);
+        public ObjectBuilder<T> addTag(Tag.Identified<T> identifiedTag) {
+            this.field_23960.addTag(identifiedTag.getId(), this.field_23962);
             return this;
         }
 

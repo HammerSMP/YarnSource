@@ -36,24 +36,24 @@ implements DebugRenderer.Renderer {
     private final MinecraftClient client;
     private final Map<Long, Map<BlockPos, Integer>> neighborUpdates = Maps.newTreeMap((Comparator)Ordering.natural().reverse());
 
-    NeighborUpdateDebugRenderer(MinecraftClient arg) {
-        this.client = arg;
+    NeighborUpdateDebugRenderer(MinecraftClient client) {
+        this.client = client;
     }
 
-    public void addNeighborUpdate(long l, BlockPos arg) {
-        Map map = this.neighborUpdates.computeIfAbsent(l, long_ -> Maps.newHashMap());
-        int i = map.getOrDefault(arg, 0);
-        map.put(arg, i + 1);
+    public void addNeighborUpdate(long time, BlockPos pos) {
+        Map map = this.neighborUpdates.computeIfAbsent(time, long_ -> Maps.newHashMap());
+        int i = map.getOrDefault(pos, 0);
+        map.put(pos, i + 1);
     }
 
     @Override
-    public void render(MatrixStack arg, VertexConsumerProvider arg2, double d, double e, double f) {
+    public void render(MatrixStack matrices, VertexConsumerProvider vertexConsumers, double cameraX, double cameraY, double cameraZ) {
         long l = this.client.world.getTime();
         int i = 200;
         double g = 0.0025;
         HashSet set = Sets.newHashSet();
         HashMap map = Maps.newHashMap();
-        VertexConsumer lv = arg2.getBuffer(RenderLayer.getLines());
+        VertexConsumer lv = vertexConsumers.getBuffer(RenderLayer.getLines());
         Iterator<Map.Entry<Long, Map<BlockPos, Integer>>> iterator = this.neighborUpdates.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<Long, Map<BlockPos, Integer>> entry = iterator.next();
@@ -68,8 +68,8 @@ implements DebugRenderer.Renderer {
                 BlockPos lv2 = entry2.getKey();
                 Integer integer = entry2.getValue();
                 if (!set.add(lv2)) continue;
-                Box lv3 = new Box(BlockPos.ORIGIN).expand(0.002).contract(0.0025 * (double)m).offset(lv2.getX(), lv2.getY(), lv2.getZ()).offset(-d, -e, -f);
-                WorldRenderer.drawBox(arg, lv, lv3.minX, lv3.minY, lv3.minZ, lv3.maxX, lv3.maxY, lv3.maxZ, 1.0f, 1.0f, 1.0f, 1.0f);
+                Box lv3 = new Box(BlockPos.ORIGIN).expand(0.002).contract(0.0025 * (double)m).offset(lv2.getX(), lv2.getY(), lv2.getZ()).offset(-cameraX, -cameraY, -cameraZ);
+                WorldRenderer.drawBox(matrices, lv, lv3.minX, lv3.minY, lv3.minZ, lv3.maxX, lv3.maxY, lv3.maxZ, 1.0f, 1.0f, 1.0f, 1.0f);
                 map.put(lv2, integer);
             }
         }

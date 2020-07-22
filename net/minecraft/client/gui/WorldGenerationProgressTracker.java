@@ -29,33 +29,33 @@ implements WorldGenerationProgressListener {
     private final int size;
     private boolean isRunning;
 
-    public WorldGenerationProgressTracker(int i) {
-        this.progressLogger = new WorldGenerationProgressLogger(i);
-        this.centerSize = i * 2 + 1;
-        this.radius = i + ChunkStatus.getMaxTargetGenerationRadius();
+    public WorldGenerationProgressTracker(int radius) {
+        this.progressLogger = new WorldGenerationProgressLogger(radius);
+        this.centerSize = radius * 2 + 1;
+        this.radius = radius + ChunkStatus.getMaxTargetGenerationRadius();
         this.size = this.radius * 2 + 1;
         this.chunkStatuses = new Long2ObjectOpenHashMap();
     }
 
     @Override
-    public void start(ChunkPos arg) {
+    public void start(ChunkPos spawnPos) {
         if (!this.isRunning) {
             return;
         }
-        this.progressLogger.start(arg);
-        this.spawnPos = arg;
+        this.progressLogger.start(spawnPos);
+        this.spawnPos = spawnPos;
     }
 
     @Override
-    public void setChunkStatus(ChunkPos arg, @Nullable ChunkStatus arg2) {
+    public void setChunkStatus(ChunkPos pos, @Nullable ChunkStatus status) {
         if (!this.isRunning) {
             return;
         }
-        this.progressLogger.setChunkStatus(arg, arg2);
-        if (arg2 == null) {
-            this.chunkStatuses.remove(arg.toLong());
+        this.progressLogger.setChunkStatus(pos, status);
+        if (status == null) {
+            this.chunkStatuses.remove(pos.toLong());
         } else {
-            this.chunkStatuses.put(arg.toLong(), (Object)arg2);
+            this.chunkStatuses.put(pos.toLong(), (Object)status);
         }
     }
 
@@ -83,8 +83,8 @@ implements WorldGenerationProgressListener {
     }
 
     @Nullable
-    public ChunkStatus getChunkStatus(int i, int j) {
-        return (ChunkStatus)this.chunkStatuses.get(ChunkPos.toLong(i + this.spawnPos.x - this.radius, j + this.spawnPos.z - this.radius));
+    public ChunkStatus getChunkStatus(int x, int z) {
+        return (ChunkStatus)this.chunkStatuses.get(ChunkPos.toLong(x + this.spawnPos.x - this.radius, z + this.spawnPos.z - this.radius));
     }
 }
 

@@ -16,19 +16,19 @@ public class AutomaticItemPlacementContext
 extends ItemPlacementContext {
     private final Direction facing;
 
-    public AutomaticItemPlacementContext(World arg, BlockPos arg2, Direction arg3, ItemStack arg4, Direction arg5) {
-        super(arg, null, Hand.MAIN_HAND, arg4, new BlockHitResult(Vec3d.ofBottomCenter(arg2), arg5, arg2, false));
-        this.facing = arg3;
+    public AutomaticItemPlacementContext(World world, BlockPos pos, Direction facing, ItemStack stack, Direction side) {
+        super(world, null, Hand.MAIN_HAND, stack, new BlockHitResult(Vec3d.ofBottomCenter(pos), side, pos, false));
+        this.facing = facing;
     }
 
     @Override
     public BlockPos getBlockPos() {
-        return this.hit.getBlockPos();
+        return this.method_30344().getBlockPos();
     }
 
     @Override
     public boolean canPlace() {
-        return this.world.getBlockState(this.hit.getBlockPos()).canReplace(this);
+        return this.getWorld().getBlockState(this.method_30344().getBlockPos()).canReplace(this);
     }
 
     @Override

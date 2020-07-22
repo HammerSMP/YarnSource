@@ -27,9 +27,9 @@ public class TakeJobSiteTask
 extends Task<VillagerEntity> {
     private final float speed;
 
-    public TakeJobSiteTask(float f) {
+    public TakeJobSiteTask(float speed) {
         super((Map<MemoryModuleType<?>, MemoryModuleState>)ImmutableMap.of(MemoryModuleType.POTENTIAL_JOB_SITE, (Object)((Object)MemoryModuleState.VALUE_PRESENT), MemoryModuleType.JOB_SITE, (Object)((Object)MemoryModuleState.VALUE_ABSENT), MemoryModuleType.MOBS, (Object)((Object)MemoryModuleState.VALUE_PRESENT)));
-        this.speed = f;
+        this.speed = speed;
     }
 
     @Override
@@ -50,40 +50,40 @@ extends Task<VillagerEntity> {
         LookTargetUtil.streamSeenVillagers(arg22, arg2 -> this.canUseJobSite((PointOfInterestType)optional.get(), (VillagerEntity)arg2, lv)).findFirst().ifPresent(arg4 -> this.claimSite(arg, arg22, (VillagerEntity)arg4, lv, arg4.getBrain().getOptionalMemory(MemoryModuleType.JOB_SITE).isPresent()));
     }
 
-    private boolean canUseJobSite(PointOfInterestType arg, VillagerEntity arg2, BlockPos arg3) {
-        boolean bl = arg2.getBrain().getOptionalMemory(MemoryModuleType.POTENTIAL_JOB_SITE).isPresent();
+    private boolean canUseJobSite(PointOfInterestType poiType, VillagerEntity villager, BlockPos pos) {
+        boolean bl = villager.getBrain().getOptionalMemory(MemoryModuleType.POTENTIAL_JOB_SITE).isPresent();
         if (bl) {
             return false;
         }
-        Optional<GlobalPos> optional = arg2.getBrain().getOptionalMemory(MemoryModuleType.JOB_SITE);
-        VillagerProfession lv = arg2.getVillagerData().getProfession();
-        if (arg2.getVillagerData().getProfession() != VillagerProfession.NONE && lv.getWorkStation().getCompletionCondition().test(arg)) {
+        Optional<GlobalPos> optional = villager.getBrain().getOptionalMemory(MemoryModuleType.JOB_SITE);
+        VillagerProfession lv = villager.getVillagerData().getProfession();
+        if (villager.getVillagerData().getProfession() != VillagerProfession.NONE && lv.getWorkStation().getCompletionCondition().test(poiType)) {
             if (!optional.isPresent()) {
-                return this.canReachJobSite(arg2, arg3, arg);
+                return this.canReachJobSite(villager, pos, poiType);
             }
-            return optional.get().getPos().equals(arg3);
+            return optional.get().getPos().equals(pos);
         }
         return false;
     }
 
-    private void claimSite(ServerWorld arg, VillagerEntity arg2, VillagerEntity arg3, BlockPos arg4, boolean bl) {
-        this.forgetJobSiteAndWalkTarget(arg2);
-        if (!bl) {
-            LookTargetUtil.walkTowards((LivingEntity)arg3, arg4, this.speed, 1);
-            arg3.getBrain().remember(MemoryModuleType.POTENTIAL_JOB_SITE, GlobalPos.create(arg.getRegistryKey(), arg4));
-            DebugInfoSender.sendPointOfInterest(arg, arg4);
+    private void claimSite(ServerWorld world, VillagerEntity previousOwner, VillagerEntity newOwner, BlockPos pos, boolean jobSitePresent) {
+        this.forgetJobSiteAndWalkTarget(previousOwner);
+        if (!jobSitePresent) {
+            LookTargetUtil.walkTowards((LivingEntity)newOwner, pos, this.speed, 1);
+            newOwner.getBrain().remember(MemoryModuleType.POTENTIAL_JOB_SITE, GlobalPos.create(world.getRegistryKey(), pos));
+            DebugInfoSender.sendPointOfInterest(world, pos);
         }
     }
 
-    private boolean canReachJobSite(VillagerEntity arg, BlockPos arg2, PointOfInterestType arg3) {
-        Path lv = arg.getNavigation().findPathTo(arg2, arg3.getSearchDistance());
+    private boolean canReachJobSite(VillagerEntity villager, BlockPos pos, PointOfInterestType poiType) {
+        Path lv = villager.getNavigation().findPathTo(pos, poiType.getSearchDistance());
         return lv != null && lv.reachesTarget();
     }
 
-    private void forgetJobSiteAndWalkTarget(VillagerEntity arg) {
-        arg.getBrain().forget(MemoryModuleType.WALK_TARGET);
-        arg.getBrain().forget(MemoryModuleType.LOOK_TARGET);
-        arg.getBrain().forget(MemoryModuleType.POTENTIAL_JOB_SITE);
+    private void forgetJobSiteAndWalkTarget(VillagerEntity villager) {
+        villager.getBrain().forget(MemoryModuleType.WALK_TARGET);
+        villager.getBrain().forget(MemoryModuleType.LOOK_TARGET);
+        villager.getBrain().forget(MemoryModuleType.POTENTIAL_JOB_SITE);
     }
 }
 

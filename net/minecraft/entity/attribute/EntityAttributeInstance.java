@@ -43,10 +43,10 @@ public class EntityAttributeInstance {
     private double value;
     private final Consumer<EntityAttributeInstance> updateCallback;
 
-    public EntityAttributeInstance(EntityAttribute arg, Consumer<EntityAttributeInstance> consumer) {
-        this.type = arg;
-        this.updateCallback = consumer;
-        this.baseValue = arg.getDefaultValue();
+    public EntityAttributeInstance(EntityAttribute type, Consumer<EntityAttributeInstance> updateCallback) {
+        this.type = type;
+        this.updateCallback = updateCallback;
+        this.baseValue = type.getDefaultValue();
     }
 
     public EntityAttribute getAttribute() {
@@ -57,16 +57,16 @@ public class EntityAttributeInstance {
         return this.baseValue;
     }
 
-    public void setBaseValue(double d) {
-        if (d == this.baseValue) {
+    public void setBaseValue(double baseValue) {
+        if (baseValue == this.baseValue) {
             return;
         }
-        this.baseValue = d;
+        this.baseValue = baseValue;
         this.onUpdate();
     }
 
-    public Set<EntityAttributeModifier> getModifiers(EntityAttributeModifier.Operation arg2) {
-        return this.operationToModifiers.computeIfAbsent(arg2, arg -> Sets.newHashSet());
+    public Set<EntityAttributeModifier> getModifiers(EntityAttributeModifier.Operation operation) {
+        return this.operationToModifiers.computeIfAbsent(operation, arg -> Sets.newHashSet());
     }
 
     public Set<EntityAttributeModifier> getModifiers() {
@@ -74,30 +74,30 @@ public class EntityAttributeInstance {
     }
 
     @Nullable
-    public EntityAttributeModifier getModifier(UUID uUID) {
-        return this.byId.get(uUID);
+    public EntityAttributeModifier getModifier(UUID uuid) {
+        return this.byId.get(uuid);
     }
 
-    public boolean hasModifier(EntityAttributeModifier arg) {
-        return this.byId.get(arg.getId()) != null;
+    public boolean hasModifier(EntityAttributeModifier modifier) {
+        return this.byId.get(modifier.getId()) != null;
     }
 
-    private void addModifier(EntityAttributeModifier arg) {
-        EntityAttributeModifier lv = this.byId.putIfAbsent(arg.getId(), arg);
+    private void addModifier(EntityAttributeModifier modifier) {
+        EntityAttributeModifier lv = this.byId.putIfAbsent(modifier.getId(), modifier);
         if (lv != null) {
             throw new IllegalArgumentException("Modifier is already applied on this attribute!");
         }
-        this.getModifiers(arg.getOperation()).add(arg);
+        this.getModifiers(modifier.getOperation()).add(modifier);
         this.onUpdate();
     }
 
-    public void addTemporaryModifier(EntityAttributeModifier arg) {
-        this.addModifier(arg);
+    public void addTemporaryModifier(EntityAttributeModifier modifier) {
+        this.addModifier(modifier);
     }
 
-    public void addPersistentModifier(EntityAttributeModifier arg) {
-        this.addModifier(arg);
-        this.persistentModifiers.add(arg);
+    public void addPersistentModifier(EntityAttributeModifier modifier) {
+        this.addModifier(modifier);
+        this.persistentModifiers.add(modifier);
     }
 
     protected void onUpdate() {
@@ -105,22 +105,22 @@ public class EntityAttributeInstance {
         this.updateCallback.accept(this);
     }
 
-    public void removeModifier(EntityAttributeModifier arg) {
-        this.getModifiers(arg.getOperation()).remove(arg);
-        this.byId.remove(arg.getId());
-        this.persistentModifiers.remove(arg);
+    public void removeModifier(EntityAttributeModifier modifier) {
+        this.getModifiers(modifier.getOperation()).remove(modifier);
+        this.byId.remove(modifier.getId());
+        this.persistentModifiers.remove(modifier);
         this.onUpdate();
     }
 
-    public void removeModifier(UUID uUID) {
-        EntityAttributeModifier lv = this.getModifier(uUID);
+    public void removeModifier(UUID uuid) {
+        EntityAttributeModifier lv = this.getModifier(uuid);
         if (lv != null) {
             this.removeModifier(lv);
         }
     }
 
-    public boolean tryRemoveModifier(UUID uUID) {
-        EntityAttributeModifier lv = this.getModifier(uUID);
+    public boolean tryRemoveModifier(UUID uuid) {
+        EntityAttributeModifier lv = this.getModifier(uuid);
         if (lv != null && this.persistentModifiers.contains(lv)) {
             this.removeModifier(lv);
             return true;
@@ -162,14 +162,14 @@ public class EntityAttributeInstance {
         return this.operationToModifiers.getOrDefault((Object)arg, Collections.emptySet());
     }
 
-    public void setFrom(EntityAttributeInstance arg2) {
-        this.baseValue = arg2.baseValue;
+    public void setFrom(EntityAttributeInstance other) {
+        this.baseValue = other.baseValue;
         this.byId.clear();
-        this.byId.putAll(arg2.byId);
+        this.byId.putAll(other.byId);
         this.persistentModifiers.clear();
-        this.persistentModifiers.addAll(arg2.persistentModifiers);
+        this.persistentModifiers.addAll(other.persistentModifiers);
         this.operationToModifiers.clear();
-        arg2.operationToModifiers.forEach((arg, set) -> this.getModifiers((EntityAttributeModifier.Operation)((Object)arg)).addAll((Collection<EntityAttributeModifier>)set));
+        other.operationToModifiers.forEach((arg, set) -> this.getModifiers((EntityAttributeModifier.Operation)((Object)arg)).addAll((Collection<EntityAttributeModifier>)set));
         this.onUpdate();
     }
 
@@ -187,10 +187,10 @@ public class EntityAttributeInstance {
         return lv;
     }
 
-    public void fromTag(CompoundTag arg) {
-        this.baseValue = arg.getDouble("Base");
-        if (arg.contains("Modifiers", 9)) {
-            ListTag lv = arg.getList("Modifiers", 10);
+    public void fromTag(CompoundTag tag) {
+        this.baseValue = tag.getDouble("Base");
+        if (tag.contains("Modifiers", 9)) {
+            ListTag lv = tag.getList("Modifiers", 10);
             for (int i = 0; i < lv.size(); ++i) {
                 EntityAttributeModifier lv2 = EntityAttributeModifier.fromTag(lv.getCompound(i));
                 if (lv2 == null) continue;

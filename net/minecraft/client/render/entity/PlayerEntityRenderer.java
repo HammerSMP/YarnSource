@@ -54,8 +54,8 @@ extends LivingEntityRenderer<AbstractClientPlayerEntity, PlayerEntityModel<Abstr
         this(arg, false);
     }
 
-    public PlayerEntityRenderer(EntityRenderDispatcher arg, boolean bl) {
-        super(arg, new PlayerEntityModel(0.0f, bl), 0.5f);
+    public PlayerEntityRenderer(EntityRenderDispatcher dispatcher, boolean bl) {
+        super(dispatcher, new PlayerEntityModel(0.0f, bl), 0.5f);
         this.addFeature(new ArmorFeatureRenderer(this, new BipedEntityModel(0.5f), new BipedEntityModel(1.0f)));
         this.addFeature(new HeldItemFeatureRenderer<AbstractClientPlayerEntity, PlayerEntityModel<AbstractClientPlayerEntity>>(this));
         this.addFeature(new StuckArrowsFeatureRenderer<AbstractClientPlayerEntity, PlayerEntityModel<AbstractClientPlayerEntity>>(this));
@@ -96,7 +96,7 @@ extends LivingEntityRenderer<AbstractClientPlayerEntity, PlayerEntityModel<Abstr
             lv.rightPantLeg.visible = arg.isPartVisible(PlayerModelPart.RIGHT_PANTS_LEG);
             lv.leftSleeve.visible = arg.isPartVisible(PlayerModelPart.LEFT_SLEEVE);
             lv.rightSleeve.visible = arg.isPartVisible(PlayerModelPart.RIGHT_SLEEVE);
-            lv.isSneaking = arg.isInSneakingPose();
+            lv.sneaking = arg.isInSneakingPose();
             BipedEntityModel.ArmPose lv2 = PlayerEntityRenderer.getArmPose(arg, Hand.MAIN_HAND);
             BipedEntityModel.ArmPose lv3 = PlayerEntityRenderer.getArmPose(arg, Hand.OFF_HAND);
             if (lv2.method_30156()) {
@@ -164,25 +164,25 @@ extends LivingEntityRenderer<AbstractClientPlayerEntity, PlayerEntityModel<Abstr
         arg3.pop();
     }
 
-    public void renderRightArm(MatrixStack arg, VertexConsumerProvider arg2, int i, AbstractClientPlayerEntity arg3) {
-        this.renderArm(arg, arg2, i, arg3, ((PlayerEntityModel)this.model).rightArm, ((PlayerEntityModel)this.model).rightSleeve);
+    public void renderRightArm(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, AbstractClientPlayerEntity player) {
+        this.renderArm(matrices, vertexConsumers, light, player, ((PlayerEntityModel)this.model).rightArm, ((PlayerEntityModel)this.model).rightSleeve);
     }
 
-    public void renderLeftArm(MatrixStack arg, VertexConsumerProvider arg2, int i, AbstractClientPlayerEntity arg3) {
-        this.renderArm(arg, arg2, i, arg3, ((PlayerEntityModel)this.model).leftArm, ((PlayerEntityModel)this.model).leftSleeve);
+    public void renderLeftArm(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, AbstractClientPlayerEntity player) {
+        this.renderArm(matrices, vertexConsumers, light, player, ((PlayerEntityModel)this.model).leftArm, ((PlayerEntityModel)this.model).leftSleeve);
     }
 
-    private void renderArm(MatrixStack arg, VertexConsumerProvider arg2, int i, AbstractClientPlayerEntity arg3, ModelPart arg4, ModelPart arg5) {
+    private void renderArm(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, AbstractClientPlayerEntity player, ModelPart arm, ModelPart sleeve) {
         PlayerEntityModel lv = (PlayerEntityModel)this.getModel();
-        this.setModelPose(arg3);
+        this.setModelPose(player);
         lv.handSwingProgress = 0.0f;
-        lv.isSneaking = false;
+        lv.sneaking = false;
         lv.leaningPitch = 0.0f;
-        lv.setAngles(arg3, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-        arg4.pitch = 0.0f;
-        arg4.render(arg, arg2.getBuffer(RenderLayer.getEntitySolid(arg3.getSkinTexture())), i, OverlayTexture.DEFAULT_UV);
-        arg5.pitch = 0.0f;
-        arg5.render(arg, arg2.getBuffer(RenderLayer.getEntityTranslucent(arg3.getSkinTexture())), i, OverlayTexture.DEFAULT_UV);
+        lv.setAngles(player, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+        arm.pitch = 0.0f;
+        arm.render(matrices, vertexConsumers.getBuffer(RenderLayer.getEntitySolid(player.getSkinTexture())), light, OverlayTexture.DEFAULT_UV);
+        sleeve.pitch = 0.0f;
+        sleeve.render(matrices, vertexConsumers.getBuffer(RenderLayer.getEntityTranslucent(player.getSkinTexture())), light, OverlayTexture.DEFAULT_UV);
     }
 
     @Override

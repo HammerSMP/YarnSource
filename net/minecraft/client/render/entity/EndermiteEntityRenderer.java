@@ -37,13 +37,13 @@ extends MobEntityRenderer<EndermiteEntity, EndermiteEntityModel<EndermiteEntity>
     }
 
     @Override
-    protected /* synthetic */ float getLyingAngle(LivingEntity arg) {
-        return this.getLyingAngle((EndermiteEntity)arg);
+    protected /* synthetic */ float getLyingAngle(LivingEntity entity) {
+        return this.getLyingAngle((EndermiteEntity)entity);
     }
 
     @Override
-    public /* synthetic */ Identifier getTexture(Entity arg) {
-        return this.getTexture((EndermiteEntity)arg);
+    public /* synthetic */ Identifier getTexture(Entity entity) {
+        return this.getTexture((EndermiteEntity)entity);
     }
 }
 

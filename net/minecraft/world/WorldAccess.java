@@ -46,13 +46,13 @@ class_5424 {
     public ChunkManager getChunkManager();
 
     @Override
-    default public boolean isChunkLoaded(int i, int j) {
-        return this.getChunkManager().isChunkLoaded(i, j);
+    default public boolean isChunkLoaded(int chunkX, int chunkZ) {
+        return this.getChunkManager().isChunkLoaded(chunkX, chunkZ);
     }
 
     public Random getRandom();
 
-    default public void updateNeighbors(BlockPos arg, Block arg2) {
+    default public void updateNeighbors(BlockPos pos, Block block) {
     }
 
     public void playSound(@Nullable PlayerEntity var1, BlockPos var2, SoundEvent var3, SoundCategory var4, float var5, float var6);
@@ -65,8 +65,8 @@ class_5424 {
         return this.getDimension().getLogicalHeight();
     }
 
-    default public void syncWorldEvent(int i, BlockPos arg, int j) {
-        this.syncWorldEvent(null, i, arg, j);
+    default public void syncWorldEvent(int eventId, BlockPos pos, int data) {
+        this.syncWorldEvent(null, eventId, pos, data);
     }
 }
 

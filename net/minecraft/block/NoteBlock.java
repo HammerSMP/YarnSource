@@ -37,68 +37,68 @@ extends Block {
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext arg) {
-        return (BlockState)this.getDefaultState().with(INSTRUMENT, Instrument.fromBlockState(arg.getWorld().getBlockState(arg.getBlockPos().down())));
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        return (BlockState)this.getDefaultState().with(INSTRUMENT, Instrument.fromBlockState(ctx.getWorld().getBlockState(ctx.getBlockPos().down())));
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
-        if (arg2 == Direction.DOWN) {
-            return (BlockState)arg.with(INSTRUMENT, Instrument.fromBlockState(arg3));
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
+        if (direction == Direction.DOWN) {
+            return (BlockState)state.with(INSTRUMENT, Instrument.fromBlockState(newState));
         }
-        return super.getStateForNeighborUpdate(arg, arg2, arg3, arg4, arg5, arg6);
+        return super.getStateForNeighborUpdate(state, direction, newState, world, pos, posFrom);
     }
 
     @Override
-    public void neighborUpdate(BlockState arg, World arg2, BlockPos arg3, Block arg4, BlockPos arg5, boolean bl) {
-        boolean bl2 = arg2.isReceivingRedstonePower(arg3);
-        if (bl2 != arg.get(POWERED)) {
+    public void neighborUpdate(BlockState state, World world, BlockPos pos, Block block, BlockPos fromPos, boolean notify) {
+        boolean bl2 = world.isReceivingRedstonePower(pos);
+        if (bl2 != state.get(POWERED)) {
             if (bl2) {
-                this.playNote(arg2, arg3);
+                this.playNote(world, pos);
             }
-            arg2.setBlockState(arg3, (BlockState)arg.with(POWERED, bl2), 3);
+            world.setBlockState(pos, (BlockState)state.with(POWERED, bl2), 3);
         }
     }
 
-    private void playNote(World arg, BlockPos arg2) {
-        if (arg.getBlockState(arg2.up()).isAir()) {
-            arg.addSyncedBlockEvent(arg2, this, 0, 0);
+    private void playNote(World world, BlockPos pos) {
+        if (world.getBlockState(pos.up()).isAir()) {
+            world.addSyncedBlockEvent(pos, this, 0, 0);
         }
     }
 
     @Override
-    public ActionResult onUse(BlockState arg, World arg2, BlockPos arg3, PlayerEntity arg4, Hand arg5, BlockHitResult arg6) {
-        if (arg2.isClient) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        if (world.isClient) {
             return ActionResult.SUCCESS;
         }
-        arg = (BlockState)arg.cycle(NOTE);
-        arg2.setBlockState(arg3, arg, 3);
-        this.playNote(arg2, arg3);
-        arg4.incrementStat(Stats.TUNE_NOTEBLOCK);
+        state = (BlockState)state.cycle(NOTE);
+        world.setBlockState(pos, state, 3);
+        this.playNote(world, pos);
+        player.incrementStat(Stats.TUNE_NOTEBLOCK);
         return ActionResult.CONSUME;
     }
 
     @Override
-    public void onBlockBreakStart(BlockState arg, World arg2, BlockPos arg3, PlayerEntity arg4) {
-        if (arg2.isClient) {
+    public void onBlockBreakStart(BlockState state, World world, BlockPos pos, PlayerEntity player) {
+        if (world.isClient) {
             return;
         }
-        this.playNote(arg2, arg3);
-        arg4.incrementStat(Stats.PLAY_NOTEBLOCK);
+        this.playNote(world, pos);
+        player.incrementStat(Stats.PLAY_NOTEBLOCK);
     }
 
     @Override
-    public boolean onSyncedBlockEvent(BlockState arg, World arg2, BlockPos arg3, int i, int j) {
-        int k = arg.get(NOTE);
+    public boolean onSyncedBlockEvent(BlockState state, World world, BlockPos pos, int type, int data) {
+        int k = state.get(NOTE);
         float f = (float)Math.pow(2.0, (double)(k - 12) / 12.0);
-        arg2.playSound(null, arg3, arg.get(INSTRUMENT).getSound(), SoundCategory.RECORDS, 3.0f, f);
-        arg2.addParticle(ParticleTypes.NOTE, (double)arg3.getX() + 0.5, (double)arg3.getY() + 1.2, (double)arg3.getZ() + 0.5, (double)k / 24.0, 0.0, 0.0);
+        world.playSound(null, pos, state.get(INSTRUMENT).getSound(), SoundCategory.RECORDS, 3.0f, f);
+        world.addParticle(ParticleTypes.NOTE, (double)pos.getX() + 0.5, (double)pos.getY() + 1.2, (double)pos.getZ() + 0.5, (double)k / 24.0, 0.0, 0.0);
         return true;
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(INSTRUMENT, POWERED, NOTE);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(INSTRUMENT, POWERED, NOTE);
     }
 }
 

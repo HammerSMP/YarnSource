@@ -26,13 +26,13 @@ extends WallSkullBlock {
     }
 
     @Override
-    public void onPlaced(World arg, BlockPos arg2, BlockState arg3, @Nullable LivingEntity arg4, ItemStack arg5) {
-        Blocks.PLAYER_HEAD.onPlaced(arg, arg2, arg3, arg4, arg5);
+    public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
+        Blocks.PLAYER_HEAD.onPlaced(world, pos, state, placer, itemStack);
     }
 
     @Override
-    public List<ItemStack> getDroppedStacks(BlockState arg, LootContext.Builder arg2) {
-        return Blocks.PLAYER_HEAD.getDroppedStacks(arg, arg2);
+    public List<ItemStack> getDroppedStacks(BlockState state, LootContext.Builder builder) {
+        return Blocks.PLAYER_HEAD.getDroppedStacks(state, builder);
     }
 }
 

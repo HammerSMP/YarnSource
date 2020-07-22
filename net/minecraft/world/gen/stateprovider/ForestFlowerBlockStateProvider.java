@@ -28,8 +28,8 @@ extends BlockStateProvider {
     }
 
     @Override
-    public BlockState getBlockState(Random random, BlockPos arg) {
-        double d = MathHelper.clamp((1.0 + Biome.FOLIAGE_NOISE.sample((double)arg.getX() / 48.0, (double)arg.getZ() / 48.0, false)) / 2.0, 0.0, 0.9999);
+    public BlockState getBlockState(Random random, BlockPos pos) {
+        double d = MathHelper.clamp((1.0 + Biome.FOLIAGE_NOISE.sample((double)pos.getX() / 48.0, (double)pos.getZ() / 48.0, false)) / 2.0, 0.0, 0.9999);
         return FLOWERS[(int)(d * (double)FLOWERS.length)];
     }
 }

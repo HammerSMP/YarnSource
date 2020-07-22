@@ -28,8 +28,8 @@ extends EnergySwirlOverlayFeatureRenderer<WitherEntity, WitherEntityModel<Wither
     }
 
     @Override
-    protected float getEnergySwirlX(float f) {
-        return MathHelper.cos(f * 0.02f) * 3.0f;
+    protected float getEnergySwirlX(float partialAge) {
+        return MathHelper.cos(partialAge * 0.02f) * 3.0f;
     }
 
     @Override

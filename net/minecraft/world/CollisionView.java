@@ -3,6 +3,8 @@
  * 
  * Could not load the following classes:
  *  javax.annotation.Nullable
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
  */
 package net.minecraft.world;
 
@@ -11,6 +13,8 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import javax.annotation.Nullable;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.entity.Entity;
@@ -29,29 +33,29 @@ extends BlockView {
     @Nullable
     public BlockView getExistingChunk(int var1, int var2);
 
-    default public boolean intersectsEntities(@Nullable Entity arg, VoxelShape arg2) {
+    default public boolean intersectsEntities(@Nullable Entity except, VoxelShape shape) {
         return true;
     }
 
-    default public boolean canPlace(BlockState arg, BlockPos arg2, ShapeContext arg3) {
-        VoxelShape lv = arg.getCollisionShape(this, arg2, arg3);
-        return lv.isEmpty() || this.intersectsEntities(null, lv.offset(arg2.getX(), arg2.getY(), arg2.getZ()));
+    default public boolean canPlace(BlockState state, BlockPos pos, ShapeContext context) {
+        VoxelShape lv = state.getCollisionShape(this, pos, context);
+        return lv.isEmpty() || this.intersectsEntities(null, lv.offset(pos.getX(), pos.getY(), pos.getZ()));
     }
 
-    default public boolean intersectsEntities(Entity arg) {
-        return this.intersectsEntities(arg, VoxelShapes.cuboid(arg.getBoundingBox()));
+    default public boolean intersectsEntities(Entity entity) {
+        return this.intersectsEntities(entity, VoxelShapes.cuboid(entity.getBoundingBox()));
     }
 
-    default public boolean doesNotCollide(Box arg2) {
-        return this.doesNotCollide(null, arg2, arg -> true);
+    default public boolean doesNotCollide(Box box) {
+        return this.doesNotCollide(null, box, arg -> true);
     }
 
-    default public boolean doesNotCollide(Entity arg2) {
-        return this.doesNotCollide(arg2, arg2.getBoundingBox(), arg -> true);
+    default public boolean doesNotCollide(Entity entity) {
+        return this.doesNotCollide(entity, entity.getBoundingBox(), arg -> true);
     }
 
-    default public boolean doesNotCollide(Entity arg2, Box arg22) {
-        return this.doesNotCollide(arg2, arg22, arg -> true);
+    default public boolean doesNotCollide(Entity entity, Box box) {
+        return this.doesNotCollide(entity, box, arg -> true);
     }
 
     default public boolean doesNotCollide(@Nullable Entity arg, Box arg2, Predicate<Entity> predicate) {
@@ -64,8 +68,13 @@ extends BlockView {
         return Stream.concat(this.getBlockCollisions(arg, arg2), this.getEntityCollisions(arg, arg2, predicate));
     }
 
-    default public Stream<VoxelShape> getBlockCollisions(@Nullable Entity arg, Box arg2) {
-        return StreamSupport.stream(new BlockCollisionSpliterator(this, arg, arg2), false);
+    default public Stream<VoxelShape> getBlockCollisions(@Nullable Entity entity, Box box) {
+        return StreamSupport.stream(new BlockCollisionSpliterator(this, entity, box), false);
+    }
+
+    @Environment(value=EnvType.CLIENT)
+    default public boolean method_30635(@Nullable Entity arg, Box arg2, BiPredicate<BlockState, BlockPos> biPredicate) {
+        return this.method_30030(arg, arg2, biPredicate).allMatch(VoxelShape::isEmpty);
     }
 
     default public Stream<VoxelShape> method_30030(@Nullable Entity arg, Box arg2, BiPredicate<BlockState, BlockPos> biPredicate) {

@@ -59,65 +59,65 @@ extends ScreenHandler {
         }
     };
 
-    public LoomScreenHandler(int i, PlayerInventory arg) {
-        this(i, arg, ScreenHandlerContext.EMPTY);
+    public LoomScreenHandler(int syncId, PlayerInventory playerInventory) {
+        this(syncId, playerInventory, ScreenHandlerContext.EMPTY);
     }
 
-    public LoomScreenHandler(int i, PlayerInventory arg, final ScreenHandlerContext arg2) {
-        super(ScreenHandlerType.LOOM, i);
-        this.context = arg2;
+    public LoomScreenHandler(int syncId, PlayerInventory playerInventory, final ScreenHandlerContext context) {
+        super(ScreenHandlerType.LOOM, syncId);
+        this.context = context;
         this.bannerSlot = this.addSlot(new Slot(this.input, 0, 13, 26){
 
             @Override
-            public boolean canInsert(ItemStack arg) {
-                return arg.getItem() instanceof BannerItem;
+            public boolean canInsert(ItemStack stack) {
+                return stack.getItem() instanceof BannerItem;
             }
         });
         this.dyeSlot = this.addSlot(new Slot(this.input, 1, 33, 26){
 
             @Override
-            public boolean canInsert(ItemStack arg) {
-                return arg.getItem() instanceof DyeItem;
+            public boolean canInsert(ItemStack stack) {
+                return stack.getItem() instanceof DyeItem;
             }
         });
         this.patternSlot = this.addSlot(new Slot(this.input, 2, 23, 45){
 
             @Override
-            public boolean canInsert(ItemStack arg) {
-                return arg.getItem() instanceof BannerPatternItem;
+            public boolean canInsert(ItemStack stack) {
+                return stack.getItem() instanceof BannerPatternItem;
             }
         });
         this.outputSlot = this.addSlot(new Slot(this.output, 0, 143, 58){
 
             @Override
-            public boolean canInsert(ItemStack arg) {
+            public boolean canInsert(ItemStack stack) {
                 return false;
             }
 
             @Override
-            public ItemStack onTakeItem(PlayerEntity arg3, ItemStack arg22) {
+            public ItemStack onTakeItem(PlayerEntity player, ItemStack stack) {
                 LoomScreenHandler.this.bannerSlot.takeStack(1);
                 LoomScreenHandler.this.dyeSlot.takeStack(1);
                 if (!LoomScreenHandler.this.bannerSlot.hasStack() || !LoomScreenHandler.this.dyeSlot.hasStack()) {
                     LoomScreenHandler.this.selectedPattern.set(0);
                 }
-                arg2.run((arg, arg2) -> {
+                context.run((arg, arg2) -> {
                     long l = arg.getTime();
                     if (LoomScreenHandler.this.lastTakeResultTime != l) {
                         arg.playSound(null, (BlockPos)arg2, SoundEvents.UI_LOOM_TAKE_RESULT, SoundCategory.BLOCKS, 1.0f, 1.0f);
                         LoomScreenHandler.this.lastTakeResultTime = l;
                     }
                 });
-                return super.onTakeItem(arg3, arg22);
+                return super.onTakeItem(player, stack);
             }
         });
         for (int j = 0; j < 3; ++j) {
             for (int k = 0; k < 9; ++k) {
-                this.addSlot(new Slot(arg, k + j * 9 + 9, 8 + k * 18, 84 + j * 18));
+                this.addSlot(new Slot(playerInventory, k + j * 9 + 9, 8 + k * 18, 84 + j * 18));
             }
         }
         for (int l = 0; l < 9; ++l) {
-            this.addSlot(new Slot(arg, l, 8 + l * 18, 142));
+            this.addSlot(new Slot(playerInventory, l, 8 + l * 18, 142));
         }
         this.addProperty(this.selectedPattern);
     }
@@ -128,14 +128,14 @@ extends ScreenHandler {
     }
 
     @Override
-    public boolean canUse(PlayerEntity arg) {
-        return LoomScreenHandler.canUse(this.context, arg, Blocks.LOOM);
+    public boolean canUse(PlayerEntity player) {
+        return LoomScreenHandler.canUse(this.context, player, Blocks.LOOM);
     }
 
     @Override
-    public boolean onButtonClick(PlayerEntity arg, int i) {
-        if (i > 0 && i <= BannerPattern.LOOM_APPLICABLE_COUNT) {
-            this.selectedPattern.set(i);
+    public boolean onButtonClick(PlayerEntity player, int id) {
+        if (id > 0 && id <= BannerPattern.LOOM_APPLICABLE_COUNT) {
+            this.selectedPattern.set(id);
             this.updateOutputSlot();
             return true;
         }
@@ -143,7 +143,7 @@ extends ScreenHandler {
     }
 
     @Override
-    public void onContentChanged(Inventory arg) {
+    public void onContentChanged(Inventory inventory) {
         ItemStack lv = this.bannerSlot.getStack();
         ItemStack lv2 = this.dyeSlot.getStack();
         ItemStack lv3 = this.patternSlot.getStack();
@@ -166,23 +166,23 @@ extends ScreenHandler {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public void setInventoryChangeListener(Runnable runnable) {
-        this.inventoryChangeListener = runnable;
+    public void setInventoryChangeListener(Runnable inventoryChangeListener) {
+        this.inventoryChangeListener = inventoryChangeListener;
     }
 
     @Override
-    public ItemStack transferSlot(PlayerEntity arg, int i) {
+    public ItemStack transferSlot(PlayerEntity player, int index) {
         ItemStack lv = ItemStack.EMPTY;
-        Slot lv2 = (Slot)this.slots.get(i);
+        Slot lv2 = (Slot)this.slots.get(index);
         if (lv2 != null && lv2.hasStack()) {
             ItemStack lv3 = lv2.getStack();
             lv = lv3.copy();
-            if (i == this.outputSlot.id) {
+            if (index == this.outputSlot.id) {
                 if (!this.insertItem(lv3, 4, 40, true)) {
                     return ItemStack.EMPTY;
                 }
                 lv2.onStackChanged(lv3, lv);
-            } else if (i == this.dyeSlot.id || i == this.bannerSlot.id || i == this.patternSlot.id ? !this.insertItem(lv3, 4, 40, false) : (lv3.getItem() instanceof BannerItem ? !this.insertItem(lv3, this.bannerSlot.id, this.bannerSlot.id + 1, false) : (lv3.getItem() instanceof DyeItem ? !this.insertItem(lv3, this.dyeSlot.id, this.dyeSlot.id + 1, false) : (lv3.getItem() instanceof BannerPatternItem ? !this.insertItem(lv3, this.patternSlot.id, this.patternSlot.id + 1, false) : (i >= 4 && i < 31 ? !this.insertItem(lv3, 31, 40, false) : i >= 31 && i < 40 && !this.insertItem(lv3, 4, 31, false)))))) {
+            } else if (index == this.dyeSlot.id || index == this.bannerSlot.id || index == this.patternSlot.id ? !this.insertItem(lv3, 4, 40, false) : (lv3.getItem() instanceof BannerItem ? !this.insertItem(lv3, this.bannerSlot.id, this.bannerSlot.id + 1, false) : (lv3.getItem() instanceof DyeItem ? !this.insertItem(lv3, this.dyeSlot.id, this.dyeSlot.id + 1, false) : (lv3.getItem() instanceof BannerPatternItem ? !this.insertItem(lv3, this.patternSlot.id, this.patternSlot.id + 1, false) : (index >= 4 && index < 31 ? !this.insertItem(lv3, 31, 40, false) : index >= 31 && index < 40 && !this.insertItem(lv3, 4, 31, false)))))) {
                 return ItemStack.EMPTY;
             }
             if (lv3.isEmpty()) {
@@ -193,15 +193,15 @@ extends ScreenHandler {
             if (lv3.getCount() == lv.getCount()) {
                 return ItemStack.EMPTY;
             }
-            lv2.onTakeItem(arg, lv3);
+            lv2.onTakeItem(player, lv3);
         }
         return lv;
     }
 
     @Override
-    public void close(PlayerEntity arg) {
-        super.close(arg);
-        this.context.run((arg2, arg3) -> this.dropInventory(arg, arg.world, this.input));
+    public void close(PlayerEntity player) {
+        super.close(player);
+        this.context.run((arg2, arg3) -> this.dropInventory(player, arg.world, this.input));
     }
 
     private void updateOutputSlot() {

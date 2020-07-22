@@ -24,8 +24,8 @@ public class OnKilledCriterion
 extends AbstractCriterion<Conditions> {
     private final Identifier id;
 
-    public OnKilledCriterion(Identifier arg) {
-        this.id = arg;
+    public OnKilledCriterion(Identifier id) {
+        this.id = id;
     }
 
     @Override
@@ -38,14 +38,14 @@ extends AbstractCriterion<Conditions> {
         return new Conditions(this.id, arg, EntityPredicate.Extended.getInJson(jsonObject, "entity", arg2), DamageSourcePredicate.fromJson(jsonObject.get("killing_blow")));
     }
 
-    public void trigger(ServerPlayerEntity arg, Entity arg2, DamageSource arg3) {
-        LootContext lv = EntityPredicate.createAdvancementEntityLootContext(arg, arg2);
-        this.test(arg, arg4 -> arg4.test(arg, lv, arg3));
+    public void trigger(ServerPlayerEntity player, Entity entity, DamageSource killingDamage) {
+        LootContext lv = EntityPredicate.createAdvancementEntityLootContext(player, entity);
+        this.test(player, arg4 -> arg4.test(player, lv, killingDamage));
     }
 
     @Override
-    public /* synthetic */ AbstractCriterionConditions conditionsFromJson(JsonObject jsonObject, EntityPredicate.Extended arg, AdvancementEntityPredicateDeserializer arg2) {
-        return this.conditionsFromJson(jsonObject, arg, arg2);
+    public /* synthetic */ AbstractCriterionConditions conditionsFromJson(JsonObject obj, EntityPredicate.Extended playerPredicate, AdvancementEntityPredicateDeserializer predicateDeserializer) {
+        return this.conditionsFromJson(obj, playerPredicate, predicateDeserializer);
     }
 
     public static class Conditions
@@ -53,39 +53,39 @@ extends AbstractCriterion<Conditions> {
         private final EntityPredicate.Extended entity;
         private final DamageSourcePredicate killingBlow;
 
-        public Conditions(Identifier arg, EntityPredicate.Extended arg2, EntityPredicate.Extended arg3, DamageSourcePredicate arg4) {
-            super(arg, arg2);
-            this.entity = arg3;
-            this.killingBlow = arg4;
+        public Conditions(Identifier id, EntityPredicate.Extended player, EntityPredicate.Extended entity, DamageSourcePredicate killingBlow) {
+            super(id, player);
+            this.entity = entity;
+            this.killingBlow = killingBlow;
         }
 
-        public static Conditions createPlayerKilledEntity(EntityPredicate.Builder arg) {
-            return new Conditions(Criteria.PLAYER_KILLED_ENTITY.id, EntityPredicate.Extended.EMPTY, EntityPredicate.Extended.ofLegacy(arg.build()), DamageSourcePredicate.EMPTY);
+        public static Conditions createPlayerKilledEntity(EntityPredicate.Builder killedEntityPredicateBuilder) {
+            return new Conditions(Criteria.PLAYER_KILLED_ENTITY.id, EntityPredicate.Extended.EMPTY, EntityPredicate.Extended.ofLegacy(killedEntityPredicateBuilder.build()), DamageSourcePredicate.EMPTY);
         }
 
         public static Conditions createPlayerKilledEntity() {
             return new Conditions(Criteria.PLAYER_KILLED_ENTITY.id, EntityPredicate.Extended.EMPTY, EntityPredicate.Extended.EMPTY, DamageSourcePredicate.EMPTY);
         }
 
-        public static Conditions createPlayerKilledEntity(EntityPredicate.Builder arg, DamageSourcePredicate.Builder arg2) {
-            return new Conditions(Criteria.PLAYER_KILLED_ENTITY.id, EntityPredicate.Extended.EMPTY, EntityPredicate.Extended.ofLegacy(arg.build()), arg2.build());
+        public static Conditions createPlayerKilledEntity(EntityPredicate.Builder killedEntityPredicateBuilder, DamageSourcePredicate.Builder killingBlowBuilder) {
+            return new Conditions(Criteria.PLAYER_KILLED_ENTITY.id, EntityPredicate.Extended.EMPTY, EntityPredicate.Extended.ofLegacy(killedEntityPredicateBuilder.build()), killingBlowBuilder.build());
         }
 
         public static Conditions createEntityKilledPlayer() {
             return new Conditions(Criteria.ENTITY_KILLED_PLAYER.id, EntityPredicate.Extended.EMPTY, EntityPredicate.Extended.EMPTY, DamageSourcePredicate.EMPTY);
         }
 
-        public boolean test(ServerPlayerEntity arg, LootContext arg2, DamageSource arg3) {
-            if (!this.killingBlow.test(arg, arg3)) {
+        public boolean test(ServerPlayerEntity player, LootContext killedEntityContext, DamageSource killingBlow) {
+            if (!this.killingBlow.test(player, killingBlow)) {
                 return false;
             }
-            return this.entity.test(arg2);
+            return this.entity.test(killedEntityContext);
         }
 
         @Override
-        public JsonObject toJson(AdvancementEntityPredicateSerializer arg) {
-            JsonObject jsonObject = super.toJson(arg);
-            jsonObject.add("entity", this.entity.toJson(arg));
+        public JsonObject toJson(AdvancementEntityPredicateSerializer predicateSerializer) {
+            JsonObject jsonObject = super.toJson(predicateSerializer);
+            jsonObject.add("entity", this.entity.toJson(predicateSerializer));
             jsonObject.add("killing_blow", this.killingBlow.toJson());
             return jsonObject;
         }

@@ -35,20 +35,20 @@ implements DebugRenderer.Renderer {
     }
 
     @Override
-    public void render(MatrixStack arg, VertexConsumerProvider arg2, double d, double e, double f) {
+    public void render(MatrixStack matrices, VertexConsumerProvider vertexConsumers, double cameraX, double cameraY, double cameraZ) {
         World lv = this.client.player.world;
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.lineWidth(2.0f);
         RenderSystem.disableTexture();
         RenderSystem.depthMask(false);
-        BlockPos lv2 = new BlockPos(d, e, f);
+        BlockPos lv2 = new BlockPos(cameraX, cameraY, cameraZ);
         for (BlockPos lv3 : BlockPos.iterate(lv2.add(-6, -6, -6), lv2.add(6, 6, 6))) {
             BlockState lv4 = lv.getBlockState(lv3);
             if (lv4.isOf(Blocks.AIR)) continue;
             VoxelShape lv5 = lv4.getOutlineShape(lv, lv3);
             for (Box lv6 : lv5.getBoundingBoxes()) {
-                Box lv7 = lv6.offset(lv3).expand(0.002).offset(-d, -e, -f);
+                Box lv7 = lv6.offset(lv3).expand(0.002).offset(-cameraX, -cameraY, -cameraZ);
                 double g = lv7.minX;
                 double h = lv7.minY;
                 double i = lv7.minZ;

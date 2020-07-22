@@ -25,10 +25,10 @@ import net.minecraft.state.property.Property;
 public abstract class BlockStateVariantMap {
     private final Map<PropertiesMap, List<BlockStateVariant>> variants = Maps.newHashMap();
 
-    protected void register(PropertiesMap arg, List<BlockStateVariant> list) {
-        List<BlockStateVariant> list2 = this.variants.put(arg, list);
+    protected void register(PropertiesMap condition, List<BlockStateVariant> possibleVariants) {
+        List<BlockStateVariant> list2 = this.variants.put(condition, possibleVariants);
         if (list2 != null) {
-            throw new IllegalStateException("Value " + arg + " is already defined");
+            throw new IllegalStateException("Value " + condition + " is already defined");
         }
     }
 
@@ -41,7 +41,7 @@ public abstract class BlockStateVariantMap {
         List<Property<?>> list = this.getProperties();
         Stream<PropertiesMap> stream = Stream.of(PropertiesMap.empty());
         for (Property<?> lv : list) {
-            stream = stream.flatMap(arg2 -> lv.method_30043().map(arg2::method_25819));
+            stream = stream.flatMap(arg2 -> lv.stream().map(arg2::method_25819));
         }
         List list2 = stream.filter(arg -> !this.variants.containsKey(arg)).collect(Collectors.toList());
         if (!list2.isEmpty()) {
@@ -98,7 +98,7 @@ public abstract class BlockStateVariantMap {
         }
 
         public QuintupleProperty<T1, T2, T3, T4, T5> register(T1 comparable, T2 comparable2, T3 comparable3, T4 comparable4, T5 comparable5, List<BlockStateVariant> list) {
-            PropertiesMap lv = PropertiesMap.method_25821(this.first.method_30042(comparable), this.second.method_30042(comparable2), this.third.method_30042(comparable3), this.fourth.method_30042(comparable4), this.fifth.method_30042(comparable5));
+            PropertiesMap lv = PropertiesMap.method_25821(this.first.createValue(comparable), this.second.createValue(comparable2), this.third.createValue(comparable3), this.fourth.createValue(comparable4), this.fifth.createValue(comparable5));
             this.register(lv, list);
             return this;
         }
@@ -128,7 +128,7 @@ public abstract class BlockStateVariantMap {
         }
 
         public QuadrupleProperty<T1, T2, T3, T4> register(T1 comparable, T2 comparable2, T3 comparable3, T4 comparable4, List<BlockStateVariant> list) {
-            PropertiesMap lv = PropertiesMap.method_25821(this.first.method_30042(comparable), this.second.method_30042(comparable2), this.third.method_30042(comparable3), this.fourth.method_30042(comparable4));
+            PropertiesMap lv = PropertiesMap.method_25821(this.first.createValue(comparable), this.second.createValue(comparable2), this.third.createValue(comparable3), this.fourth.createValue(comparable4));
             this.register(lv, list);
             return this;
         }
@@ -156,7 +156,7 @@ public abstract class BlockStateVariantMap {
         }
 
         public TripleProperty<T1, T2, T3> register(T1 comparable, T2 comparable2, T3 comparable3, List<BlockStateVariant> list) {
-            PropertiesMap lv = PropertiesMap.method_25821(this.first.method_30042(comparable), this.second.method_30042(comparable2), this.third.method_30042(comparable3));
+            PropertiesMap lv = PropertiesMap.method_25821(this.first.createValue(comparable), this.second.createValue(comparable2), this.third.createValue(comparable3));
             this.register(lv, list);
             return this;
         }
@@ -187,7 +187,7 @@ public abstract class BlockStateVariantMap {
         }
 
         public DoubleProperty<T1, T2> register(T1 comparable, T2 comparable2, List<BlockStateVariant> list) {
-            PropertiesMap lv = PropertiesMap.method_25821(this.first.method_30042(comparable), this.second.method_30042(comparable2));
+            PropertiesMap lv = PropertiesMap.method_25821(this.first.createValue(comparable), this.second.createValue(comparable2));
             this.register(lv, list);
             return this;
         }
@@ -196,13 +196,13 @@ public abstract class BlockStateVariantMap {
             return this.register(comparable, comparable2, Collections.singletonList(arg));
         }
 
-        public BlockStateVariantMap register(BiFunction<T1, T2, BlockStateVariant> biFunction) {
-            this.first.getValues().forEach(comparable -> this.second.getValues().forEach(comparable2 -> this.register(comparable, comparable2, (BlockStateVariant)biFunction.apply(comparable, comparable2))));
+        public BlockStateVariantMap register(BiFunction<T1, T2, BlockStateVariant> variantFactory) {
+            this.first.getValues().forEach(comparable -> this.second.getValues().forEach(comparable2 -> this.register(comparable, comparable2, (BlockStateVariant)variantFactory.apply(comparable, comparable2))));
             return this;
         }
 
-        public BlockStateVariantMap registerVariants(BiFunction<T1, T2, List<BlockStateVariant>> biFunction) {
-            this.first.getValues().forEach(comparable -> this.second.getValues().forEach(comparable2 -> this.register(comparable, comparable2, (List)biFunction.apply(comparable, comparable2))));
+        public BlockStateVariantMap registerVariants(BiFunction<T1, T2, List<BlockStateVariant>> variantsFactory) {
+            this.first.getValues().forEach(comparable -> this.second.getValues().forEach(comparable2 -> this.register(comparable, comparable2, (List)variantsFactory.apply(comparable, comparable2))));
             return this;
         }
     }
@@ -220,18 +220,18 @@ public abstract class BlockStateVariantMap {
             return ImmutableList.of(this.property);
         }
 
-        public SingleProperty<T1> register(T1 comparable, List<BlockStateVariant> list) {
-            PropertiesMap lv = PropertiesMap.method_25821(this.property.method_30042(comparable));
-            this.register(lv, list);
+        public SingleProperty<T1> register(T1 value, List<BlockStateVariant> variants) {
+            PropertiesMap lv = PropertiesMap.method_25821(this.property.createValue(value));
+            this.register(lv, variants);
             return this;
         }
 
-        public SingleProperty<T1> register(T1 comparable, BlockStateVariant arg) {
-            return this.register(comparable, Collections.singletonList(arg));
+        public SingleProperty<T1> register(T1 value, BlockStateVariant variant) {
+            return this.register(value, Collections.singletonList(variant));
         }
 
-        public BlockStateVariantMap register(Function<T1, BlockStateVariant> function) {
-            this.property.getValues().forEach(comparable -> this.register(comparable, (BlockStateVariant)function.apply(comparable)));
+        public BlockStateVariantMap register(Function<T1, BlockStateVariant> variantFactory) {
+            this.property.getValues().forEach(comparable -> this.register(comparable, (BlockStateVariant)variantFactory.apply(comparable)));
             return this;
         }
     }

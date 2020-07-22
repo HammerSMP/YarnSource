@@ -27,21 +27,21 @@ implements Packet<ServerLoginPacketListener> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public LoginKeyC2SPacket(SecretKey secretKey, PublicKey publicKey, byte[] bs) {
+    public LoginKeyC2SPacket(SecretKey secretKey, PublicKey publicKey, byte[] nonce) {
         this.encryptedSecretKey = NetworkEncryptionUtils.encrypt(publicKey, secretKey.getEncoded());
-        this.encryptedNonce = NetworkEncryptionUtils.encrypt(publicKey, bs);
+        this.encryptedNonce = NetworkEncryptionUtils.encrypt(publicKey, nonce);
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.encryptedSecretKey = arg.readByteArray();
-        this.encryptedNonce = arg.readByteArray();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.encryptedSecretKey = buf.readByteArray();
+        this.encryptedNonce = buf.readByteArray();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeByteArray(this.encryptedSecretKey);
-        arg.writeByteArray(this.encryptedNonce);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeByteArray(this.encryptedSecretKey);
+        buf.writeByteArray(this.encryptedNonce);
     }
 
     @Override

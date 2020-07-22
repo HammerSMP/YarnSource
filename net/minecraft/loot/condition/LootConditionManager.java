@@ -45,8 +45,8 @@ extends JsonDataLoader {
     }
 
     @Nullable
-    public LootCondition get(Identifier arg) {
-        return this.conditions.get(arg);
+    public LootCondition get(Identifier id) {
+        return this.conditions.get(id);
     }
 
     @Override
@@ -82,9 +82,9 @@ extends JsonDataLoader {
         private final LootCondition[] terms;
         private final Predicate<LootContext> predicate;
 
-        private AndCondition(LootCondition[] args) {
-            this.terms = args;
-            this.predicate = LootConditionTypes.joinAnd(args);
+        private AndCondition(LootCondition[] elements) {
+            this.terms = elements;
+            this.predicate = LootConditionTypes.joinAnd(elements);
         }
 
         @Override
@@ -93,10 +93,10 @@ extends JsonDataLoader {
         }
 
         @Override
-        public void validate(LootTableReporter arg) {
-            LootCondition.super.validate(arg);
+        public void validate(LootTableReporter reporter) {
+            LootCondition.super.validate(reporter);
             for (int i = 0; i < this.terms.length; ++i) {
-                this.terms[i].validate(arg.makeChild(".term[" + i + "]"));
+                this.terms[i].validate(reporter.makeChild(".term[" + i + "]"));
             }
         }
 
@@ -106,8 +106,8 @@ extends JsonDataLoader {
         }
 
         @Override
-        public /* synthetic */ boolean test(Object object) {
-            return this.test((LootContext)object);
+        public /* synthetic */ boolean test(Object context) {
+            return this.test((LootContext)context);
         }
     }
 }

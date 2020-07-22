@@ -36,23 +36,23 @@ RecipeUnlocker {
     }
 
     @Override
-    public ItemStack getStack(int i) {
+    public ItemStack getStack(int slot) {
         return this.stacks.get(0);
     }
 
     @Override
-    public ItemStack removeStack(int i, int j) {
+    public ItemStack removeStack(int slot, int amount) {
         return Inventories.removeStack(this.stacks, 0);
     }
 
     @Override
-    public ItemStack removeStack(int i) {
+    public ItemStack removeStack(int slot) {
         return Inventories.removeStack(this.stacks, 0);
     }
 
     @Override
-    public void setStack(int i, ItemStack arg) {
-        this.stacks.set(0, arg);
+    public void setStack(int slot, ItemStack stack) {
+        this.stacks.set(0, stack);
     }
 
     @Override
@@ -60,7 +60,7 @@ RecipeUnlocker {
     }
 
     @Override
-    public boolean canPlayerUse(PlayerEntity arg) {
+    public boolean canPlayerUse(PlayerEntity player) {
         return true;
     }
 
@@ -70,8 +70,8 @@ RecipeUnlocker {
     }
 
     @Override
-    public void setLastRecipe(@Nullable Recipe<?> arg) {
-        this.lastRecipe = arg;
+    public void setLastRecipe(@Nullable Recipe<?> recipe) {
+        this.lastRecipe = recipe;
     }
 
     @Override

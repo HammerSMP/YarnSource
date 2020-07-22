@@ -46,9 +46,9 @@ extends CompositeEntityModel<T> {
     }
 
     @Override
-    public void setAngles(T arg, float f, float g, float h, float i, float j) {
+    public void setAngles(T entity, float limbAngle, float limbDistance, float animationProgress, float headYaw, float headPitch) {
         for (int k = 0; k < this.field_3372.length; ++k) {
-            this.field_3372[k].pitch = 0.2f * MathHelper.sin(h * 0.3f + (float)k) + 0.4f;
+            this.field_3372[k].pitch = 0.2f * MathHelper.sin(animationProgress * 0.3f + (float)k) + 0.4f;
         }
     }
 

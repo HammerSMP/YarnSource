@@ -140,12 +140,12 @@ VillagerDataContainer {
         this(arg, arg2, VillagerType.PLAINS);
     }
 
-    public VillagerEntity(EntityType<? extends VillagerEntity> arg, World arg2, VillagerType arg3) {
-        super((EntityType<? extends AbstractTraderEntity>)arg, arg2);
+    public VillagerEntity(EntityType<? extends VillagerEntity> entityType, World world, VillagerType type) {
+        super((EntityType<? extends AbstractTraderEntity>)entityType, world);
         ((MobNavigation)this.getNavigation()).setCanPathThroughDoors(true);
         this.getNavigation().setCanSwim(true);
         this.setCanPickUpLoot(true);
-        this.setVillagerData(this.getVillagerData().withType(arg3).withProfession(VillagerProfession.NONE));
+        this.setVillagerData(this.getVillagerData().withType(type).withProfession(VillagerProfession.NONE));
     }
 
     public Brain<VillagerEntity> getBrain() {
@@ -163,34 +163,34 @@ VillagerDataContainer {
         return lv;
     }
 
-    public void reinitializeBrain(ServerWorld arg) {
+    public void reinitializeBrain(ServerWorld world) {
         Brain<VillagerEntity> lv = this.getBrain();
-        lv.stopAllTasks(arg, this);
+        lv.stopAllTasks(world, this);
         this.brain = lv.copy();
         this.initBrain(this.getBrain());
     }
 
-    private void initBrain(Brain<VillagerEntity> arg) {
+    private void initBrain(Brain<VillagerEntity> brain) {
         VillagerProfession lv = this.getVillagerData().getProfession();
         if (this.isBaby()) {
-            arg.setSchedule(Schedule.VILLAGER_BABY);
-            arg.setTaskList(Activity.PLAY, VillagerTaskListProvider.createPlayTasks(0.5f));
+            brain.setSchedule(Schedule.VILLAGER_BABY);
+            brain.setTaskList(Activity.PLAY, VillagerTaskListProvider.createPlayTasks(0.5f));
         } else {
-            arg.setSchedule(Schedule.VILLAGER_DEFAULT);
-            arg.setTaskList(Activity.WORK, (ImmutableList<Pair<Integer, Task<VillagerEntity>>>)VillagerTaskListProvider.createWorkTasks(lv, 0.5f), (Set<Pair<MemoryModuleType<?>, MemoryModuleState>>)ImmutableSet.of((Object)Pair.of(MemoryModuleType.JOB_SITE, (Object)((Object)MemoryModuleState.VALUE_PRESENT))));
+            brain.setSchedule(Schedule.VILLAGER_DEFAULT);
+            brain.setTaskList(Activity.WORK, (ImmutableList<Pair<Integer, Task<VillagerEntity>>>)VillagerTaskListProvider.createWorkTasks(lv, 0.5f), (Set<Pair<MemoryModuleType<?>, MemoryModuleState>>)ImmutableSet.of((Object)Pair.of(MemoryModuleType.JOB_SITE, (Object)((Object)MemoryModuleState.VALUE_PRESENT))));
         }
-        arg.setTaskList(Activity.CORE, VillagerTaskListProvider.createCoreTasks(lv, 0.5f));
-        arg.setTaskList(Activity.MEET, (ImmutableList<Pair<Integer, Task<VillagerEntity>>>)VillagerTaskListProvider.createMeetTasks(lv, 0.5f), (Set<Pair<MemoryModuleType<?>, MemoryModuleState>>)ImmutableSet.of((Object)Pair.of(MemoryModuleType.MEETING_POINT, (Object)((Object)MemoryModuleState.VALUE_PRESENT))));
-        arg.setTaskList(Activity.REST, VillagerTaskListProvider.createRestTasks(lv, 0.5f));
-        arg.setTaskList(Activity.IDLE, VillagerTaskListProvider.createIdleTasks(lv, 0.5f));
-        arg.setTaskList(Activity.PANIC, VillagerTaskListProvider.createPanicTasks(lv, 0.5f));
-        arg.setTaskList(Activity.PRE_RAID, VillagerTaskListProvider.createPreRaidTasks(lv, 0.5f));
-        arg.setTaskList(Activity.RAID, VillagerTaskListProvider.createRaidTasks(lv, 0.5f));
-        arg.setTaskList(Activity.HIDE, VillagerTaskListProvider.createHideTasks(lv, 0.5f));
-        arg.setCoreActivities((Set<Activity>)ImmutableSet.of((Object)Activity.CORE));
-        arg.setDefaultActivity(Activity.IDLE);
-        arg.doExclusively(Activity.IDLE);
-        arg.refreshActivities(this.world.getTimeOfDay(), this.world.getTime());
+        brain.setTaskList(Activity.CORE, VillagerTaskListProvider.createCoreTasks(lv, 0.5f));
+        brain.setTaskList(Activity.MEET, (ImmutableList<Pair<Integer, Task<VillagerEntity>>>)VillagerTaskListProvider.createMeetTasks(lv, 0.5f), (Set<Pair<MemoryModuleType<?>, MemoryModuleState>>)ImmutableSet.of((Object)Pair.of(MemoryModuleType.MEETING_POINT, (Object)((Object)MemoryModuleState.VALUE_PRESENT))));
+        brain.setTaskList(Activity.REST, VillagerTaskListProvider.createRestTasks(lv, 0.5f));
+        brain.setTaskList(Activity.IDLE, VillagerTaskListProvider.createIdleTasks(lv, 0.5f));
+        brain.setTaskList(Activity.PANIC, VillagerTaskListProvider.createPanicTasks(lv, 0.5f));
+        brain.setTaskList(Activity.PRE_RAID, VillagerTaskListProvider.createPreRaidTasks(lv, 0.5f));
+        brain.setTaskList(Activity.RAID, VillagerTaskListProvider.createRaidTasks(lv, 0.5f));
+        brain.setTaskList(Activity.HIDE, VillagerTaskListProvider.createHideTasks(lv, 0.5f));
+        brain.setCoreActivities((Set<Activity>)ImmutableSet.of((Object)Activity.CORE));
+        brain.setDefaultActivity(Activity.IDLE);
+        brain.doExclusively(Activity.IDLE);
+        brain.refreshActivities(this.world.getTimeOfDay(), this.world.getTime());
     }
 
     @Override
@@ -252,29 +252,29 @@ VillagerDataContainer {
     }
 
     @Override
-    public ActionResult interactMob(PlayerEntity arg, Hand arg2) {
-        ItemStack lv = arg.getStackInHand(arg2);
+    public ActionResult interactMob(PlayerEntity player, Hand hand) {
+        ItemStack lv = player.getStackInHand(hand);
         if (lv.getItem() != Items.VILLAGER_SPAWN_EGG && this.isAlive() && !this.hasCustomer() && !this.isSleeping()) {
             if (this.isBaby()) {
                 this.sayNo();
                 return ActionResult.success(this.world.isClient);
             }
             boolean bl = this.getOffers().isEmpty();
-            if (arg2 == Hand.MAIN_HAND) {
+            if (hand == Hand.MAIN_HAND) {
                 if (bl && !this.world.isClient) {
                     this.sayNo();
                 }
-                arg.incrementStat(Stats.TALKED_TO_VILLAGER);
+                player.incrementStat(Stats.TALKED_TO_VILLAGER);
             }
             if (bl) {
                 return ActionResult.success(this.world.isClient);
             }
             if (!this.world.isClient && !this.offers.isEmpty()) {
-                this.beginTradeWith(arg);
+                this.beginTradeWith(player);
             }
             return ActionResult.success(this.world.isClient);
         }
-        return super.interactMob(arg, arg2);
+        return super.interactMob(player, hand);
     }
 
     private void sayNo() {
@@ -284,16 +284,16 @@ VillagerDataContainer {
         }
     }
 
-    private void beginTradeWith(PlayerEntity arg) {
-        this.prepareRecipesFor(arg);
-        this.setCurrentCustomer(arg);
-        this.sendOffers(arg, this.getDisplayName(), this.getVillagerData().getLevel());
+    private void beginTradeWith(PlayerEntity customer) {
+        this.prepareRecipesFor(customer);
+        this.setCurrentCustomer(customer);
+        this.sendOffers(customer, this.getDisplayName(), this.getVillagerData().getLevel());
     }
 
     @Override
-    public void setCurrentCustomer(@Nullable PlayerEntity arg) {
-        boolean bl = this.getCurrentCustomer() != null && arg == null;
-        super.setCurrentCustomer(arg);
+    public void setCurrentCustomer(@Nullable PlayerEntity customer) {
+        boolean bl = this.getCurrentCustomer() != null && customer == null;
+        super.setCurrentCustomer(customer);
         if (bl) {
             this.resetCustomer();
         }
@@ -373,15 +373,15 @@ VillagerDataContainer {
         }
     }
 
-    private void prepareRecipesFor(PlayerEntity arg) {
-        int i = this.getReputation(arg);
+    private void prepareRecipesFor(PlayerEntity player) {
+        int i = this.getReputation(player);
         if (i != 0) {
             for (TradeOffer lv : this.getOffers()) {
                 lv.increaseSpecialPrice(-MathHelper.floor((float)i * lv.getPriceMultiplier()));
             }
         }
-        if (arg.hasStatusEffect(StatusEffects.HERO_OF_THE_VILLAGE)) {
-            StatusEffectInstance lv2 = arg.getStatusEffect(StatusEffects.HERO_OF_THE_VILLAGE);
+        if (player.hasStatusEffect(StatusEffects.HERO_OF_THE_VILLAGE)) {
+            StatusEffectInstance lv2 = player.getStatusEffect(StatusEffects.HERO_OF_THE_VILLAGE);
             int j = lv2.getAmplifier();
             for (TradeOffer lv3 : this.getOffers()) {
                 double d = 0.3 + 0.0625 * (double)j;
@@ -398,52 +398,52 @@ VillagerDataContainer {
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
-        VillagerData.CODEC.encodeStart((DynamicOps)NbtOps.INSTANCE, (Object)this.getVillagerData()).resultOrPartial(((Logger)LOGGER)::error).ifPresent(arg2 -> arg.put("VillagerData", (Tag)arg2));
-        arg.putByte("FoodLevel", this.foodLevel);
-        arg.put("Gossips", (Tag)this.gossip.serialize(NbtOps.INSTANCE).getValue());
-        arg.putInt("Xp", this.experience);
-        arg.putLong("LastRestock", this.lastRestockTime);
-        arg.putLong("LastGossipDecay", this.lastGossipDecayTime);
-        arg.putInt("RestocksToday", this.restocksToday);
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
+        VillagerData.CODEC.encodeStart((DynamicOps)NbtOps.INSTANCE, (Object)this.getVillagerData()).resultOrPartial(((Logger)LOGGER)::error).ifPresent(arg2 -> tag.put("VillagerData", (Tag)arg2));
+        tag.putByte("FoodLevel", this.foodLevel);
+        tag.put("Gossips", (Tag)this.gossip.serialize(NbtOps.INSTANCE).getValue());
+        tag.putInt("Xp", this.experience);
+        tag.putLong("LastRestock", this.lastRestockTime);
+        tag.putLong("LastGossipDecay", this.lastGossipDecayTime);
+        tag.putInt("RestocksToday", this.restocksToday);
         if (this.natural) {
-            arg.putBoolean("AssignProfessionWhenSpawned", true);
+            tag.putBoolean("AssignProfessionWhenSpawned", true);
         }
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        if (arg.contains("VillagerData", 10)) {
-            DataResult dataResult = VillagerData.CODEC.parse(new Dynamic((DynamicOps)NbtOps.INSTANCE, (Object)arg.get("VillagerData")));
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        if (tag.contains("VillagerData", 10)) {
+            DataResult dataResult = VillagerData.CODEC.parse(new Dynamic((DynamicOps)NbtOps.INSTANCE, (Object)tag.get("VillagerData")));
             dataResult.resultOrPartial(((Logger)LOGGER)::error).ifPresent(this::setVillagerData);
         }
-        if (arg.contains("Offers", 10)) {
-            this.offers = new TraderOfferList(arg.getCompound("Offers"));
+        if (tag.contains("Offers", 10)) {
+            this.offers = new TraderOfferList(tag.getCompound("Offers"));
         }
-        if (arg.contains("FoodLevel", 1)) {
-            this.foodLevel = arg.getByte("FoodLevel");
+        if (tag.contains("FoodLevel", 1)) {
+            this.foodLevel = tag.getByte("FoodLevel");
         }
-        ListTag lv = arg.getList("Gossips", 10);
+        ListTag lv = tag.getList("Gossips", 10);
         this.gossip.deserialize(new Dynamic((DynamicOps)NbtOps.INSTANCE, (Object)lv));
-        if (arg.contains("Xp", 3)) {
-            this.experience = arg.getInt("Xp");
+        if (tag.contains("Xp", 3)) {
+            this.experience = tag.getInt("Xp");
         }
-        this.lastRestockTime = arg.getLong("LastRestock");
-        this.lastGossipDecayTime = arg.getLong("LastGossipDecay");
+        this.lastRestockTime = tag.getLong("LastRestock");
+        this.lastGossipDecayTime = tag.getLong("LastGossipDecay");
         this.setCanPickUpLoot(true);
         if (this.world instanceof ServerWorld) {
             this.reinitializeBrain((ServerWorld)this.world);
         }
-        this.restocksToday = arg.getInt("RestocksToday");
-        if (arg.contains("AssignProfessionWhenSpawned")) {
-            this.natural = arg.getBoolean("AssignProfessionWhenSpawned");
+        this.restocksToday = tag.getInt("RestocksToday");
+        if (tag.contains("AssignProfessionWhenSpawned")) {
+            this.natural = tag.getBoolean("AssignProfessionWhenSpawned");
         }
     }
 
     @Override
-    public boolean canImmediatelyDespawn(double d) {
+    public boolean canImmediatelyDespawn(double distanceSquared) {
         return false;
     }
 
@@ -460,7 +460,7 @@ VillagerDataContainer {
     }
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource arg) {
+    protected SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.ENTITY_VILLAGER_HURT;
     }
 
@@ -476,12 +476,12 @@ VillagerDataContainer {
         }
     }
 
-    public void setVillagerData(VillagerData arg) {
+    public void setVillagerData(VillagerData villagerData) {
         VillagerData lv = this.getVillagerData();
-        if (lv.getProfession() != arg.getProfession()) {
+        if (lv.getProfession() != villagerData.getProfession()) {
             this.offers = null;
         }
-        this.dataTracker.set(VILLAGER_DATA, arg);
+        this.dataTracker.set(VILLAGER_DATA, villagerData);
     }
 
     @Override
@@ -490,45 +490,45 @@ VillagerDataContainer {
     }
 
     @Override
-    protected void afterUsing(TradeOffer arg) {
+    protected void afterUsing(TradeOffer offer) {
         int i = 3 + this.random.nextInt(4);
-        this.experience += arg.getTraderExperience();
+        this.experience += offer.getTraderExperience();
         this.lastCustomer = this.getCurrentCustomer();
         if (this.canLevelUp()) {
             this.levelUpTimer = 40;
             this.levelingUp = true;
             i += 5;
         }
-        if (arg.shouldRewardPlayerExperience()) {
+        if (offer.shouldRewardPlayerExperience()) {
             this.world.spawnEntity(new ExperienceOrbEntity(this.world, this.getX(), this.getY() + 0.5, this.getZ(), i));
         }
     }
 
     @Override
-    public void setAttacker(@Nullable LivingEntity arg) {
-        if (arg != null && this.world instanceof ServerWorld) {
-            ((ServerWorld)this.world).handleInteraction(EntityInteraction.VILLAGER_HURT, arg, this);
-            if (this.isAlive() && arg instanceof PlayerEntity) {
+    public void setAttacker(@Nullable LivingEntity attacker) {
+        if (attacker != null && this.world instanceof ServerWorld) {
+            ((ServerWorld)this.world).handleInteraction(EntityInteraction.VILLAGER_HURT, attacker, this);
+            if (this.isAlive() && attacker instanceof PlayerEntity) {
                 this.world.sendEntityStatus(this, (byte)13);
             }
         }
-        super.setAttacker(arg);
+        super.setAttacker(attacker);
     }
 
     @Override
-    public void onDeath(DamageSource arg) {
-        LOGGER.info("Villager {} died, message: '{}'", (Object)this, (Object)arg.getDeathMessage(this).getString());
-        Entity lv = arg.getAttacker();
+    public void onDeath(DamageSource source) {
+        LOGGER.info("Villager {} died, message: '{}'", (Object)this, (Object)source.getDeathMessage(this).getString());
+        Entity lv = source.getAttacker();
         if (lv != null) {
             this.notifyDeath(lv);
         }
         this.releaseTicketFor(MemoryModuleType.HOME);
         this.releaseTicketFor(MemoryModuleType.JOB_SITE);
         this.releaseTicketFor(MemoryModuleType.MEETING_POINT);
-        super.onDeath(arg);
+        super.onDeath(source);
     }
 
-    private void notifyDeath(Entity arg2) {
+    private void notifyDeath(Entity killer) {
         if (!(this.world instanceof ServerWorld)) {
             return;
         }
@@ -537,7 +537,7 @@ VillagerDataContainer {
             return;
         }
         ServerWorld lv = (ServerWorld)this.world;
-        optional.get().stream().filter(arg -> arg instanceof InteractionObserver).forEach(arg3 -> lv.handleInteraction(EntityInteraction.VILLAGER_KILLED, arg2, (InteractionObserver)((Object)arg3)));
+        optional.get().stream().filter(arg -> arg instanceof InteractionObserver).forEach(arg3 -> lv.handleInteraction(EntityInteraction.VILLAGER_KILLED, killer, (InteractionObserver)((Object)arg3)));
     }
 
     public void releaseTicketFor(MemoryModuleType<GlobalPos> arg) {
@@ -587,12 +587,12 @@ VillagerDataContainer {
         }
     }
 
-    public int getReputation(PlayerEntity arg2) {
-        return this.gossip.getReputationFor(arg2.getUuid(), arg -> true);
+    public int getReputation(PlayerEntity player) {
+        return this.gossip.getReputationFor(player.getUuid(), arg -> true);
     }
 
-    private void depleteFood(int i) {
-        this.foodLevel = (byte)(this.foodLevel - i);
+    private void depleteFood(int amount) {
+        this.foodLevel = (byte)(this.foodLevel - amount);
     }
 
     public void eatForBreeding() {
@@ -600,8 +600,8 @@ VillagerDataContainer {
         this.depleteFood(12);
     }
 
-    public void setOffers(TraderOfferList arg) {
-        this.offers = arg;
+    public void setOffers(TraderOfferList offers) {
+        this.offers = offers;
     }
 
     private boolean canLevelUp() {
@@ -621,33 +621,33 @@ VillagerDataContainer {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void handleStatus(byte b) {
-        if (b == 12) {
+    public void handleStatus(byte status) {
+        if (status == 12) {
             this.produceParticles(ParticleTypes.HEART);
-        } else if (b == 13) {
+        } else if (status == 13) {
             this.produceParticles(ParticleTypes.ANGRY_VILLAGER);
-        } else if (b == 14) {
+        } else if (status == 14) {
             this.produceParticles(ParticleTypes.HAPPY_VILLAGER);
-        } else if (b == 42) {
+        } else if (status == 42) {
             this.produceParticles(ParticleTypes.SPLASH);
         } else {
-            super.handleStatus(b);
+            super.handleStatus(status);
         }
     }
 
     @Override
     @Nullable
-    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
-        if (arg3 == SpawnReason.BREEDING) {
+    public EntityData initialize(class_5425 arg, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable CompoundTag entityTag) {
+        if (spawnReason == SpawnReason.BREEDING) {
             this.setVillagerData(this.getVillagerData().withProfession(VillagerProfession.NONE));
         }
-        if (arg3 == SpawnReason.COMMAND || arg3 == SpawnReason.SPAWN_EGG || arg3 == SpawnReason.SPAWNER || arg3 == SpawnReason.DISPENSER) {
+        if (spawnReason == SpawnReason.COMMAND || spawnReason == SpawnReason.SPAWN_EGG || spawnReason == SpawnReason.SPAWNER || spawnReason == SpawnReason.DISPENSER) {
             this.setVillagerData(this.getVillagerData().withType(VillagerType.forBiome(arg.getBiome(this.getBlockPos()))));
         }
-        if (arg3 == SpawnReason.STRUCTURE) {
+        if (spawnReason == SpawnReason.STRUCTURE) {
             this.natural = true;
         }
-        return super.initialize(arg, arg2, arg3, arg4, arg5);
+        return super.initialize(arg, difficulty, spawnReason, entityData, entityTag);
     }
 
     @Override
@@ -687,19 +687,19 @@ VillagerDataContainer {
     }
 
     @Override
-    protected void loot(ItemEntity arg) {
-        ItemStack lv = arg.getStack();
+    protected void loot(ItemEntity item) {
+        ItemStack lv = item.getStack();
         if (this.canGather(lv)) {
             SimpleInventory lv2 = this.getInventory();
             boolean bl = lv2.canInsert(lv);
             if (!bl) {
                 return;
             }
-            this.method_29499(arg);
-            this.sendPickup(arg, lv.getCount());
+            this.method_29499(item);
+            this.sendPickup(item, lv.getCount());
             ItemStack lv3 = lv2.addStack(lv);
             if (lv3.isEmpty()) {
-                arg.remove();
+                item.remove();
             } else {
                 lv.setCount(lv3.getCount());
             }
@@ -707,9 +707,9 @@ VillagerDataContainer {
     }
 
     @Override
-    public boolean canGather(ItemStack arg) {
-        Item lv = arg.getItem();
-        return (GATHERABLE_ITEMS.contains(lv) || this.getVillagerData().getProfession().getGatherableItems().contains((Object)lv)) && this.getInventory().canInsert(arg);
+    public boolean canGather(ItemStack stack) {
+        Item lv = stack.getItem();
+        return (GATHERABLE_ITEMS.contains(lv) || this.getVillagerData().getProfession().getGatherableItems().contains((Object)lv)) && this.getInventory().canInsert(stack);
     }
 
     public boolean wantsToStartBreeding() {
@@ -784,7 +784,7 @@ VillagerDataContainer {
         list.forEach(GolemLastSeenSensor::method_30233);
     }
 
-    public boolean canSummonGolem(long l) {
+    public boolean canSummonGolem(long time) {
         if (!this.hasRecentlyWorkedAndSlept(this.world.getTime())) {
             return false;
         }
@@ -826,16 +826,16 @@ VillagerDataContainer {
     }
 
     @Override
-    public void onInteractionWith(EntityInteraction arg, Entity arg2) {
-        if (arg == EntityInteraction.ZOMBIE_VILLAGER_CURED) {
-            this.gossip.startGossip(arg2.getUuid(), VillageGossipType.MAJOR_POSITIVE, 20);
-            this.gossip.startGossip(arg2.getUuid(), VillageGossipType.MINOR_POSITIVE, 25);
-        } else if (arg == EntityInteraction.TRADE) {
-            this.gossip.startGossip(arg2.getUuid(), VillageGossipType.TRADING, 2);
-        } else if (arg == EntityInteraction.VILLAGER_HURT) {
-            this.gossip.startGossip(arg2.getUuid(), VillageGossipType.MINOR_NEGATIVE, 25);
-        } else if (arg == EntityInteraction.VILLAGER_KILLED) {
-            this.gossip.startGossip(arg2.getUuid(), VillageGossipType.MAJOR_NEGATIVE, 25);
+    public void onInteractionWith(EntityInteraction interaction, Entity entity) {
+        if (interaction == EntityInteraction.ZOMBIE_VILLAGER_CURED) {
+            this.gossip.startGossip(entity.getUuid(), VillageGossipType.MAJOR_POSITIVE, 20);
+            this.gossip.startGossip(entity.getUuid(), VillageGossipType.MINOR_POSITIVE, 25);
+        } else if (interaction == EntityInteraction.TRADE) {
+            this.gossip.startGossip(entity.getUuid(), VillageGossipType.TRADING, 2);
+        } else if (interaction == EntityInteraction.VILLAGER_HURT) {
+            this.gossip.startGossip(entity.getUuid(), VillageGossipType.MINOR_NEGATIVE, 25);
+        } else if (interaction == EntityInteraction.VILLAGER_KILLED) {
+            this.gossip.startGossip(entity.getUuid(), VillageGossipType.MAJOR_NEGATIVE, 25);
         }
     }
 
@@ -844,8 +844,8 @@ VillagerDataContainer {
         return this.experience;
     }
 
-    public void setExperience(int i) {
-        this.experience = i;
+    public void setExperience(int amount) {
+        this.experience = amount;
     }
 
     private void clearDailyRestockCount() {
@@ -868,8 +868,8 @@ VillagerDataContainer {
     }
 
     @Override
-    public void sleep(BlockPos arg) {
-        super.sleep(arg);
+    public void sleep(BlockPos pos) {
+        super.sleep(pos);
         this.brain.remember(MemoryModuleType.LAST_SLEPT, this.world.getTime());
         this.brain.forget(MemoryModuleType.WALK_TARGET);
         this.brain.forget(MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE);
@@ -881,10 +881,10 @@ VillagerDataContainer {
         this.brain.remember(MemoryModuleType.LAST_WOKEN, this.world.getTime());
     }
 
-    private boolean hasRecentlyWorkedAndSlept(long l) {
+    private boolean hasRecentlyWorkedAndSlept(long worldTime) {
         Optional<Long> optional = this.brain.getOptionalMemory(MemoryModuleType.LAST_SLEPT);
         if (optional.isPresent()) {
-            return l - optional.get() < 24000L;
+            return worldTime - optional.get() < 24000L;
         }
         return false;
     }

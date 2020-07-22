@@ -35,8 +35,8 @@ extends CropBlock {
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
-        return AGE_TO_SHAPE[arg.get(this.getAgeProperty())];
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        return AGE_TO_SHAPE[state.get(this.getAgeProperty())];
     }
 }
 

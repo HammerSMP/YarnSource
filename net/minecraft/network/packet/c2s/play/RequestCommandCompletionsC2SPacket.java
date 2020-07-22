@@ -23,21 +23,21 @@ implements Packet<ServerPlayPacketListener> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public RequestCommandCompletionsC2SPacket(int i, String string) {
-        this.completionId = i;
-        this.partialCommand = string;
+    public RequestCommandCompletionsC2SPacket(int completionId, String partialCommand) {
+        this.completionId = completionId;
+        this.partialCommand = partialCommand;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.completionId = arg.readVarInt();
-        this.partialCommand = arg.readString(32500);
+    public void read(PacketByteBuf buf) throws IOException {
+        this.completionId = buf.readVarInt();
+        this.partialCommand = buf.readString(32500);
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeVarInt(this.completionId);
-        arg.writeString(this.partialCommand, 32500);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeVarInt(this.completionId);
+        buf.writeString(this.partialCommand, 32500);
     }
 
     @Override

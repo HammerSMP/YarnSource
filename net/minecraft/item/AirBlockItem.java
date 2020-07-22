@@ -23,9 +23,9 @@ public class AirBlockItem
 extends Item {
     private final Block block;
 
-    public AirBlockItem(Block arg, Item.Settings arg2) {
-        super(arg2);
-        this.block = arg;
+    public AirBlockItem(Block block, Item.Settings settings) {
+        super(settings);
+        this.block = block;
     }
 
     @Override
@@ -35,9 +35,9 @@ extends Item {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void appendTooltip(ItemStack arg, @Nullable World arg2, List<Text> list, TooltipContext arg3) {
-        super.appendTooltip(arg, arg2, list, arg3);
-        this.block.buildTooltip(arg, arg2, list, arg3);
+    public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
+        super.appendTooltip(stack, world, tooltip, context);
+        this.block.appendTooltip(stack, world, tooltip, context);
     }
 }
 

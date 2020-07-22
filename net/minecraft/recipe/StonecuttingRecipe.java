@@ -21,13 +21,13 @@ import net.minecraft.world.World;
 
 public class StonecuttingRecipe
 extends CuttingRecipe {
-    public StonecuttingRecipe(Identifier arg, String string, Ingredient arg2, ItemStack arg3) {
-        super(RecipeType.STONECUTTING, RecipeSerializer.STONECUTTING, arg, string, arg2, arg3);
+    public StonecuttingRecipe(Identifier id, String group, Ingredient input, ItemStack output) {
+        super(RecipeType.STONECUTTING, RecipeSerializer.STONECUTTING, id, group, input, output);
     }
 
     @Override
-    public boolean matches(Inventory arg, World arg2) {
-        return this.input.test(arg.getStack(0));
+    public boolean matches(Inventory inv, World world) {
+        return this.input.test(inv.getStack(0));
     }
 
     @Override

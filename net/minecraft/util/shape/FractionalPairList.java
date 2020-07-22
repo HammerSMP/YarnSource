@@ -20,19 +20,19 @@ implements PairList {
     private final int secondSectionCount;
     private final int gcd;
 
-    FractionalPairList(int i, int j) {
-        this.mergedList = new FractionalDoubleList((int)VoxelShapes.lcm(i, j));
-        this.firstSectionCount = i;
-        this.secondSectionCount = j;
-        this.gcd = IntMath.gcd((int)i, (int)j);
+    FractionalPairList(int firstSectionCount, int secondSectionCount) {
+        this.mergedList = new FractionalDoubleList((int)VoxelShapes.lcm(firstSectionCount, secondSectionCount));
+        this.firstSectionCount = firstSectionCount;
+        this.secondSectionCount = secondSectionCount;
+        this.gcd = IntMath.gcd((int)firstSectionCount, (int)secondSectionCount);
     }
 
     @Override
-    public boolean forEachPair(PairList.Consumer arg) {
+    public boolean forEachPair(PairList.Consumer predicate) {
         int i = this.firstSectionCount / this.gcd;
         int j = this.secondSectionCount / this.gcd;
         for (int k = 0; k <= this.mergedList.size(); ++k) {
-            if (arg.merge(k / j, k / i, k)) continue;
+            if (predicate.merge(k / j, k / i, k)) continue;
             return false;
         }
         return true;

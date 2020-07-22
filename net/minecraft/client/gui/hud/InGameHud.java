@@ -131,24 +131,24 @@ extends DrawableHelper {
     private int scaledHeight;
     private final Map<MessageType, List<ClientChatListener>> listeners = Maps.newHashMap();
 
-    public InGameHud(MinecraftClient arg) {
-        this.client = arg;
-        this.itemRenderer = arg.getItemRenderer();
-        this.debugHud = new DebugHud(arg);
-        this.spectatorHud = new SpectatorHud(arg);
-        this.chatHud = new ChatHud(arg);
-        this.playerListHud = new PlayerListHud(arg, this);
-        this.bossBarHud = new BossBarHud(arg);
-        this.subtitlesHud = new SubtitlesHud(arg);
+    public InGameHud(MinecraftClient client) {
+        this.client = client;
+        this.itemRenderer = client.getItemRenderer();
+        this.debugHud = new DebugHud(client);
+        this.spectatorHud = new SpectatorHud(client);
+        this.chatHud = new ChatHud(client);
+        this.playerListHud = new PlayerListHud(client, this);
+        this.bossBarHud = new BossBarHud(client);
+        this.subtitlesHud = new SubtitlesHud(client);
         for (MessageType lv : MessageType.values()) {
             this.listeners.put(lv, Lists.newArrayList());
         }
         NarratorManager lv2 = NarratorManager.INSTANCE;
-        this.listeners.get((Object)MessageType.CHAT).add(new ChatListenerHud(arg));
+        this.listeners.get((Object)MessageType.CHAT).add(new ChatListenerHud(client));
         this.listeners.get((Object)MessageType.CHAT).add(lv2);
-        this.listeners.get((Object)MessageType.SYSTEM).add(new ChatListenerHud(arg));
+        this.listeners.get((Object)MessageType.SYSTEM).add(new ChatListenerHud(client));
         this.listeners.get((Object)MessageType.SYSTEM).add(lv2);
-        this.listeners.get((Object)MessageType.GAME_INFO).add(new GameInfoChatListener(arg));
+        this.listeners.get((Object)MessageType.GAME_INFO).add(new GameInfoChatListener(client));
         this.setDefaultTitleFade();
     }
 
@@ -653,11 +653,11 @@ extends DrawableHelper {
         return null;
     }
 
-    private int getHeartCount(LivingEntity arg) {
-        if (arg == null || !arg.isLiving()) {
+    private int getHeartCount(LivingEntity entity) {
+        if (entity == null || !entity.isLiving()) {
             return 0;
         }
-        float f = arg.getMaxHealth();
+        float f = entity.getMaxHealth();
         int i = (int)(f + 0.5f) / 2;
         if (i > 30) {
             i = 30;
@@ -665,8 +665,8 @@ extends DrawableHelper {
         return i;
     }
 
-    private int getHeartRows(int i) {
-        return (int)Math.ceil((double)i / 10.0);
+    private int getHeartRows(int heartCount) {
+        return (int)Math.ceil((double)heartCount / 10.0);
     }
 
     private void renderStatusBars(MatrixStack arg) {
@@ -872,11 +872,11 @@ extends DrawableHelper {
         RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
     }
 
-    private void updateVignetteDarkness(Entity arg) {
-        if (arg == null) {
+    private void updateVignetteDarkness(Entity entity) {
+        if (entity == null) {
             return;
         }
-        float f = MathHelper.clamp(1.0f - arg.getBrightnessAtEyes(), 0.0f, 1.0f);
+        float f = MathHelper.clamp(1.0f - entity.getBrightnessAtEyes(), 0.0f, 1.0f);
         this.vignetteDarkness = (float)((double)this.vignetteDarkness + (double)(f - this.vignetteDarkness) * 0.01);
     }
 
@@ -992,10 +992,10 @@ extends DrawableHelper {
         this.setOverlayMessage(new TranslatableText("record.nowPlaying", arg), true);
     }
 
-    public void setOverlayMessage(Text arg, boolean bl) {
-        this.overlayMessage = arg;
+    public void setOverlayMessage(Text message, boolean tinted) {
+        this.overlayMessage = message;
         this.overlayRemaining = 60;
-        this.overlayTinted = bl;
+        this.overlayTinted = tinted;
     }
 
     public void setTitles(@Nullable Text arg, @Nullable Text arg2, int i, int j, int k) {
@@ -1028,9 +1028,9 @@ extends DrawableHelper {
         }
     }
 
-    public void addChatMessage(MessageType arg, Text arg2, UUID uUID) {
-        for (ClientChatListener lv : this.listeners.get((Object)arg)) {
-            lv.onChatMessage(arg, arg2, uUID);
+    public void addChatMessage(MessageType type, Text text, UUID senderUuid) {
+        for (ClientChatListener lv : this.listeners.get((Object)type)) {
+            lv.onChatMessage(type, text, senderUuid);
         }
     }
 

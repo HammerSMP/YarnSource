@@ -49,8 +49,8 @@ extends AbstractPhase {
         this.field_7037 = 0;
     }
 
-    public void setTarget(Vec3d arg) {
-        this.target = arg;
+    public void setTarget(Vec3d target) {
+        this.target = target;
     }
 
     @Override

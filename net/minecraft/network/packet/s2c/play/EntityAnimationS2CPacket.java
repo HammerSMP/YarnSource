@@ -23,21 +23,21 @@ implements Packet<ClientPlayPacketListener> {
     public EntityAnimationS2CPacket() {
     }
 
-    public EntityAnimationS2CPacket(Entity arg, int i) {
-        this.id = arg.getEntityId();
-        this.animationId = i;
+    public EntityAnimationS2CPacket(Entity entity, int animationId) {
+        this.id = entity.getEntityId();
+        this.animationId = animationId;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.id = arg.readVarInt();
-        this.animationId = arg.readUnsignedByte();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.id = buf.readVarInt();
+        this.animationId = buf.readUnsignedByte();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeVarInt(this.id);
-        arg.writeByte(this.animationId);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeVarInt(this.id);
+        buf.writeByte(this.animationId);
     }
 
     @Override

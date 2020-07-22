@@ -17,14 +17,14 @@ extends DoorInteractGoal {
     protected int prevBreakProgress = -1;
     protected int maxProgress = -1;
 
-    public BreakDoorGoal(MobEntity arg, Predicate<Difficulty> predicate) {
-        super(arg);
-        this.difficultySufficientPredicate = predicate;
+    public BreakDoorGoal(MobEntity mob, Predicate<Difficulty> difficultySufficientPredicate) {
+        super(mob);
+        this.difficultySufficientPredicate = difficultySufficientPredicate;
     }
 
-    public BreakDoorGoal(MobEntity arg, int i, Predicate<Difficulty> predicate) {
-        this(arg, predicate);
-        this.maxProgress = i;
+    public BreakDoorGoal(MobEntity mob, int maxProgress, Predicate<Difficulty> difficultySufficientPredicate) {
+        this(mob, difficultySufficientPredicate);
+        this.maxProgress = maxProgress;
     }
 
     protected int getMaxProgress() {
@@ -81,8 +81,8 @@ extends DoorInteractGoal {
         }
     }
 
-    private boolean isDifficultySufficient(Difficulty arg) {
-        return this.difficultySufficientPredicate.test(arg);
+    private boolean isDifficultySufficient(Difficulty difficulty) {
+        return this.difficultySufficientPredicate.test(difficulty);
     }
 }
 

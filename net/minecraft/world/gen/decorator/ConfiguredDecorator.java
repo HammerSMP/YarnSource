@@ -8,28 +8,46 @@ package net.minecraft.world.gen.decorator;
 
 import com.mojang.serialization.Codec;
 import java.util.Random;
+import java.util.stream.Stream;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
-import net.minecraft.world.ServerWorldAccess;
-import net.minecraft.world.gen.chunk.ChunkGenerator;
+import net.minecraft.world.gen.decorator.Decoratable;
+import net.minecraft.world.gen.decorator.DecoratedDecoratorConfig;
 import net.minecraft.world.gen.decorator.Decorator;
 import net.minecraft.world.gen.decorator.DecoratorConfig;
-import net.minecraft.world.gen.feature.ConfiguredFeature;
-import net.minecraft.world.gen.feature.Feature;
-import net.minecraft.world.gen.feature.FeatureConfig;
+import net.minecraft.world.gen.decorator.DecoratorContext;
 
-public class ConfiguredDecorator<DC extends DecoratorConfig> {
-    public static final Codec<ConfiguredDecorator<?>> field_24981 = Registry.DECORATOR.dispatch("name", arg -> arg.decorator, Decorator::getCodec);
-    public final Decorator<DC> decorator;
-    public final DC config;
+public class ConfiguredDecorator<DC extends DecoratorConfig>
+implements Decoratable<ConfiguredDecorator<?>> {
+    public static final Codec<ConfiguredDecorator<?>> CODEC = Registry.DECORATOR.dispatch("name", arg -> arg.decorator, Decorator::getCodec);
+    private final Decorator<DC> decorator;
+    private final DC config;
 
-    public ConfiguredDecorator(Decorator<DC> arg, DC arg2) {
-        this.decorator = arg;
-        this.config = arg2;
+    public ConfiguredDecorator(Decorator<DC> decorator, DC config) {
+        this.decorator = decorator;
+        this.config = config;
     }
 
-    public <FC extends FeatureConfig, F extends Feature<FC>> boolean generate(ServerWorldAccess arg, ChunkGenerator arg2, Random random, BlockPos arg3, ConfiguredFeature<FC, F> arg4) {
-        return this.decorator.generate(arg, arg2, random, arg3, this.config, arg4);
+    public Stream<BlockPos> method_30444(DecoratorContext arg, Random random, BlockPos arg2) {
+        return this.decorator.getPositions(arg, random, this.config, arg2);
+    }
+
+    public String toString() {
+        return String.format("[%s %s]", Registry.DECORATOR.getId(this.decorator), this.config);
+    }
+
+    @Override
+    public ConfiguredDecorator<?> decorate(ConfiguredDecorator<?> arg) {
+        return new ConfiguredDecorator<DecoratedDecoratorConfig>(Decorator.DECORATED, new DecoratedDecoratorConfig(arg, this));
+    }
+
+    public DC getConfig() {
+        return this.config;
+    }
+
+    @Override
+    public /* synthetic */ Object decorate(ConfiguredDecorator decorator) {
+        return this.decorate(decorator);
     }
 }
 

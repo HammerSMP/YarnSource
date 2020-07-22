@@ -29,15 +29,15 @@ public class Channel {
     private final SoundEngine soundEngine;
     private final Executor executor;
 
-    public Channel(SoundEngine arg, Executor executor) {
-        this.soundEngine = arg;
+    public Channel(SoundEngine soundEngine, Executor executor) {
+        this.soundEngine = soundEngine;
         this.executor = executor;
     }
 
-    public CompletableFuture<SourceManager> createSource(SoundEngine.RunMode arg) {
+    public CompletableFuture<SourceManager> createSource(SoundEngine.RunMode mode) {
         CompletableFuture<SourceManager> completableFuture = new CompletableFuture<SourceManager>();
         this.executor.execute(() -> {
-            Source lv = this.soundEngine.createSource(arg);
+            Source lv = this.soundEngine.createSource(mode);
             if (lv != null) {
                 SourceManager lv2 = new SourceManager(lv);
                 this.sources.add(lv2);
@@ -85,10 +85,10 @@ public class Channel {
             this.source = arg2;
         }
 
-        public void run(Consumer<Source> consumer) {
+        public void run(Consumer<Source> action) {
             Channel.this.executor.execute(() -> {
                 if (this.source != null) {
-                    consumer.accept(this.source);
+                    action.accept(this.source);
                 }
             });
         }

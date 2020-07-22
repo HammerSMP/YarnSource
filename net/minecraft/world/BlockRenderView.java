@@ -26,16 +26,16 @@ extends BlockView {
     @Environment(value=EnvType.CLIENT)
     public int getColor(BlockPos var1, ColorResolver var2);
 
-    default public int getLightLevel(LightType arg, BlockPos arg2) {
-        return this.getLightingProvider().get(arg).getLightLevel(arg2);
+    default public int getLightLevel(LightType type, BlockPos pos) {
+        return this.getLightingProvider().get(type).getLightLevel(pos);
     }
 
-    default public int getBaseLightLevel(BlockPos arg, int i) {
-        return this.getLightingProvider().getLight(arg, i);
+    default public int getBaseLightLevel(BlockPos pos, int ambientDarkness) {
+        return this.getLightingProvider().getLight(pos, ambientDarkness);
     }
 
-    default public boolean isSkyVisible(BlockPos arg) {
-        return this.getLightLevel(LightType.SKY, arg) >= this.getMaxLightLevel();
+    default public boolean isSkyVisible(BlockPos pos) {
+        return this.getLightLevel(LightType.SKY, pos) >= this.getMaxLightLevel();
     }
 }
 

@@ -22,8 +22,8 @@ implements Packet<ClientPlayPacketListener> {
     public SignEditorOpenS2CPacket() {
     }
 
-    public SignEditorOpenS2CPacket(BlockPos arg) {
-        this.pos = arg;
+    public SignEditorOpenS2CPacket(BlockPos pos) {
+        this.pos = pos;
     }
 
     @Override
@@ -32,13 +32,13 @@ implements Packet<ClientPlayPacketListener> {
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.pos = arg.readBlockPos();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.pos = buf.readBlockPos();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeBlockPos(this.pos);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeBlockPos(this.pos);
     }
 
     @Environment(value=EnvType.CLIENT)

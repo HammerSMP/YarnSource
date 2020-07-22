@@ -36,24 +36,24 @@ CollisionView {
     protected boolean empty;
     protected final World world;
 
-    public ChunkCache(World arg, BlockPos arg2, BlockPos arg3) {
-        this.world = arg;
-        this.minX = arg2.getX() >> 4;
-        this.minZ = arg2.getZ() >> 4;
-        int i = arg3.getX() >> 4;
-        int j = arg3.getZ() >> 4;
+    public ChunkCache(World world, BlockPos minPos, BlockPos maxPos) {
+        this.world = world;
+        this.minX = minPos.getX() >> 4;
+        this.minZ = minPos.getZ() >> 4;
+        int i = maxPos.getX() >> 4;
+        int j = maxPos.getZ() >> 4;
         this.chunks = new Chunk[i - this.minX + 1][j - this.minZ + 1];
-        ChunkManager lv = arg.getChunkManager();
+        ChunkManager lv = world.getChunkManager();
         this.empty = true;
         for (int k = this.minX; k <= i; ++k) {
             for (int l = this.minZ; l <= j; ++l) {
                 this.chunks[k - this.minX][l - this.minZ] = lv.getWorldChunk(k, l);
             }
         }
-        for (int m = arg2.getX() >> 4; m <= arg3.getX() >> 4; ++m) {
-            for (int n = arg2.getZ() >> 4; n <= arg3.getZ() >> 4; ++n) {
+        for (int m = minPos.getX() >> 4; m <= maxPos.getX() >> 4; ++m) {
+            for (int n = minPos.getZ() >> 4; n <= maxPos.getZ() >> 4; ++n) {
                 Chunk lv2 = this.chunks[m - this.minX][n - this.minZ];
-                if (lv2 == null || lv2.areSectionsEmptyBetween(arg2.getY(), arg3.getY())) continue;
+                if (lv2 == null || lv2.areSectionsEmptyBetween(minPos.getY(), maxPos.getY())) continue;
                 this.empty = false;
                 return;
             }
@@ -80,24 +80,24 @@ CollisionView {
     }
 
     @Override
-    public BlockView getExistingChunk(int i, int j) {
-        return this.method_22353(i, j);
+    public BlockView getExistingChunk(int chunkX, int chunkZ) {
+        return this.method_22353(chunkX, chunkZ);
     }
 
     @Override
     @Nullable
-    public BlockEntity getBlockEntity(BlockPos arg) {
-        Chunk lv = this.method_22354(arg);
-        return lv.getBlockEntity(arg);
+    public BlockEntity getBlockEntity(BlockPos pos) {
+        Chunk lv = this.method_22354(pos);
+        return lv.getBlockEntity(pos);
     }
 
     @Override
-    public BlockState getBlockState(BlockPos arg) {
-        if (World.isHeightInvalid(arg)) {
+    public BlockState getBlockState(BlockPos pos) {
+        if (World.isHeightInvalid(pos)) {
             return Blocks.AIR.getDefaultState();
         }
-        Chunk lv = this.method_22354(arg);
-        return lv.getBlockState(arg);
+        Chunk lv = this.method_22354(pos);
+        return lv.getBlockState(pos);
     }
 
     @Override
@@ -111,12 +111,12 @@ CollisionView {
     }
 
     @Override
-    public FluidState getFluidState(BlockPos arg) {
-        if (World.isHeightInvalid(arg)) {
+    public FluidState getFluidState(BlockPos pos) {
+        if (World.isHeightInvalid(pos)) {
             return Fluids.EMPTY.getDefaultState();
         }
-        Chunk lv = this.method_22354(arg);
-        return lv.getFluidState(arg);
+        Chunk lv = this.method_22354(pos);
+        return lv.getFluidState(pos);
     }
 }
 

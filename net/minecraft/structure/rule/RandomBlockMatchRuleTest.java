@@ -32,8 +32,8 @@ extends RuleTest {
     }
 
     @Override
-    public boolean test(BlockState arg, Random random) {
-        return arg.isOf(this.block) && random.nextFloat() < this.probability;
+    public boolean test(BlockState state, Random random) {
+        return state.isOf(this.block) && random.nextFloat() < this.probability;
     }
 
     @Override

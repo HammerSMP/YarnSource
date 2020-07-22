@@ -41,62 +41,62 @@ extends ScreenHandler {
 
     protected abstract boolean canUse(BlockState var1);
 
-    public ForgingScreenHandler(@Nullable ScreenHandlerType<?> arg, int i, PlayerInventory arg2, ScreenHandlerContext arg3) {
-        super(arg, i);
-        this.context = arg3;
-        this.player = arg2.player;
+    public ForgingScreenHandler(@Nullable ScreenHandlerType<?> type, int syncId, PlayerInventory playerInventory, ScreenHandlerContext context) {
+        super(type, syncId);
+        this.context = context;
+        this.player = playerInventory.player;
         this.addSlot(new Slot(this.input, 0, 27, 47));
         this.addSlot(new Slot(this.input, 1, 76, 47));
         this.addSlot(new Slot(this.output, 2, 134, 47){
 
             @Override
-            public boolean canInsert(ItemStack arg) {
+            public boolean canInsert(ItemStack stack) {
                 return false;
             }
 
             @Override
-            public boolean canTakeItems(PlayerEntity arg) {
-                return ForgingScreenHandler.this.canTakeOutput(arg, this.hasStack());
+            public boolean canTakeItems(PlayerEntity playerEntity) {
+                return ForgingScreenHandler.this.canTakeOutput(playerEntity, this.hasStack());
             }
 
             @Override
-            public ItemStack onTakeItem(PlayerEntity arg, ItemStack arg2) {
-                return ForgingScreenHandler.this.onTakeOutput(arg, arg2);
+            public ItemStack onTakeItem(PlayerEntity player, ItemStack stack) {
+                return ForgingScreenHandler.this.onTakeOutput(player, stack);
             }
         });
         for (int j = 0; j < 3; ++j) {
             for (int k = 0; k < 9; ++k) {
-                this.addSlot(new Slot(arg2, k + j * 9 + 9, 8 + k * 18, 84 + j * 18));
+                this.addSlot(new Slot(playerInventory, k + j * 9 + 9, 8 + k * 18, 84 + j * 18));
             }
         }
         for (int l = 0; l < 9; ++l) {
-            this.addSlot(new Slot(arg2, l, 8 + l * 18, 142));
+            this.addSlot(new Slot(playerInventory, l, 8 + l * 18, 142));
         }
     }
 
     public abstract void updateResult();
 
     @Override
-    public void onContentChanged(Inventory arg) {
-        super.onContentChanged(arg);
-        if (arg == this.input) {
+    public void onContentChanged(Inventory inventory) {
+        super.onContentChanged(inventory);
+        if (inventory == this.input) {
             this.updateResult();
         }
     }
 
     @Override
-    public void close(PlayerEntity arg) {
-        super.close(arg);
-        this.context.run((arg2, arg3) -> this.dropInventory(arg, (World)arg2, this.input));
+    public void close(PlayerEntity player) {
+        super.close(player);
+        this.context.run((arg2, arg3) -> this.dropInventory(player, (World)arg2, this.input));
     }
 
     @Override
-    public boolean canUse(PlayerEntity arg) {
+    public boolean canUse(PlayerEntity player) {
         return this.context.run((arg2, arg3) -> {
             if (!this.canUse(arg2.getBlockState((BlockPos)arg3))) {
                 return false;
             }
-            return arg.squaredDistanceTo((double)arg3.getX() + 0.5, (double)arg3.getY() + 0.5, (double)arg3.getZ() + 0.5) <= 64.0;
+            return player.squaredDistanceTo((double)arg3.getX() + 0.5, (double)arg3.getY() + 0.5, (double)arg3.getZ() + 0.5) <= 64.0;
         }, true);
     }
 
@@ -105,22 +105,22 @@ extends ScreenHandler {
     }
 
     @Override
-    public ItemStack transferSlot(PlayerEntity arg, int i) {
+    public ItemStack transferSlot(PlayerEntity player, int index) {
         ItemStack lv = ItemStack.EMPTY;
-        Slot lv2 = (Slot)this.slots.get(i);
+        Slot lv2 = (Slot)this.slots.get(index);
         if (lv2 != null && lv2.hasStack()) {
             ItemStack lv3 = lv2.getStack();
             lv = lv3.copy();
-            if (i == 2) {
+            if (index == 2) {
                 if (!this.insertItem(lv3, 3, 39, true)) {
                     return ItemStack.EMPTY;
                 }
                 lv2.onStackChanged(lv3, lv);
-            } else if (i == 0 || i == 1) {
+            } else if (index == 0 || index == 1) {
                 if (!this.insertItem(lv3, 3, 39, false)) {
                     return ItemStack.EMPTY;
                 }
-            } else if (i >= 3 && i < 39) {
+            } else if (index >= 3 && index < 39) {
                 int j;
                 int n = j = this.method_30025(lv) ? 1 : 0;
                 if (!this.insertItem(lv3, j, 2, false)) {
@@ -135,7 +135,7 @@ extends ScreenHandler {
             if (lv3.getCount() == lv.getCount()) {
                 return ItemStack.EMPTY;
             }
-            lv2.onTakeItem(arg, lv3);
+            lv2.onTakeItem(player, lv3);
         }
         return lv;
     }

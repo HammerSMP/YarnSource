@@ -32,8 +32,8 @@ extends ChoiceFix {
         hashMap.put("skullandroses", "skull_and_roses");
     });
 
-    public EntityPaintingMotiveFix(Schema schema, boolean bl) {
-        super(schema, bl, "EntityPaintingMotiveFix", TypeReferences.ENTITY, "minecraft:painting");
+    public EntityPaintingMotiveFix(Schema outputSchema, boolean changesType) {
+        super(outputSchema, changesType, "EntityPaintingMotiveFix", TypeReferences.ENTITY, "minecraft:painting");
     }
 
     public Dynamic<?> renameMotive(Dynamic<?> dynamic) {
@@ -46,8 +46,8 @@ extends ChoiceFix {
     }
 
     @Override
-    protected Typed<?> transform(Typed<?> typed) {
-        return typed.update(DSL.remainderFinder(), this::renameMotive);
+    protected Typed<?> transform(Typed<?> inputType) {
+        return inputType.update(DSL.remainderFinder(), this::renameMotive);
     }
 }
 

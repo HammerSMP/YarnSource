@@ -42,15 +42,15 @@ extends IllagerEntity {
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        this.spellTicks = arg.getInt("SpellTicks");
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        this.spellTicks = tag.getInt("SpellTicks");
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
-        arg.putInt("SpellTicks", this.spellTicks);
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
+        tag.putInt("SpellTicks", this.spellTicks);
     }
 
     @Override
@@ -72,9 +72,9 @@ extends IllagerEntity {
         return this.spellTicks > 0;
     }
 
-    public void setSpell(Spell arg) {
-        this.spell = arg;
-        this.dataTracker.set(SPELL, (byte)arg.id);
+    public void setSpell(Spell spell) {
+        this.spell = spell;
+        this.dataTracker.set(SPELL, (byte)spell.id);
     }
 
     protected Spell getSpell() {
@@ -125,14 +125,14 @@ extends IllagerEntity {
         private final int id;
         private final double[] particleVelocity;
 
-        private Spell(int j, double d, double e, double f) {
-            this.id = j;
-            this.particleVelocity = new double[]{d, e, f};
+        private Spell(int id, double particleVelocityX, double particleVelocityY, double particleVelocityZ) {
+            this.id = id;
+            this.particleVelocity = new double[]{particleVelocityX, particleVelocityY, particleVelocityZ};
         }
 
-        public static Spell byId(int i) {
+        public static Spell byId(int id) {
             for (Spell lv : Spell.values()) {
-                if (i != lv.id) continue;
+                if (id != lv.id) continue;
                 return lv;
             }
             return NONE;

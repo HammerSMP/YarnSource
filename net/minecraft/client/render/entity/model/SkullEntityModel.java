@@ -24,11 +24,11 @@ extends Model {
         this(0, 35, 64, 64);
     }
 
-    public SkullEntityModel(int i, int j, int k, int l) {
+    public SkullEntityModel(int textureU, int textureV, int textureWidth, int textureHeight) {
         super(RenderLayer::getEntityTranslucent);
-        this.textureWidth = k;
-        this.textureHeight = l;
-        this.skull = new ModelPart(this, i, j);
+        this.textureWidth = textureWidth;
+        this.textureHeight = textureHeight;
+        this.skull = new ModelPart(this, textureU, textureV);
         this.skull.addCuboid(-4.0f, -8.0f, -4.0f, 8.0f, 8.0f, 8.0f, 0.0f);
         this.skull.setPivot(0.0f, 0.0f, 0.0f);
     }
@@ -39,8 +39,8 @@ extends Model {
     }
 
     @Override
-    public void render(MatrixStack arg, VertexConsumer arg2, int i, int j, float f, float g, float h, float k) {
-        this.skull.render(arg, arg2, i, j, f, g, h, k);
+    public void render(MatrixStack matrices, VertexConsumer vertices, int light, int overlay, float red, float green, float blue, float alpha) {
+        this.skull.render(matrices, vertices, light, overlay, red, green, blue, alpha);
     }
 }
 

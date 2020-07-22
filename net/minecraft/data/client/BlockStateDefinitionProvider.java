@@ -48,12 +48,12 @@ implements DataProvider {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private final DataGenerator generator;
 
-    public BlockStateDefinitionProvider(DataGenerator arg) {
-        this.generator = arg;
+    public BlockStateDefinitionProvider(DataGenerator generator) {
+        this.generator = generator;
     }
 
     @Override
-    public void run(DataCache arg2) {
+    public void run(DataCache cache) {
         Path path = this.generator.getOutput();
         HashMap map = Maps.newHashMap();
         Consumer<BlockStateSupplier> consumer = arg -> {
@@ -90,15 +90,15 @@ implements DataProvider {
                 }
             }
         });
-        this.writeJsons(arg2, path, map, BlockStateDefinitionProvider::getBlockStateJsonPath);
-        this.writeJsons(arg2, path, map2, BlockStateDefinitionProvider::getModelJsonPath);
+        this.writeJsons(cache, path, map, BlockStateDefinitionProvider::getBlockStateJsonPath);
+        this.writeJsons(cache, path, map2, BlockStateDefinitionProvider::getModelJsonPath);
     }
 
-    private <T> void writeJsons(DataCache arg, Path path, Map<T, ? extends Supplier<JsonElement>> map, BiFunction<Path, T, Path> biFunction) {
-        map.forEach((object, supplier) -> {
-            Path path2 = (Path)biFunction.apply(path, object);
+    private <T> void writeJsons(DataCache cache, Path root, Map<T, ? extends Supplier<JsonElement>> jsons, BiFunction<Path, T, Path> locator) {
+        jsons.forEach((object, supplier) -> {
+            Path path2 = (Path)locator.apply(root, object);
             try {
-                DataProvider.writeToPath(GSON, arg, (JsonElement)supplier.get(), path2);
+                DataProvider.writeToPath(GSON, cache, (JsonElement)supplier.get(), path2);
             }
             catch (Exception exception) {
                 LOGGER.error("Couldn't save {}", (Object)path2, (Object)exception);
@@ -106,13 +106,13 @@ implements DataProvider {
         });
     }
 
-    private static Path getBlockStateJsonPath(Path path, Block arg) {
-        Identifier lv = Registry.BLOCK.getId(arg);
-        return path.resolve("assets/" + lv.getNamespace() + "/blockstates/" + lv.getPath() + ".json");
+    private static Path getBlockStateJsonPath(Path root, Block block) {
+        Identifier lv = Registry.BLOCK.getId(block);
+        return root.resolve("assets/" + lv.getNamespace() + "/blockstates/" + lv.getPath() + ".json");
     }
 
-    private static Path getModelJsonPath(Path path, Identifier arg) {
-        return path.resolve("assets/" + arg.getNamespace() + "/models/" + arg.getPath() + ".json");
+    private static Path getModelJsonPath(Path root, Identifier id) {
+        return root.resolve("assets/" + id.getNamespace() + "/models/" + id.getPath() + ".json");
     }
 
     @Override

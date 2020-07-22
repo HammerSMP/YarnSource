@@ -3,7 +3,7 @@
  */
 package net.minecraft.world.biome.layer;
 
-import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.BuiltinRegistries;
 import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.biome.layer.BiomeLayers;
 import net.minecraft.world.biome.layer.type.MergingLayer;
@@ -23,9 +23,9 @@ IdentityCoordinateTransformer
     private static final int RIVER_ID;
 
     @Override
-    public int sample(LayerRandomnessSource arg, LayerSampler arg2, LayerSampler arg3, int i, int j) {
-        int k = arg2.sample(this.transformX(i), this.transformZ(j));
-        int l = arg3.sample(this.transformX(i), this.transformZ(j));
+    public int sample(LayerRandomnessSource context, LayerSampler sampler1, LayerSampler sampler2, int x, int z) {
+        int k = sampler1.sample(this.transformX(x), this.transformZ(z));
+        int l = sampler2.sample(this.transformX(x), this.transformZ(z));
         if (BiomeLayers.isOcean(k)) {
             return k;
         }
@@ -42,11 +42,11 @@ IdentityCoordinateTransformer
     }
 
     static {
-        FROZEN_RIVER_ID = Registry.BIOME.getRawId(Biomes.FROZEN_RIVER);
-        SNOWY_TUNDRA_ID = Registry.BIOME.getRawId(Biomes.SNOWY_TUNDRA);
-        MUSHROOM_FIELDS_ID = Registry.BIOME.getRawId(Biomes.MUSHROOM_FIELDS);
-        MUSHROOM_FIELD_SHORE_ID = Registry.BIOME.getRawId(Biomes.MUSHROOM_FIELD_SHORE);
-        RIVER_ID = Registry.BIOME.getRawId(Biomes.RIVER);
+        FROZEN_RIVER_ID = BuiltinRegistries.BIOME.getRawId(Biomes.FROZEN_RIVER);
+        SNOWY_TUNDRA_ID = BuiltinRegistries.BIOME.getRawId(Biomes.SNOWY_TUNDRA);
+        MUSHROOM_FIELDS_ID = BuiltinRegistries.BIOME.getRawId(Biomes.MUSHROOM_FIELDS);
+        MUSHROOM_FIELD_SHORE_ID = BuiltinRegistries.BIOME.getRawId(Biomes.MUSHROOM_FIELD_SHORE);
+        RIVER_ID = BuiltinRegistries.BIOME.getRawId(Biomes.RIVER);
     }
 }
 

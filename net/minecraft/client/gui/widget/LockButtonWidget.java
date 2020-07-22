@@ -21,8 +21,8 @@ public class LockButtonWidget
 extends ButtonWidget {
     private boolean locked;
 
-    public LockButtonWidget(int i, int j, ButtonWidget.PressAction arg) {
-        super(i, j, 20, 20, new TranslatableText("narrator.button.difficulty_lock"), arg);
+    public LockButtonWidget(int x, int y, ButtonWidget.PressAction action) {
+        super(x, y, 20, 20, new TranslatableText("narrator.button.difficulty_lock"), action);
     }
 
     @Override
@@ -34,12 +34,12 @@ extends ButtonWidget {
         return this.locked;
     }
 
-    public void setLocked(boolean bl) {
-        this.locked = bl;
+    public void setLocked(boolean locked) {
+        this.locked = locked;
     }
 
     @Override
-    public void renderButton(MatrixStack arg, int i, int j, float f) {
+    public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         IconLocation lv3;
         MinecraftClient.getInstance().getTextureManager().bindTexture(ButtonWidget.WIDGETS_LOCATION);
         RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
@@ -50,7 +50,7 @@ extends ButtonWidget {
         } else {
             lv3 = this.locked ? IconLocation.LOCKED : IconLocation.UNLOCKED;
         }
-        this.drawTexture(arg, this.x, this.y, lv3.getU(), lv3.getV(), this.width, this.height);
+        this.drawTexture(matrices, this.x, this.y, lv3.getU(), lv3.getV(), this.width, this.height);
     }
 
     @Environment(value=EnvType.CLIENT)

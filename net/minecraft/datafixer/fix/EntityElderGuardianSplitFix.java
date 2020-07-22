@@ -16,13 +16,13 @@ import net.minecraft.datafixer.fix.EntitySimpleTransformFix;
 
 public class EntityElderGuardianSplitFix
 extends EntitySimpleTransformFix {
-    public EntityElderGuardianSplitFix(Schema schema, boolean bl) {
-        super("EntityElderGuardianSplitFix", schema, bl);
+    public EntityElderGuardianSplitFix(Schema outputSchema, boolean changesType) {
+        super("EntityElderGuardianSplitFix", outputSchema, changesType);
     }
 
     @Override
-    protected Pair<String, Dynamic<?>> transform(String string, Dynamic<?> dynamic) {
-        return Pair.of((Object)(Objects.equals(string, "Guardian") && dynamic.get("Elder").asBoolean(false) ? "ElderGuardian" : string), dynamic);
+    protected Pair<String, Dynamic<?>> transform(String choice, Dynamic<?> dynamic) {
+        return Pair.of((Object)(Objects.equals(choice, "Guardian") && dynamic.get("Elder").asBoolean(false) ? "ElderGuardian" : choice), dynamic);
     }
 }
 

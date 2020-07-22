@@ -20,15 +20,15 @@ import net.minecraft.particle.DefaultParticleType;
 @Environment(value=EnvType.CLIENT)
 public class CampfireSmokeParticle
 extends SpriteBillboardParticle {
-    private CampfireSmokeParticle(ClientWorld arg, double d, double e, double f, double g, double h, double i, boolean bl) {
-        super(arg, d, e, f);
+    private CampfireSmokeParticle(ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ, boolean signalFire) {
+        super(world, x, y, z);
         this.scale(3.0f);
         this.setBoundingBoxSpacing(0.25f, 0.25f);
-        this.maxAge = bl ? this.random.nextInt(50) + 280 : this.random.nextInt(50) + 80;
+        this.maxAge = signalFire ? this.random.nextInt(50) + 280 : this.random.nextInt(50) + 80;
         this.gravityStrength = 3.0E-6f;
-        this.velocityX = g;
-        this.velocityY = h + (double)(this.random.nextFloat() / 500.0f);
-        this.velocityZ = i;
+        this.velocityX = velocityX;
+        this.velocityY = velocityY + (double)(this.random.nextFloat() / 500.0f);
+        this.velocityZ = velocityZ;
     }
 
     @Override
@@ -59,8 +59,8 @@ extends SpriteBillboardParticle {
     implements ParticleFactory<DefaultParticleType> {
         private final SpriteProvider spriteProvider;
 
-        public SignalSmokeFactory(SpriteProvider arg) {
-            this.spriteProvider = arg;
+        public SignalSmokeFactory(SpriteProvider spriteProvider) {
+            this.spriteProvider = spriteProvider;
         }
 
         @Override
@@ -77,8 +77,8 @@ extends SpriteBillboardParticle {
     implements ParticleFactory<DefaultParticleType> {
         private final SpriteProvider spriteProvider;
 
-        public CosySmokeFactory(SpriteProvider arg) {
-            this.spriteProvider = arg;
+        public CosySmokeFactory(SpriteProvider spriteProvider) {
+            this.spriteProvider = spriteProvider;
         }
 
         @Override

@@ -28,10 +28,10 @@ extends ConditionalLootFunction {
     private final Identifier id;
     private final long seed;
 
-    private SetLootTableLootFunction(LootCondition[] args, Identifier arg, long l) {
-        super(args);
-        this.id = arg;
-        this.seed = l;
+    private SetLootTableLootFunction(LootCondition[] conditions, Identifier id, long seed) {
+        super(conditions);
+        this.id = id;
+        this.seed = seed;
     }
 
     @Override
@@ -40,31 +40,31 @@ extends ConditionalLootFunction {
     }
 
     @Override
-    public ItemStack process(ItemStack arg, LootContext arg2) {
-        if (arg.isEmpty()) {
-            return arg;
+    public ItemStack process(ItemStack stack, LootContext context) {
+        if (stack.isEmpty()) {
+            return stack;
         }
         CompoundTag lv = new CompoundTag();
         lv.putString("LootTable", this.id.toString());
         if (this.seed != 0L) {
             lv.putLong("LootTableSeed", this.seed);
         }
-        arg.getOrCreateTag().put("BlockEntityTag", lv);
-        return arg;
+        stack.getOrCreateTag().put("BlockEntityTag", lv);
+        return stack;
     }
 
     @Override
-    public void validate(LootTableReporter arg) {
-        if (arg.hasTable(this.id)) {
-            arg.report("Table " + this.id + " is recursively called");
+    public void validate(LootTableReporter reporter) {
+        if (reporter.hasTable(this.id)) {
+            reporter.report("Table " + this.id + " is recursively called");
             return;
         }
-        super.validate(arg);
-        LootTable lv = arg.getTable(this.id);
+        super.validate(reporter);
+        LootTable lv = reporter.getTable(this.id);
         if (lv == null) {
-            arg.report("Unknown loot table called " + this.id);
+            reporter.report("Unknown loot table called " + this.id);
         } else {
-            lv.validate(arg.withTable("->{" + this.id + "}", this.id));
+            lv.validate(reporter.withTable("->{" + this.id + "}", this.id));
         }
     }
 
@@ -87,8 +87,8 @@ extends ConditionalLootFunction {
         }
 
         @Override
-        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
-            return this.fromJson(jsonObject, jsonDeserializationContext, args);
+        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject json, JsonDeserializationContext context, LootCondition[] conditions) {
+            return this.fromJson(json, context, conditions);
         }
     }
 }

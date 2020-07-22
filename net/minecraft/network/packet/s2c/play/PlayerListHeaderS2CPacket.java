@@ -21,15 +21,15 @@ implements Packet<ClientPlayPacketListener> {
     private Text footer;
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.header = arg.readText();
-        this.footer = arg.readText();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.header = buf.readText();
+        this.footer = buf.readText();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeText(this.header);
-        arg.writeText(this.footer);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeText(this.header);
+        buf.writeText(this.footer);
     }
 
     @Override

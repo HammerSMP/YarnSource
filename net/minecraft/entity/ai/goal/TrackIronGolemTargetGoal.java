@@ -20,9 +20,9 @@ extends TrackTargetGoal {
     private LivingEntity target;
     private final TargetPredicate targetPredicate = new TargetPredicate().setBaseMaxDistance(64.0);
 
-    public TrackIronGolemTargetGoal(IronGolemEntity arg) {
-        super(arg, false, true);
-        this.golem = arg;
+    public TrackIronGolemTargetGoal(IronGolemEntity golem) {
+        super(golem, false, true);
+        this.golem = golem;
         this.setControls(EnumSet.of(Goal.Control.TARGET));
     }
 

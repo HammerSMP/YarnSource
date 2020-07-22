@@ -48,17 +48,17 @@ implements AutoCloseable {
     private int frameIndex;
     private int frameTicks;
 
-    protected Sprite(SpriteAtlasTexture arg, Info arg2, int i, int j, int k, int l, int m, NativeImage arg3) {
+    protected Sprite(SpriteAtlasTexture arg, Info arg2, int maxLevel, int atlasWidth, int atlasHeight, int x, int y, NativeImage arg3) {
         this.atlas = arg;
         AnimationResourceMetadata lv = arg2.animationData;
         int n = arg2.width;
         int o = arg2.height;
-        this.x = l;
-        this.y = m;
-        this.uMin = (float)l / (float)j;
-        this.uMax = (float)(l + n) / (float)j;
-        this.vMin = (float)m / (float)k;
-        this.vMax = (float)(m + o) / (float)k;
+        this.x = x;
+        this.y = y;
+        this.uMin = (float)x / (float)atlasWidth;
+        this.uMax = (float)(x + n) / (float)atlasWidth;
+        this.vMin = (float)y / (float)atlasHeight;
+        this.vMax = (float)(y + o) / (float)atlasHeight;
         int p = arg3.getWidth() / lv.getWidth(n);
         int q = arg3.getHeight() / lv.getHeight(o);
         if (lv.getFrameCount() > 0) {
@@ -82,12 +82,12 @@ implements AutoCloseable {
             this.frameXs = new int[v];
             this.frameYs = new int[v];
             for (int w = 0; w < q; ++w) {
-                int x = 0;
-                while (x < p) {
-                    int y = w * p + x;
-                    this.frameXs[y] = x++;
-                    this.frameYs[y] = w;
-                    list.add(new AnimationFrameResourceMetadata(y, -1));
+                int x2 = 0;
+                while (x2 < p) {
+                    int y2 = w * p + x2;
+                    this.frameXs[y2] = x2++;
+                    this.frameYs[y2] = w;
+                    list.add(new AnimationFrameResourceMetadata(y2, -1));
                 }
             }
             lv = new AnimationResourceMetadata(list, n, o, lv.getDefaultFrameTime(), lv.shouldInterpolate());
@@ -96,7 +96,7 @@ implements AutoCloseable {
         this.animationMetadata = lv;
         try {
             try {
-                this.images = MipmapHelper.getMipmapLevelsImages(arg3, i);
+                this.images = MipmapHelper.getMipmapLevelsImages(arg3, maxLevel);
             }
             catch (Throwable throwable) {
                 CrashReport lv2 = CrashReport.create(throwable, "Generating mipmaps for frame");
@@ -118,21 +118,21 @@ implements AutoCloseable {
             lv5.add("Sprite name", () -> this.getId().toString());
             lv5.add("Sprite size", () -> this.getWidth() + " x " + this.getHeight());
             lv5.add("Sprite frames", () -> this.getFrameCount() + " frames");
-            lv5.add("Mipmap levels", i);
+            lv5.add("Mipmap levels", maxLevel);
             throw new CrashException(lv4);
         }
-        this.interpolation = lv.shouldInterpolate() ? new Interpolation(arg2, i) : null;
+        this.interpolation = lv.shouldInterpolate() ? new Interpolation(arg2, maxLevel) : null;
     }
 
-    private void upload(int i) {
-        int j = this.frameXs[i] * this.info.width;
-        int k = this.frameYs[i] * this.info.height;
+    private void upload(int frame) {
+        int j = this.frameXs[frame] * this.info.width;
+        int k = this.frameYs[frame] * this.info.height;
         this.upload(j, k, this.images);
     }
 
-    private void upload(int i, int j, NativeImage[] args) {
+    private void upload(int frameX, int frameY, NativeImage[] output) {
         for (int k = 0; k < this.images.length; ++k) {
-            args[k].upload(k, this.x >> k, this.y >> k, i >> k, j >> k, this.info.width >> k, this.info.height >> k, this.images.length > 1, false);
+            output[k].upload(k, this.x >> k, this.y >> k, frameX >> k, frameY >> k, this.info.width >> k, this.info.height >> k, this.images.length > 1, false);
         }
     }
 
@@ -152,9 +152,9 @@ implements AutoCloseable {
         return this.uMax;
     }
 
-    public float getFrameU(double d) {
+    public float getFrameU(double frame) {
         float f = this.uMax - this.uMin;
-        return this.uMin + f * (float)d / 16.0f;
+        return this.uMin + f * (float)frame / 16.0f;
     }
 
     public float getMinV() {
@@ -165,9 +165,9 @@ implements AutoCloseable {
         return this.vMax;
     }
 
-    public float getFrameV(double d) {
+    public float getFrameV(double frame) {
         float f = this.vMax - this.vMin;
-        return this.vMin + f * (float)d / 16.0f;
+        return this.vMin + f * (float)frame / 16.0f;
     }
 
     public Identifier getId() {
@@ -198,8 +198,8 @@ implements AutoCloseable {
         return "TextureAtlasSprite{name='" + this.info.id + '\'' + ", frameCount=" + i + ", x=" + this.x + ", y=" + this.y + ", height=" + this.info.height + ", width=" + this.info.width + ", u0=" + this.uMin + ", u1=" + this.uMax + ", v0=" + this.vMin + ", v1=" + this.vMax + '}';
     }
 
-    public boolean isPixelTransparent(int i, int j, int k) {
-        return (this.images[0].getPixelColor(j + this.frameXs[i] * this.info.width, k + this.frameYs[i] * this.info.height) >> 24 & 0xFF) == 0;
+    public boolean isPixelTransparent(int frame, int x, int y) {
+        return (this.images[0].getPixelColor(x + this.frameXs[frame] * this.info.width, y + this.frameYs[frame] * this.info.height) >> 24 & 0xFF) == 0;
     }
 
     public void upload() {
@@ -249,8 +249,8 @@ implements AutoCloseable {
     implements AutoCloseable {
         private final NativeImage[] images;
 
-        private Interpolation(Info arg2, int i) {
-            this.images = new NativeImage[i + 1];
+        private Interpolation(Info arg2, int mipmap) {
+            this.images = new NativeImage[mipmap + 1];
             for (int j = 0; j < this.images.length; ++j) {
                 int k = arg2.width >> j;
                 int l = arg2.height >> j;
@@ -283,12 +283,12 @@ implements AutoCloseable {
             }
         }
 
-        private int getPixelColor(int i, int j, int k, int l) {
-            return Sprite.this.images[j].getPixelColor(k + (Sprite.this.frameXs[i] * Sprite.this.info.width >> j), l + (Sprite.this.frameYs[i] * Sprite.this.info.height >> j));
+        private int getPixelColor(int frameIndex, int layer, int x, int y) {
+            return Sprite.this.images[layer].getPixelColor(x + (Sprite.this.frameXs[frameIndex] * Sprite.this.info.width >> layer), y + (Sprite.this.frameYs[frameIndex] * Sprite.this.info.height >> layer));
         }
 
-        private int lerp(double d, int i, int j) {
-            return (int)(d * (double)i + (1.0 - d) * (double)j);
+        private int lerp(double delta, int to, int from) {
+            return (int)(delta * (double)to + (1.0 - delta) * (double)from);
         }
 
         @Override
@@ -307,11 +307,11 @@ implements AutoCloseable {
         private final int height;
         private final AnimationResourceMetadata animationData;
 
-        public Info(Identifier arg, int i, int j, AnimationResourceMetadata arg2) {
-            this.id = arg;
-            this.width = i;
-            this.height = j;
-            this.animationData = arg2;
+        public Info(Identifier id, int width, int height, AnimationResourceMetadata animationData) {
+            this.id = id;
+            this.width = width;
+            this.height = height;
+            this.animationData = animationData;
         }
 
         public Identifier getId() {

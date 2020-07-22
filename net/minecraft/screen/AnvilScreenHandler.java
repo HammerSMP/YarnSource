@@ -40,29 +40,29 @@ extends ForgingScreenHandler {
     private String newItemName;
     private final Property levelCost = Property.create();
 
-    public AnvilScreenHandler(int i, PlayerInventory arg) {
-        this(i, arg, ScreenHandlerContext.EMPTY);
+    public AnvilScreenHandler(int syncId, PlayerInventory inventory) {
+        this(syncId, inventory, ScreenHandlerContext.EMPTY);
     }
 
-    public AnvilScreenHandler(int i, PlayerInventory arg, ScreenHandlerContext arg2) {
-        super(ScreenHandlerType.ANVIL, i, arg, arg2);
+    public AnvilScreenHandler(int syncId, PlayerInventory inventory, ScreenHandlerContext context) {
+        super(ScreenHandlerType.ANVIL, syncId, inventory, context);
         this.addProperty(this.levelCost);
     }
 
     @Override
-    protected boolean canUse(BlockState arg) {
-        return arg.isIn(BlockTags.ANVIL);
+    protected boolean canUse(BlockState state) {
+        return state.isIn(BlockTags.ANVIL);
     }
 
     @Override
-    protected boolean canTakeOutput(PlayerEntity arg, boolean bl) {
-        return (arg.abilities.creativeMode || arg.experienceLevel >= this.levelCost.get()) && this.levelCost.get() > 0;
+    protected boolean canTakeOutput(PlayerEntity player, boolean present) {
+        return (player.abilities.creativeMode || player.experienceLevel >= this.levelCost.get()) && this.levelCost.get() > 0;
     }
 
     @Override
-    protected ItemStack onTakeOutput(PlayerEntity arg, ItemStack arg22) {
-        if (!arg.abilities.creativeMode) {
-            arg.addExperienceLevels(-this.levelCost.get());
+    protected ItemStack onTakeOutput(PlayerEntity player, ItemStack stack) {
+        if (!player.abilities.creativeMode) {
+            player.addExperienceLevels(-this.levelCost.get());
         }
         this.input.setStack(0, ItemStack.EMPTY);
         if (this.repairItemUsage > 0) {
@@ -79,7 +79,7 @@ extends ForgingScreenHandler {
         this.levelCost.set(0);
         this.context.run((arg2, arg3) -> {
             BlockState lv = arg2.getBlockState((BlockPos)arg3);
-            if (!arg.abilities.creativeMode && lv.isIn(BlockTags.ANVIL) && arg.getRandom().nextFloat() < 0.12f) {
+            if (!arg.abilities.creativeMode && lv.isIn(BlockTags.ANVIL) && player.getRandom().nextFloat() < 0.12f) {
                 BlockState lv2 = AnvilBlock.getLandingState(lv);
                 if (lv2 == null) {
                     arg2.removeBlock((BlockPos)arg3, false);
@@ -92,7 +92,7 @@ extends ForgingScreenHandler {
                 arg2.syncWorldEvent(1030, (BlockPos)arg3, 0);
             }
         });
-        return arg22;
+        return stack;
     }
 
     @Override
@@ -244,8 +244,8 @@ extends ForgingScreenHandler {
         this.sendContentUpdates();
     }
 
-    public static int getNextCost(int i) {
-        return i * 2 + 1;
+    public static int getNextCost(int cost) {
+        return cost * 2 + 1;
     }
 
     public void setNewItemName(String string) {

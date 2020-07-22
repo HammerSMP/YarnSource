@@ -30,24 +30,24 @@ implements Packet<ServerPlayPacketListener> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public UpdateCommandBlockMinecartC2SPacket(int i, String string, boolean bl) {
-        this.entityId = i;
-        this.command = string;
-        this.trackOutput = bl;
+    public UpdateCommandBlockMinecartC2SPacket(int entityId, String command, boolean trackOutput) {
+        this.entityId = entityId;
+        this.command = command;
+        this.trackOutput = trackOutput;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.entityId = arg.readVarInt();
-        this.command = arg.readString(32767);
-        this.trackOutput = arg.readBoolean();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.entityId = buf.readVarInt();
+        this.command = buf.readString(32767);
+        this.trackOutput = buf.readBoolean();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeVarInt(this.entityId);
-        arg.writeString(this.command);
-        arg.writeBoolean(this.trackOutput);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeVarInt(this.entityId);
+        buf.writeString(this.command);
+        buf.writeBoolean(this.trackOutput);
     }
 
     @Override
@@ -56,8 +56,8 @@ implements Packet<ServerPlayPacketListener> {
     }
 
     @Nullable
-    public CommandBlockExecutor getMinecartCommandExecutor(World arg) {
-        Entity lv = arg.getEntityById(this.entityId);
+    public CommandBlockExecutor getMinecartCommandExecutor(World world) {
+        Entity lv = world.getEntityById(this.entityId);
         if (lv instanceof CommandBlockMinecartEntity) {
             return ((CommandBlockMinecartEntity)lv).getCommandExecutor();
         }

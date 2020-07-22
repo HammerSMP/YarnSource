@@ -113,31 +113,31 @@ implements Waterloggable {
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
-        return this.shapeMap.get(arg);
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        return this.shapeMap.get(state);
     }
 
     @Override
-    public VoxelShape getCollisionShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
-        return this.collisionShapeMap.get(arg);
+    public VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        return this.collisionShapeMap.get(state);
     }
 
     @Override
-    public boolean canPathfindThrough(BlockState arg, BlockView arg2, BlockPos arg3, NavigationType arg4) {
+    public boolean canPathfindThrough(BlockState state, BlockView world, BlockPos pos, NavigationType type) {
         return false;
     }
 
-    private boolean shouldConnectTo(BlockState arg, boolean bl, Direction arg2) {
-        Block lv = arg.getBlock();
-        boolean bl2 = lv instanceof FenceGateBlock && FenceGateBlock.canWallConnect(arg, arg2);
-        return arg.isIn(BlockTags.WALLS) || !WallBlock.cannotConnect(lv) && bl || lv instanceof PaneBlock || bl2;
+    private boolean shouldConnectTo(BlockState state, boolean faceFullSquare, Direction side) {
+        Block lv = state.getBlock();
+        boolean bl2 = lv instanceof FenceGateBlock && FenceGateBlock.canWallConnect(state, side);
+        return state.isIn(BlockTags.WALLS) || !WallBlock.cannotConnect(lv) && faceFullSquare || lv instanceof PaneBlock || bl2;
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext arg) {
-        World lv = arg.getWorld();
-        BlockPos lv2 = arg.getBlockPos();
-        FluidState lv3 = arg.getWorld().getFluidState(arg.getBlockPos());
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        World lv = ctx.getWorld();
+        BlockPos lv2 = ctx.getBlockPos();
+        FluidState lv3 = ctx.getWorld().getFluidState(ctx.getBlockPos());
         BlockPos lv4 = lv2.north();
         BlockPos lv5 = lv2.east();
         BlockPos lv6 = lv2.south();
@@ -157,17 +157,17 @@ implements Waterloggable {
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
-        if (arg.get(WATERLOGGED).booleanValue()) {
-            arg4.getFluidTickScheduler().schedule(arg5, Fluids.WATER, Fluids.WATER.getTickRate(arg4));
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
+        if (state.get(WATERLOGGED).booleanValue()) {
+            world.getFluidTickScheduler().schedule(pos, Fluids.WATER, Fluids.WATER.getTickRate(world));
         }
-        if (arg2 == Direction.DOWN) {
-            return super.getStateForNeighborUpdate(arg, arg2, arg3, arg4, arg5, arg6);
+        if (direction == Direction.DOWN) {
+            return super.getStateForNeighborUpdate(state, direction, newState, world, pos, posFrom);
         }
-        if (arg2 == Direction.UP) {
-            return this.method_24421(arg4, arg, arg6, arg3);
+        if (direction == Direction.UP) {
+            return this.method_24421(world, state, posFrom, newState);
         }
-        return this.method_24423(arg4, arg5, arg, arg6, arg3, arg2);
+        return this.method_24423(world, pos, state, posFrom, newState, direction);
     }
 
     private static boolean method_24424(BlockState arg, Property<WallShape> arg2) {
@@ -245,50 +245,50 @@ implements Waterloggable {
     }
 
     @Override
-    public FluidState getFluidState(BlockState arg) {
-        if (arg.get(WATERLOGGED).booleanValue()) {
+    public FluidState getFluidState(BlockState state) {
+        if (state.get(WATERLOGGED).booleanValue()) {
             return Fluids.WATER.getStill(false);
         }
-        return super.getFluidState(arg);
+        return super.getFluidState(state);
     }
 
     @Override
-    public boolean isTranslucent(BlockState arg, BlockView arg2, BlockPos arg3) {
-        return arg.get(WATERLOGGED) == false;
+    public boolean isTranslucent(BlockState state, BlockView world, BlockPos pos) {
+        return state.get(WATERLOGGED) == false;
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(UP, NORTH_SHAPE, EAST_SHAPE, WEST_SHAPE, SOUTH_SHAPE, WATERLOGGED);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(UP, NORTH_SHAPE, EAST_SHAPE, WEST_SHAPE, SOUTH_SHAPE, WATERLOGGED);
     }
 
     @Override
-    public BlockState rotate(BlockState arg, BlockRotation arg2) {
-        switch (arg2) {
+    public BlockState rotate(BlockState state, BlockRotation rotation) {
+        switch (rotation) {
             case CLOCKWISE_180: {
-                return (BlockState)((BlockState)((BlockState)((BlockState)arg.with(NORTH_SHAPE, arg.get(SOUTH_SHAPE))).with(EAST_SHAPE, arg.get(WEST_SHAPE))).with(SOUTH_SHAPE, arg.get(NORTH_SHAPE))).with(WEST_SHAPE, arg.get(EAST_SHAPE));
+                return (BlockState)((BlockState)((BlockState)((BlockState)state.with(NORTH_SHAPE, state.get(SOUTH_SHAPE))).with(EAST_SHAPE, state.get(WEST_SHAPE))).with(SOUTH_SHAPE, state.get(NORTH_SHAPE))).with(WEST_SHAPE, state.get(EAST_SHAPE));
             }
             case COUNTERCLOCKWISE_90: {
-                return (BlockState)((BlockState)((BlockState)((BlockState)arg.with(NORTH_SHAPE, arg.get(EAST_SHAPE))).with(EAST_SHAPE, arg.get(SOUTH_SHAPE))).with(SOUTH_SHAPE, arg.get(WEST_SHAPE))).with(WEST_SHAPE, arg.get(NORTH_SHAPE));
+                return (BlockState)((BlockState)((BlockState)((BlockState)state.with(NORTH_SHAPE, state.get(EAST_SHAPE))).with(EAST_SHAPE, state.get(SOUTH_SHAPE))).with(SOUTH_SHAPE, state.get(WEST_SHAPE))).with(WEST_SHAPE, state.get(NORTH_SHAPE));
             }
             case CLOCKWISE_90: {
-                return (BlockState)((BlockState)((BlockState)((BlockState)arg.with(NORTH_SHAPE, arg.get(WEST_SHAPE))).with(EAST_SHAPE, arg.get(NORTH_SHAPE))).with(SOUTH_SHAPE, arg.get(EAST_SHAPE))).with(WEST_SHAPE, arg.get(SOUTH_SHAPE));
+                return (BlockState)((BlockState)((BlockState)((BlockState)state.with(NORTH_SHAPE, state.get(WEST_SHAPE))).with(EAST_SHAPE, state.get(NORTH_SHAPE))).with(SOUTH_SHAPE, state.get(EAST_SHAPE))).with(WEST_SHAPE, state.get(SOUTH_SHAPE));
             }
         }
-        return arg;
+        return state;
     }
 
     @Override
-    public BlockState mirror(BlockState arg, BlockMirror arg2) {
-        switch (arg2) {
+    public BlockState mirror(BlockState state, BlockMirror mirror) {
+        switch (mirror) {
             case LEFT_RIGHT: {
-                return (BlockState)((BlockState)arg.with(NORTH_SHAPE, arg.get(SOUTH_SHAPE))).with(SOUTH_SHAPE, arg.get(NORTH_SHAPE));
+                return (BlockState)((BlockState)state.with(NORTH_SHAPE, state.get(SOUTH_SHAPE))).with(SOUTH_SHAPE, state.get(NORTH_SHAPE));
             }
             case FRONT_BACK: {
-                return (BlockState)((BlockState)arg.with(EAST_SHAPE, arg.get(WEST_SHAPE))).with(WEST_SHAPE, arg.get(EAST_SHAPE));
+                return (BlockState)((BlockState)state.with(EAST_SHAPE, state.get(WEST_SHAPE))).with(WEST_SHAPE, state.get(EAST_SHAPE));
             }
         }
-        return super.mirror(arg, arg2);
+        return super.mirror(state, mirror);
     }
 }
 

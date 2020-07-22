@@ -81,17 +81,17 @@ implements Monster {
         this.dataTracker.startTracking(SLIME_SIZE, 1);
     }
 
-    protected void setSize(int i, boolean bl) {
-        this.dataTracker.set(SLIME_SIZE, i);
+    protected void setSize(int size, boolean heal) {
+        this.dataTracker.set(SLIME_SIZE, size);
         this.refreshPosition();
         this.calculateDimensions();
-        this.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH).setBaseValue(i * i);
-        this.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED).setBaseValue(0.2f + 0.1f * (float)i);
-        this.getAttributeInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE).setBaseValue(i);
-        if (bl) {
+        this.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH).setBaseValue(size * size);
+        this.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED).setBaseValue(0.2f + 0.1f * (float)size);
+        this.getAttributeInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE).setBaseValue(size);
+        if (heal) {
             this.setHealth(this.getMaxHealth());
         }
-        this.experiencePoints = i;
+        this.experiencePoints = size;
     }
 
     public int getSize() {
@@ -99,21 +99,21 @@ implements Monster {
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
-        arg.putInt("Size", this.getSize() - 1);
-        arg.putBoolean("wasOnGround", this.onGroundLastTick);
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
+        tag.putInt("Size", this.getSize() - 1);
+        tag.putBoolean("wasOnGround", this.onGroundLastTick);
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        int i = arg.getInt("Size");
+    public void readCustomDataFromTag(CompoundTag tag) {
+        int i = tag.getInt("Size");
         if (i < 0) {
             i = 0;
         }
         this.setSize(i + 1, false);
-        super.readCustomDataFromTag(arg);
-        this.onGroundLastTick = arg.getBoolean("wasOnGround");
+        super.readCustomDataFromTag(tag);
+        this.onGroundLastTick = tag.getBoolean("wasOnGround");
     }
 
     public boolean isSmall() {
@@ -170,8 +170,8 @@ implements Monster {
     }
 
     @Override
-    public void onTrackedDataSet(TrackedData<?> arg) {
-        if (SLIME_SIZE.equals(arg)) {
+    public void onTrackedDataSet(TrackedData<?> data) {
+        if (SLIME_SIZE.equals(data)) {
             this.calculateDimensions();
             this.yaw = this.headYaw;
             this.bodyYaw = this.headYaw;
@@ -179,7 +179,7 @@ implements Monster {
                 this.onSwimmingStart();
             }
         }
-        super.onTrackedDataSet(arg);
+        super.onTrackedDataSet(data);
     }
 
     public EntityType<? extends SlimeEntity> getType() {
@@ -214,33 +214,33 @@ implements Monster {
     }
 
     @Override
-    public void pushAwayFrom(Entity arg) {
-        super.pushAwayFrom(arg);
-        if (arg instanceof IronGolemEntity && this.canAttack()) {
-            this.damage((LivingEntity)arg);
+    public void pushAwayFrom(Entity entity) {
+        super.pushAwayFrom(entity);
+        if (entity instanceof IronGolemEntity && this.canAttack()) {
+            this.damage((LivingEntity)entity);
         }
     }
 
     @Override
-    public void onPlayerCollision(PlayerEntity arg) {
+    public void onPlayerCollision(PlayerEntity player) {
         if (this.canAttack()) {
-            this.damage(arg);
+            this.damage(player);
         }
     }
 
-    protected void damage(LivingEntity arg) {
+    protected void damage(LivingEntity target) {
         if (this.isAlive()) {
             int i = this.getSize();
-            if (this.squaredDistanceTo(arg) < 0.6 * (double)i * (0.6 * (double)i) && this.canSee(arg) && arg.damage(DamageSource.mob(this), this.getDamageAmount())) {
+            if (this.squaredDistanceTo(target) < 0.6 * (double)i * (0.6 * (double)i) && this.canSee(target) && target.damage(DamageSource.mob(this), this.getDamageAmount())) {
                 this.playSound(SoundEvents.ENTITY_SLIME_ATTACK, 1.0f, (this.random.nextFloat() - this.random.nextFloat()) * 0.2f + 1.0f);
-                this.dealDamage(this, arg);
+                this.dealDamage(this, target);
             }
         }
     }
 
     @Override
-    protected float getActiveEyeHeight(EntityPose arg, EntityDimensions arg2) {
-        return 0.625f * arg2.height;
+    protected float getActiveEyeHeight(EntityPose pose, EntityDimensions dimensions) {
+        return 0.625f * dimensions.height;
     }
 
     protected boolean canAttack() {
@@ -252,7 +252,7 @@ implements Monster {
     }
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource arg) {
+    protected SoundEvent getHurtSound(DamageSource source) {
         if (this.isSmall()) {
             return SoundEvents.ENTITY_SLIME_HURT_SMALL;
         }
@@ -279,20 +279,20 @@ implements Monster {
         return this.getSize() == 1 ? this.getType().getLootTableId() : LootTables.EMPTY;
     }
 
-    public static boolean canSpawn(EntityType<SlimeEntity> arg, WorldAccess arg2, SpawnReason arg3, BlockPos arg4, Random random) {
-        if (arg2.getDifficulty() != Difficulty.PEACEFUL) {
+    public static boolean canSpawn(EntityType<SlimeEntity> type, WorldAccess world, SpawnReason spawnReason, BlockPos pos, Random random) {
+        if (world.getDifficulty() != Difficulty.PEACEFUL) {
             boolean bl;
-            Biome lv = arg2.getBiome(arg4);
-            if (lv == Biomes.SWAMP && arg4.getY() > 50 && arg4.getY() < 70 && random.nextFloat() < 0.5f && random.nextFloat() < arg2.method_30272() && arg2.getLightLevel(arg4) <= random.nextInt(8)) {
-                return SlimeEntity.canMobSpawn(arg, arg2, arg3, arg4, random);
+            Biome lv = world.getBiome(pos);
+            if (lv == Biomes.SWAMP && pos.getY() > 50 && pos.getY() < 70 && random.nextFloat() < 0.5f && random.nextFloat() < world.method_30272() && world.getLightLevel(pos) <= random.nextInt(8)) {
+                return SlimeEntity.canMobSpawn(type, world, spawnReason, pos, random);
             }
-            if (!(arg2 instanceof ServerWorldAccess)) {
+            if (!(world instanceof ServerWorldAccess)) {
                 return false;
             }
-            ChunkPos lv2 = new ChunkPos(arg4);
-            boolean bl2 = bl = ChunkRandom.getSlimeRandom(lv2.x, lv2.z, ((ServerWorldAccess)arg2).getSeed(), 987234911L).nextInt(10) == 0;
-            if (random.nextInt(10) == 0 && bl && arg4.getY() < 40) {
-                return SlimeEntity.canMobSpawn(arg, arg2, arg3, arg4, random);
+            ChunkPos lv2 = new ChunkPos(pos);
+            boolean bl2 = bl = ChunkRandom.getSlimeRandom(lv2.x, lv2.z, ((ServerWorldAccess)world).getSeed(), 987234911L).nextInt(10) == 0;
+            if (random.nextInt(10) == 0 && bl && pos.getY() < 40) {
+                return SlimeEntity.canMobSpawn(type, world, spawnReason, pos, random);
             }
         }
         return false;
@@ -321,14 +321,14 @@ implements Monster {
 
     @Override
     @Nullable
-    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(class_5425 arg, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable CompoundTag entityTag) {
         int i = this.random.nextInt(3);
-        if (i < 2 && this.random.nextFloat() < 0.5f * arg2.getClampedLocalDifficulty()) {
+        if (i < 2 && this.random.nextFloat() < 0.5f * difficulty.getClampedLocalDifficulty()) {
             ++i;
         }
         int j = 1 << i;
         this.setSize(j, true);
-        return super.initialize(arg, arg2, arg3, arg4, arg5);
+        return super.initialize(arg, difficulty, spawnReason, entityData, entityTag);
     }
 
     private float getJumpSoundPitch() {
@@ -341,16 +341,16 @@ implements Monster {
     }
 
     @Override
-    public EntityDimensions getDimensions(EntityPose arg) {
-        return super.getDimensions(arg).scaled(0.255f * (float)this.getSize());
+    public EntityDimensions getDimensions(EntityPose pose) {
+        return super.getDimensions(pose).scaled(0.255f * (float)this.getSize());
     }
 
     static class MoveGoal
     extends Goal {
         private final SlimeEntity slime;
 
-        public MoveGoal(SlimeEntity arg) {
-            this.slime = arg;
+        public MoveGoal(SlimeEntity slime) {
+            this.slime = slime;
             this.setControls(EnumSet.of(Goal.Control.JUMP, Goal.Control.MOVE));
         }
 
@@ -369,10 +369,10 @@ implements Monster {
     extends Goal {
         private final SlimeEntity slime;
 
-        public SwimmingGoal(SlimeEntity arg) {
-            this.slime = arg;
+        public SwimmingGoal(SlimeEntity slime) {
+            this.slime = slime;
             this.setControls(EnumSet.of(Goal.Control.JUMP, Goal.Control.MOVE));
-            arg.getNavigation().setCanSwim(true);
+            slime.getNavigation().setCanSwim(true);
         }
 
         @Override
@@ -395,8 +395,8 @@ implements Monster {
         private float targetYaw;
         private int timer;
 
-        public RandomLookGoal(SlimeEntity arg) {
-            this.slime = arg;
+        public RandomLookGoal(SlimeEntity slime) {
+            this.slime = slime;
             this.setControls(EnumSet.of(Goal.Control.LOOK));
         }
 
@@ -420,8 +420,8 @@ implements Monster {
         private final SlimeEntity slime;
         private int ticksLeft;
 
-        public FaceTowardTargetGoal(SlimeEntity arg) {
-            this.slime = arg;
+        public FaceTowardTargetGoal(SlimeEntity slime) {
+            this.slime = slime;
             this.setControls(EnumSet.of(Goal.Control.LOOK));
         }
 
@@ -475,19 +475,19 @@ implements Monster {
         private final SlimeEntity slime;
         private boolean jumpOften;
 
-        public SlimeMoveControl(SlimeEntity arg) {
-            super(arg);
-            this.slime = arg;
-            this.targetYaw = 180.0f * arg.yaw / (float)Math.PI;
+        public SlimeMoveControl(SlimeEntity slime) {
+            super(slime);
+            this.slime = slime;
+            this.targetYaw = 180.0f * slime.yaw / (float)Math.PI;
         }
 
-        public void look(float f, boolean bl) {
-            this.targetYaw = f;
-            this.jumpOften = bl;
+        public void look(float targetYaw, boolean jumpOften) {
+            this.targetYaw = targetYaw;
+            this.jumpOften = jumpOften;
         }
 
-        public void move(double d) {
-            this.speed = d;
+        public void move(double speed) {
+            this.speed = speed;
             this.state = MoveControl.State.MOVE_TO;
         }
 

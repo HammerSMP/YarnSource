@@ -16,11 +16,11 @@ public enum EquipmentSlot {
     private final int armorStandId;
     private final String name;
 
-    private EquipmentSlot(Type arg, int j, int k, String string2) {
-        this.type = arg;
-        this.entityId = j;
-        this.armorStandId = k;
-        this.name = string2;
+    private EquipmentSlot(Type type, int entityId, int armorStandId, String name) {
+        this.type = type;
+        this.entityId = entityId;
+        this.armorStandId = armorStandId;
+        this.name = name;
     }
 
     public Type getType() {
@@ -39,20 +39,20 @@ public enum EquipmentSlot {
         return this.name;
     }
 
-    public static EquipmentSlot byName(String string) {
+    public static EquipmentSlot byName(String name) {
         for (EquipmentSlot lv : EquipmentSlot.values()) {
-            if (!lv.getName().equals(string)) continue;
+            if (!lv.getName().equals(name)) continue;
             return lv;
         }
-        throw new IllegalArgumentException("Invalid slot '" + string + "'");
+        throw new IllegalArgumentException("Invalid slot '" + name + "'");
     }
 
-    public static EquipmentSlot fromTypeIndex(Type arg, int i) {
+    public static EquipmentSlot fromTypeIndex(Type type, int index) {
         for (EquipmentSlot lv : EquipmentSlot.values()) {
-            if (lv.getType() != arg || lv.getEntitySlotId() != i) continue;
+            if (lv.getType() != type || lv.getEntitySlotId() != index) continue;
             return lv;
         }
-        throw new IllegalArgumentException("Invalid slot '" + (Object)((Object)arg) + "': " + i);
+        throw new IllegalArgumentException("Invalid slot '" + (Object)((Object)type) + "': " + index);
     }
 
     public static enum Type {

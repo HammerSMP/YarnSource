@@ -20,20 +20,20 @@ public class BiomeColors {
     public static final ColorResolver FOLIAGE_COLOR = (arg, d, e) -> arg.getFoliageColor();
     public static final ColorResolver WATER_COLOR = (arg, d, e) -> arg.getWaterColor();
 
-    private static int getColor(BlockRenderView arg, BlockPos arg2, ColorResolver colorResolver) {
-        return arg.getColor(arg2, colorResolver);
+    private static int getColor(BlockRenderView world, BlockPos pos, ColorResolver resolver) {
+        return world.getColor(pos, resolver);
     }
 
-    public static int getGrassColor(BlockRenderView arg, BlockPos arg2) {
-        return BiomeColors.getColor(arg, arg2, GRASS_COLOR);
+    public static int getGrassColor(BlockRenderView world, BlockPos pos) {
+        return BiomeColors.getColor(world, pos, GRASS_COLOR);
     }
 
-    public static int getFoliageColor(BlockRenderView arg, BlockPos arg2) {
-        return BiomeColors.getColor(arg, arg2, FOLIAGE_COLOR);
+    public static int getFoliageColor(BlockRenderView world, BlockPos pos) {
+        return BiomeColors.getColor(world, pos, FOLIAGE_COLOR);
     }
 
-    public static int getWaterColor(BlockRenderView arg, BlockPos arg2) {
-        return BiomeColors.getColor(arg, arg2, WATER_COLOR);
+    public static int getWaterColor(BlockRenderView world, BlockPos pos) {
+        return BiomeColors.getColor(world, pos, WATER_COLOR);
     }
 }
 

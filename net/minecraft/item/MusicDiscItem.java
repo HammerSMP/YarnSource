@@ -39,27 +39,27 @@ extends Item {
     private final int comparatorOutput;
     private final SoundEvent sound;
 
-    protected MusicDiscItem(int i, SoundEvent arg, Item.Settings arg2) {
-        super(arg2);
-        this.comparatorOutput = i;
-        this.sound = arg;
+    protected MusicDiscItem(int comparatorOutput, SoundEvent sound, Item.Settings settings) {
+        super(settings);
+        this.comparatorOutput = comparatorOutput;
+        this.sound = sound;
         MUSIC_DISCS.put(this.sound, this);
     }
 
     @Override
-    public ActionResult useOnBlock(ItemUsageContext arg) {
+    public ActionResult useOnBlock(ItemUsageContext context) {
         BlockPos lv2;
-        World lv = arg.getWorld();
-        BlockState lv3 = lv.getBlockState(lv2 = arg.getBlockPos());
+        World lv = context.getWorld();
+        BlockState lv3 = lv.getBlockState(lv2 = context.getBlockPos());
         if (!lv3.isOf(Blocks.JUKEBOX) || lv3.get(JukeboxBlock.HAS_RECORD).booleanValue()) {
             return ActionResult.PASS;
         }
-        ItemStack lv4 = arg.getStack();
+        ItemStack lv4 = context.getStack();
         if (!lv.isClient) {
             ((JukeboxBlock)Blocks.JUKEBOX).setRecord(lv, lv2, lv3, lv4);
             lv.syncWorldEvent(null, 1010, lv2, Item.getRawId(this));
             lv4.decrement(1);
-            PlayerEntity lv5 = arg.getPlayer();
+            PlayerEntity lv5 = context.getPlayer();
             if (lv5 != null) {
                 lv5.incrementStat(Stats.PLAY_RECORD);
             }
@@ -73,8 +73,8 @@ extends Item {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void appendTooltip(ItemStack arg, @Nullable World arg2, List<Text> list, TooltipContext arg3) {
-        list.add(this.getDescription().formatted(Formatting.GRAY));
+    public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
+        tooltip.add(this.getDescription().formatted(Formatting.GRAY));
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -84,8 +84,8 @@ extends Item {
 
     @Nullable
     @Environment(value=EnvType.CLIENT)
-    public static MusicDiscItem bySound(SoundEvent arg) {
-        return MUSIC_DISCS.get(arg);
+    public static MusicDiscItem bySound(SoundEvent sound) {
+        return MUSIC_DISCS.get(sound);
     }
 
     @Environment(value=EnvType.CLIENT)

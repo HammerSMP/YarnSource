@@ -38,21 +38,21 @@ implements Packet<ClientPlayPacketListener> {
     public GameStateChangeS2CPacket() {
     }
 
-    public GameStateChangeS2CPacket(Reason arg, float f) {
-        this.reason = arg;
-        this.value = f;
+    public GameStateChangeS2CPacket(Reason reason, float value) {
+        this.reason = reason;
+        this.value = value;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.reason = (Reason)Reason.REASONS.get((int)arg.readUnsignedByte());
-        this.value = arg.readFloat();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.reason = (Reason)Reason.REASONS.get((int)buf.readUnsignedByte());
+        this.value = buf.readFloat();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeByte(this.reason.id);
-        arg.writeFloat(this.value);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeByte(this.reason.id);
+        buf.writeFloat(this.value);
     }
 
     @Override
@@ -74,9 +74,9 @@ implements Packet<ClientPlayPacketListener> {
         private static final Int2ObjectMap<Reason> REASONS = new Int2ObjectOpenHashMap();
         private final int id;
 
-        public Reason(int i) {
-            this.id = i;
-            REASONS.put(i, (Object)this);
+        public Reason(int id) {
+            this.id = id;
+            REASONS.put(id, (Object)this);
         }
     }
 }

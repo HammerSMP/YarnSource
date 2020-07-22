@@ -23,14 +23,14 @@ extends Task<E> {
     private final Predicate<E> startCondition;
     private final Function<E, Optional<? extends LivingEntity>> targetGetter;
 
-    public UpdateAttackTargetTask(Predicate<E> predicate, Function<E, Optional<? extends LivingEntity>> function) {
+    public UpdateAttackTargetTask(Predicate<E> startCondition, Function<E, Optional<? extends LivingEntity>> targetGetter) {
         super((Map<MemoryModuleType<?>, MemoryModuleState>)ImmutableMap.of(MemoryModuleType.ATTACK_TARGET, (Object)((Object)MemoryModuleState.VALUE_ABSENT), MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE, (Object)((Object)MemoryModuleState.REGISTERED)));
-        this.startCondition = predicate;
-        this.targetGetter = function;
+        this.startCondition = startCondition;
+        this.targetGetter = targetGetter;
     }
 
-    public UpdateAttackTargetTask(Function<E, Optional<? extends LivingEntity>> function) {
-        this((E arg) -> true, function);
+    public UpdateAttackTargetTask(Function<E, Optional<? extends LivingEntity>> targetGetter) {
+        this((E arg) -> true, targetGetter);
     }
 
     @Override
@@ -47,9 +47,9 @@ extends Task<E> {
         this.targetGetter.apply(arg22).ifPresent(arg2 -> this.updateAttackTarget(arg22, (LivingEntity)arg2));
     }
 
-    private void updateAttackTarget(E arg, LivingEntity arg2) {
-        ((LivingEntity)arg).getBrain().remember(MemoryModuleType.ATTACK_TARGET, arg2);
-        ((LivingEntity)arg).getBrain().forget(MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE);
+    private void updateAttackTarget(E entity, LivingEntity target) {
+        ((LivingEntity)entity).getBrain().remember(MemoryModuleType.ATTACK_TARGET, target);
+        ((LivingEntity)entity).getBrain().forget(MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE);
     }
 }
 

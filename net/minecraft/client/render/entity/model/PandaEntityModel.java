@@ -23,8 +23,8 @@ extends QuadrupedEntityModel<T> {
     private float lieOnBackAnimationProgress;
     private float playAnimationProgress;
 
-    public PandaEntityModel(int i, float f) {
-        super(i, f, true, 23.0f, 4.8f, 2.7f, 3.0f, 49);
+    public PandaEntityModel(int legHeight, float scale) {
+        super(legHeight, scale, true, 23.0f, 4.8f, 2.7f, 3.0f, 49);
         this.textureWidth = 64;
         this.textureHeight = 64;
         this.head = new ModelPart(this, 0, 6);

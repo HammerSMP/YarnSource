@@ -75,37 +75,37 @@ implements ItemConvertible {
     @Nullable
     private final FoodComponent foodComponent;
 
-    public static int getRawId(Item arg) {
-        return arg == null ? 0 : Registry.ITEM.getRawId(arg);
+    public static int getRawId(Item item) {
+        return item == null ? 0 : Registry.ITEM.getRawId(item);
     }
 
-    public static Item byRawId(int i) {
-        return Registry.ITEM.get(i);
+    public static Item byRawId(int id) {
+        return Registry.ITEM.get(id);
     }
 
     @Deprecated
-    public static Item fromBlock(Block arg) {
-        return BLOCK_ITEMS.getOrDefault(arg, Items.AIR);
+    public static Item fromBlock(Block block) {
+        return BLOCK_ITEMS.getOrDefault(block, Items.AIR);
     }
 
-    public Item(Settings arg) {
-        this.group = arg.group;
-        this.rarity = arg.rarity;
-        this.recipeRemainder = arg.recipeRemainder;
-        this.maxDamage = arg.maxDamage;
-        this.maxCount = arg.maxCount;
-        this.foodComponent = arg.foodComponent;
-        this.fireproof = arg.fireproof;
+    public Item(Settings settings) {
+        this.group = settings.group;
+        this.rarity = settings.rarity;
+        this.recipeRemainder = settings.recipeRemainder;
+        this.maxDamage = settings.maxDamage;
+        this.maxCount = settings.maxCount;
+        this.foodComponent = settings.foodComponent;
+        this.fireproof = settings.fireproof;
     }
 
-    public void usageTick(World arg, LivingEntity arg2, ItemStack arg3, int i) {
+    public void usageTick(World world, LivingEntity user, ItemStack stack, int remainingUseTicks) {
     }
 
-    public boolean postProcessTag(CompoundTag arg) {
+    public boolean postProcessTag(CompoundTag tag) {
         return false;
     }
 
-    public boolean canMine(BlockState arg, World arg2, BlockPos arg3, PlayerEntity arg4) {
+    public boolean canMine(BlockState state, World world, BlockPos pos, PlayerEntity miner) {
         return true;
     }
 
@@ -114,31 +114,31 @@ implements ItemConvertible {
         return this;
     }
 
-    public ActionResult useOnBlock(ItemUsageContext arg) {
+    public ActionResult useOnBlock(ItemUsageContext context) {
         return ActionResult.PASS;
     }
 
-    public float getMiningSpeedMultiplier(ItemStack arg, BlockState arg2) {
+    public float getMiningSpeedMultiplier(ItemStack stack, BlockState state) {
         return 1.0f;
     }
 
-    public TypedActionResult<ItemStack> use(World arg, PlayerEntity arg2, Hand arg3) {
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         if (this.isFood()) {
-            ItemStack lv = arg2.getStackInHand(arg3);
-            if (arg2.canConsume(this.getFoodComponent().isAlwaysEdible())) {
-                arg2.setCurrentHand(arg3);
+            ItemStack lv = user.getStackInHand(hand);
+            if (user.canConsume(this.getFoodComponent().isAlwaysEdible())) {
+                user.setCurrentHand(hand);
                 return TypedActionResult.consume(lv);
             }
             return TypedActionResult.fail(lv);
         }
-        return TypedActionResult.pass(arg2.getStackInHand(arg3));
+        return TypedActionResult.pass(user.getStackInHand(hand));
     }
 
-    public ItemStack finishUsing(ItemStack arg, World arg2, LivingEntity arg3) {
+    public ItemStack finishUsing(ItemStack stack, World world, LivingEntity user) {
         if (this.isFood()) {
-            return arg3.eatFood(arg2, arg);
+            return user.eatFood(world, stack);
         }
-        return arg;
+        return stack;
     }
 
     public final int getMaxCount() {
@@ -153,19 +153,19 @@ implements ItemConvertible {
         return this.maxDamage > 0;
     }
 
-    public boolean postHit(ItemStack arg, LivingEntity arg2, LivingEntity arg3) {
+    public boolean postHit(ItemStack stack, LivingEntity target, LivingEntity attacker) {
         return false;
     }
 
-    public boolean postMine(ItemStack arg, World arg2, BlockState arg3, BlockPos arg4, LivingEntity arg5) {
+    public boolean postMine(ItemStack stack, World world, BlockState state, BlockPos pos, LivingEntity miner) {
         return false;
     }
 
-    public boolean isEffectiveOn(BlockState arg) {
+    public boolean isEffectiveOn(BlockState state) {
         return false;
     }
 
-    public ActionResult useOnEntity(ItemStack arg, PlayerEntity arg2, LivingEntity arg3, Hand arg4) {
+    public ActionResult useOnEntity(ItemStack stack, PlayerEntity user, LivingEntity entity, Hand hand) {
         return ActionResult.PASS;
     }
 
@@ -189,7 +189,7 @@ implements ItemConvertible {
         return this.getOrCreateTranslationKey();
     }
 
-    public String getTranslationKey(ItemStack arg) {
+    public String getTranslationKey(ItemStack stack) {
         return this.getTranslationKey();
     }
 
@@ -206,44 +206,44 @@ implements ItemConvertible {
         return this.recipeRemainder != null;
     }
 
-    public void inventoryTick(ItemStack arg, World arg2, Entity arg3, int i, boolean bl) {
+    public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
     }
 
-    public void onCraft(ItemStack arg, World arg2, PlayerEntity arg3) {
+    public void onCraft(ItemStack stack, World world, PlayerEntity player) {
     }
 
     public boolean isNetworkSynced() {
         return false;
     }
 
-    public UseAction getUseAction(ItemStack arg) {
-        return arg.getItem().isFood() ? UseAction.EAT : UseAction.NONE;
+    public UseAction getUseAction(ItemStack stack) {
+        return stack.getItem().isFood() ? UseAction.EAT : UseAction.NONE;
     }
 
-    public int getMaxUseTime(ItemStack arg) {
-        if (arg.getItem().isFood()) {
+    public int getMaxUseTime(ItemStack stack) {
+        if (stack.getItem().isFood()) {
             return this.getFoodComponent().isSnack() ? 16 : 32;
         }
         return 0;
     }
 
-    public void onStoppedUsing(ItemStack arg, World arg2, LivingEntity arg3, int i) {
+    public void onStoppedUsing(ItemStack stack, World world, LivingEntity user, int remainingUseTicks) {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public void appendTooltip(ItemStack arg, @Nullable World arg2, List<Text> list, TooltipContext arg3) {
+    public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
     }
 
-    public Text getName(ItemStack arg) {
-        return new TranslatableText(this.getTranslationKey(arg));
+    public Text getName(ItemStack stack) {
+        return new TranslatableText(this.getTranslationKey(stack));
     }
 
-    public boolean hasGlint(ItemStack arg) {
-        return arg.hasEnchantments();
+    public boolean hasGlint(ItemStack stack) {
+        return stack.hasEnchantments();
     }
 
-    public Rarity getRarity(ItemStack arg) {
-        if (!arg.hasEnchantments()) {
+    public Rarity getRarity(ItemStack stack) {
+        if (!stack.hasEnchantments()) {
             return this.rarity;
         }
         switch (this.rarity) {
@@ -258,14 +258,14 @@ implements ItemConvertible {
         return this.rarity;
     }
 
-    public boolean isEnchantable(ItemStack arg) {
+    public boolean isEnchantable(ItemStack stack) {
         return this.getMaxCount() == 1 && this.isDamageable();
     }
 
-    protected static BlockHitResult rayTrace(World arg, PlayerEntity arg2, RayTraceContext.FluidHandling arg3) {
-        float f = arg2.pitch;
-        float g = arg2.yaw;
-        Vec3d lv = arg2.getCameraPosVec(1.0f);
+    protected static BlockHitResult rayTrace(World world, PlayerEntity player, RayTraceContext.FluidHandling fluidHandling) {
+        float f = player.pitch;
+        float g = player.yaw;
+        Vec3d lv = player.getCameraPosVec(1.0f);
         float h = MathHelper.cos(-g * ((float)Math.PI / 180) - (float)Math.PI);
         float i = MathHelper.sin(-g * ((float)Math.PI / 180) - (float)Math.PI);
         float j = -MathHelper.cos(-f * ((float)Math.PI / 180));
@@ -275,22 +275,22 @@ implements ItemConvertible {
         float n = h * j;
         double d = 5.0;
         Vec3d lv2 = lv.add((double)l * 5.0, (double)m * 5.0, (double)n * 5.0);
-        return arg.rayTrace(new RayTraceContext(lv, lv2, RayTraceContext.ShapeType.OUTLINE, arg3, arg2));
+        return world.rayTrace(new RayTraceContext(lv, lv2, RayTraceContext.ShapeType.OUTLINE, fluidHandling, player));
     }
 
     public int getEnchantability() {
         return 0;
     }
 
-    public void appendStacks(ItemGroup arg, DefaultedList<ItemStack> arg2) {
-        if (this.isIn(arg)) {
-            arg2.add(new ItemStack(this));
+    public void appendStacks(ItemGroup group, DefaultedList<ItemStack> stacks) {
+        if (this.isIn(group)) {
+            stacks.add(new ItemStack(this));
         }
     }
 
-    protected boolean isIn(ItemGroup arg) {
+    protected boolean isIn(ItemGroup group) {
         ItemGroup lv = this.getGroup();
-        return lv != null && (arg == ItemGroup.SEARCH || arg == lv);
+        return lv != null && (group == ItemGroup.SEARCH || group == lv);
     }
 
     @Nullable
@@ -298,24 +298,24 @@ implements ItemConvertible {
         return this.group;
     }
 
-    public boolean canRepair(ItemStack arg, ItemStack arg2) {
+    public boolean canRepair(ItemStack stack, ItemStack ingredient) {
         return false;
     }
 
-    public Multimap<EntityAttribute, EntityAttributeModifier> getAttributeModifiers(EquipmentSlot arg) {
+    public Multimap<EntityAttribute, EntityAttributeModifier> getAttributeModifiers(EquipmentSlot slot) {
         return ImmutableMultimap.of();
     }
 
-    public boolean isUsedOnRelease(ItemStack arg) {
-        return arg.getItem() == Items.CROSSBOW;
+    public boolean isUsedOnRelease(ItemStack stack) {
+        return stack.getItem() == Items.CROSSBOW;
     }
 
     public ItemStack getStackForRender() {
         return new ItemStack(this);
     }
 
-    public boolean isIn(Tag<Item> arg) {
-        return arg.contains(this);
+    public boolean isIn(Tag<Item> tag) {
+        return tag.contains(this);
     }
 
     public boolean isFood() {
@@ -339,8 +339,8 @@ implements ItemConvertible {
         return this.fireproof;
     }
 
-    public boolean damage(DamageSource arg) {
-        return !this.fireproof || !arg.isFire();
+    public boolean damage(DamageSource source) {
+        return !this.fireproof || !source.isFire();
     }
 
     public static class Settings {
@@ -352,41 +352,41 @@ implements ItemConvertible {
         private FoodComponent foodComponent;
         private boolean fireproof;
 
-        public Settings food(FoodComponent arg) {
-            this.foodComponent = arg;
+        public Settings food(FoodComponent foodComponent) {
+            this.foodComponent = foodComponent;
             return this;
         }
 
-        public Settings maxCount(int i) {
+        public Settings maxCount(int maxCount) {
             if (this.maxDamage > 0) {
                 throw new RuntimeException("Unable to have damage AND stack.");
             }
-            this.maxCount = i;
+            this.maxCount = maxCount;
             return this;
         }
 
-        public Settings maxDamageIfAbsent(int i) {
-            return this.maxDamage == 0 ? this.maxDamage(i) : this;
+        public Settings maxDamageIfAbsent(int maxDamage) {
+            return this.maxDamage == 0 ? this.maxDamage(maxDamage) : this;
         }
 
-        public Settings maxDamage(int i) {
-            this.maxDamage = i;
+        public Settings maxDamage(int maxDamage) {
+            this.maxDamage = maxDamage;
             this.maxCount = 1;
             return this;
         }
 
-        public Settings recipeRemainder(Item arg) {
-            this.recipeRemainder = arg;
+        public Settings recipeRemainder(Item recipeRemainder) {
+            this.recipeRemainder = recipeRemainder;
             return this;
         }
 
-        public Settings group(ItemGroup arg) {
-            this.group = arg;
+        public Settings group(ItemGroup group) {
+            this.group = group;
             return this;
         }
 
-        public Settings rarity(Rarity arg) {
-            this.rarity = arg;
+        public Settings rarity(Rarity rarity) {
+            this.rarity = rarity;
             return this;
         }
 

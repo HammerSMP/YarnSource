@@ -16,21 +16,21 @@ implements Packet<ServerPlayPacketListener> {
     public BoatPaddleStateC2SPacket() {
     }
 
-    public BoatPaddleStateC2SPacket(boolean bl, boolean bl2) {
-        this.leftPaddling = bl;
-        this.rightPaddling = bl2;
+    public BoatPaddleStateC2SPacket(boolean leftPaddling, boolean rightPaddling) {
+        this.leftPaddling = leftPaddling;
+        this.rightPaddling = rightPaddling;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.leftPaddling = arg.readBoolean();
-        this.rightPaddling = arg.readBoolean();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.leftPaddling = buf.readBoolean();
+        this.rightPaddling = buf.readBoolean();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeBoolean(this.leftPaddling);
-        arg.writeBoolean(this.rightPaddling);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeBoolean(this.leftPaddling);
+        buf.writeBoolean(this.rightPaddling);
     }
 
     @Override

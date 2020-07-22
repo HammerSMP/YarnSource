@@ -61,20 +61,20 @@ public enum Direction implements StringIdentifiable
     private static final Direction[] HORIZONTAL;
     private static final Long2ObjectMap<Direction> VECTOR_TO_DIRECTION;
 
-    private Direction(int j, int k, int l, String string2, AxisDirection arg, Axis arg2, Vec3i arg3) {
-        this.id = j;
-        this.idHorizontal = l;
-        this.idOpposite = k;
-        this.name = string2;
-        this.axis = arg2;
-        this.direction = arg;
-        this.vector = arg3;
+    private Direction(int id, int idOpposite, int idHorizontal, String name, AxisDirection direction, Axis axis, Vec3i vector) {
+        this.id = id;
+        this.idHorizontal = idHorizontal;
+        this.idOpposite = idOpposite;
+        this.name = name;
+        this.axis = axis;
+        this.direction = direction;
+        this.vector = vector;
     }
 
-    public static Direction[] getEntityFacingOrder(Entity arg) {
+    public static Direction[] getEntityFacingOrder(Entity entity) {
         Direction lv3;
-        float f = arg.getPitch(1.0f) * ((float)Math.PI / 180);
-        float g = -arg.getYaw(1.0f) * ((float)Math.PI / 180);
+        float f = entity.getPitch(1.0f) * ((float)Math.PI / 180);
+        float g = -entity.getYaw(1.0f) * ((float)Math.PI / 180);
         float h = MathHelper.sin(f);
         float i = MathHelper.cos(f);
         float j = MathHelper.sin(g);
@@ -225,40 +225,40 @@ public enum Direction implements StringIdentifiable
 
     @Nullable
     @Environment(value=EnvType.CLIENT)
-    public static Direction byName(@Nullable String string) {
-        if (string == null) {
+    public static Direction byName(@Nullable String name) {
+        if (name == null) {
             return null;
         }
-        return NAME_MAP.get(string.toLowerCase(Locale.ROOT));
+        return NAME_MAP.get(name.toLowerCase(Locale.ROOT));
     }
 
-    public static Direction byId(int i) {
-        return VALUES[MathHelper.abs(i % VALUES.length)];
+    public static Direction byId(int id) {
+        return VALUES[MathHelper.abs(id % VALUES.length)];
     }
 
-    public static Direction fromHorizontal(int i) {
-        return HORIZONTAL[MathHelper.abs(i % HORIZONTAL.length)];
+    public static Direction fromHorizontal(int value) {
+        return HORIZONTAL[MathHelper.abs(value % HORIZONTAL.length)];
     }
 
     @Nullable
-    public static Direction fromVector(int i, int j, int k) {
-        return (Direction)VECTOR_TO_DIRECTION.get(BlockPos.asLong(i, j, k));
+    public static Direction fromVector(int x, int y, int z) {
+        return (Direction)VECTOR_TO_DIRECTION.get(BlockPos.asLong(x, y, z));
     }
 
-    public static Direction fromRotation(double d) {
-        return Direction.fromHorizontal(MathHelper.floor(d / 90.0 + 0.5) & 3);
+    public static Direction fromRotation(double rotation) {
+        return Direction.fromHorizontal(MathHelper.floor(rotation / 90.0 + 0.5) & 3);
     }
 
-    public static Direction from(Axis arg, AxisDirection arg2) {
-        switch (arg) {
+    public static Direction from(Axis axis, AxisDirection direction) {
+        switch (axis) {
             case X: {
-                return arg2 == AxisDirection.POSITIVE ? EAST : WEST;
+                return direction == AxisDirection.POSITIVE ? EAST : WEST;
             }
             case Y: {
-                return arg2 == AxisDirection.POSITIVE ? UP : DOWN;
+                return direction == AxisDirection.POSITIVE ? UP : DOWN;
             }
         }
-        return arg2 == AxisDirection.POSITIVE ? SOUTH : NORTH;
+        return direction == AxisDirection.POSITIVE ? SOUTH : NORTH;
     }
 
     public float asRotation() {
@@ -269,15 +269,15 @@ public enum Direction implements StringIdentifiable
         return Util.getRandom(ALL, random);
     }
 
-    public static Direction getFacing(double d, double e, double f) {
-        return Direction.getFacing((float)d, (float)e, (float)f);
+    public static Direction getFacing(double x, double y, double z) {
+        return Direction.getFacing((float)x, (float)y, (float)z);
     }
 
-    public static Direction getFacing(float f, float g, float h) {
+    public static Direction getFacing(float x, float y, float z) {
         Direction lv = NORTH;
         float i = Float.MIN_VALUE;
         for (Direction lv2 : ALL) {
-            float j = f * (float)lv2.vector.getX() + g * (float)lv2.vector.getY() + h * (float)lv2.vector.getZ();
+            float j = x * (float)lv2.vector.getX() + y * (float)lv2.vector.getY() + z * (float)lv2.vector.getZ();
             if (!(j > i)) continue;
             i = j;
             lv = lv2;
@@ -294,12 +294,12 @@ public enum Direction implements StringIdentifiable
         return this.name;
     }
 
-    public static Direction get(AxisDirection arg, Axis arg2) {
+    public static Direction get(AxisDirection direction, Axis axis) {
         for (Direction lv : ALL) {
-            if (lv.getDirection() != arg || lv.getAxis() != arg2) continue;
+            if (lv.getDirection() != direction || lv.getAxis() != axis) continue;
             return lv;
         }
-        throw new IllegalArgumentException("No such direction: " + (Object)((Object)arg) + " " + arg2);
+        throw new IllegalArgumentException("No such direction: " + (Object)((Object)direction) + " " + axis);
     }
 
     public Vec3i getVector() {
@@ -325,8 +325,8 @@ public enum Direction implements StringIdentifiable
         private final Direction[] facingArray;
         private final Axis[] axisArray;
 
-        private Type(Direction[] args, Axis[] args2) {
-            this.facingArray = args;
+        private Type(Direction[] directions, Axis[] args2) {
+            this.facingArray = directions;
             this.axisArray = args2;
         }
 
@@ -349,8 +349,8 @@ public enum Direction implements StringIdentifiable
         }
 
         @Override
-        public /* synthetic */ boolean test(@Nullable Object object) {
-            return this.test((Direction)object);
+        public /* synthetic */ boolean test(@Nullable Object direction) {
+            return this.test((Direction)direction);
         }
     }
 
@@ -361,9 +361,9 @@ public enum Direction implements StringIdentifiable
         private final int offset;
         private final String desc;
 
-        private AxisDirection(int j, String string2) {
-            this.offset = j;
-            this.desc = string2;
+        private AxisDirection(int offset, String description) {
+            this.offset = offset;
+            this.desc = description;
         }
 
         public int offset() {
@@ -385,13 +385,13 @@ public enum Direction implements StringIdentifiable
         X("x"){
 
             @Override
-            public int choose(int i, int j, int k) {
-                return i;
+            public int choose(int x, int y, int z) {
+                return x;
             }
 
             @Override
-            public double choose(double d, double e, double f) {
-                return d;
+            public double choose(double x, double y, double z) {
+                return x;
             }
 
             @Override
@@ -403,13 +403,13 @@ public enum Direction implements StringIdentifiable
         Y("y"){
 
             @Override
-            public int choose(int i, int j, int k) {
-                return j;
+            public int choose(int x, int y, int z) {
+                return y;
             }
 
             @Override
-            public double choose(double d, double e, double f) {
-                return e;
+            public double choose(double x, double y, double z) {
+                return y;
             }
 
             @Override
@@ -421,13 +421,13 @@ public enum Direction implements StringIdentifiable
         Z("z"){
 
             @Override
-            public int choose(int i, int j, int k) {
-                return k;
+            public int choose(int x, int y, int z) {
+                return z;
             }
 
             @Override
-            public double choose(double d, double e, double f) {
-                return f;
+            public double choose(double x, double y, double z) {
+                return z;
             }
 
             @Override
@@ -446,8 +446,8 @@ public enum Direction implements StringIdentifiable
         }
 
         @Nullable
-        public static Axis fromName(String string) {
-            return BY_NAME.get(string.toLowerCase(Locale.ROOT));
+        public static Axis fromName(String name) {
+            return BY_NAME.get(name.toLowerCase(Locale.ROOT));
         }
 
         public String getName() {
@@ -504,7 +504,7 @@ public enum Direction implements StringIdentifiable
 
         static {
             field_23780 = Axis.values();
-            field_25065 = StringIdentifiable.method_28140(Axis::values, Axis::fromName);
+            field_25065 = StringIdentifiable.createCodec(Axis::values, Axis::fromName);
             BY_NAME = Arrays.stream(field_23780).collect(Collectors.toMap(Axis::getName, arg -> arg));
         }
     }

@@ -25,25 +25,25 @@ implements Packet<ServerPlayPacketListener> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public CustomPayloadC2SPacket(Identifier arg, PacketByteBuf arg2) {
-        this.channel = arg;
-        this.data = arg2;
+    public CustomPayloadC2SPacket(Identifier channel, PacketByteBuf data) {
+        this.channel = channel;
+        this.data = data;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.channel = arg.readIdentifier();
-        int i = arg.readableBytes();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.channel = buf.readIdentifier();
+        int i = buf.readableBytes();
         if (i < 0 || i > 32767) {
             throw new IOException("Payload may not be larger than 32767 bytes");
         }
-        this.data = new PacketByteBuf(arg.readBytes(i));
+        this.data = new PacketByteBuf(buf.readBytes(i));
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeIdentifier(this.channel);
-        arg.writeBytes(this.data);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeIdentifier(this.channel);
+        buf.writeBytes(this.data);
     }
 
     @Override

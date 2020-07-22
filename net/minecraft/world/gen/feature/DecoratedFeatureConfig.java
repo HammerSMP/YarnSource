@@ -13,6 +13,8 @@ import com.mojang.datafixers.kinds.App;
 import com.mojang.datafixers.kinds.Applicative;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.gen.decorator.ConfiguredDecorator;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
@@ -21,17 +23,22 @@ import net.minecraft.world.gen.feature.FeatureConfig;
 
 public class DecoratedFeatureConfig
 implements FeatureConfig {
-    public static final Codec<DecoratedFeatureConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)ConfiguredFeature.CODEC.fieldOf("feature").forGetter(arg -> arg.feature), (App)ConfiguredDecorator.field_24981.fieldOf("decorator").forGetter(arg -> arg.decorator)).apply((Applicative)instance, DecoratedFeatureConfig::new));
-    public final ConfiguredFeature<?, ?> feature;
+    public static final Codec<DecoratedFeatureConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)ConfiguredFeature.CODEC.fieldOf("feature").forGetter(arg -> arg.feature), (App)ConfiguredDecorator.CODEC.fieldOf("decorator").forGetter(arg -> arg.decorator)).apply((Applicative)instance, DecoratedFeatureConfig::new));
+    public final Supplier<ConfiguredFeature<?, ?>> feature;
     public final ConfiguredDecorator<?> decorator;
 
-    public DecoratedFeatureConfig(ConfiguredFeature<?, ?> arg, ConfiguredDecorator<?> arg2) {
-        this.feature = arg;
-        this.decorator = arg2;
+    public DecoratedFeatureConfig(Supplier<ConfiguredFeature<?, ?>> supplier, ConfiguredDecorator<?> arg) {
+        this.feature = supplier;
+        this.decorator = arg;
     }
 
     public String toString() {
-        return String.format("< %s [%s | %s] >", this.getClass().getSimpleName(), Registry.FEATURE.getId((Feature<?>)this.feature.feature), Registry.DECORATOR.getId(this.decorator.decorator));
+        return String.format("< %s [%s | %s] >", this.getClass().getSimpleName(), Registry.FEATURE.getId((Feature<?>)this.feature.get().getFeature()), this.decorator);
+    }
+
+    @Override
+    public Stream<ConfiguredFeature<?, ?>> method_30649() {
+        return this.feature.get().method_30648();
     }
 }
 

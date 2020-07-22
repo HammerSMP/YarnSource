@@ -19,9 +19,9 @@ extends PrintStream {
     protected static final Logger LOGGER = LogManager.getLogger();
     protected final String name;
 
-    public LoggerPrintStream(String string, OutputStream outputStream) {
-        super(outputStream);
-        this.name = string;
+    public LoggerPrintStream(String name, OutputStream out) {
+        super(out);
+        this.name = name;
     }
 
     @Override
@@ -34,8 +34,8 @@ extends PrintStream {
         this.log(String.valueOf(object));
     }
 
-    protected void log(@Nullable String string) {
-        LOGGER.info("[{}]: {}", (Object)this.name, (Object)string);
+    protected void log(@Nullable String message) {
+        LOGGER.info("[{}]: {}", (Object)this.name, (Object)message);
     }
 }
 

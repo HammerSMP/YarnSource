@@ -33,8 +33,8 @@ extends MessageToByteEncoder<Packet<?>> {
     private static final Marker MARKER = MarkerManager.getMarker((String)"PACKET_SENT", (Marker)ClientConnection.MARKER_NETWORK_PACKETS);
     private final NetworkSide side;
 
-    public PacketEncoder(NetworkSide arg) {
-        this.side = arg;
+    public PacketEncoder(NetworkSide side) {
+        this.side = side;
     }
 
     protected void encode(ChannelHandlerContext channelHandlerContext, Packet<?> arg, ByteBuf byteBuf) throws Exception {
@@ -63,8 +63,8 @@ extends MessageToByteEncoder<Packet<?>> {
         }
     }
 
-    protected /* synthetic */ void encode(ChannelHandlerContext channelHandlerContext, Object object, ByteBuf byteBuf) throws Exception {
-        this.encode(channelHandlerContext, (Packet)object, byteBuf);
+    protected /* synthetic */ void encode(ChannelHandlerContext ctx, Object packet, ByteBuf out) throws Exception {
+        this.encode(ctx, (Packet)packet, out);
     }
 }
 

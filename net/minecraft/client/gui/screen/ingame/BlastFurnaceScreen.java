@@ -21,8 +21,8 @@ public class BlastFurnaceScreen
 extends AbstractFurnaceScreen<BlastFurnaceScreenHandler> {
     private static final Identifier TEXTURE = new Identifier("textures/gui/container/blast_furnace.png");
 
-    public BlastFurnaceScreen(BlastFurnaceScreenHandler arg, PlayerInventory arg2, Text arg3) {
-        super(arg, new BlastFurnaceRecipeBookScreen(), arg2, arg3, TEXTURE);
+    public BlastFurnaceScreen(BlastFurnaceScreenHandler container, PlayerInventory inventory, Text title) {
+        super(container, new BlastFurnaceRecipeBookScreen(), inventory, title, TEXTURE);
     }
 }
 

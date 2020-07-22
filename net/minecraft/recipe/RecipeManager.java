@@ -83,20 +83,20 @@ extends JsonDataLoader {
         LOGGER.info("Loaded {} recipes", (Object)map2.size());
     }
 
-    public <C extends Inventory, T extends Recipe<C>> Optional<T> getFirstMatch(RecipeType<T> arg, C arg2, World arg3) {
-        return this.getAllOfType(arg).values().stream().flatMap(arg4 -> Util.stream(arg.get(arg4, arg3, arg2))).findFirst();
+    public <C extends Inventory, T extends Recipe<C>> Optional<T> getFirstMatch(RecipeType<T> type, C inventory, World world) {
+        return this.getAllOfType(type).values().stream().flatMap(arg4 -> Util.stream(type.get(arg4, world, inventory))).findFirst();
     }
 
-    public <C extends Inventory, T extends Recipe<C>> List<T> method_30027(RecipeType<T> arg2) {
+    public <C extends Inventory, T extends Recipe<C>> List<T> listAllOfType(RecipeType<T> arg2) {
         return this.getAllOfType(arg2).values().stream().map(arg -> arg).collect(Collectors.toList());
     }
 
-    public <C extends Inventory, T extends Recipe<C>> List<T> getAllMatches(RecipeType<T> arg2, C arg22, World arg3) {
-        return this.getAllOfType(arg2).values().stream().flatMap(arg4 -> Util.stream(arg2.get(arg4, arg3, arg22))).sorted(Comparator.comparing(arg -> arg.getOutput().getTranslationKey())).collect(Collectors.toList());
+    public <C extends Inventory, T extends Recipe<C>> List<T> getAllMatches(RecipeType<T> type, C inventory, World world) {
+        return this.getAllOfType(type).values().stream().flatMap(arg4 -> Util.stream(type.get(arg4, world, inventory))).sorted(Comparator.comparing(arg -> arg.getOutput().getTranslationKey())).collect(Collectors.toList());
     }
 
-    private <C extends Inventory, T extends Recipe<C>> Map<Identifier, Recipe<C>> getAllOfType(RecipeType<T> arg) {
-        return this.recipes.getOrDefault(arg, Collections.emptyMap());
+    private <C extends Inventory, T extends Recipe<C>> Map<Identifier, Recipe<C>> getAllOfType(RecipeType<T> type) {
+        return this.recipes.getOrDefault(type, Collections.emptyMap());
     }
 
     public <C extends Inventory, T extends Recipe<C>> DefaultedList<ItemStack> getRemainingStacks(RecipeType<T> arg, C arg2, World arg3) {
@@ -111,8 +111,8 @@ extends JsonDataLoader {
         return lv;
     }
 
-    public Optional<? extends Recipe<?>> get(Identifier arg) {
-        return this.recipes.values().stream().map(map -> (Recipe)map.get(arg)).filter(Objects::nonNull).findFirst();
+    public Optional<? extends Recipe<?>> get(Identifier id) {
+        return this.recipes.values().stream().map(map -> (Recipe)map.get(id)).filter(Objects::nonNull).findFirst();
     }
 
     public Collection<Recipe<?>> values() {
@@ -123,16 +123,16 @@ extends JsonDataLoader {
         return this.recipes.values().stream().flatMap(map -> map.keySet().stream());
     }
 
-    public static Recipe<?> deserialize(Identifier arg, JsonObject jsonObject) {
-        String string = JsonHelper.getString(jsonObject, "type");
-        return Registry.RECIPE_SERIALIZER.getOrEmpty(new Identifier(string)).orElseThrow(() -> new JsonSyntaxException("Invalid or unsupported recipe type '" + string + "'")).read(arg, jsonObject);
+    public static Recipe<?> deserialize(Identifier id, JsonObject json) {
+        String string = JsonHelper.getString(json, "type");
+        return Registry.RECIPE_SERIALIZER.getOrEmpty(new Identifier(string)).orElseThrow(() -> new JsonSyntaxException("Invalid or unsupported recipe type '" + string + "'")).read(id, json);
     }
 
     @Environment(value=EnvType.CLIENT)
-    public void setRecipes(Iterable<Recipe<?>> iterable) {
+    public void setRecipes(Iterable<Recipe<?>> recipes) {
         this.errored = false;
         HashMap map = Maps.newHashMap();
-        iterable.forEach(arg2 -> {
+        recipes.forEach(arg2 -> {
             Map map2 = map.computeIfAbsent(arg2.getType(), arg -> Maps.newHashMap());
             Recipe lv = map2.put(arg2.getId(), arg2);
             if (lv != null) {

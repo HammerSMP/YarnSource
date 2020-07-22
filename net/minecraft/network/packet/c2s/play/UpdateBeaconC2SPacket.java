@@ -23,21 +23,21 @@ implements Packet<ServerPlayPacketListener> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public UpdateBeaconC2SPacket(int i, int j) {
-        this.primaryEffectId = i;
-        this.secondaryEffectId = j;
+    public UpdateBeaconC2SPacket(int primaryEffectId, int secondaryEffectId) {
+        this.primaryEffectId = primaryEffectId;
+        this.secondaryEffectId = secondaryEffectId;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.primaryEffectId = arg.readVarInt();
-        this.secondaryEffectId = arg.readVarInt();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.primaryEffectId = buf.readVarInt();
+        this.secondaryEffectId = buf.readVarInt();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeVarInt(this.primaryEffectId);
-        arg.writeVarInt(this.secondaryEffectId);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeVarInt(this.primaryEffectId);
+        buf.writeVarInt(this.secondaryEffectId);
     }
 
     @Override

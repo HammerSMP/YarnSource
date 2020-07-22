@@ -42,67 +42,67 @@ FluidFillable {
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
         return SHAPE;
     }
 
     @Override
-    protected boolean canPlantOnTop(BlockState arg, BlockView arg2, BlockPos arg3) {
-        return arg.isSideSolidFullSquare(arg2, arg3, Direction.UP) && !arg.isOf(Blocks.MAGMA_BLOCK);
+    protected boolean canPlantOnTop(BlockState floor, BlockView world, BlockPos pos) {
+        return floor.isSideSolidFullSquare(world, pos, Direction.UP) && !floor.isOf(Blocks.MAGMA_BLOCK);
     }
 
     @Override
     @Nullable
-    public BlockState getPlacementState(ItemPlacementContext arg) {
-        FluidState lv = arg.getWorld().getFluidState(arg.getBlockPos());
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        FluidState lv = ctx.getWorld().getFluidState(ctx.getBlockPos());
         if (lv.isIn(FluidTags.WATER) && lv.getLevel() == 8) {
-            return super.getPlacementState(arg);
+            return super.getPlacementState(ctx);
         }
         return null;
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
-        BlockState lv = super.getStateForNeighborUpdate(arg, arg2, arg3, arg4, arg5, arg6);
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
+        BlockState lv = super.getStateForNeighborUpdate(state, direction, newState, world, pos, posFrom);
         if (!lv.isAir()) {
-            arg4.getFluidTickScheduler().schedule(arg5, Fluids.WATER, Fluids.WATER.getTickRate(arg4));
+            world.getFluidTickScheduler().schedule(pos, Fluids.WATER, Fluids.WATER.getTickRate(world));
         }
         return lv;
     }
 
     @Override
-    public boolean isFertilizable(BlockView arg, BlockPos arg2, BlockState arg3, boolean bl) {
+    public boolean isFertilizable(BlockView world, BlockPos pos, BlockState state, boolean isClient) {
         return true;
     }
 
     @Override
-    public boolean canGrow(World arg, Random random, BlockPos arg2, BlockState arg3) {
+    public boolean canGrow(World world, Random random, BlockPos pos, BlockState state) {
         return true;
     }
 
     @Override
-    public FluidState getFluidState(BlockState arg) {
+    public FluidState getFluidState(BlockState state) {
         return Fluids.WATER.getStill(false);
     }
 
     @Override
-    public void grow(ServerWorld arg, Random random, BlockPos arg2, BlockState arg3) {
+    public void grow(ServerWorld world, Random random, BlockPos pos, BlockState state) {
         BlockState lv = Blocks.TALL_SEAGRASS.getDefaultState();
         BlockState lv2 = (BlockState)lv.with(TallSeagrassBlock.HALF, DoubleBlockHalf.UPPER);
-        BlockPos lv3 = arg2.up();
-        if (arg.getBlockState(lv3).isOf(Blocks.WATER)) {
-            arg.setBlockState(arg2, lv, 2);
-            arg.setBlockState(lv3, lv2, 2);
+        BlockPos lv3 = pos.up();
+        if (world.getBlockState(lv3).isOf(Blocks.WATER)) {
+            world.setBlockState(pos, lv, 2);
+            world.setBlockState(lv3, lv2, 2);
         }
     }
 
     @Override
-    public boolean canFillWithFluid(BlockView arg, BlockPos arg2, BlockState arg3, Fluid arg4) {
+    public boolean canFillWithFluid(BlockView world, BlockPos pos, BlockState state, Fluid fluid) {
         return false;
     }
 
     @Override
-    public boolean tryFillWithFluid(WorldAccess arg, BlockPos arg2, BlockState arg3, FluidState arg4) {
+    public boolean tryFillWithFluid(WorldAccess world, BlockPos pos, BlockState state, FluidState fluidState) {
         return false;
     }
 }

@@ -47,8 +47,8 @@ public class ReloadCommand {
         return collection2;
     }
 
-    public static void register(CommandDispatcher<ServerCommandSource> commandDispatcher) {
-        commandDispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)CommandManager.literal("reload").requires(arg -> arg.hasPermissionLevel(2))).executes(commandContext -> {
+    public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
+        dispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)CommandManager.literal("reload").requires(arg -> arg.hasPermissionLevel(2))).executes(commandContext -> {
             ServerCommandSource lv = (ServerCommandSource)commandContext.getSource();
             MinecraftServer minecraftServer = lv.getMinecraftServer();
             ResourcePackManager lv2 = minecraftServer.getDataPackManager();

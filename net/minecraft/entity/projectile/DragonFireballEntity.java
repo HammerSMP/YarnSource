@@ -31,19 +31,19 @@ extends ExplosiveProjectileEntity {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public DragonFireballEntity(World arg, double d, double e, double f, double g, double h, double i) {
-        super(EntityType.DRAGON_FIREBALL, d, e, f, g, h, i, arg);
+    public DragonFireballEntity(World world, double x, double y, double z, double directionX, double directionY, double directionZ) {
+        super(EntityType.DRAGON_FIREBALL, x, y, z, directionX, directionY, directionZ, world);
     }
 
-    public DragonFireballEntity(World arg, LivingEntity arg2, double d, double e, double f) {
-        super(EntityType.DRAGON_FIREBALL, arg2, d, e, f, arg);
+    public DragonFireballEntity(World world, LivingEntity owner, double directionX, double directionY, double directionZ) {
+        super(EntityType.DRAGON_FIREBALL, owner, directionX, directionY, directionZ, world);
     }
 
     @Override
-    protected void onCollision(HitResult arg) {
-        super.onCollision(arg);
+    protected void onCollision(HitResult hitResult) {
+        super.onCollision(hitResult);
         Entity lv = this.getOwner();
-        if (arg.getType() == HitResult.Type.ENTITY && ((EntityHitResult)arg).getEntity().isPartOf(lv)) {
+        if (hitResult.getType() == HitResult.Type.ENTITY && ((EntityHitResult)hitResult).getEntity().isPartOf(lv)) {
             return;
         }
         if (!this.world.isClient) {
@@ -77,7 +77,7 @@ extends ExplosiveProjectileEntity {
     }
 
     @Override
-    public boolean damage(DamageSource arg, float f) {
+    public boolean damage(DamageSource source, float amount) {
         return false;
     }
 

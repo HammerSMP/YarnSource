@@ -24,10 +24,10 @@ implements Packet<ClientPlayPacketListener> {
     public ScreenHandlerSlotUpdateS2CPacket() {
     }
 
-    public ScreenHandlerSlotUpdateS2CPacket(int i, int j, ItemStack arg) {
-        this.syncId = i;
-        this.slot = j;
-        this.stack = arg.copy();
+    public ScreenHandlerSlotUpdateS2CPacket(int syncId, int slot, ItemStack stack) {
+        this.syncId = syncId;
+        this.slot = slot;
+        this.stack = stack.copy();
     }
 
     @Override
@@ -36,17 +36,17 @@ implements Packet<ClientPlayPacketListener> {
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.syncId = arg.readByte();
-        this.slot = arg.readShort();
-        this.stack = arg.readItemStack();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.syncId = buf.readByte();
+        this.slot = buf.readShort();
+        this.stack = buf.readItemStack();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeByte(this.syncId);
-        arg.writeShort(this.slot);
-        arg.writeItemStack(this.stack);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeByte(this.syncId);
+        buf.writeShort(this.slot);
+        buf.writeItemStack(this.stack);
     }
 
     @Environment(value=EnvType.CLIENT)

@@ -17,10 +17,10 @@ public class ChatHudLine {
     private final StringRenderable text;
     private final int id;
 
-    public ChatHudLine(int i, StringRenderable arg, int j) {
+    public ChatHudLine(int creationTick, StringRenderable arg, int id) {
         this.text = arg;
-        this.creationTick = i;
-        this.id = j;
+        this.creationTick = creationTick;
+        this.id = id;
     }
 
     public StringRenderable getText() {

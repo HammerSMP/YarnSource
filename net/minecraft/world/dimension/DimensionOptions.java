@@ -45,8 +45,8 @@ public final class DimensionOptions {
     private final Supplier<DimensionType> dimensionTypeSupplier;
     private final ChunkGenerator chunkGenerator;
 
-    public DimensionOptions(Supplier<DimensionType> supplier, ChunkGenerator arg) {
-        this.dimensionTypeSupplier = supplier;
+    public DimensionOptions(Supplier<DimensionType> typeSupplier, ChunkGenerator arg) {
+        this.dimensionTypeSupplier = typeSupplier;
         this.chunkGenerator = arg;
     }
 
@@ -81,7 +81,7 @@ public final class DimensionOptions {
         return lv;
     }
 
-    public static boolean method_29567(long l, SimpleRegistry<DimensionOptions> arg) {
+    public static boolean method_29567(long seed, SimpleRegistry<DimensionOptions> arg) {
         ArrayList list = Lists.newArrayList(arg.getEntries());
         if (list.size() != BASE_DIMENSIONS.size()) {
             return false;
@@ -106,24 +106,24 @@ public final class DimensionOptions {
         }
         SurfaceChunkGenerator lv = (SurfaceChunkGenerator)((DimensionOptions)entry2.getValue()).getChunkGenerator();
         SurfaceChunkGenerator lv2 = (SurfaceChunkGenerator)((DimensionOptions)entry3.getValue()).getChunkGenerator();
-        if (!lv.method_28548(l, ChunkGeneratorType.Preset.NETHER)) {
+        if (!lv.method_28548(seed, ChunkGeneratorType.field_26357)) {
             return false;
         }
-        if (!lv2.method_28548(l, ChunkGeneratorType.Preset.END)) {
+        if (!lv2.method_28548(seed, ChunkGeneratorType.field_26358)) {
             return false;
         }
         if (!(lv.getBiomeSource() instanceof MultiNoiseBiomeSource)) {
             return false;
         }
         MultiNoiseBiomeSource lv3 = (MultiNoiseBiomeSource)lv.getBiomeSource();
-        if (!lv3.method_28462(l)) {
+        if (!lv3.method_28462(seed)) {
             return false;
         }
         if (!(lv2.getBiomeSource() instanceof TheEndBiomeSource)) {
             return false;
         }
         TheEndBiomeSource lv4 = (TheEndBiomeSource)lv2.getBiomeSource();
-        return lv4.method_28479(l);
+        return lv4.method_28479(seed);
     }
 }
 

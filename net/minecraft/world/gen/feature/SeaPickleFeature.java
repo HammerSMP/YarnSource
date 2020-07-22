@@ -14,24 +14,25 @@ import net.minecraft.block.SeaPickleBlock;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.ServerWorldAccess;
+import net.minecraft.world.gen.CountConfig;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.feature.Feature;
-import net.minecraft.world.gen.feature.SeaPickleFeatureConfig;
 
 public class SeaPickleFeature
-extends Feature<SeaPickleFeatureConfig> {
-    public SeaPickleFeature(Codec<SeaPickleFeatureConfig> codec) {
+extends Feature<CountConfig> {
+    public SeaPickleFeature(Codec<CountConfig> codec) {
         super(codec);
     }
 
     @Override
-    public boolean generate(ServerWorldAccess arg, ChunkGenerator arg2, Random random, BlockPos arg3, SeaPickleFeatureConfig arg4) {
+    public boolean generate(ServerWorldAccess arg, ChunkGenerator arg2, Random random, BlockPos arg3, CountConfig arg4) {
         int i = 0;
-        for (int j = 0; j < arg4.count; ++j) {
-            int k = random.nextInt(8) - random.nextInt(8);
+        int j = arg4.method_30396().getValue(random);
+        for (int k = 0; k < j; ++k) {
             int l = random.nextInt(8) - random.nextInt(8);
-            int m = arg.getTopY(Heightmap.Type.OCEAN_FLOOR, arg3.getX() + k, arg3.getZ() + l);
-            BlockPos lv = new BlockPos(arg3.getX() + k, m, arg3.getZ() + l);
+            int m = random.nextInt(8) - random.nextInt(8);
+            int n = arg.getTopY(Heightmap.Type.OCEAN_FLOOR, arg3.getX() + l, arg3.getZ() + m);
+            BlockPos lv = new BlockPos(arg3.getX() + l, n, arg3.getZ() + m);
             BlockState lv2 = (BlockState)Blocks.SEA_PICKLE.getDefaultState().with(SeaPickleBlock.PICKLES, random.nextInt(4) + 1);
             if (!arg.getBlockState(lv).isOf(Blocks.WATER) || !lv2.canPlaceAt(arg, lv)) continue;
             arg.setBlockState(lv, lv2, 2);

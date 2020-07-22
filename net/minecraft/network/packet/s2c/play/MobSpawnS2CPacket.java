@@ -37,18 +37,18 @@ implements Packet<ClientPlayPacketListener> {
     public MobSpawnS2CPacket() {
     }
 
-    public MobSpawnS2CPacket(LivingEntity arg) {
-        this.id = arg.getEntityId();
-        this.uuid = arg.getUuid();
-        this.entityTypeId = Registry.ENTITY_TYPE.getRawId(arg.getType());
-        this.x = arg.getX();
-        this.y = arg.getY();
-        this.z = arg.getZ();
-        this.yaw = (byte)(arg.yaw * 256.0f / 360.0f);
-        this.pitch = (byte)(arg.pitch * 256.0f / 360.0f);
-        this.headYaw = (byte)(arg.headYaw * 256.0f / 360.0f);
+    public MobSpawnS2CPacket(LivingEntity entity) {
+        this.id = entity.getEntityId();
+        this.uuid = entity.getUuid();
+        this.entityTypeId = Registry.ENTITY_TYPE.getRawId(entity.getType());
+        this.x = entity.getX();
+        this.y = entity.getY();
+        this.z = entity.getZ();
+        this.yaw = (byte)(entity.yaw * 256.0f / 360.0f);
+        this.pitch = (byte)(entity.pitch * 256.0f / 360.0f);
+        this.headYaw = (byte)(entity.headYaw * 256.0f / 360.0f);
         double d = 3.9;
-        Vec3d lv = arg.getVelocity();
+        Vec3d lv = entity.getVelocity();
         double e = MathHelper.clamp(lv.x, -3.9, 3.9);
         double f = MathHelper.clamp(lv.y, -3.9, 3.9);
         double g = MathHelper.clamp(lv.z, -3.9, 3.9);
@@ -58,35 +58,35 @@ implements Packet<ClientPlayPacketListener> {
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.id = arg.readVarInt();
-        this.uuid = arg.readUuid();
-        this.entityTypeId = arg.readVarInt();
-        this.x = arg.readDouble();
-        this.y = arg.readDouble();
-        this.z = arg.readDouble();
-        this.yaw = arg.readByte();
-        this.pitch = arg.readByte();
-        this.headYaw = arg.readByte();
-        this.velocityX = arg.readShort();
-        this.velocityY = arg.readShort();
-        this.velocityZ = arg.readShort();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.id = buf.readVarInt();
+        this.uuid = buf.readUuid();
+        this.entityTypeId = buf.readVarInt();
+        this.x = buf.readDouble();
+        this.y = buf.readDouble();
+        this.z = buf.readDouble();
+        this.yaw = buf.readByte();
+        this.pitch = buf.readByte();
+        this.headYaw = buf.readByte();
+        this.velocityX = buf.readShort();
+        this.velocityY = buf.readShort();
+        this.velocityZ = buf.readShort();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeVarInt(this.id);
-        arg.writeUuid(this.uuid);
-        arg.writeVarInt(this.entityTypeId);
-        arg.writeDouble(this.x);
-        arg.writeDouble(this.y);
-        arg.writeDouble(this.z);
-        arg.writeByte(this.yaw);
-        arg.writeByte(this.pitch);
-        arg.writeByte(this.headYaw);
-        arg.writeShort(this.velocityX);
-        arg.writeShort(this.velocityY);
-        arg.writeShort(this.velocityZ);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeVarInt(this.id);
+        buf.writeUuid(this.uuid);
+        buf.writeVarInt(this.entityTypeId);
+        buf.writeDouble(this.x);
+        buf.writeDouble(this.y);
+        buf.writeDouble(this.z);
+        buf.writeByte(this.yaw);
+        buf.writeByte(this.pitch);
+        buf.writeByte(this.headYaw);
+        buf.writeShort(this.velocityX);
+        buf.writeShort(this.velocityY);
+        buf.writeShort(this.velocityZ);
     }
 
     @Override

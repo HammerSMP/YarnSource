@@ -15,7 +15,7 @@ import com.google.gson.JsonElement;
 import com.mojang.brigadier.CommandDispatcher;
 import java.io.IOException;
 import java.nio.file.Path;
-import net.minecraft.command.arguments.ArgumentTypes;
+import net.minecraft.command.argument.ArgumentTypes;
 import net.minecraft.data.DataCache;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
@@ -32,10 +32,10 @@ implements DataProvider {
     }
 
     @Override
-    public void run(DataCache arg) throws IOException {
+    public void run(DataCache cache) throws IOException {
         Path path = this.root.getOutput().resolve("reports/commands.json");
         CommandDispatcher<ServerCommandSource> commandDispatcher = new CommandManager(CommandManager.RegistrationEnvironment.ALL).getDispatcher();
-        DataProvider.writeToPath(GSON, arg, (JsonElement)ArgumentTypes.toJson(commandDispatcher, commandDispatcher.getRoot()), path);
+        DataProvider.writeToPath(GSON, cache, (JsonElement)ArgumentTypes.toJson(commandDispatcher, commandDispatcher.getRoot()), path);
     }
 
     @Override

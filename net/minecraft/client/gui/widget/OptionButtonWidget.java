@@ -18,9 +18,9 @@ public class OptionButtonWidget
 extends ButtonWidget {
     private final Option option;
 
-    public OptionButtonWidget(int i, int j, int k, int l, Option arg, Text arg2, ButtonWidget.PressAction arg3) {
-        super(i, j, k, l, arg2, arg3);
-        this.option = arg;
+    public OptionButtonWidget(int x, int y, int width, int height, Option option, Text arg2, ButtonWidget.PressAction pressAction) {
+        super(x, y, width, height, arg2, pressAction);
+        this.option = option;
     }
 
     public Option getOption() {

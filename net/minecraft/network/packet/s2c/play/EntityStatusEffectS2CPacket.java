@@ -27,39 +27,39 @@ implements Packet<ClientPlayPacketListener> {
     public EntityStatusEffectS2CPacket() {
     }
 
-    public EntityStatusEffectS2CPacket(int i, StatusEffectInstance arg) {
-        this.entityId = i;
-        this.effectId = (byte)(StatusEffect.getRawId(arg.getEffectType()) & 0xFF);
-        this.amplifier = (byte)(arg.getAmplifier() & 0xFF);
-        this.duration = arg.getDuration() > 32767 ? 32767 : arg.getDuration();
+    public EntityStatusEffectS2CPacket(int entityId, StatusEffectInstance effect) {
+        this.entityId = entityId;
+        this.effectId = (byte)(StatusEffect.getRawId(effect.getEffectType()) & 0xFF);
+        this.amplifier = (byte)(effect.getAmplifier() & 0xFF);
+        this.duration = effect.getDuration() > 32767 ? 32767 : effect.getDuration();
         this.flags = 0;
-        if (arg.isAmbient()) {
+        if (effect.isAmbient()) {
             this.flags = (byte)(this.flags | 1);
         }
-        if (arg.shouldShowParticles()) {
+        if (effect.shouldShowParticles()) {
             this.flags = (byte)(this.flags | 2);
         }
-        if (arg.shouldShowIcon()) {
+        if (effect.shouldShowIcon()) {
             this.flags = (byte)(this.flags | 4);
         }
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.entityId = arg.readVarInt();
-        this.effectId = arg.readByte();
-        this.amplifier = arg.readByte();
-        this.duration = arg.readVarInt();
-        this.flags = arg.readByte();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.entityId = buf.readVarInt();
+        this.effectId = buf.readByte();
+        this.amplifier = buf.readByte();
+        this.duration = buf.readVarInt();
+        this.flags = buf.readByte();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeVarInt(this.entityId);
-        arg.writeByte(this.effectId);
-        arg.writeByte(this.amplifier);
-        arg.writeVarInt(this.duration);
-        arg.writeByte(this.flags);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeVarInt(this.entityId);
+        buf.writeByte(this.effectId);
+        buf.writeByte(this.amplifier);
+        buf.writeVarInt(this.duration);
+        buf.writeByte(this.flags);
     }
 
     @Environment(value=EnvType.CLIENT)

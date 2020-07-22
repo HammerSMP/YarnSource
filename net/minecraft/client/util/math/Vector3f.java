@@ -30,24 +30,24 @@ public final class Vector3f {
     public Vector3f() {
     }
 
-    public Vector3f(float f, float g, float h) {
-        this.x = f;
-        this.y = g;
-        this.z = h;
+    public Vector3f(float x, float y, float z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
     }
 
-    public Vector3f(Vec3d arg) {
-        this((float)arg.x, (float)arg.y, (float)arg.z);
+    public Vector3f(Vec3d other) {
+        this((float)other.x, (float)other.y, (float)other.z);
     }
 
-    public boolean equals(Object object) {
-        if (this == object) {
+    public boolean equals(Object o) {
+        if (this == o) {
             return true;
         }
-        if (object == null || this.getClass() != object.getClass()) {
+        if (o == null || this.getClass() != o.getClass()) {
             return false;
         }
-        Vector3f lv = (Vector3f)object;
+        Vector3f lv = (Vector3f)o;
         if (Float.compare(lv.x, this.x) != 0) {
             return false;
         }
@@ -77,56 +77,56 @@ public final class Vector3f {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public void scale(float f) {
-        this.x *= f;
-        this.y *= f;
-        this.z *= f;
+    public void scale(float scale) {
+        this.x *= scale;
+        this.y *= scale;
+        this.z *= scale;
     }
 
     @Environment(value=EnvType.CLIENT)
-    public void multiplyComponentwise(float f, float g, float h) {
-        this.x *= f;
-        this.y *= g;
-        this.z *= h;
+    public void multiplyComponentwise(float x, float y, float z) {
+        this.x *= x;
+        this.y *= y;
+        this.z *= z;
     }
 
     @Environment(value=EnvType.CLIENT)
-    public void clamp(float f, float g) {
-        this.x = MathHelper.clamp(this.x, f, g);
-        this.y = MathHelper.clamp(this.y, f, g);
-        this.z = MathHelper.clamp(this.z, f, g);
+    public void clamp(float min, float max) {
+        this.x = MathHelper.clamp(this.x, min, max);
+        this.y = MathHelper.clamp(this.y, min, max);
+        this.z = MathHelper.clamp(this.z, min, max);
     }
 
-    public void set(float f, float g, float h) {
-        this.x = f;
-        this.y = g;
-        this.z = h;
-    }
-
-    @Environment(value=EnvType.CLIENT)
-    public void add(float f, float g, float h) {
-        this.x += f;
-        this.y += g;
-        this.z += h;
+    public void set(float x, float y, float z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
     }
 
     @Environment(value=EnvType.CLIENT)
-    public void add(Vector3f arg) {
-        this.x += arg.x;
-        this.y += arg.y;
-        this.z += arg.z;
+    public void add(float x, float y, float z) {
+        this.x += x;
+        this.y += y;
+        this.z += z;
     }
 
     @Environment(value=EnvType.CLIENT)
-    public void subtract(Vector3f arg) {
-        this.x -= arg.x;
-        this.y -= arg.y;
-        this.z -= arg.z;
+    public void add(Vector3f vector) {
+        this.x += vector.x;
+        this.y += vector.y;
+        this.z += vector.z;
     }
 
     @Environment(value=EnvType.CLIENT)
-    public float dot(Vector3f arg) {
-        return this.x * arg.x + this.y * arg.y + this.z * arg.z;
+    public void subtract(Vector3f other) {
+        this.x -= other.x;
+        this.y -= other.y;
+        this.z -= other.z;
+    }
+
+    @Environment(value=EnvType.CLIENT)
+    public float dot(Vector3f other) {
+        return this.x * other.x + this.y * other.y + this.z * other.z;
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -143,13 +143,13 @@ public final class Vector3f {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public void cross(Vector3f arg) {
+    public void cross(Vector3f vector) {
         float f = this.x;
         float g = this.y;
         float h = this.z;
-        float i = arg.getX();
-        float j = arg.getY();
-        float k = arg.getZ();
+        float i = vector.getX();
+        float j = vector.getY();
+        float k = vector.getZ();
         this.x = g * k - h * j;
         this.y = h * i - f * k;
         this.z = f * j - g * i;
@@ -165,31 +165,31 @@ public final class Vector3f {
         this.z = arg.a20 * f + arg.a21 * g + arg.a22 * h;
     }
 
-    public void rotate(Quaternion arg) {
-        Quaternion lv = new Quaternion(arg);
+    public void rotate(Quaternion rotation) {
+        Quaternion lv = new Quaternion(rotation);
         lv.hamiltonProduct(new Quaternion(this.getX(), this.getY(), this.getZ(), 0.0f));
-        Quaternion lv2 = new Quaternion(arg);
+        Quaternion lv2 = new Quaternion(rotation);
         lv2.conjugate();
         lv.hamiltonProduct(lv2);
         this.set(lv.getX(), lv.getY(), lv.getZ());
     }
 
     @Environment(value=EnvType.CLIENT)
-    public void lerp(Vector3f arg, float f) {
-        float g = 1.0f - f;
-        this.x = this.x * g + arg.x * f;
-        this.y = this.y * g + arg.y * f;
-        this.z = this.z * g + arg.z * f;
+    public void lerp(Vector3f vector, float delta) {
+        float g = 1.0f - delta;
+        this.x = this.x * g + vector.x * delta;
+        this.y = this.y * g + vector.y * delta;
+        this.z = this.z * g + vector.z * delta;
     }
 
     @Environment(value=EnvType.CLIENT)
-    public Quaternion getRadialQuaternion(float f) {
-        return new Quaternion(this, f, false);
+    public Quaternion getRadialQuaternion(float angle) {
+        return new Quaternion(this, angle, false);
     }
 
     @Environment(value=EnvType.CLIENT)
-    public Quaternion getDegreesQuaternion(float f) {
-        return new Quaternion(this, f, true);
+    public Quaternion getDegreesQuaternion(float angle) {
+        return new Quaternion(this, angle, true);
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -198,10 +198,10 @@ public final class Vector3f {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public void modify(Float2FloatFunction float2FloatFunction) {
-        this.x = float2FloatFunction.get(this.x);
-        this.y = float2FloatFunction.get(this.y);
-        this.z = float2FloatFunction.get(this.z);
+    public void modify(Float2FloatFunction function) {
+        this.x = function.get(this.x);
+        this.y = function.get(this.y);
+        this.z = function.get(this.z);
     }
 
     public String toString() {

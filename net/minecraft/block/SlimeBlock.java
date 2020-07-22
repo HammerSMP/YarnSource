@@ -19,39 +19,39 @@ extends TransparentBlock {
     }
 
     @Override
-    public void onLandedUpon(World arg, BlockPos arg2, Entity arg3, float f) {
-        if (arg3.bypassesLandingEffects()) {
-            super.onLandedUpon(arg, arg2, arg3, f);
+    public void onLandedUpon(World world, BlockPos pos, Entity entity, float distance) {
+        if (entity.bypassesLandingEffects()) {
+            super.onLandedUpon(world, pos, entity, distance);
         } else {
-            arg3.handleFallDamage(f, 0.0f);
+            entity.handleFallDamage(distance, 0.0f);
         }
     }
 
     @Override
-    public void onEntityLand(BlockView arg, Entity arg2) {
-        if (arg2.bypassesLandingEffects()) {
-            super.onEntityLand(arg, arg2);
+    public void onEntityLand(BlockView world, Entity entity) {
+        if (entity.bypassesLandingEffects()) {
+            super.onEntityLand(world, entity);
         } else {
-            this.bounce(arg2);
+            this.bounce(entity);
         }
     }
 
-    private void bounce(Entity arg) {
-        Vec3d lv = arg.getVelocity();
+    private void bounce(Entity entity) {
+        Vec3d lv = entity.getVelocity();
         if (lv.y < 0.0) {
-            double d = arg instanceof LivingEntity ? 1.0 : 0.8;
-            arg.setVelocity(lv.x, -lv.y * d, lv.z);
+            double d = entity instanceof LivingEntity ? 1.0 : 0.8;
+            entity.setVelocity(lv.x, -lv.y * d, lv.z);
         }
     }
 
     @Override
-    public void onSteppedOn(World arg, BlockPos arg2, Entity arg3) {
-        double d = Math.abs(arg3.getVelocity().y);
-        if (d < 0.1 && !arg3.bypassesSteppingEffects()) {
+    public void onSteppedOn(World world, BlockPos pos, Entity entity) {
+        double d = Math.abs(entity.getVelocity().y);
+        if (d < 0.1 && !entity.bypassesSteppingEffects()) {
             double e = 0.4 + d * 0.2;
-            arg3.setVelocity(arg3.getVelocity().multiply(e, 1.0, e));
+            entity.setVelocity(entity.getVelocity().multiply(e, 1.0, e));
         }
-        super.onSteppedOn(arg, arg2, arg3);
+        super.onSteppedOn(world, pos, entity);
     }
 }
 

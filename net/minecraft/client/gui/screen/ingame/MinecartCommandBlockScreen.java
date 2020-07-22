@@ -19,8 +19,8 @@ public class MinecartCommandBlockScreen
 extends AbstractCommandBlockScreen {
     private final CommandBlockExecutor commandExecutor;
 
-    public MinecartCommandBlockScreen(CommandBlockExecutor arg) {
-        this.commandExecutor = arg;
+    public MinecartCommandBlockScreen(CommandBlockExecutor commandExecutor) {
+        this.commandExecutor = commandExecutor;
     }
 
     @Override
@@ -42,10 +42,10 @@ extends AbstractCommandBlockScreen {
     }
 
     @Override
-    protected void syncSettingsToServer(CommandBlockExecutor arg) {
-        if (arg instanceof CommandBlockMinecartEntity.CommandExecutor) {
-            CommandBlockMinecartEntity.CommandExecutor lv = (CommandBlockMinecartEntity.CommandExecutor)arg;
-            this.client.getNetworkHandler().sendPacket(new UpdateCommandBlockMinecartC2SPacket(lv.getMinecart().getEntityId(), this.consoleCommandTextField.getText(), arg.isTrackingOutput()));
+    protected void syncSettingsToServer(CommandBlockExecutor commandExecutor) {
+        if (commandExecutor instanceof CommandBlockMinecartEntity.CommandExecutor) {
+            CommandBlockMinecartEntity.CommandExecutor lv = (CommandBlockMinecartEntity.CommandExecutor)commandExecutor;
+            this.client.getNetworkHandler().sendPacket(new UpdateCommandBlockMinecartC2SPacket(lv.getMinecart().getEntityId(), this.consoleCommandTextField.getText(), commandExecutor.isTrackingOutput()));
         }
     }
 }

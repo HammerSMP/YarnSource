@@ -19,10 +19,10 @@ extends Screen {
     protected final Screen parent;
     protected final GameOptions gameOptions;
 
-    public GameOptionsScreen(Screen arg, GameOptions arg2, Text arg3) {
-        super(arg3);
-        this.parent = arg;
-        this.gameOptions = arg2;
+    public GameOptionsScreen(Screen parent, GameOptions gameOptions, Text title) {
+        super(title);
+        this.parent = parent;
+        this.gameOptions = gameOptions;
     }
 
     @Override

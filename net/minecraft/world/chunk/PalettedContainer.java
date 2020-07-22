@@ -36,7 +36,7 @@ import net.minecraft.world.chunk.PaletteResizeListener;
 public class PalettedContainer<T>
 implements PaletteResizeListener<T> {
     private final Palette<T> fallbackPalette;
-    private final PaletteResizeListener<T> noOpPaletteResizeHandler = (i, object) -> 0;
+    private final PaletteResizeListener<T> noOpPaletteResizeHandler = (newSize, added) -> 0;
     private final IdList<T> idList;
     private final Function<CompoundTag, T> elementDeserializer;
     private final Function<T, CompoundTag> elementSerializer;
@@ -61,24 +61,24 @@ implements PaletteResizeListener<T> {
         this.writeLock.unlock();
     }
 
-    public PalettedContainer(Palette<T> arg, IdList<T> arg2, Function<CompoundTag, T> function, Function<T, CompoundTag> function2, T object2) {
-        this.fallbackPalette = arg;
-        this.idList = arg2;
-        this.elementDeserializer = function;
-        this.elementSerializer = function2;
-        this.defaultValue = object2;
+    public PalettedContainer(Palette<T> fallbackPalette, IdList<T> idList, Function<CompoundTag, T> elementDeserializer, Function<T, CompoundTag> elementSerializer, T defaultElement) {
+        this.fallbackPalette = fallbackPalette;
+        this.idList = idList;
+        this.elementDeserializer = elementDeserializer;
+        this.elementSerializer = elementSerializer;
+        this.defaultValue = defaultElement;
         this.setPaletteSize(4);
     }
 
-    private static int toIndex(int i, int j, int k) {
-        return j << 8 | k << 4 | i;
+    private static int toIndex(int x, int y, int z) {
+        return y << 8 | z << 4 | x;
     }
 
-    private void setPaletteSize(int i) {
-        if (i == this.paletteSize) {
+    private void setPaletteSize(int size) {
+        if (size == this.paletteSize) {
             return;
         }
-        this.paletteSize = i;
+        this.paletteSize = size;
         if (this.paletteSize <= 4) {
             this.paletteSize = 4;
             this.palette = new ArrayPalette<T>(this.idList, this.paletteSize, this, this.elementDeserializer);
@@ -108,20 +108,20 @@ implements PaletteResizeListener<T> {
         return k;
     }
 
-    public T setSync(int i, int j, int k, T object) {
+    public T setSync(int x, int y, int z, T value) {
         this.lock();
-        T object2 = this.setAndGetOldValue(PalettedContainer.toIndex(i, j, k), object);
+        T object2 = this.setAndGetOldValue(PalettedContainer.toIndex(x, y, z), value);
         this.unlock();
         return object2;
     }
 
-    public T set(int i, int j, int k, T object) {
-        return this.setAndGetOldValue(PalettedContainer.toIndex(i, j, k), object);
+    public T set(int x, int y, int z, T value) {
+        return this.setAndGetOldValue(PalettedContainer.toIndex(x, y, z), value);
     }
 
-    protected T setAndGetOldValue(int i, T object) {
-        int j = this.palette.getIndex(object);
-        int k = this.data.setAndGetOldValue(i, j);
+    protected T setAndGetOldValue(int index, T value) {
+        int j = this.palette.getIndex(value);
+        int k = this.data.setAndGetOldValue(index, j);
         T object2 = this.palette.getByIndex(k);
         return object2 == null ? this.defaultValue : object2;
     }
@@ -131,54 +131,54 @@ implements PaletteResizeListener<T> {
         this.data.set(i, j);
     }
 
-    public T get(int i, int j, int k) {
-        return this.get(PalettedContainer.toIndex(i, j, k));
+    public T get(int x, int y, int z) {
+        return this.get(PalettedContainer.toIndex(x, y, z));
     }
 
-    protected T get(int i) {
-        T object = this.palette.getByIndex(this.data.get(i));
+    protected T get(int index) {
+        T object = this.palette.getByIndex(this.data.get(index));
         return object == null ? this.defaultValue : object;
     }
 
     @Environment(value=EnvType.CLIENT)
-    public void fromPacket(PacketByteBuf arg) {
+    public void fromPacket(PacketByteBuf buf) {
         this.lock();
-        byte i = arg.readByte();
+        byte i = buf.readByte();
         if (this.paletteSize != i) {
             this.setPaletteSize(i);
         }
-        this.palette.fromPacket(arg);
-        arg.readLongArray(this.data.getStorage());
+        this.palette.fromPacket(buf);
+        buf.readLongArray(this.data.getStorage());
         this.unlock();
     }
 
-    public void toPacket(PacketByteBuf arg) {
+    public void toPacket(PacketByteBuf buf) {
         this.lock();
-        arg.writeByte(this.paletteSize);
-        this.palette.toPacket(arg);
-        arg.writeLongArray(this.data.getStorage());
+        buf.writeByte(this.paletteSize);
+        this.palette.toPacket(buf);
+        buf.writeLongArray(this.data.getStorage());
         this.unlock();
     }
 
-    public void read(ListTag arg, long[] ls) {
+    public void read(ListTag paletteTag, long[] data) {
         this.lock();
-        int i = Math.max(4, MathHelper.log2DeBruijn(arg.size()));
+        int i = Math.max(4, MathHelper.log2DeBruijn(paletteTag.size()));
         if (i != this.paletteSize) {
             this.setPaletteSize(i);
         }
-        this.palette.fromTag(arg);
-        int j = ls.length * 64 / 4096;
+        this.palette.fromTag(paletteTag);
+        int j = data.length * 64 / 4096;
         if (this.palette == this.fallbackPalette) {
             BiMapPalette<T> lv = new BiMapPalette<T>(this.idList, i, this.noOpPaletteResizeHandler, this.elementDeserializer, this.elementSerializer);
-            lv.fromTag(arg);
-            PackedIntegerArray lv2 = new PackedIntegerArray(i, 4096, ls);
+            lv.fromTag(paletteTag);
+            PackedIntegerArray lv2 = new PackedIntegerArray(i, 4096, data);
             for (int k = 0; k < 4096; ++k) {
                 this.data.set(k, this.fallbackPalette.getIndex(lv.getByIndex(lv2.get(k))));
             }
         } else if (j == this.paletteSize) {
-            System.arraycopy(ls, 0, this.data.getStorage(), 0, ls.length);
+            System.arraycopy(data, 0, this.data.getStorage(), 0, data.length);
         } else {
-            PackedIntegerArray lv3 = new PackedIntegerArray(j, 4096, ls);
+            PackedIntegerArray lv3 = new PackedIntegerArray(j, 4096, data);
             for (int l = 0; l < 4096; ++l) {
                 this.data.set(l, lv3.get(l));
             }
@@ -220,10 +220,10 @@ implements PaletteResizeListener<T> {
         return this.palette.accepts(predicate);
     }
 
-    public void count(CountConsumer<T> arg) {
+    public void count(CountConsumer<T> consumer) {
         Int2IntOpenHashMap int2IntMap = new Int2IntOpenHashMap();
         this.data.forEach(arg_0 -> PalettedContainer.method_21734((Int2IntMap)int2IntMap, arg_0));
-        int2IntMap.int2IntEntrySet().forEach(entry -> arg.accept(this.palette.getByIndex(entry.getIntKey()), entry.getIntValue()));
+        int2IntMap.int2IntEntrySet().forEach(entry -> consumer.accept(this.palette.getByIndex(entry.getIntKey()), entry.getIntValue()));
     }
 
     private static /* synthetic */ void method_21734(Int2IntMap int2IntMap, int i) {

@@ -16,9 +16,8 @@ import net.minecraft.block.Block;
 import net.minecraft.block.ComposterBlock;
 import net.minecraft.block.FireBlock;
 import net.minecraft.block.dispenser.DispenserBehavior;
-import net.minecraft.class_5413;
 import net.minecraft.command.EntitySelectorOptions;
-import net.minecraft.command.arguments.ArgumentTypes;
+import net.minecraft.command.argument.ArgumentTypes;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.attribute.DefaultAttributeRegistry;
@@ -26,12 +25,12 @@ import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.item.Item;
 import net.minecraft.recipe.BrewingRecipeRegistry;
+import net.minecraft.tag.RequiredTagListRegistry;
 import net.minecraft.util.Language;
 import net.minecraft.util.logging.DebugLoggerPrintStream;
 import net.minecraft.util.logging.LoggerPrintStream;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.GameRules;
-import net.minecraft.world.biome.Biome;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -57,28 +56,28 @@ public class Bootstrap {
         EntitySelectorOptions.register();
         DispenserBehavior.registerDefaults();
         ArgumentTypes.register();
-        class_5413.method_30202();
+        RequiredTagListRegistry.validateRegistrations();
         Bootstrap.setOutputStreams();
     }
 
-    private static <T> void collectMissingTranslations(Iterable<T> iterable, Function<T, String> function, Set<String> set) {
+    private static <T> void collectMissingTranslations(Iterable<T> iterable, Function<T, String> keyExtractor, Set<String> translationKeys) {
         Language lv = Language.getInstance();
         iterable.forEach(object -> {
-            String string = (String)function.apply(object);
+            String string = (String)keyExtractor.apply(object);
             if (!lv.hasTranslation(string)) {
-                set.add(string);
+                translationKeys.add(string);
             }
         });
     }
 
-    private static void method_27732(final Set<String> set) {
+    private static void collectMissingGameRuleTranslations(final Set<String> translations) {
         final Language lv = Language.getInstance();
-        GameRules.forEachType(new GameRules.TypeConsumer(){
+        GameRules.accept(new GameRules.Visitor(){
 
             @Override
-            public <T extends GameRules.Rule<T>> void accept(GameRules.Key<T> arg, GameRules.Type<T> arg2) {
-                if (!lv.hasTranslation(arg.getTranslationKey())) {
-                    set.add(arg.getName());
+            public <T extends GameRules.Rule<T>> void visit(GameRules.Key<T> key, GameRules.Type<T> type) {
+                if (!lv.hasTranslation(key.getTranslationKey())) {
+                    translations.add(key.getName());
                 }
             }
         });
@@ -91,10 +90,9 @@ public class Bootstrap {
         Bootstrap.collectMissingTranslations(Registry.STATUS_EFFECT, StatusEffect::getTranslationKey, set);
         Bootstrap.collectMissingTranslations(Registry.ITEM, Item::getTranslationKey, set);
         Bootstrap.collectMissingTranslations(Registry.ENCHANTMENT, Enchantment::getTranslationKey, set);
-        Bootstrap.collectMissingTranslations(Registry.BIOME, Biome::getTranslationKey, set);
         Bootstrap.collectMissingTranslations(Registry.BLOCK, Block::getTranslationKey, set);
         Bootstrap.collectMissingTranslations(Registry.CUSTOM_STAT, arg -> "stat." + arg.toString().replace(':', '.'), set);
-        Bootstrap.method_27732(set);
+        Bootstrap.collectMissingGameRuleTranslations(set);
         return set;
     }
 
@@ -118,8 +116,8 @@ public class Bootstrap {
         }
     }
 
-    public static void println(String string) {
-        SYSOUT.println(string);
+    public static void println(String str) {
+        SYSOUT.println(str);
     }
 
     static {

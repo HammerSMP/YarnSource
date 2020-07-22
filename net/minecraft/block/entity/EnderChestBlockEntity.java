@@ -71,12 +71,12 @@ Tickable {
     }
 
     @Override
-    public boolean onSyncedBlockEvent(int i, int j) {
-        if (i == 1) {
-            this.viewerCount = j;
+    public boolean onSyncedBlockEvent(int type, int data) {
+        if (type == 1) {
+            this.viewerCount = data;
             return true;
         }
-        return super.onSyncedBlockEvent(i, j);
+        return super.onSyncedBlockEvent(type, data);
     }
 
     @Override
@@ -104,8 +104,8 @@ Tickable {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public float getAnimationProgress(float f) {
-        return MathHelper.lerp(f, this.lastAnimationProgress, this.animationProgress);
+    public float getAnimationProgress(float tickDelta) {
+        return MathHelper.lerp(tickDelta, this.lastAnimationProgress, this.animationProgress);
     }
 }
 

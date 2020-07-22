@@ -29,29 +29,29 @@ extends Sensor<LivingEntity> {
     }
 
     @Override
-    protected void sense(ServerWorld arg, LivingEntity arg2) {
-        arg2.getBrain().remember(MemoryModuleType.NEAREST_HOSTILE, this.getNearestHostile(arg2));
+    protected void sense(ServerWorld world, LivingEntity entity) {
+        entity.getBrain().remember(MemoryModuleType.NEAREST_HOSTILE, this.getNearestHostile(entity));
     }
 
-    private Optional<LivingEntity> getNearestHostile(LivingEntity arg) {
-        return this.getVisibleMobs(arg).flatMap(list -> list.stream().filter(this::isHostile).filter(arg2 -> this.isCloseEnoughForDanger(arg, (LivingEntity)arg2)).min((arg2, arg3) -> this.compareDistances(arg, (LivingEntity)arg2, (LivingEntity)arg3)));
+    private Optional<LivingEntity> getNearestHostile(LivingEntity entity) {
+        return this.getVisibleMobs(entity).flatMap(list -> list.stream().filter(this::isHostile).filter(arg2 -> this.isCloseEnoughForDanger(entity, (LivingEntity)arg2)).min((arg2, arg3) -> this.compareDistances(entity, (LivingEntity)arg2, (LivingEntity)arg3)));
     }
 
-    private Optional<List<LivingEntity>> getVisibleMobs(LivingEntity arg) {
-        return arg.getBrain().getOptionalMemory(MemoryModuleType.VISIBLE_MOBS);
+    private Optional<List<LivingEntity>> getVisibleMobs(LivingEntity entity) {
+        return entity.getBrain().getOptionalMemory(MemoryModuleType.VISIBLE_MOBS);
     }
 
-    private int compareDistances(LivingEntity arg, LivingEntity arg2, LivingEntity arg3) {
-        return MathHelper.floor(arg2.squaredDistanceTo(arg) - arg3.squaredDistanceTo(arg));
+    private int compareDistances(LivingEntity entity, LivingEntity hostile1, LivingEntity hostile2) {
+        return MathHelper.floor(hostile1.squaredDistanceTo(entity) - hostile2.squaredDistanceTo(entity));
     }
 
-    private boolean isCloseEnoughForDanger(LivingEntity arg, LivingEntity arg2) {
-        float f = ((Float)SQUARED_DISTANCES_FOR_DANGER.get(arg2.getType())).floatValue();
-        return arg2.squaredDistanceTo(arg) <= (double)(f * f);
+    private boolean isCloseEnoughForDanger(LivingEntity entity, LivingEntity hostile) {
+        float f = ((Float)SQUARED_DISTANCES_FOR_DANGER.get(hostile.getType())).floatValue();
+        return hostile.squaredDistanceTo(entity) <= (double)(f * f);
     }
 
-    private boolean isHostile(LivingEntity arg) {
-        return SQUARED_DISTANCES_FOR_DANGER.containsKey(arg.getType());
+    private boolean isHostile(LivingEntity entity) {
+        return SQUARED_DISTANCES_FOR_DANGER.containsKey(entity.getType());
     }
 }
 

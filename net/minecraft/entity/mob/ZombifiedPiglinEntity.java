@@ -63,8 +63,8 @@ implements Angerable {
     }
 
     @Override
-    public void setAngryAt(@Nullable UUID uUID) {
-        this.targetUuid = uUID;
+    public void setAngryAt(@Nullable UUID uuid) {
+        this.targetUuid = uuid;
     }
 
     @Override
@@ -142,15 +142,15 @@ implements Angerable {
     }
 
     @Override
-    public void setTarget(@Nullable LivingEntity arg) {
-        if (this.getTarget() == null && arg != null) {
+    public void setTarget(@Nullable LivingEntity target) {
+        if (this.getTarget() == null && target != null) {
             this.angrySoundDelay = field_25382.choose(this.random);
             this.field_25608 = field_25609.choose(this.random);
         }
-        if (arg instanceof PlayerEntity) {
-            this.setAttacking((PlayerEntity)arg);
+        if (target instanceof PlayerEntity) {
+            this.setAttacking((PlayerEntity)target);
         }
-        super.setTarget(arg);
+        super.setTarget(target);
     }
 
     @Override
@@ -158,30 +158,30 @@ implements Angerable {
         this.setAngerTime(field_25379.choose(this.random));
     }
 
-    public static boolean canSpawn(EntityType<ZombifiedPiglinEntity> arg, WorldAccess arg2, SpawnReason arg3, BlockPos arg4, Random random) {
-        return arg2.getDifficulty() != Difficulty.PEACEFUL && arg2.getBlockState(arg4.down()).getBlock() != Blocks.NETHER_WART_BLOCK;
+    public static boolean canSpawn(EntityType<ZombifiedPiglinEntity> type, WorldAccess world, SpawnReason spawnReason, BlockPos pos, Random random) {
+        return world.getDifficulty() != Difficulty.PEACEFUL && world.getBlockState(pos.down()).getBlock() != Blocks.NETHER_WART_BLOCK;
     }
 
     @Override
-    public boolean canSpawn(WorldView arg) {
-        return arg.intersectsEntities(this) && !arg.containsFluid(this.getBoundingBox());
+    public boolean canSpawn(WorldView world) {
+        return world.intersectsEntities(this) && !world.containsFluid(this.getBoundingBox());
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
-        this.angerToTag(arg);
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
+        this.angerToTag(tag);
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        this.angerFromTag((ServerWorld)this.world, arg);
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        this.angerFromTag((ServerWorld)this.world, tag);
     }
 
     @Override
-    public void setAngerTime(int i) {
-        this.angerTime = i;
+    public void setAngerTime(int ticks) {
+        this.angerTime = ticks;
     }
 
     @Override
@@ -190,11 +190,11 @@ implements Angerable {
     }
 
     @Override
-    public boolean damage(DamageSource arg, float f) {
-        if (this.isInvulnerableTo(arg)) {
+    public boolean damage(DamageSource source, float amount) {
+        if (this.isInvulnerableTo(source)) {
             return false;
         }
-        return super.damage(arg, f);
+        return super.damage(source, amount);
     }
 
     @Override
@@ -203,7 +203,7 @@ implements Angerable {
     }
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource arg) {
+    protected SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.ENTITY_ZOMBIFIED_PIGLIN_HURT;
     }
 
@@ -213,7 +213,7 @@ implements Angerable {
     }
 
     @Override
-    protected void initEquipment(LocalDifficulty arg) {
+    protected void initEquipment(LocalDifficulty difficulty) {
         this.equipStack(EquipmentSlot.MAINHAND, new ItemStack(Items.GOLDEN_SWORD));
     }
 
@@ -233,8 +233,8 @@ implements Angerable {
     }
 
     @Override
-    public boolean isAngryAt(PlayerEntity arg) {
-        return this.shouldAngerAt(arg);
+    public boolean isAngryAt(PlayerEntity player) {
+        return this.shouldAngerAt(player);
     }
 }
 

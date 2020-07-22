@@ -68,16 +68,16 @@ extends Feature<DefaultFeatureConfig> {
         return true;
     }
 
-    public static void generateVineColumn(WorldAccess arg, Random random, BlockPos.Mutable arg2, int i, int j, int k) {
-        for (int l = 1; l <= i; ++l) {
-            if (arg.isAir(arg2)) {
-                if (l == i || !arg.isAir(arg2.up())) {
-                    arg.setBlockState(arg2, (BlockState)Blocks.TWISTING_VINES.getDefaultState().with(AbstractPlantStemBlock.AGE, MathHelper.nextInt(random, j, k)), 2);
+    public static void generateVineColumn(WorldAccess world, Random random, BlockPos.Mutable pos, int maxLength, int minAge, int maxAge) {
+        for (int l = 1; l <= maxLength; ++l) {
+            if (world.isAir(pos)) {
+                if (l == maxLength || !world.isAir(pos.up())) {
+                    world.setBlockState(pos, (BlockState)Blocks.TWISTING_VINES.getDefaultState().with(AbstractPlantStemBlock.AGE, MathHelper.nextInt(random, minAge, maxAge)), 2);
                     break;
                 }
-                arg.setBlockState(arg2, Blocks.TWISTING_VINES_PLANT.getDefaultState(), 2);
+                world.setBlockState(pos, Blocks.TWISTING_VINES_PLANT.getDefaultState(), 2);
             }
-            arg2.move(Direction.UP);
+            pos.move(Direction.UP);
         }
     }
 

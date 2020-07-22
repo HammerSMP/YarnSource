@@ -45,10 +45,10 @@ implements Font {
     private final String template;
     private final Map<Identifier, NativeImage> images = Maps.newHashMap();
 
-    public UnicodeTextureFont(ResourceManager arg, byte[] bs, String string) {
-        this.resourceManager = arg;
-        this.sizes = bs;
-        this.template = string;
+    public UnicodeTextureFont(ResourceManager resourceManager, byte[] sizes, String template) {
+        this.resourceManager = resourceManager;
+        this.sizes = sizes;
+        this.template = template;
         for (int i = 0; i < 256; ++i) {
             int j = i * 256;
             Identifier lv = this.getImageId(j);
@@ -56,9 +56,9 @@ implements Font {
                  NativeImage lv3 = NativeImage.read(NativeImage.Format.ABGR, lv2.getInputStream());){
                 if (lv3.getWidth() == 256 && lv3.getHeight() == 256) {
                     for (int k = 0; k < 256; ++k) {
-                        byte b = bs[j + k];
+                        byte b = sizes[j + k];
                         if (b == 0 || UnicodeTextureFont.getStart(b) <= UnicodeTextureFont.getEnd(b)) continue;
-                        bs[j + k] = 0;
+                        sizes[j + k] = 0;
                     }
                     continue;
                 }
@@ -66,7 +66,7 @@ implements Font {
             catch (IOException iOException) {
                 // empty catch block
             }
-            Arrays.fill(bs, j, j + 256, (byte)0);
+            Arrays.fill(sizes, j, j + 256, (byte)0);
         }
     }
 
@@ -111,23 +111,23 @@ implements Font {
      * Enabled aggressive exception aggregation
      */
     @Nullable
-    private NativeImage getGlyphImage(Identifier arg) {
-        try (Resource lv = this.resourceManager.getResource(arg);){
+    private NativeImage getGlyphImage(Identifier glyphId) {
+        try (Resource lv = this.resourceManager.getResource(glyphId);){
             NativeImage nativeImage = NativeImage.read(NativeImage.Format.ABGR, lv.getInputStream());
             return nativeImage;
         }
         catch (IOException iOException) {
-            LOGGER.error("Couldn't load texture {}", (Object)arg, (Object)iOException);
+            LOGGER.error("Couldn't load texture {}", (Object)glyphId, (Object)iOException);
             return null;
         }
     }
 
-    private static int getStart(byte b) {
-        return b >> 4 & 0xF;
+    private static int getStart(byte size) {
+        return size >> 4 & 0xF;
     }
 
-    private static int getEnd(byte b) {
-        return (b & 0xF) + 1;
+    private static int getEnd(byte size) {
+        return (size & 0xF) + 1;
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -139,12 +139,12 @@ implements Font {
         private final int unpackSkipRows;
         private final NativeImage image;
 
-        private UnicodeTextureGlyph(int i, int j, int k, int l, NativeImage arg) {
-            this.width = k;
-            this.height = l;
-            this.unpackSkipPixels = i;
-            this.unpackSkipRows = j;
-            this.image = arg;
+        private UnicodeTextureGlyph(int x, int y, int width, int height, NativeImage image) {
+            this.width = width;
+            this.height = height;
+            this.unpackSkipPixels = x;
+            this.unpackSkipRows = y;
+            this.image = image;
         }
 
         @Override
@@ -168,8 +168,8 @@ implements Font {
         }
 
         @Override
-        public void upload(int i, int j) {
-            this.image.upload(0, i, j, this.unpackSkipPixels, this.unpackSkipRows, this.width, this.height, false, false);
+        public void upload(int x, int y) {
+            this.image.upload(0, x, y, this.unpackSkipPixels, this.unpackSkipRows, this.width, this.height, false, false);
         }
 
         @Override
@@ -194,13 +194,13 @@ implements Font {
         private final Identifier sizes;
         private final String template;
 
-        public Loader(Identifier arg, String string) {
-            this.sizes = arg;
-            this.template = string;
+        public Loader(Identifier sizes, String template) {
+            this.sizes = sizes;
+            this.template = template;
         }
 
-        public static FontLoader fromJson(JsonObject jsonObject) {
-            return new Loader(new Identifier(JsonHelper.getString(jsonObject, "sizes")), JsonHelper.getString(jsonObject, "template"));
+        public static FontLoader fromJson(JsonObject json) {
+            return new Loader(new Identifier(JsonHelper.getString(json, "sizes")), JsonHelper.getString(json, "template"));
         }
 
         /*
@@ -210,11 +210,11 @@ implements Font {
          */
         @Override
         @Nullable
-        public Font load(ResourceManager arg) {
+        public Font load(ResourceManager manager) {
             try (Resource lv = MinecraftClient.getInstance().getResourceManager().getResource(this.sizes);){
                 byte[] bs = new byte[65536];
                 lv.getInputStream().read(bs);
-                UnicodeTextureFont unicodeTextureFont = new UnicodeTextureFont(arg, bs, this.template);
+                UnicodeTextureFont unicodeTextureFont = new UnicodeTextureFont(manager, bs, this.template);
                 return unicodeTextureFont;
             }
             catch (IOException iOException) {

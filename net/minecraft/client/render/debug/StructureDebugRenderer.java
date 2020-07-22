@@ -39,16 +39,16 @@ implements DebugRenderer.Renderer {
     }
 
     @Override
-    public void render(MatrixStack arg, VertexConsumerProvider arg2, double d, double e, double f) {
+    public void render(MatrixStack matrices, VertexConsumerProvider vertexConsumers, double cameraX, double cameraY, double cameraZ) {
         Camera lv = this.field_4624.gameRenderer.getCamera();
         ClientWorld lv2 = this.field_4624.world;
         DimensionType lv3 = lv2.getDimension();
         BlockPos lv4 = new BlockPos(lv.getPos().x, 0.0, lv.getPos().z);
-        VertexConsumer lv5 = arg2.getBuffer(RenderLayer.getLines());
+        VertexConsumer lv5 = vertexConsumers.getBuffer(RenderLayer.getLines());
         if (this.field_4626.containsKey(lv3)) {
             for (BlockBox blockBox : this.field_4626.get(lv3).values()) {
                 if (!lv4.isWithinDistance(blockBox.getCenter(), 500.0)) continue;
-                WorldRenderer.drawBox(arg, lv5, (double)blockBox.minX - d, (double)blockBox.minY - e, (double)blockBox.minZ - f, (double)(blockBox.maxX + 1) - d, (double)(blockBox.maxY + 1) - e, (double)(blockBox.maxZ + 1) - f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f);
+                WorldRenderer.drawBox(matrices, lv5, (double)blockBox.minX - cameraX, (double)blockBox.minY - cameraY, (double)blockBox.minZ - cameraZ, (double)(blockBox.maxX + 1) - cameraX, (double)(blockBox.maxY + 1) - cameraY, (double)(blockBox.maxZ + 1) - cameraZ, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f);
             }
         }
         if (this.field_4627.containsKey(lv3)) {
@@ -58,10 +58,10 @@ implements DebugRenderer.Renderer {
                 Boolean boolean_ = this.field_4625.get(lv3).get(string);
                 if (!lv4.isWithinDistance(lv7.getCenter(), 500.0)) continue;
                 if (boolean_.booleanValue()) {
-                    WorldRenderer.drawBox(arg, lv5, (double)lv7.minX - d, (double)lv7.minY - e, (double)lv7.minZ - f, (double)(lv7.maxX + 1) - d, (double)(lv7.maxY + 1) - e, (double)(lv7.maxZ + 1) - f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f);
+                    WorldRenderer.drawBox(matrices, lv5, (double)lv7.minX - cameraX, (double)lv7.minY - cameraY, (double)lv7.minZ - cameraZ, (double)(lv7.maxX + 1) - cameraX, (double)(lv7.maxY + 1) - cameraY, (double)(lv7.maxZ + 1) - cameraZ, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f);
                     continue;
                 }
-                WorldRenderer.drawBox(arg, lv5, (double)lv7.minX - d, (double)lv7.minY - e, (double)lv7.minZ - f, (double)(lv7.maxX + 1) - d, (double)(lv7.maxY + 1) - e, (double)(lv7.maxZ + 1) - f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f);
+                WorldRenderer.drawBox(matrices, lv5, (double)lv7.minX - cameraX, (double)lv7.minY - cameraY, (double)lv7.minZ - cameraZ, (double)(lv7.maxX + 1) - cameraX, (double)(lv7.maxY + 1) - cameraY, (double)(lv7.maxZ + 1) - cameraZ, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f);
             }
         }
     }

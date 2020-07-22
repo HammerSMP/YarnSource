@@ -52,11 +52,11 @@ extends EntityRenderer<T> {
         double e = MathHelper.lerp((double)g, ((AbstractMinecartEntity)arg).lastRenderY, ((Entity)arg).getY());
         double m = MathHelper.lerp((double)g, ((AbstractMinecartEntity)arg).lastRenderZ, ((Entity)arg).getZ());
         double n = 0.3f;
-        Vec3d lv = ((AbstractMinecartEntity)arg).method_7508(d, e, m);
+        Vec3d lv = ((AbstractMinecartEntity)arg).snapPositionToRail(d, e, m);
         float o = MathHelper.lerp(g, ((AbstractMinecartEntity)arg).prevPitch, ((AbstractMinecartEntity)arg).pitch);
         if (lv != null) {
-            Vec3d lv2 = ((AbstractMinecartEntity)arg).method_7505(d, e, m, 0.3f);
-            Vec3d lv3 = ((AbstractMinecartEntity)arg).method_7505(d, e, m, -0.3f);
+            Vec3d lv2 = ((AbstractMinecartEntity)arg).snapPositionToRailWithOffset(d, e, m, 0.3f);
+            Vec3d lv3 = ((AbstractMinecartEntity)arg).snapPositionToRailWithOffset(d, e, m, -0.3f);
             if (lv2 == null) {
                 lv2 = lv;
             }
@@ -105,8 +105,8 @@ extends EntityRenderer<T> {
         return TEXTURE;
     }
 
-    protected void renderBlock(T arg, float f, BlockState arg2, MatrixStack arg3, VertexConsumerProvider arg4, int i) {
-        MinecraftClient.getInstance().getBlockRenderManager().renderBlockAsEntity(arg2, arg3, arg4, i, OverlayTexture.DEFAULT_UV);
+    protected void renderBlock(T entity, float delta, BlockState state, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
+        MinecraftClient.getInstance().getBlockRenderManager().renderBlockAsEntity(state, matrices, vertexConsumers, light, OverlayTexture.DEFAULT_UV);
     }
 }
 

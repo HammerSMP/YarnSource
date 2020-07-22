@@ -48,13 +48,13 @@ NamedScreenHandlerFactory {
         super(arg, arg2);
     }
 
-    protected StorageMinecartEntity(EntityType<?> arg, double d, double e, double f, World arg2) {
-        super(arg, arg2, d, e, f);
+    protected StorageMinecartEntity(EntityType<?> type, double x, double y, double z, World world) {
+        super(type, world, x, y, z);
     }
 
     @Override
-    public void dropItems(DamageSource arg) {
-        super.dropItems(arg);
+    public void dropItems(DamageSource damageSource) {
+        super.dropItems(damageSource);
         if (this.world.getGameRules().getBoolean(GameRules.DO_ENTITY_DROPS)) {
             ItemScatterer.spawn(this.world, this, (Inventory)this);
         }
@@ -70,41 +70,41 @@ NamedScreenHandlerFactory {
     }
 
     @Override
-    public ItemStack getStack(int i) {
+    public ItemStack getStack(int slot) {
         this.generateLoot(null);
-        return this.inventory.get(i);
+        return this.inventory.get(slot);
     }
 
     @Override
-    public ItemStack removeStack(int i, int j) {
+    public ItemStack removeStack(int slot, int amount) {
         this.generateLoot(null);
-        return Inventories.splitStack(this.inventory, i, j);
+        return Inventories.splitStack(this.inventory, slot, amount);
     }
 
     @Override
-    public ItemStack removeStack(int i) {
+    public ItemStack removeStack(int slot) {
         this.generateLoot(null);
-        ItemStack lv = this.inventory.get(i);
+        ItemStack lv = this.inventory.get(slot);
         if (lv.isEmpty()) {
             return ItemStack.EMPTY;
         }
-        this.inventory.set(i, ItemStack.EMPTY);
+        this.inventory.set(slot, ItemStack.EMPTY);
         return lv;
     }
 
     @Override
-    public void setStack(int i, ItemStack arg) {
+    public void setStack(int slot, ItemStack stack) {
         this.generateLoot(null);
-        this.inventory.set(i, arg);
-        if (!arg.isEmpty() && arg.getCount() > this.getMaxCountPerStack()) {
-            arg.setCount(this.getMaxCountPerStack());
+        this.inventory.set(slot, stack);
+        if (!stack.isEmpty() && stack.getCount() > this.getMaxCountPerStack()) {
+            stack.setCount(this.getMaxCountPerStack());
         }
     }
 
     @Override
-    public boolean equip(int i, ItemStack arg) {
-        if (i >= 0 && i < this.size()) {
-            this.setStack(i, arg);
+    public boolean equip(int slot, ItemStack item) {
+        if (slot >= 0 && slot < this.size()) {
+            this.setStack(slot, item);
             return true;
         }
         return false;
@@ -115,18 +115,18 @@ NamedScreenHandlerFactory {
     }
 
     @Override
-    public boolean canPlayerUse(PlayerEntity arg) {
+    public boolean canPlayerUse(PlayerEntity player) {
         if (this.removed) {
             return false;
         }
-        return !(arg.squaredDistanceTo(this) > 64.0);
+        return !(player.squaredDistanceTo(this) > 64.0);
     }
 
     @Override
     @Nullable
-    public Entity changeDimension(ServerWorld arg) {
+    public Entity moveToWorld(ServerWorld destination) {
         this.field_7733 = false;
-        return super.changeDimension(arg);
+        return super.moveToWorld(destination);
     }
 
     @Override
@@ -138,33 +138,33 @@ NamedScreenHandlerFactory {
     }
 
     @Override
-    protected void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
+    protected void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
         if (this.lootTableId != null) {
-            arg.putString("LootTable", this.lootTableId.toString());
+            tag.putString("LootTable", this.lootTableId.toString());
             if (this.lootSeed != 0L) {
-                arg.putLong("LootTableSeed", this.lootSeed);
+                tag.putLong("LootTableSeed", this.lootSeed);
             }
         } else {
-            Inventories.toTag(arg, this.inventory);
+            Inventories.toTag(tag, this.inventory);
         }
     }
 
     @Override
-    protected void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
+    protected void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
         this.inventory = DefaultedList.ofSize(this.size(), ItemStack.EMPTY);
-        if (arg.contains("LootTable", 8)) {
-            this.lootTableId = new Identifier(arg.getString("LootTable"));
-            this.lootSeed = arg.getLong("LootTableSeed");
+        if (tag.contains("LootTable", 8)) {
+            this.lootTableId = new Identifier(tag.getString("LootTable"));
+            this.lootSeed = tag.getLong("LootTableSeed");
         } else {
-            Inventories.fromTag(arg, this.inventory);
+            Inventories.fromTag(tag, this.inventory);
         }
     }
 
     @Override
-    public ActionResult interact(PlayerEntity arg, Hand arg2) {
-        arg.openHandledScreen(this);
+    public ActionResult interact(PlayerEntity player, Hand hand) {
+        player.openHandledScreen(this);
         return ActionResult.success(this.world.isClient);
     }
 
@@ -178,16 +178,16 @@ NamedScreenHandlerFactory {
         this.setVelocity(this.getVelocity().multiply(f, 0.0, f));
     }
 
-    public void generateLoot(@Nullable PlayerEntity arg) {
+    public void generateLoot(@Nullable PlayerEntity player) {
         if (this.lootTableId != null && this.world.getServer() != null) {
             LootTable lv = this.world.getServer().getLootManager().getTable(this.lootTableId);
-            if (arg instanceof ServerPlayerEntity) {
-                Criteria.PLAYER_GENERATES_CONTAINER_LOOT.test((ServerPlayerEntity)arg, this.lootTableId);
+            if (player instanceof ServerPlayerEntity) {
+                Criteria.PLAYER_GENERATES_CONTAINER_LOOT.test((ServerPlayerEntity)player, this.lootTableId);
             }
             this.lootTableId = null;
             LootContext.Builder lv2 = new LootContext.Builder((ServerWorld)this.world).parameter(LootContextParameters.POSITION, this.getBlockPos()).random(this.lootSeed);
-            if (arg != null) {
-                lv2.luck(arg.getLuck()).parameter(LootContextParameters.THIS_ENTITY, arg);
+            if (player != null) {
+                lv2.luck(player.getLuck()).parameter(LootContextParameters.THIS_ENTITY, player);
             }
             lv.supplyInventory(this, lv2.build(LootContextTypes.CHEST));
         }
@@ -199,9 +199,9 @@ NamedScreenHandlerFactory {
         this.inventory.clear();
     }
 
-    public void setLootTable(Identifier arg, long l) {
-        this.lootTableId = arg;
-        this.lootSeed = l;
+    public void setLootTable(Identifier id, long lootSeed) {
+        this.lootTableId = id;
+        this.lootSeed = lootSeed;
     }
 
     @Override

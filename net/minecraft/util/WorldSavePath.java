@@ -15,8 +15,8 @@ public class WorldSavePath {
     public static final WorldSavePath ROOT = new WorldSavePath(".");
     private final String relativePath;
 
-    private WorldSavePath(String string) {
-        this.relativePath = string;
+    private WorldSavePath(String relativePath) {
+        this.relativePath = relativePath;
     }
 
     public String getRelativePath() {

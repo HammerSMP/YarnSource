@@ -23,34 +23,34 @@ extends ServerConfigEntry<T> {
     protected final Date expiryDate;
     protected final String reason;
 
-    public BanEntry(T object, @Nullable Date date, @Nullable String string, @Nullable Date date2, @Nullable String string2) {
-        super(object);
-        this.creationDate = date == null ? new Date() : date;
-        this.source = string == null ? "(Unknown)" : string;
-        this.expiryDate = date2;
-        this.reason = string2 == null ? "Banned by an operator." : string2;
+    public BanEntry(T key, @Nullable Date creationDate, @Nullable String source, @Nullable Date expiryDate, @Nullable String reason) {
+        super(key);
+        this.creationDate = creationDate == null ? new Date() : creationDate;
+        this.source = source == null ? "(Unknown)" : source;
+        this.expiryDate = expiryDate;
+        this.reason = reason == null ? "Banned by an operator." : reason;
     }
 
-    protected BanEntry(T object, JsonObject jsonObject) {
-        super(object);
+    protected BanEntry(T key, JsonObject json) {
+        super(key);
         Object date4;
         Date date2;
         try {
-            Date date = jsonObject.has("created") ? DATE_FORMAT.parse(jsonObject.get("created").getAsString()) : new Date();
+            Date date = json.has("created") ? DATE_FORMAT.parse(json.get("created").getAsString()) : new Date();
         }
         catch (ParseException parseException) {
             date2 = new Date();
         }
         this.creationDate = date2;
-        this.source = jsonObject.has("source") ? jsonObject.get("source").getAsString() : "(Unknown)";
+        this.source = json.has("source") ? json.get("source").getAsString() : "(Unknown)";
         try {
-            Date date3 = jsonObject.has("expires") ? DATE_FORMAT.parse(jsonObject.get("expires").getAsString()) : null;
+            Date date3 = json.has("expires") ? DATE_FORMAT.parse(json.get("expires").getAsString()) : null;
         }
         catch (ParseException parseException2) {
             date4 = null;
         }
         this.expiryDate = date4;
-        this.reason = jsonObject.has("reason") ? jsonObject.get("reason").getAsString() : "Banned by an operator.";
+        this.reason = json.has("reason") ? json.get("reason").getAsString() : "Banned by an operator.";
     }
 
     public String getSource() {
@@ -76,11 +76,11 @@ extends ServerConfigEntry<T> {
     }
 
     @Override
-    protected void fromJson(JsonObject jsonObject) {
-        jsonObject.addProperty("created", DATE_FORMAT.format(this.creationDate));
-        jsonObject.addProperty("source", this.source);
-        jsonObject.addProperty("expires", this.expiryDate == null ? "forever" : DATE_FORMAT.format(this.expiryDate));
-        jsonObject.addProperty("reason", this.reason);
+    protected void fromJson(JsonObject json) {
+        json.addProperty("created", DATE_FORMAT.format(this.creationDate));
+        json.addProperty("source", this.source);
+        json.addProperty("expires", this.expiryDate == null ? "forever" : DATE_FORMAT.format(this.expiryDate));
+        json.addProperty("reason", this.reason);
     }
 }
 

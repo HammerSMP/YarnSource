@@ -12,8 +12,8 @@ public class SitGoal
 extends Goal {
     private final TameableEntity tameable;
 
-    public SitGoal(TameableEntity arg) {
-        this.tameable = arg;
+    public SitGoal(TameableEntity tameable) {
+        this.tameable = tameable;
         this.setControls(EnumSet.of(Goal.Control.JUMP, Goal.Control.MOVE));
     }
 

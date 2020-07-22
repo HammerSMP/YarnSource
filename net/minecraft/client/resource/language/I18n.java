@@ -20,18 +20,18 @@ public class I18n {
         field_25290 = arg;
     }
 
-    public static String translate(String string, Object ... objects) {
-        String string2 = field_25290.get(string);
+    public static String translate(String key, Object ... args) {
+        String string2 = field_25290.get(key);
         try {
-            return String.format(string2, objects);
+            return String.format(string2, args);
         }
         catch (IllegalFormatException illegalFormatException) {
             return "Format error: " + string2;
         }
     }
 
-    public static boolean hasTranslation(String string) {
-        return field_25290.hasTranslation(string);
+    public static boolean hasTranslation(String key) {
+        return field_25290.hasTranslation(key);
     }
 }
 

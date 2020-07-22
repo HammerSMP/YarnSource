@@ -23,28 +23,28 @@ implements Fertilizable {
     }
 
     @Override
-    public boolean isFertilizable(BlockView arg, BlockPos arg2, BlockState arg3, boolean bl) {
-        if (!arg.getBlockState(arg2.up()).isTranslucent(arg, arg2)) {
+    public boolean isFertilizable(BlockView world, BlockPos pos, BlockState state, boolean isClient) {
+        if (!world.getBlockState(pos.up()).isTranslucent(world, pos)) {
             return false;
         }
-        for (BlockPos lv : BlockPos.iterate(arg2.add(-1, -1, -1), arg2.add(1, 1, 1))) {
-            if (!arg.getBlockState(lv).isIn(BlockTags.NYLIUM)) continue;
+        for (BlockPos lv : BlockPos.iterate(pos.add(-1, -1, -1), pos.add(1, 1, 1))) {
+            if (!world.getBlockState(lv).isIn(BlockTags.NYLIUM)) continue;
             return true;
         }
         return false;
     }
 
     @Override
-    public boolean canGrow(World arg, Random random, BlockPos arg2, BlockState arg3) {
+    public boolean canGrow(World world, Random random, BlockPos pos, BlockState state) {
         return true;
     }
 
     @Override
-    public void grow(ServerWorld arg, Random random, BlockPos arg2, BlockState arg3) {
+    public void grow(ServerWorld world, Random random, BlockPos pos, BlockState state) {
         boolean bl = false;
         boolean bl2 = false;
-        for (BlockPos lv : BlockPos.iterate(arg2.add(-1, -1, -1), arg2.add(1, 1, 1))) {
-            BlockState lv2 = arg.getBlockState(lv);
+        for (BlockPos lv : BlockPos.iterate(pos.add(-1, -1, -1), pos.add(1, 1, 1))) {
+            BlockState lv2 = world.getBlockState(lv);
             if (lv2.isOf(Blocks.WARPED_NYLIUM)) {
                 bl2 = true;
             }
@@ -55,11 +55,11 @@ implements Fertilizable {
             break;
         }
         if (bl2 && bl) {
-            arg.setBlockState(arg2, random.nextBoolean() ? Blocks.WARPED_NYLIUM.getDefaultState() : Blocks.CRIMSON_NYLIUM.getDefaultState(), 3);
+            world.setBlockState(pos, random.nextBoolean() ? Blocks.WARPED_NYLIUM.getDefaultState() : Blocks.CRIMSON_NYLIUM.getDefaultState(), 3);
         } else if (bl2) {
-            arg.setBlockState(arg2, Blocks.WARPED_NYLIUM.getDefaultState(), 3);
+            world.setBlockState(pos, Blocks.WARPED_NYLIUM.getDefaultState(), 3);
         } else if (bl) {
-            arg.setBlockState(arg2, Blocks.CRIMSON_NYLIUM.getDefaultState(), 3);
+            world.setBlockState(pos, Blocks.CRIMSON_NYLIUM.getDefaultState(), 3);
         }
     }
 }

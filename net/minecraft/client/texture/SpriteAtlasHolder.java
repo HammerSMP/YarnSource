@@ -25,20 +25,20 @@ implements AutoCloseable {
     private final SpriteAtlasTexture atlas;
     private final String pathPrefix;
 
-    public SpriteAtlasHolder(TextureManager arg, Identifier arg2, String string) {
-        this.pathPrefix = string;
-        this.atlas = new SpriteAtlasTexture(arg2);
-        arg.registerTexture(this.atlas.getId(), this.atlas);
+    public SpriteAtlasHolder(TextureManager textureManager, Identifier atlasId, String pathPrefix) {
+        this.pathPrefix = pathPrefix;
+        this.atlas = new SpriteAtlasTexture(atlasId);
+        textureManager.registerTexture(this.atlas.getId(), this.atlas);
     }
 
     protected abstract Stream<Identifier> getSprites();
 
-    protected Sprite getSprite(Identifier arg) {
-        return this.atlas.getSprite(this.toSpriteId(arg));
+    protected Sprite getSprite(Identifier objectId) {
+        return this.atlas.getSprite(this.toSpriteId(objectId));
     }
 
-    private Identifier toSpriteId(Identifier arg) {
-        return new Identifier(arg.getNamespace(), this.pathPrefix + "/" + arg.getPath());
+    private Identifier toSpriteId(Identifier objectId) {
+        return new Identifier(objectId.getNamespace(), this.pathPrefix + "/" + objectId.getPath());
     }
 
     @Override
@@ -66,8 +66,8 @@ implements AutoCloseable {
     }
 
     @Override
-    protected /* synthetic */ Object prepare(ResourceManager arg, Profiler arg2) {
-        return this.prepare(arg, arg2);
+    protected /* synthetic */ Object prepare(ResourceManager manager, Profiler profiler) {
+        return this.prepare(manager, profiler);
     }
 }
 

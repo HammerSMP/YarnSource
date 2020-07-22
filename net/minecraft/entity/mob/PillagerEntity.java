@@ -101,8 +101,8 @@ implements CrossbowUser {
     }
 
     @Override
-    public boolean canUseRangedWeapon(RangedWeaponItem arg) {
-        return arg == Items.CROSSBOW;
+    public boolean canUseRangedWeapon(RangedWeaponItem weapon) {
+        return weapon == Items.CROSSBOW;
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -111,8 +111,8 @@ implements CrossbowUser {
     }
 
     @Override
-    public void setCharging(boolean bl) {
-        this.dataTracker.set(CHARGING, bl);
+    public void setCharging(boolean charging) {
+        this.dataTracker.set(CHARGING, charging);
     }
 
     @Override
@@ -121,15 +121,15 @@ implements CrossbowUser {
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
         ListTag lv = new ListTag();
         for (int i = 0; i < this.inventory.size(); ++i) {
             ItemStack lv2 = this.inventory.getStack(i);
             if (lv2.isEmpty()) continue;
             lv.add(lv2.toTag(new CompoundTag()));
         }
-        arg.put("Inventory", lv);
+        tag.put("Inventory", lv);
     }
 
     @Override
@@ -148,9 +148,9 @@ implements CrossbowUser {
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        ListTag lv = arg.getList("Inventory", 10);
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        ListTag lv = tag.getList("Inventory", 10);
         for (int i = 0; i < lv.size(); ++i) {
             ItemStack lv2 = ItemStack.fromTag(lv.getCompound(i));
             if (lv2.isEmpty()) continue;
@@ -160,12 +160,12 @@ implements CrossbowUser {
     }
 
     @Override
-    public float getPathfindingFavor(BlockPos arg, WorldView arg2) {
-        BlockState lv = arg2.getBlockState(arg.down());
+    public float getPathfindingFavor(BlockPos pos, WorldView world) {
+        BlockState lv = world.getBlockState(pos.down());
         if (lv.isOf(Blocks.GRASS_BLOCK) || lv.isOf(Blocks.SAND)) {
             return 10.0f;
         }
-        return 0.5f - arg2.getBrightness(arg);
+        return 0.5f - world.getBrightness(pos);
     }
 
     @Override
@@ -175,14 +175,14 @@ implements CrossbowUser {
 
     @Override
     @Nullable
-    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
-        this.initEquipment(arg2);
-        this.updateEnchantments(arg2);
-        return super.initialize(arg, arg2, arg3, arg4, arg5);
+    public EntityData initialize(class_5425 arg, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable CompoundTag entityTag) {
+        this.initEquipment(difficulty);
+        this.updateEnchantments(difficulty);
+        return super.initialize(arg, difficulty, spawnReason, entityData, entityTag);
     }
 
     @Override
-    protected void initEquipment(LocalDifficulty arg) {
+    protected void initEquipment(LocalDifficulty difficulty) {
         ItemStack lv = new ItemStack(Items.CROSSBOW);
         if (this.random.nextInt(300) == 0) {
             HashMap map = Maps.newHashMap();
@@ -193,12 +193,12 @@ implements CrossbowUser {
     }
 
     @Override
-    public boolean isTeammate(Entity arg) {
-        if (super.isTeammate(arg)) {
+    public boolean isTeammate(Entity other) {
+        if (super.isTeammate(other)) {
             return true;
         }
-        if (arg instanceof LivingEntity && ((LivingEntity)arg).getGroup() == EntityGroup.ILLAGER) {
-            return this.getScoreboardTeam() == null && arg.getScoreboardTeam() == null;
+        if (other instanceof LivingEntity && ((LivingEntity)other).getGroup() == EntityGroup.ILLAGER) {
+            return this.getScoreboardTeam() == null && other.getScoreboardTeam() == null;
         }
         return false;
     }
@@ -214,32 +214,32 @@ implements CrossbowUser {
     }
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource arg) {
+    protected SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.ENTITY_PILLAGER_HURT;
     }
 
     @Override
-    public void attack(LivingEntity arg, float f) {
+    public void attack(LivingEntity target, float pullProgress) {
         this.shoot(this, 1.6f);
     }
 
     @Override
-    public void shoot(LivingEntity arg, ItemStack arg2, ProjectileEntity arg3, float f) {
-        this.shoot(this, arg, arg3, f, 1.6f);
+    public void shoot(LivingEntity target, ItemStack crossbow, ProjectileEntity projectile, float multiShotSpray) {
+        this.shoot(this, target, projectile, multiShotSpray, 1.6f);
     }
 
     @Override
-    protected void loot(ItemEntity arg) {
-        ItemStack lv = arg.getStack();
+    protected void loot(ItemEntity item) {
+        ItemStack lv = item.getStack();
         if (lv.getItem() instanceof BannerItem) {
-            super.loot(arg);
+            super.loot(item);
         } else {
             Item lv2 = lv.getItem();
             if (this.method_7111(lv2)) {
-                this.method_29499(arg);
+                this.method_29499(item);
                 ItemStack lv3 = this.inventory.addStack(lv);
                 if (lv3.isEmpty()) {
-                    arg.remove();
+                    item.remove();
                 } else {
                     lv.setCount(lv3.getCount());
                 }
@@ -252,29 +252,29 @@ implements CrossbowUser {
     }
 
     @Override
-    public boolean equip(int i, ItemStack arg) {
-        if (super.equip(i, arg)) {
+    public boolean equip(int slot, ItemStack item) {
+        if (super.equip(slot, item)) {
             return true;
         }
-        int j = i - 300;
+        int j = slot - 300;
         if (j >= 0 && j < this.inventory.size()) {
-            this.inventory.setStack(j, arg);
+            this.inventory.setStack(j, item);
             return true;
         }
         return false;
     }
 
     @Override
-    public void addBonusForWave(int i, boolean bl) {
+    public void addBonusForWave(int wave, boolean unused) {
         boolean bl2;
         Raid lv = this.getRaid();
-        boolean bl3 = bl2 = this.random.nextFloat() <= lv.getEnchantmentChance();
+        boolean bl = bl2 = this.random.nextFloat() <= lv.getEnchantmentChance();
         if (bl2) {
             ItemStack lv2 = new ItemStack(Items.CROSSBOW);
             HashMap map = Maps.newHashMap();
-            if (i > lv.getMaxWaves(Difficulty.NORMAL)) {
+            if (wave > lv.getMaxWaves(Difficulty.NORMAL)) {
                 map.put(Enchantments.QUICK_CHARGE, 2);
-            } else if (i > lv.getMaxWaves(Difficulty.EASY)) {
+            } else if (wave > lv.getMaxWaves(Difficulty.EASY)) {
                 map.put(Enchantments.QUICK_CHARGE, 1);
             }
             map.put(Enchantments.MULTISHOT, 1);

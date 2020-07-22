@@ -14,9 +14,9 @@ implements BlockPointer {
     private final ServerWorld world;
     private final BlockPos pos;
 
-    public BlockPointerImpl(ServerWorld arg, BlockPos arg2) {
+    public BlockPointerImpl(ServerWorld arg, BlockPos pos) {
         this.world = arg;
-        this.pos = arg2;
+        this.pos = pos;
     }
 
     @Override

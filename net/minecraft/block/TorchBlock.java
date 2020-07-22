@@ -30,37 +30,37 @@ extends Block {
     protected static final VoxelShape BOUNDING_SHAPE = Block.createCuboidShape(6.0, 0.0, 6.0, 10.0, 10.0, 10.0);
     protected final ParticleEffect particle;
 
-    protected TorchBlock(AbstractBlock.Settings arg, ParticleEffect arg2) {
-        super(arg);
-        this.particle = arg2;
+    protected TorchBlock(AbstractBlock.Settings settings, ParticleEffect particle) {
+        super(settings);
+        this.particle = particle;
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
         return BOUNDING_SHAPE;
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
-        if (arg2 == Direction.DOWN && !this.canPlaceAt(arg, arg4, arg5)) {
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
+        if (direction == Direction.DOWN && !this.canPlaceAt(state, world, pos)) {
             return Blocks.AIR.getDefaultState();
         }
-        return super.getStateForNeighborUpdate(arg, arg2, arg3, arg4, arg5, arg6);
+        return super.getStateForNeighborUpdate(state, direction, newState, world, pos, posFrom);
     }
 
     @Override
-    public boolean canPlaceAt(BlockState arg, WorldView arg2, BlockPos arg3) {
-        return TorchBlock.sideCoversSmallSquare(arg2, arg3.down(), Direction.UP);
+    public boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
+        return TorchBlock.sideCoversSmallSquare(world, pos.down(), Direction.UP);
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void randomDisplayTick(BlockState arg, World arg2, BlockPos arg3, Random random) {
-        double d = (double)arg3.getX() + 0.5;
-        double e = (double)arg3.getY() + 0.7;
-        double f = (double)arg3.getZ() + 0.5;
-        arg2.addParticle(ParticleTypes.SMOKE, d, e, f, 0.0, 0.0, 0.0);
-        arg2.addParticle(this.particle, d, e, f, 0.0, 0.0, 0.0);
+    public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
+        double d = (double)pos.getX() + 0.5;
+        double e = (double)pos.getY() + 0.7;
+        double f = (double)pos.getZ() + 0.5;
+        world.addParticle(ParticleTypes.SMOKE, d, e, f, 0.0, 0.0, 0.0);
+        world.addParticle(this.particle, d, e, f, 0.0, 0.0, 0.0);
     }
 }
 

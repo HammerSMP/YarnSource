@@ -43,21 +43,21 @@ extends AbstractCriterion<Conditions> {
     }
 
     @Nullable
-    private static Block getBlock(JsonObject jsonObject) {
-        if (jsonObject.has("block")) {
-            Identifier lv = new Identifier(JsonHelper.getString(jsonObject, "block"));
-            return (Block)Registry.BLOCK.getOrEmpty(lv).orElseThrow(() -> new JsonSyntaxException("Unknown block type '" + lv + "'"));
+    private static Block getBlock(JsonObject root) {
+        if (root.has("block")) {
+            Identifier lv = new Identifier(JsonHelper.getString(root, "block"));
+            return Registry.BLOCK.getOrEmpty(lv).orElseThrow(() -> new JsonSyntaxException("Unknown block type '" + lv + "'"));
         }
         return null;
     }
 
-    public void test(ServerPlayerEntity arg, Block arg2, ItemStack arg32, int i) {
-        this.test(arg, arg3 -> arg3.test(arg2, arg32, i));
+    public void test(ServerPlayerEntity player, Block block, ItemStack stack, int beeCount) {
+        this.test(player, conditions -> conditions.test(block, stack, beeCount));
     }
 
     @Override
-    public /* synthetic */ AbstractCriterionConditions conditionsFromJson(JsonObject jsonObject, EntityPredicate.Extended arg, AdvancementEntityPredicateDeserializer arg2) {
-        return this.conditionsFromJson(jsonObject, arg, arg2);
+    public /* synthetic */ AbstractCriterionConditions conditionsFromJson(JsonObject obj, EntityPredicate.Extended playerPredicate, AdvancementEntityPredicateDeserializer predicateDeserializer) {
+        return this.conditionsFromJson(obj, playerPredicate, predicateDeserializer);
     }
 
     public static class Conditions
@@ -67,30 +67,30 @@ extends AbstractCriterion<Conditions> {
         private final ItemPredicate item;
         private final NumberRange.IntRange beeCount;
 
-        public Conditions(EntityPredicate.Extended arg, @Nullable Block arg2, ItemPredicate arg3, NumberRange.IntRange arg4) {
-            super(ID, arg);
-            this.block = arg2;
-            this.item = arg3;
-            this.beeCount = arg4;
+        public Conditions(EntityPredicate.Extended player, @Nullable Block block, ItemPredicate item, NumberRange.IntRange beeCount) {
+            super(ID, player);
+            this.block = block;
+            this.item = item;
+            this.beeCount = beeCount;
         }
 
-        public static Conditions create(Block arg, ItemPredicate.Builder arg2, NumberRange.IntRange arg3) {
-            return new Conditions(EntityPredicate.Extended.EMPTY, arg, arg2.build(), arg3);
+        public static Conditions create(Block block, ItemPredicate.Builder itemPredicateBuilder, NumberRange.IntRange beeCountRange) {
+            return new Conditions(EntityPredicate.Extended.EMPTY, block, itemPredicateBuilder.build(), beeCountRange);
         }
 
-        public boolean test(Block arg, ItemStack arg2, int i) {
-            if (this.block != null && arg != this.block) {
+        public boolean test(Block block, ItemStack stack, int count) {
+            if (this.block != null && block != this.block) {
                 return false;
             }
-            if (!this.item.test(arg2)) {
+            if (!this.item.test(stack)) {
                 return false;
             }
-            return this.beeCount.test(i);
+            return this.beeCount.test(count);
         }
 
         @Override
-        public JsonObject toJson(AdvancementEntityPredicateSerializer arg) {
-            JsonObject jsonObject = super.toJson(arg);
+        public JsonObject toJson(AdvancementEntityPredicateSerializer predicateSerializer) {
+            JsonObject jsonObject = super.toJson(predicateSerializer);
             if (this.block != null) {
                 jsonObject.addProperty("block", Registry.BLOCK.getId(this.block).toString());
             }

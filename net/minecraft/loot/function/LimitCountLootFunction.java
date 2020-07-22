@@ -24,9 +24,9 @@ public class LimitCountLootFunction
 extends ConditionalLootFunction {
     private final BoundedIntUnaryOperator limit;
 
-    private LimitCountLootFunction(LootCondition[] args, BoundedIntUnaryOperator arg) {
-        super(args);
-        this.limit = arg;
+    private LimitCountLootFunction(LootCondition[] conditions, BoundedIntUnaryOperator limit) {
+        super(conditions);
+        this.limit = limit;
     }
 
     @Override
@@ -35,14 +35,14 @@ extends ConditionalLootFunction {
     }
 
     @Override
-    public ItemStack process(ItemStack arg, LootContext arg2) {
-        int i = this.limit.applyAsInt(arg.getCount());
-        arg.setCount(i);
-        return arg;
+    public ItemStack process(ItemStack stack, LootContext context) {
+        int i = this.limit.applyAsInt(stack.getCount());
+        stack.setCount(i);
+        return stack;
     }
 
-    public static ConditionalLootFunction.Builder<?> builder(BoundedIntUnaryOperator arg) {
-        return LimitCountLootFunction.builder((LootCondition[] args) -> new LimitCountLootFunction((LootCondition[])args, arg));
+    public static ConditionalLootFunction.Builder<?> builder(BoundedIntUnaryOperator limit) {
+        return LimitCountLootFunction.builder((LootCondition[] conditions) -> new LimitCountLootFunction((LootCondition[])conditions, limit));
     }
 
     public static class Serializer
@@ -60,8 +60,8 @@ extends ConditionalLootFunction {
         }
 
         @Override
-        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
-            return this.fromJson(jsonObject, jsonDeserializationContext, args);
+        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject json, JsonDeserializationContext context, LootCondition[] conditions) {
+            return this.fromJson(json, context, conditions);
         }
     }
 }

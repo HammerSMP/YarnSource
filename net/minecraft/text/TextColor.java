@@ -26,13 +26,13 @@ public final class TextColor {
     @Nullable
     private final String name;
 
-    private TextColor(int i, String string) {
-        this.rgb = i;
-        this.name = string;
+    private TextColor(int rgb, String name) {
+        this.rgb = rgb;
+        this.name = name;
     }
 
-    private TextColor(int i) {
-        this.rgb = i;
+    private TextColor(int rgb) {
+        this.rgb = rgb;
         this.name = null;
     }
 
@@ -72,26 +72,26 @@ public final class TextColor {
     }
 
     @Nullable
-    public static TextColor fromFormatting(Formatting arg) {
-        return FORMATTING_TO_COLOR.get((Object)arg);
+    public static TextColor fromFormatting(Formatting formatting) {
+        return FORMATTING_TO_COLOR.get((Object)formatting);
     }
 
-    public static TextColor fromRgb(int i) {
-        return new TextColor(i);
+    public static TextColor fromRgb(int rgb) {
+        return new TextColor(rgb);
     }
 
     @Nullable
-    public static TextColor parse(String string) {
-        if (string.startsWith("#")) {
+    public static TextColor parse(String name) {
+        if (name.startsWith("#")) {
             try {
-                int i = Integer.parseInt(string.substring(1), 16);
+                int i = Integer.parseInt(name.substring(1), 16);
                 return TextColor.fromRgb(i);
             }
             catch (NumberFormatException numberFormatException) {
                 return null;
             }
         }
-        return BY_NAME.get(string);
+        return BY_NAME.get(name);
     }
 }
 

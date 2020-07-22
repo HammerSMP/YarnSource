@@ -56,38 +56,38 @@ public class UpgradeData {
     private UpgradeData() {
     }
 
-    public UpgradeData(CompoundTag arg) {
+    public UpgradeData(CompoundTag tag) {
         this();
-        if (arg.contains("Indices", 10)) {
-            CompoundTag lv = arg.getCompound("Indices");
+        if (tag.contains("Indices", 10)) {
+            CompoundTag lv = tag.getCompound("Indices");
             for (int i = 0; i < this.centerIndicesToUpgrade.length; ++i) {
                 String string = String.valueOf(i);
                 if (!lv.contains(string, 11)) continue;
                 this.centerIndicesToUpgrade[i] = lv.getIntArray(string);
             }
         }
-        int j = arg.getInt("Sides");
+        int j = tag.getInt("Sides");
         for (EightWayDirection lv2 : EightWayDirection.values()) {
             if ((j & 1 << lv2.ordinal()) == 0) continue;
             this.sidesToUpgrade.add(lv2);
         }
     }
 
-    public void upgrade(WorldChunk arg) {
-        this.upgradeCenter(arg);
+    public void upgrade(WorldChunk chunk) {
+        this.upgradeCenter(chunk);
         for (EightWayDirection lv : EIGHT_WAYS) {
-            UpgradeData.upgradeSide(arg, lv);
+            UpgradeData.upgradeSide(chunk, lv);
         }
-        World lv2 = arg.getWorld();
+        World lv2 = chunk.getWorld();
         CALLBACK_LOGICS.forEach(arg2 -> arg2.postUpdate(lv2));
     }
 
-    private static void upgradeSide(WorldChunk arg, EightWayDirection arg2) {
-        World lv = arg.getWorld();
-        if (!arg.getUpgradeData().sidesToUpgrade.remove((Object)arg2)) {
+    private static void upgradeSide(WorldChunk chunk, EightWayDirection side) {
+        World lv = chunk.getWorld();
+        if (!chunk.getUpgradeData().sidesToUpgrade.remove((Object)side)) {
             return;
         }
-        Set<Direction> set = arg2.getDirections();
+        Set<Direction> set = side.getDirections();
         boolean i = false;
         int j = 15;
         boolean bl = set.contains(Direction.EAST);
@@ -95,7 +95,7 @@ public class UpgradeData {
         boolean bl3 = set.contains(Direction.SOUTH);
         boolean bl4 = set.contains(Direction.NORTH);
         boolean bl5 = set.size() == 1;
-        ChunkPos lv2 = arg.getPos();
+        ChunkPos lv2 = chunk.getPos();
         int k = lv2.getStartX() + (bl5 && (bl4 || bl3) ? 1 : (bl2 ? 0 : 15));
         int l = lv2.getStartX() + (bl5 && (bl4 || bl3) ? 14 : (bl2 ? 0 : 15));
         int m = lv2.getStartZ() + (bl5 && (bl || bl2) ? 1 : (bl4 ? 0 : 15));
@@ -109,21 +109,21 @@ public class UpgradeData {
                 lv3.set(lv4, lv7);
                 lv6 = UpgradeData.applyAdjacentBlock(lv6, lv7, lv, lv4, lv3);
             }
-            Block.replaced(lv5, lv6, lv, lv4, 18);
+            Block.replace(lv5, lv6, lv, lv4, 18);
         }
     }
 
-    private static BlockState applyAdjacentBlock(BlockState arg, Direction arg2, WorldAccess arg3, BlockPos arg4, BlockPos arg5) {
-        return BLOCK_TO_LOGIC.getOrDefault(arg.getBlock(), BuiltinLogic.DEFAULT).getUpdatedState(arg, arg2, arg3.getBlockState(arg5), arg3, arg4, arg5);
+    private static BlockState applyAdjacentBlock(BlockState oldState, Direction dir, WorldAccess world, BlockPos currentPos, BlockPos otherPos) {
+        return BLOCK_TO_LOGIC.getOrDefault(oldState.getBlock(), BuiltinLogic.DEFAULT).getUpdatedState(oldState, dir, world.getBlockState(otherPos), world, currentPos, otherPos);
     }
 
-    private void upgradeCenter(WorldChunk arg) {
+    private void upgradeCenter(WorldChunk chunk) {
         BlockPos.Mutable lv = new BlockPos.Mutable();
         BlockPos.Mutable lv2 = new BlockPos.Mutable();
-        ChunkPos lv3 = arg.getPos();
-        World lv4 = arg.getWorld();
+        ChunkPos lv3 = chunk.getPos();
+        World lv4 = chunk.getWorld();
         for (int i = 0; i < 16; ++i) {
-            ChunkSection lv5 = arg.getSectionArray()[i];
+            ChunkSection lv5 = chunk.getSectionArray()[i];
             int[] is = this.centerIndicesToUpgrade[i];
             this.centerIndicesToUpgrade[i] = null;
             if (lv5 == null || is == null || is.length <= 0) continue;
@@ -141,7 +141,7 @@ public class UpgradeData {
                     if (lv.getX() >> 4 != lv3.x || lv.getZ() >> 4 != lv3.z) continue;
                     lv8 = UpgradeData.applyAdjacentBlock(lv8, lv9, lv4, lv, lv2);
                 }
-                Block.replaced(lv7, lv8, lv4, lv, 18);
+                Block.replace(lv7, lv8, lv4, lv, 18);
             }
         }
         for (int n = 0; n < this.centerIndicesToUpgrade.length; ++n) {
@@ -240,7 +240,7 @@ public class UpgradeData {
             }
 
             @Override
-            public void postUpdate(WorldAccess arg) {
+            public void postUpdate(WorldAccess world) {
                 BlockPos.Mutable lv = new BlockPos.Mutable();
                 List<ObjectSet<BlockPos>> list = this.distanceToPositions.get();
                 for (int i = 2; i < list.size(); ++i) {
@@ -248,13 +248,13 @@ public class UpgradeData {
                     ObjectSet<BlockPos> objectSet = list.get(j);
                     ObjectSet<BlockPos> objectSet2 = list.get(i);
                     for (BlockPos lv2 : objectSet) {
-                        BlockState lv3 = arg.getBlockState(lv2);
+                        BlockState lv3 = world.getBlockState(lv2);
                         if (lv3.get(Properties.DISTANCE_1_7) < j) continue;
-                        arg.setBlockState(lv2, (BlockState)lv3.with(Properties.DISTANCE_1_7, j), 18);
+                        world.setBlockState(lv2, (BlockState)lv3.with(Properties.DISTANCE_1_7, j), 18);
                         if (i == 7) continue;
                         for (Direction lv4 : DIRECTIONS) {
                             lv.set(lv2, lv4);
-                            BlockState lv5 = arg.getBlockState(lv);
+                            BlockState lv5 = world.getBlockState(lv);
                             if (!lv5.contains(Properties.DISTANCE_1_7) || lv3.get(Properties.DISTANCE_1_7) <= i) continue;
                             objectSet2.add((Object)lv.toImmutable());
                         }
@@ -278,8 +278,8 @@ public class UpgradeData {
 
         public static final Direction[] DIRECTIONS;
 
-        private BuiltinLogic(Block ... args) {
-            this(false, args);
+        private BuiltinLogic(Block ... blocks) {
+            this(false, blocks);
         }
 
         private BuiltinLogic(boolean bl, Block ... args) {
@@ -299,7 +299,7 @@ public class UpgradeData {
     public static interface Logic {
         public BlockState getUpdatedState(BlockState var1, Direction var2, BlockState var3, WorldAccess var4, BlockPos var5, BlockPos var6);
 
-        default public void postUpdate(WorldAccess arg) {
+        default public void postUpdate(WorldAccess world) {
         }
     }
 }

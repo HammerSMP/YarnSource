@@ -58,7 +58,7 @@ import net.minecraft.util.Util;
 import net.minecraft.util.WorldSavePath;
 import net.minecraft.util.dynamic.RegistryReadingOps;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.registry.RegistryTracker;
+import net.minecraft.util.registry.DynamicRegistryManager;
 import net.minecraft.world.SaveProperties;
 import net.minecraft.world.gen.GeneratorOptions;
 import net.minecraft.world.level.storage.LevelStorage;
@@ -77,9 +77,9 @@ extends Screen {
     private TextFieldWidget levelNameTextField;
     private final LevelStorage.Session field_23777;
 
-    public EditWorldScreen(BooleanConsumer booleanConsumer, LevelStorage.Session arg) {
+    public EditWorldScreen(BooleanConsumer callback, LevelStorage.Session arg) {
         super(new TranslatableText("selectWorld.edit.title"));
-        this.callback = booleanConsumer;
+        this.callback = callback;
         this.field_23777 = arg;
     }
 
@@ -119,8 +119,8 @@ extends Screen {
         }, new TranslatableText("optimizeWorld.confirm.title"), new TranslatableText("optimizeWorld.confirm.description"), true))));
         this.addButton(new ButtonWidget(this.width / 2 - 100, this.height / 4 + 120 + 5, 200, 20, new TranslatableText("selectWorld.edit.export_worldgen_settings"), arg -> {
             DataResult dataResult4;
-            RegistryTracker.Modifiable lv = RegistryTracker.create();
-            try (MinecraftClient.IntegratedResourceManager lv2 = this.client.method_29604(lv, MinecraftClient::method_29598, (Function4<LevelStorage.Session, RegistryTracker.Modifiable, ResourceManager, DataPackSettings, SaveProperties>)((Function4)MinecraftClient::createSaveProperties), false, this.field_23777);){
+            DynamicRegistryManager.Impl lv = DynamicRegistryManager.create();
+            try (MinecraftClient.IntegratedResourceManager lv2 = this.client.method_29604(lv, MinecraftClient::method_29598, (Function4<LevelStorage.Session, DynamicRegistryManager.Impl, ResourceManager, DataPackSettings, SaveProperties>)((Function4)MinecraftClient::createSaveProperties), false, this.field_23777);){
                 RegistryReadingOps dynamicOps = RegistryReadingOps.of(JsonOps.INSTANCE, lv);
                 DataResult dataResult = GeneratorOptions.CODEC.encodeStart(dynamicOps, (Object)lv2.getSaveProperties().getGeneratorOptions());
                 DataResult dataResult2 = dataResult.flatMap(jsonElement -> {
@@ -140,7 +140,7 @@ extends Screen {
             LiteralText lv3 = new LiteralText((String)dataResult4.get().map(Function.identity(), DataResult.PartialResult::message));
             TranslatableText lv4 = new TranslatableText(dataResult4.result().isPresent() ? "selectWorld.edit.export_worldgen_settings.success" : "selectWorld.edit.export_worldgen_settings.failure");
             dataResult4.error().ifPresent(partialResult -> field_23776.error("Error exporting world settings: {}", partialResult));
-            this.client.getToastManager().add(SystemToast.method_29047(this.client, SystemToast.Type.WORLD_GEN_SETTINGS_TRANSFER, lv4, lv3));
+            this.client.getToastManager().add(SystemToast.create(this.client, SystemToast.Type.WORLD_GEN_SETTINGS_TRANSFER, lv4, lv3));
         }));
         this.saveButton = this.addButton(new ButtonWidget(this.width / 2 - 100, this.height / 4 + 144 + 5, 98, 20, new TranslatableText("selectWorld.edit.save"), arg -> this.commit()));
         this.addButton(new ButtonWidget(this.width / 2 + 2, this.height / 4 + 144 + 5, 98, 20, ScreenTexts.CANCEL, arg -> this.callback.accept(false)));
@@ -157,9 +157,9 @@ extends Screen {
     }
 
     @Override
-    public void resize(MinecraftClient arg, int i, int j) {
+    public void resize(MinecraftClient client, int width, int height) {
         String string = this.levelNameTextField.getText();
-        this.init(arg, i, j);
+        this.init(client, width, height);
         this.levelNameTextField.setText(string);
     }
 
@@ -221,12 +221,12 @@ extends Screen {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.renderBackground(arg);
-        this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 15, 0xFFFFFF);
-        this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("selectWorld.enterName", new Object[0]), this.width / 2 - 100, 24, 0xA0A0A0);
-        this.levelNameTextField.render(arg, i, j, f);
-        super.render(arg, i, j, f);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.renderBackground(matrices);
+        this.drawCenteredText(matrices, this.textRenderer, this.title, this.width / 2, 15, 0xFFFFFF);
+        this.drawStringWithShadow(matrices, this.textRenderer, I18n.translate("selectWorld.enterName", new Object[0]), this.width / 2 - 100, 24, 0xA0A0A0);
+        this.levelNameTextField.render(matrices, mouseX, mouseY, delta);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 }
 

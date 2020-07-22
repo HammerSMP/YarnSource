@@ -21,8 +21,8 @@ public class TargetPredicate {
     private boolean useDistanceScalingFactor = true;
     private Predicate<LivingEntity> predicate;
 
-    public TargetPredicate setBaseMaxDistance(double d) {
-        this.baseMaxDistance = d;
+    public TargetPredicate setBaseMaxDistance(double baseMaxDistance) {
+        this.baseMaxDistance = baseMaxDistance;
         return this;
     }
 
@@ -56,43 +56,43 @@ public class TargetPredicate {
         return this;
     }
 
-    public boolean test(@Nullable LivingEntity arg, LivingEntity arg2) {
-        if (arg == arg2) {
+    public boolean test(@Nullable LivingEntity baseEntity, LivingEntity targetEntity) {
+        if (baseEntity == targetEntity) {
             return false;
         }
-        if (arg2.isSpectator()) {
+        if (targetEntity.isSpectator()) {
             return false;
         }
-        if (!arg2.isAlive()) {
+        if (!targetEntity.isAlive()) {
             return false;
         }
-        if (!this.includeInvulnerable && arg2.isInvulnerable()) {
+        if (!this.includeInvulnerable && targetEntity.isInvulnerable()) {
             return false;
         }
-        if (this.predicate != null && !this.predicate.test(arg2)) {
+        if (this.predicate != null && !this.predicate.test(targetEntity)) {
             return false;
         }
-        if (arg != null) {
+        if (baseEntity != null) {
             if (!this.ignoreEntityTargetRules) {
-                if (!arg.canTarget(arg2)) {
+                if (!baseEntity.canTarget(targetEntity)) {
                     return false;
                 }
-                if (!arg.canTarget(arg2.getType())) {
+                if (!baseEntity.canTarget(targetEntity.getType())) {
                     return false;
                 }
             }
-            if (!this.includeTeammates && arg.isTeammate(arg2)) {
+            if (!this.includeTeammates && baseEntity.isTeammate(targetEntity)) {
                 return false;
             }
             if (this.baseMaxDistance > 0.0) {
-                double d = this.useDistanceScalingFactor ? arg2.getAttackDistanceScalingFactor(arg) : 1.0;
+                double d = this.useDistanceScalingFactor ? targetEntity.getAttackDistanceScalingFactor(baseEntity) : 1.0;
                 double e = this.baseMaxDistance * d;
-                double f = arg.squaredDistanceTo(arg2.getX(), arg2.getY(), arg2.getZ());
+                double f = baseEntity.squaredDistanceTo(targetEntity.getX(), targetEntity.getY(), targetEntity.getZ());
                 if (f > e * e) {
                     return false;
                 }
             }
-            if (!this.includeHidden && arg instanceof MobEntity && !((MobEntity)arg).getVisibilityCache().canSee(arg2)) {
+            if (!this.includeHidden && baseEntity instanceof MobEntity && !((MobEntity)baseEntity).getVisibilityCache().canSee(targetEntity)) {
                 return false;
             }
         }

@@ -13,6 +13,7 @@ import com.google.common.collect.ImmutableMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -34,18 +35,20 @@ extends Task<PathAwareEntity> {
     private final PointOfInterestType poiType;
     private final MemoryModuleType<GlobalPos> targetMemoryModuleType;
     private final boolean onlyRunIfChild;
+    private final Optional<Byte> field_25812;
     private long positionExpireTimeLimit;
     private final Long2ObjectMap<RetryMarker> foundPositionsToExpiry = new Long2ObjectOpenHashMap();
 
-    public FindPointOfInterestTask(PointOfInterestType arg, MemoryModuleType<GlobalPos> arg2, MemoryModuleType<GlobalPos> arg3, boolean bl) {
+    public FindPointOfInterestTask(PointOfInterestType poiType, MemoryModuleType<GlobalPos> arg2, MemoryModuleType<GlobalPos> arg3, boolean bl, Optional<Byte> optional) {
         super((Map<MemoryModuleType<?>, MemoryModuleState>)FindPointOfInterestTask.method_29245(arg2, arg3));
-        this.poiType = arg;
+        this.poiType = poiType;
         this.targetMemoryModuleType = arg3;
         this.onlyRunIfChild = bl;
+        this.field_25812 = optional;
     }
 
-    public FindPointOfInterestTask(PointOfInterestType arg, MemoryModuleType<GlobalPos> arg2, boolean bl) {
-        this(arg, arg2, arg2, bl);
+    public FindPointOfInterestTask(PointOfInterestType arg, MemoryModuleType<GlobalPos> arg2, boolean bl, Optional<Byte> optional) {
+        this(arg, arg2, arg2, bl, optional);
     }
 
     private static ImmutableMap<MemoryModuleType<?>, MemoryModuleState> method_29245(MemoryModuleType<GlobalPos> arg, MemoryModuleType<GlobalPos> arg2) {
@@ -92,6 +95,7 @@ extends Task<PathAwareEntity> {
             lv.getType(lv3).ifPresent(arg5 -> {
                 lv.getPosition(this.poiType.getCompletionCondition(), arg2 -> arg2.equals(lv3), lv3, 1);
                 arg22.getBrain().remember(this.targetMemoryModuleType, GlobalPos.create(arg2.getRegistryKey(), lv3));
+                this.field_25812.ifPresent(byte_ -> arg2.sendEntityStatus(arg22, (byte)byte_));
                 this.foundPositionsToExpiry.clear();
                 DebugInfoSender.sendPointOfInterest(arg2, lv3);
             });
@@ -108,24 +112,24 @@ extends Task<PathAwareEntity> {
         private long nextScheduledAttemptAt;
         private int currentDelay;
 
-        RetryMarker(Random random, long l) {
+        RetryMarker(Random random, long time) {
             this.random = random;
-            this.method_29926(l);
+            this.method_29926(time);
         }
 
-        public void method_29926(long l) {
-            this.previousAttemptAt = l;
+        public void method_29926(long time) {
+            this.previousAttemptAt = time;
             int i = this.currentDelay + this.random.nextInt(40) + 40;
             this.currentDelay = Math.min(i, 400);
-            this.nextScheduledAttemptAt = l + (long)this.currentDelay;
+            this.nextScheduledAttemptAt = time + (long)this.currentDelay;
         }
 
-        public boolean method_29927(long l) {
-            return l - this.previousAttemptAt < 400L;
+        public boolean method_29927(long time) {
+            return time - this.previousAttemptAt < 400L;
         }
 
-        public boolean method_29928(long l) {
-            return l >= this.nextScheduledAttemptAt;
+        public boolean method_29928(long time) {
+            return time >= this.nextScheduledAttemptAt;
         }
 
         public String toString() {

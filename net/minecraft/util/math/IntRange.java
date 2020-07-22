@@ -9,16 +9,16 @@ public class IntRange {
     private final int min;
     private final int max;
 
-    public IntRange(int i, int j) {
-        if (j < i) {
-            throw new IllegalArgumentException("max must be >= minInclusive! Given minInclusive: " + i + ", Given max: " + j);
+    public IntRange(int min, int max) {
+        if (max < min) {
+            throw new IllegalArgumentException("max must be >= minInclusive! Given minInclusive: " + min + ", Given max: " + max);
         }
-        this.min = i;
-        this.max = j;
+        this.min = min;
+        this.max = max;
     }
 
-    public static IntRange between(int i, int j) {
-        return new IntRange(i, j);
+    public static IntRange between(int min, int max) {
+        return new IntRange(min, max);
     }
 
     public int choose(Random random) {

@@ -34,10 +34,10 @@ extends ConditionalLootFunction {
     private final UniformLootTableRange countRange;
     private final int limit;
 
-    private LootingEnchantLootFunction(LootCondition[] args, UniformLootTableRange arg, int i) {
-        super(args);
-        this.countRange = arg;
-        this.limit = i;
+    private LootingEnchantLootFunction(LootCondition[] conditions, UniformLootTableRange countRange, int limit) {
+        super(conditions);
+        this.countRange = countRange;
+        this.limit = limit;
     }
 
     @Override
@@ -55,24 +55,24 @@ extends ConditionalLootFunction {
     }
 
     @Override
-    public ItemStack process(ItemStack arg, LootContext arg2) {
-        Entity lv = arg2.get(LootContextParameters.KILLER_ENTITY);
+    public ItemStack process(ItemStack stack, LootContext context) {
+        Entity lv = context.get(LootContextParameters.KILLER_ENTITY);
         if (lv instanceof LivingEntity) {
             int i = EnchantmentHelper.getLooting((LivingEntity)lv);
             if (i == 0) {
-                return arg;
+                return stack;
             }
-            float f = (float)i * this.countRange.nextFloat(arg2.getRandom());
-            arg.increment(Math.round(f));
-            if (this.hasLimit() && arg.getCount() > this.limit) {
-                arg.setCount(this.limit);
+            float f = (float)i * this.countRange.nextFloat(context.getRandom());
+            stack.increment(Math.round(f));
+            if (this.hasLimit() && stack.getCount() > this.limit) {
+                stack.setCount(this.limit);
             }
         }
-        return arg;
+        return stack;
     }
 
-    public static Builder builder(UniformLootTableRange arg) {
-        return new Builder(arg);
+    public static Builder builder(UniformLootTableRange countRange) {
+        return new Builder(countRange);
     }
 
     public static class Serializer
@@ -93,8 +93,8 @@ extends ConditionalLootFunction {
         }
 
         @Override
-        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
-            return this.fromJson(jsonObject, jsonDeserializationContext, args);
+        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject json, JsonDeserializationContext context, LootCondition[] conditions) {
+            return this.fromJson(json, context, conditions);
         }
     }
 
@@ -103,8 +103,8 @@ extends ConditionalLootFunction {
         private final UniformLootTableRange countRange;
         private int limit = 0;
 
-        public Builder(UniformLootTableRange arg) {
-            this.countRange = arg;
+        public Builder(UniformLootTableRange countRange) {
+            this.countRange = countRange;
         }
 
         @Override
@@ -112,8 +112,8 @@ extends ConditionalLootFunction {
             return this;
         }
 
-        public Builder withLimit(int i) {
-            this.limit = i;
+        public Builder withLimit(int limit) {
+            this.limit = limit;
             return this;
         }
 

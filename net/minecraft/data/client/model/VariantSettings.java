@@ -25,8 +25,8 @@ public class VariantSettings {
 
         private final int degrees;
 
-        private Rotation(int j) {
-            this.degrees = j;
+        private Rotation(int degrees) {
+            this.degrees = degrees;
         }
     }
 }

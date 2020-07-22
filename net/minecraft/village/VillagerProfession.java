@@ -42,12 +42,12 @@ public class VillagerProfession {
     @Nullable
     private final SoundEvent workSound;
 
-    private VillagerProfession(String string, PointOfInterestType arg, ImmutableSet<Item> immutableSet, ImmutableSet<Block> immutableSet2, @Nullable SoundEvent arg2) {
-        this.id = string;
-        this.workStation = arg;
-        this.gatherableItems = immutableSet;
-        this.secondaryJobSites = immutableSet2;
-        this.workSound = arg2;
+    private VillagerProfession(String id, PointOfInterestType workStation, ImmutableSet<Item> gatherableItems, ImmutableSet<Block> secondaryJobSites, @Nullable SoundEvent workSound) {
+        this.id = id;
+        this.workStation = workStation;
+        this.gatherableItems = gatherableItems;
+        this.secondaryJobSites = secondaryJobSites;
+        this.workSound = workSound;
     }
 
     public PointOfInterestType getWorkStation() {
@@ -71,12 +71,12 @@ public class VillagerProfession {
         return this.id;
     }
 
-    static VillagerProfession register(String string, PointOfInterestType arg, @Nullable SoundEvent arg2) {
-        return VillagerProfession.register(string, arg, (ImmutableSet<Item>)ImmutableSet.of(), (ImmutableSet<Block>)ImmutableSet.of(), arg2);
+    static VillagerProfession register(String id, PointOfInterestType workStation, @Nullable SoundEvent workSound) {
+        return VillagerProfession.register(id, workStation, (ImmutableSet<Item>)ImmutableSet.of(), (ImmutableSet<Block>)ImmutableSet.of(), workSound);
     }
 
-    static VillagerProfession register(String string, PointOfInterestType arg, ImmutableSet<Item> immutableSet, ImmutableSet<Block> immutableSet2, @Nullable SoundEvent arg2) {
-        return Registry.register(Registry.VILLAGER_PROFESSION, new Identifier(string), new VillagerProfession(string, arg, immutableSet, immutableSet2, arg2));
+    static VillagerProfession register(String id, PointOfInterestType workStation, ImmutableSet<Item> gatherableItems, ImmutableSet<Block> secondaryJobSites, @Nullable SoundEvent workSound) {
+        return Registry.register(Registry.VILLAGER_PROFESSION, new Identifier(id), new VillagerProfession(id, workStation, gatherableItems, secondaryJobSites, workSound));
     }
 }
 

@@ -31,21 +31,21 @@ public class PardonIpCommand {
     private static final SimpleCommandExceptionType INVALID_IP_EXCEPTION = new SimpleCommandExceptionType((Message)new TranslatableText("commands.pardonip.invalid"));
     private static final SimpleCommandExceptionType ALREADY_UNBANNED_EXCEPTION = new SimpleCommandExceptionType((Message)new TranslatableText("commands.pardonip.failed"));
 
-    public static void register(CommandDispatcher<ServerCommandSource> commandDispatcher) {
-        commandDispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)CommandManager.literal("pardon-ip").requires(arg -> arg.hasPermissionLevel(3))).then(CommandManager.argument("target", StringArgumentType.word()).suggests((commandContext, suggestionsBuilder) -> CommandSource.suggestMatching(((ServerCommandSource)commandContext.getSource()).getMinecraftServer().getPlayerManager().getIpBanList().getNames(), suggestionsBuilder)).executes(commandContext -> PardonIpCommand.pardonIp((ServerCommandSource)commandContext.getSource(), StringArgumentType.getString((CommandContext)commandContext, (String)"target")))));
+    public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
+        dispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)CommandManager.literal("pardon-ip").requires(arg -> arg.hasPermissionLevel(3))).then(CommandManager.argument("target", StringArgumentType.word()).suggests((commandContext, suggestionsBuilder) -> CommandSource.suggestMatching(((ServerCommandSource)commandContext.getSource()).getMinecraftServer().getPlayerManager().getIpBanList().getNames(), suggestionsBuilder)).executes(commandContext -> PardonIpCommand.pardonIp((ServerCommandSource)commandContext.getSource(), StringArgumentType.getString((CommandContext)commandContext, (String)"target")))));
     }
 
-    private static int pardonIp(ServerCommandSource arg, String string) throws CommandSyntaxException {
-        Matcher matcher = BanIpCommand.PATTERN.matcher(string);
+    private static int pardonIp(ServerCommandSource source, String target) throws CommandSyntaxException {
+        Matcher matcher = BanIpCommand.PATTERN.matcher(target);
         if (!matcher.matches()) {
             throw INVALID_IP_EXCEPTION.create();
         }
-        BannedIpList lv = arg.getMinecraftServer().getPlayerManager().getIpBanList();
-        if (!lv.isBanned(string)) {
+        BannedIpList lv = source.getMinecraftServer().getPlayerManager().getIpBanList();
+        if (!lv.isBanned(target)) {
             throw ALREADY_UNBANNED_EXCEPTION.create();
         }
-        lv.remove(string);
-        arg.sendFeedback(new TranslatableText("commands.pardonip.success", string), true);
+        lv.remove(target);
+        source.sendFeedback(new TranslatableText("commands.pardonip.success", target), true);
         return 1;
     }
 }

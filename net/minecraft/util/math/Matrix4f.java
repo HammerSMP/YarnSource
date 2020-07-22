@@ -34,30 +34,30 @@ public final class Matrix4f {
     public Matrix4f() {
     }
 
-    public Matrix4f(Matrix4f arg) {
-        this.a00 = arg.a00;
-        this.a01 = arg.a01;
-        this.a02 = arg.a02;
-        this.a03 = arg.a03;
-        this.a10 = arg.a10;
-        this.a11 = arg.a11;
-        this.a12 = arg.a12;
-        this.a13 = arg.a13;
-        this.a20 = arg.a20;
-        this.a21 = arg.a21;
-        this.a22 = arg.a22;
-        this.a23 = arg.a23;
-        this.a30 = arg.a30;
-        this.a31 = arg.a31;
-        this.a32 = arg.a32;
-        this.a33 = arg.a33;
+    public Matrix4f(Matrix4f source) {
+        this.a00 = source.a00;
+        this.a01 = source.a01;
+        this.a02 = source.a02;
+        this.a03 = source.a03;
+        this.a10 = source.a10;
+        this.a11 = source.a11;
+        this.a12 = source.a12;
+        this.a13 = source.a13;
+        this.a20 = source.a20;
+        this.a21 = source.a21;
+        this.a22 = source.a22;
+        this.a23 = source.a23;
+        this.a30 = source.a30;
+        this.a31 = source.a31;
+        this.a32 = source.a32;
+        this.a33 = source.a33;
     }
 
-    public Matrix4f(Quaternion arg) {
-        float f = arg.getX();
-        float g = arg.getY();
-        float h = arg.getZ();
-        float i = arg.getW();
+    public Matrix4f(Quaternion quaternion) {
+        float f = quaternion.getX();
+        float g = quaternion.getY();
+        float h = quaternion.getZ();
+        float i = quaternion.getW();
         float j = 2.0f * f * f;
         float k = 2.0f * g * g;
         float l = 2.0f * h * h;
@@ -79,14 +79,14 @@ public final class Matrix4f {
         this.a12 = 2.0f * (n - p);
     }
 
-    public boolean equals(Object object) {
-        if (this == object) {
+    public boolean equals(Object o) {
+        if (this == o) {
             return true;
         }
-        if (object == null || this.getClass() != object.getClass()) {
+        if (o == null || this.getClass() != o.getClass()) {
             return false;
         }
-        Matrix4f lv = (Matrix4f)object;
+        Matrix4f lv = (Matrix4f)o;
         return Float.compare(lv.a00, this.a00) == 0 && Float.compare(lv.a01, this.a01) == 0 && Float.compare(lv.a02, this.a02) == 0 && Float.compare(lv.a03, this.a03) == 0 && Float.compare(lv.a10, this.a10) == 0 && Float.compare(lv.a11, this.a11) == 0 && Float.compare(lv.a12, this.a12) == 0 && Float.compare(lv.a13, this.a13) == 0 && Float.compare(lv.a20, this.a20) == 0 && Float.compare(lv.a21, this.a21) == 0 && Float.compare(lv.a22, this.a22) == 0 && Float.compare(lv.a23, this.a23) == 0 && Float.compare(lv.a30, this.a30) == 0 && Float.compare(lv.a31, this.a31) == 0 && Float.compare(lv.a32, this.a32) == 0 && Float.compare(lv.a33, this.a33) == 0;
     }
 
@@ -111,8 +111,8 @@ public final class Matrix4f {
     }
 
     @Environment(value=EnvType.CLIENT)
-    private static int pack(int i, int j) {
-        return j * 4 + i;
+    private static int pack(int x, int y) {
+        return y * 4 + x;
     }
 
     public String toString() {
@@ -275,23 +275,23 @@ public final class Matrix4f {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public void multiply(Matrix4f arg) {
-        float f = this.a00 * arg.a00 + this.a01 * arg.a10 + this.a02 * arg.a20 + this.a03 * arg.a30;
-        float g = this.a00 * arg.a01 + this.a01 * arg.a11 + this.a02 * arg.a21 + this.a03 * arg.a31;
-        float h = this.a00 * arg.a02 + this.a01 * arg.a12 + this.a02 * arg.a22 + this.a03 * arg.a32;
-        float i = this.a00 * arg.a03 + this.a01 * arg.a13 + this.a02 * arg.a23 + this.a03 * arg.a33;
-        float j = this.a10 * arg.a00 + this.a11 * arg.a10 + this.a12 * arg.a20 + this.a13 * arg.a30;
-        float k = this.a10 * arg.a01 + this.a11 * arg.a11 + this.a12 * arg.a21 + this.a13 * arg.a31;
-        float l = this.a10 * arg.a02 + this.a11 * arg.a12 + this.a12 * arg.a22 + this.a13 * arg.a32;
-        float m = this.a10 * arg.a03 + this.a11 * arg.a13 + this.a12 * arg.a23 + this.a13 * arg.a33;
-        float n = this.a20 * arg.a00 + this.a21 * arg.a10 + this.a22 * arg.a20 + this.a23 * arg.a30;
-        float o = this.a20 * arg.a01 + this.a21 * arg.a11 + this.a22 * arg.a21 + this.a23 * arg.a31;
-        float p = this.a20 * arg.a02 + this.a21 * arg.a12 + this.a22 * arg.a22 + this.a23 * arg.a32;
-        float q = this.a20 * arg.a03 + this.a21 * arg.a13 + this.a22 * arg.a23 + this.a23 * arg.a33;
-        float r = this.a30 * arg.a00 + this.a31 * arg.a10 + this.a32 * arg.a20 + this.a33 * arg.a30;
-        float s = this.a30 * arg.a01 + this.a31 * arg.a11 + this.a32 * arg.a21 + this.a33 * arg.a31;
-        float t = this.a30 * arg.a02 + this.a31 * arg.a12 + this.a32 * arg.a22 + this.a33 * arg.a32;
-        float u = this.a30 * arg.a03 + this.a31 * arg.a13 + this.a32 * arg.a23 + this.a33 * arg.a33;
+    public void multiply(Matrix4f matrix) {
+        float f = this.a00 * matrix.a00 + this.a01 * matrix.a10 + this.a02 * matrix.a20 + this.a03 * matrix.a30;
+        float g = this.a00 * matrix.a01 + this.a01 * matrix.a11 + this.a02 * matrix.a21 + this.a03 * matrix.a31;
+        float h = this.a00 * matrix.a02 + this.a01 * matrix.a12 + this.a02 * matrix.a22 + this.a03 * matrix.a32;
+        float i = this.a00 * matrix.a03 + this.a01 * matrix.a13 + this.a02 * matrix.a23 + this.a03 * matrix.a33;
+        float j = this.a10 * matrix.a00 + this.a11 * matrix.a10 + this.a12 * matrix.a20 + this.a13 * matrix.a30;
+        float k = this.a10 * matrix.a01 + this.a11 * matrix.a11 + this.a12 * matrix.a21 + this.a13 * matrix.a31;
+        float l = this.a10 * matrix.a02 + this.a11 * matrix.a12 + this.a12 * matrix.a22 + this.a13 * matrix.a32;
+        float m = this.a10 * matrix.a03 + this.a11 * matrix.a13 + this.a12 * matrix.a23 + this.a13 * matrix.a33;
+        float n = this.a20 * matrix.a00 + this.a21 * matrix.a10 + this.a22 * matrix.a20 + this.a23 * matrix.a30;
+        float o = this.a20 * matrix.a01 + this.a21 * matrix.a11 + this.a22 * matrix.a21 + this.a23 * matrix.a31;
+        float p = this.a20 * matrix.a02 + this.a21 * matrix.a12 + this.a22 * matrix.a22 + this.a23 * matrix.a32;
+        float q = this.a20 * matrix.a03 + this.a21 * matrix.a13 + this.a22 * matrix.a23 + this.a23 * matrix.a33;
+        float r = this.a30 * matrix.a00 + this.a31 * matrix.a10 + this.a32 * matrix.a20 + this.a33 * matrix.a30;
+        float s = this.a30 * matrix.a01 + this.a31 * matrix.a11 + this.a32 * matrix.a21 + this.a33 * matrix.a31;
+        float t = this.a30 * matrix.a02 + this.a31 * matrix.a12 + this.a32 * matrix.a22 + this.a33 * matrix.a32;
+        float u = this.a30 * matrix.a03 + this.a31 * matrix.a13 + this.a32 * matrix.a23 + this.a33 * matrix.a33;
         this.a00 = f;
         this.a01 = g;
         this.a02 = h;
@@ -311,61 +311,61 @@ public final class Matrix4f {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public void multiply(Quaternion arg) {
-        this.multiply(new Matrix4f(arg));
+    public void multiply(Quaternion quaternion) {
+        this.multiply(new Matrix4f(quaternion));
     }
 
     @Environment(value=EnvType.CLIENT)
-    public void multiply(float f) {
-        this.a00 *= f;
-        this.a01 *= f;
-        this.a02 *= f;
-        this.a03 *= f;
-        this.a10 *= f;
-        this.a11 *= f;
-        this.a12 *= f;
-        this.a13 *= f;
-        this.a20 *= f;
-        this.a21 *= f;
-        this.a22 *= f;
-        this.a23 *= f;
-        this.a30 *= f;
-        this.a31 *= f;
-        this.a32 *= f;
-        this.a33 *= f;
+    public void multiply(float scalar) {
+        this.a00 *= scalar;
+        this.a01 *= scalar;
+        this.a02 *= scalar;
+        this.a03 *= scalar;
+        this.a10 *= scalar;
+        this.a11 *= scalar;
+        this.a12 *= scalar;
+        this.a13 *= scalar;
+        this.a20 *= scalar;
+        this.a21 *= scalar;
+        this.a22 *= scalar;
+        this.a23 *= scalar;
+        this.a30 *= scalar;
+        this.a31 *= scalar;
+        this.a32 *= scalar;
+        this.a33 *= scalar;
     }
 
     @Environment(value=EnvType.CLIENT)
-    public static Matrix4f viewboxMatrix(double d, float f, float g, float h) {
-        float i = (float)(1.0 / Math.tan(d * 0.01745329238474369 / 2.0));
+    public static Matrix4f viewboxMatrix(double fov, float aspectRatio, float cameraDepth, float viewDistance) {
+        float i = (float)(1.0 / Math.tan(fov * 0.01745329238474369 / 2.0));
         Matrix4f lv = new Matrix4f();
-        lv.a00 = i / f;
+        lv.a00 = i / aspectRatio;
         lv.a11 = i;
-        lv.a22 = (h + g) / (g - h);
+        lv.a22 = (viewDistance + cameraDepth) / (cameraDepth - viewDistance);
         lv.a32 = -1.0f;
-        lv.a23 = 2.0f * h * g / (g - h);
+        lv.a23 = 2.0f * viewDistance * cameraDepth / (cameraDepth - viewDistance);
         return lv;
     }
 
     @Environment(value=EnvType.CLIENT)
-    public static Matrix4f projectionMatrix(float f, float g, float h, float i) {
+    public static Matrix4f projectionMatrix(float width, float height, float nearPlane, float farPlane) {
         Matrix4f lv = new Matrix4f();
-        lv.a00 = 2.0f / f;
-        lv.a11 = 2.0f / g;
-        float j = i - h;
+        lv.a00 = 2.0f / width;
+        lv.a11 = 2.0f / height;
+        float j = farPlane - nearPlane;
         lv.a22 = -2.0f / j;
         lv.a33 = 1.0f;
         lv.a03 = -1.0f;
         lv.a13 = -1.0f;
-        lv.a23 = -(i + h) / j;
+        lv.a23 = -(farPlane + nearPlane) / j;
         return lv;
     }
 
     @Environment(value=EnvType.CLIENT)
-    public void addToLastColumn(Vector3f arg) {
-        this.a03 += arg.getX();
-        this.a13 += arg.getY();
-        this.a23 += arg.getZ();
+    public void addToLastColumn(Vector3f vector) {
+        this.a03 += vector.getX();
+        this.a13 += vector.getY();
+        this.a23 += vector.getZ();
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -374,25 +374,25 @@ public final class Matrix4f {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public static Matrix4f scale(float f, float g, float h) {
+    public static Matrix4f scale(float x, float y, float z) {
         Matrix4f lv = new Matrix4f();
-        lv.a00 = f;
-        lv.a11 = g;
-        lv.a22 = h;
+        lv.a00 = x;
+        lv.a11 = y;
+        lv.a22 = z;
         lv.a33 = 1.0f;
         return lv;
     }
 
     @Environment(value=EnvType.CLIENT)
-    public static Matrix4f translate(float f, float g, float h) {
+    public static Matrix4f translate(float x, float y, float z) {
         Matrix4f lv = new Matrix4f();
         lv.a00 = 1.0f;
         lv.a11 = 1.0f;
         lv.a22 = 1.0f;
         lv.a33 = 1.0f;
-        lv.a03 = f;
-        lv.a13 = g;
-        lv.a23 = h;
+        lv.a03 = x;
+        lv.a13 = y;
+        lv.a23 = z;
         return lv;
     }
 }

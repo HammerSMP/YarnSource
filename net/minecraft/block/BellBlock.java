@@ -69,35 +69,35 @@ extends BlockWithEntity {
     }
 
     @Override
-    public void neighborUpdate(BlockState arg, World arg2, BlockPos arg3, Block arg4, BlockPos arg5, boolean bl) {
-        boolean bl2 = arg2.isReceivingRedstonePower(arg3);
-        if (bl2 != arg.get(POWERED)) {
+    public void neighborUpdate(BlockState state, World world, BlockPos pos, Block block, BlockPos fromPos, boolean notify) {
+        boolean bl2 = world.isReceivingRedstonePower(pos);
+        if (bl2 != state.get(POWERED)) {
             if (bl2) {
-                this.ring(arg2, arg3, null);
+                this.ring(world, pos, null);
             }
-            arg2.setBlockState(arg3, (BlockState)arg.with(POWERED, bl2), 3);
+            world.setBlockState(pos, (BlockState)state.with(POWERED, bl2), 3);
         }
     }
 
     @Override
-    public void onProjectileHit(World arg, BlockState arg2, BlockHitResult arg3, ProjectileEntity arg4) {
-        Entity lv = arg4.getOwner();
+    public void onProjectileHit(World world, BlockState state, BlockHitResult hit, ProjectileEntity projectile) {
+        Entity lv = projectile.getOwner();
         PlayerEntity lv2 = lv instanceof PlayerEntity ? (PlayerEntity)lv : null;
-        this.ring(arg, arg2, arg3, lv2, true);
+        this.ring(world, state, hit, lv2, true);
     }
 
     @Override
-    public ActionResult onUse(BlockState arg, World arg2, BlockPos arg3, PlayerEntity arg4, Hand arg5, BlockHitResult arg6) {
-        return this.ring(arg2, arg, arg6, arg4, true) ? ActionResult.success(arg2.isClient) : ActionResult.PASS;
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        return this.ring(world, state, hit, player, true) ? ActionResult.success(world.isClient) : ActionResult.PASS;
     }
 
-    public boolean ring(World arg, BlockState arg2, BlockHitResult arg3, @Nullable PlayerEntity arg4, boolean bl) {
+    public boolean ring(World world, BlockState state, BlockHitResult arg3, @Nullable PlayerEntity arg4, boolean bl) {
         boolean bl2;
         Direction lv = arg3.getSide();
         BlockPos lv2 = arg3.getBlockPos();
-        boolean bl3 = bl2 = !bl || this.isPointOnBell(arg2, lv, arg3.getPos().y - (double)lv2.getY());
+        boolean bl3 = bl2 = !bl || this.isPointOnBell(state, lv, arg3.getPos().y - (double)lv2.getY());
         if (bl2) {
-            boolean bl32 = this.ring(arg, lv2, lv);
+            boolean bl32 = this.ring(world, lv2, lv);
             if (bl32 && arg4 != null) {
                 arg4.incrementStat(Stats.BELL_RING);
             }
@@ -106,19 +106,19 @@ extends BlockWithEntity {
         return false;
     }
 
-    private boolean isPointOnBell(BlockState arg, Direction arg2, double d) {
-        if (arg2.getAxis() == Direction.Axis.Y || d > (double)0.8124f) {
+    private boolean isPointOnBell(BlockState state, Direction side, double y) {
+        if (side.getAxis() == Direction.Axis.Y || y > (double)0.8124f) {
             return false;
         }
-        Direction lv = arg.get(FACING);
-        Attachment lv2 = arg.get(ATTACHMENT);
+        Direction lv = state.get(FACING);
+        Attachment lv2 = state.get(ATTACHMENT);
         switch (lv2) {
             case FLOOR: {
-                return lv.getAxis() == arg2.getAxis();
+                return lv.getAxis() == side.getAxis();
             }
             case SINGLE_WALL: 
             case DOUBLE_WALL: {
-                return lv.getAxis() != arg2.getAxis();
+                return lv.getAxis() != side.getAxis();
             }
             case CEILING: {
                 return true;
@@ -127,22 +127,22 @@ extends BlockWithEntity {
         return false;
     }
 
-    public boolean ring(World arg, BlockPos arg2, @Nullable Direction arg3) {
-        BlockEntity lv = arg.getBlockEntity(arg2);
-        if (!arg.isClient && lv instanceof BellBlockEntity) {
+    public boolean ring(World world, BlockPos pos, @Nullable Direction arg3) {
+        BlockEntity lv = world.getBlockEntity(pos);
+        if (!world.isClient && lv instanceof BellBlockEntity) {
             if (arg3 == null) {
-                arg3 = arg.getBlockState(arg2).get(FACING);
+                arg3 = world.getBlockState(pos).get(FACING);
             }
             ((BellBlockEntity)lv).activate(arg3);
-            arg.playSound(null, arg2, SoundEvents.BLOCK_BELL_USE, SoundCategory.BLOCKS, 2.0f, 1.0f);
+            world.playSound(null, pos, SoundEvents.BLOCK_BELL_USE, SoundCategory.BLOCKS, 2.0f, 1.0f);
             return true;
         }
         return false;
     }
 
-    private VoxelShape getShape(BlockState arg) {
-        Direction lv = arg.get(FACING);
-        Attachment lv2 = arg.get(ATTACHMENT);
+    private VoxelShape getShape(BlockState state) {
+        Direction lv = state.get(FACING);
+        Attachment lv2 = state.get(ATTACHMENT);
         if (lv2 == Attachment.FLOOR) {
             if (lv == Direction.NORTH || lv == Direction.SOUTH) {
                 return NORTH_SOUTH_SHAPE;
@@ -171,40 +171,40 @@ extends BlockWithEntity {
     }
 
     @Override
-    public VoxelShape getCollisionShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
-        return this.getShape(arg);
+    public VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        return this.getShape(state);
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
-        return this.getShape(arg);
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        return this.getShape(state);
     }
 
     @Override
-    public BlockRenderType getRenderType(BlockState arg) {
+    public BlockRenderType getRenderType(BlockState state) {
         return BlockRenderType.MODEL;
     }
 
     @Override
     @Nullable
-    public BlockState getPlacementState(ItemPlacementContext arg) {
-        Direction lv = arg.getSide();
-        BlockPos lv2 = arg.getBlockPos();
-        World lv3 = arg.getWorld();
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        Direction lv = ctx.getSide();
+        BlockPos lv2 = ctx.getBlockPos();
+        World lv3 = ctx.getWorld();
         Direction.Axis lv4 = lv.getAxis();
         if (lv4 == Direction.Axis.Y) {
-            BlockState lv5 = (BlockState)((BlockState)this.getDefaultState().with(ATTACHMENT, lv == Direction.DOWN ? Attachment.CEILING : Attachment.FLOOR)).with(FACING, arg.getPlayerFacing());
-            if (lv5.canPlaceAt(arg.getWorld(), lv2)) {
+            BlockState lv5 = (BlockState)((BlockState)this.getDefaultState().with(ATTACHMENT, lv == Direction.DOWN ? Attachment.CEILING : Attachment.FLOOR)).with(FACING, ctx.getPlayerFacing());
+            if (lv5.canPlaceAt(ctx.getWorld(), lv2)) {
                 return lv5;
             }
         } else {
             boolean bl = lv4 == Direction.Axis.X && lv3.getBlockState(lv2.west()).isSideSolidFullSquare(lv3, lv2.west(), Direction.EAST) && lv3.getBlockState(lv2.east()).isSideSolidFullSquare(lv3, lv2.east(), Direction.WEST) || lv4 == Direction.Axis.Z && lv3.getBlockState(lv2.north()).isSideSolidFullSquare(lv3, lv2.north(), Direction.SOUTH) && lv3.getBlockState(lv2.south()).isSideSolidFullSquare(lv3, lv2.south(), Direction.NORTH);
             BlockState lv6 = (BlockState)((BlockState)this.getDefaultState().with(FACING, lv.getOpposite())).with(ATTACHMENT, bl ? Attachment.DOUBLE_WALL : Attachment.SINGLE_WALL);
-            if (lv6.canPlaceAt(arg.getWorld(), arg.getBlockPos())) {
+            if (lv6.canPlaceAt(ctx.getWorld(), ctx.getBlockPos())) {
                 return lv6;
             }
             boolean bl2 = lv3.getBlockState(lv2.down()).isSideSolidFullSquare(lv3, lv2.down(), Direction.UP);
-            if ((lv6 = (BlockState)lv6.with(ATTACHMENT, bl2 ? Attachment.FLOOR : Attachment.CEILING)).canPlaceAt(arg.getWorld(), arg.getBlockPos())) {
+            if ((lv6 = (BlockState)lv6.with(ATTACHMENT, bl2 ? Attachment.FLOOR : Attachment.CEILING)).canPlaceAt(ctx.getWorld(), ctx.getBlockPos())) {
                 return lv6;
             }
         }
@@ -212,34 +212,34 @@ extends BlockWithEntity {
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
-        Attachment lv = arg.get(ATTACHMENT);
-        Direction lv2 = BellBlock.getPlacementSide(arg).getOpposite();
-        if (lv2 == arg2 && !arg.canPlaceAt(arg4, arg5) && lv != Attachment.DOUBLE_WALL) {
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
+        Attachment lv = state.get(ATTACHMENT);
+        Direction lv2 = BellBlock.getPlacementSide(state).getOpposite();
+        if (lv2 == direction && !state.canPlaceAt(world, pos) && lv != Attachment.DOUBLE_WALL) {
             return Blocks.AIR.getDefaultState();
         }
-        if (arg2.getAxis() == arg.get(FACING).getAxis()) {
-            if (lv == Attachment.DOUBLE_WALL && !arg3.isSideSolidFullSquare(arg4, arg6, arg2)) {
-                return (BlockState)((BlockState)arg.with(ATTACHMENT, Attachment.SINGLE_WALL)).with(FACING, arg2.getOpposite());
+        if (direction.getAxis() == state.get(FACING).getAxis()) {
+            if (lv == Attachment.DOUBLE_WALL && !newState.isSideSolidFullSquare(world, posFrom, direction)) {
+                return (BlockState)((BlockState)state.with(ATTACHMENT, Attachment.SINGLE_WALL)).with(FACING, direction.getOpposite());
             }
-            if (lv == Attachment.SINGLE_WALL && lv2.getOpposite() == arg2 && arg3.isSideSolidFullSquare(arg4, arg6, arg.get(FACING))) {
-                return (BlockState)arg.with(ATTACHMENT, Attachment.DOUBLE_WALL);
+            if (lv == Attachment.SINGLE_WALL && lv2.getOpposite() == direction && newState.isSideSolidFullSquare(world, posFrom, state.get(FACING))) {
+                return (BlockState)state.with(ATTACHMENT, Attachment.DOUBLE_WALL);
             }
         }
-        return super.getStateForNeighborUpdate(arg, arg2, arg3, arg4, arg5, arg6);
+        return super.getStateForNeighborUpdate(state, direction, newState, world, pos, posFrom);
     }
 
     @Override
-    public boolean canPlaceAt(BlockState arg, WorldView arg2, BlockPos arg3) {
-        Direction lv = BellBlock.getPlacementSide(arg).getOpposite();
+    public boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
+        Direction lv = BellBlock.getPlacementSide(state).getOpposite();
         if (lv == Direction.UP) {
-            return Block.sideCoversSmallSquare(arg2, arg3.up(), Direction.DOWN);
+            return Block.sideCoversSmallSquare(world, pos.up(), Direction.DOWN);
         }
-        return WallMountedBlock.canPlaceAt(arg2, arg3, lv);
+        return WallMountedBlock.canPlaceAt(world, pos, lv);
     }
 
-    private static Direction getPlacementSide(BlockState arg) {
-        switch (arg.get(ATTACHMENT)) {
+    private static Direction getPlacementSide(BlockState state) {
+        switch (state.get(ATTACHMENT)) {
             case CEILING: {
                 return Direction.DOWN;
             }
@@ -247,27 +247,27 @@ extends BlockWithEntity {
                 return Direction.UP;
             }
         }
-        return arg.get(FACING).getOpposite();
+        return state.get(FACING).getOpposite();
     }
 
     @Override
-    public PistonBehavior getPistonBehavior(BlockState arg) {
+    public PistonBehavior getPistonBehavior(BlockState state) {
         return PistonBehavior.DESTROY;
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(FACING, ATTACHMENT, POWERED);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(FACING, ATTACHMENT, POWERED);
     }
 
     @Override
     @Nullable
-    public BlockEntity createBlockEntity(BlockView arg) {
+    public BlockEntity createBlockEntity(BlockView world) {
         return new BellBlockEntity();
     }
 
     @Override
-    public boolean canPathfindThrough(BlockState arg, BlockView arg2, BlockPos arg3, NavigationType arg4) {
+    public boolean canPathfindThrough(BlockState state, BlockView world, BlockPos pos, NavigationType type) {
         return false;
     }
 }

@@ -19,8 +19,8 @@ import net.minecraft.particle.DefaultParticleType;
 @Environment(value=EnvType.CLIENT)
 public class SpitParticle
 extends ExplosionSmokeParticle {
-    private SpitParticle(ClientWorld arg, double d, double e, double f, double g, double h, double i, SpriteProvider arg2) {
-        super(arg, d, e, f, g, h, i, arg2);
+    private SpitParticle(ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ, SpriteProvider spriteProvider) {
+        super(world, x, y, z, velocityX, velocityY, velocityZ, spriteProvider);
         this.gravityStrength = 0.5f;
     }
 
@@ -35,8 +35,8 @@ extends ExplosionSmokeParticle {
     implements ParticleFactory<DefaultParticleType> {
         private final SpriteProvider spriteProvider;
 
-        public Factory(SpriteProvider arg) {
-            this.spriteProvider = arg;
+        public Factory(SpriteProvider spriteProvider) {
+            this.spriteProvider = spriteProvider;
         }
 
         @Override

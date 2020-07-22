@@ -46,12 +46,12 @@ implements DebugRenderer.Renderer {
     }
 
     @Override
-    public void render(MatrixStack arg, VertexConsumerProvider arg2, double d, double e, double f) {
+    public void render(MatrixStack matrices, VertexConsumerProvider vertexConsumers, double cameraX, double cameraY, double cameraZ) {
         double g = Util.getMeasuringTimeNano();
         if (g - this.lastUpdateTime > 3.0E9) {
             this.lastUpdateTime = g;
             IntegratedServer lv = this.client.getServer();
-            this.loadingData = lv != null ? new ChunkLoadingStatus(lv, d, f) : null;
+            this.loadingData = lv != null ? new ChunkLoadingStatus(lv, cameraX, cameraZ) : null;
         }
         if (this.loadingData != null) {
             RenderSystem.enableBlend();

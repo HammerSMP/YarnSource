@@ -37,17 +37,17 @@ extends MinecartEntityRenderer<TntMinecartEntity> {
             float h = 1.0f + g * 0.3f;
             arg3.scale(h, h, h);
         }
-        TntMinecartEntityRenderer.method_23190(arg2, arg3, arg4, i, j > -1 && j / 5 % 2 == 0);
+        TntMinecartEntityRenderer.renderFlashingBlock(arg2, arg3, arg4, i, j > -1 && j / 5 % 2 == 0);
     }
 
-    public static void method_23190(BlockState arg, MatrixStack arg2, VertexConsumerProvider arg3, int i, boolean bl) {
+    public static void renderFlashingBlock(BlockState blockState, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, boolean drawFlash) {
         int k;
-        if (bl) {
+        if (drawFlash) {
             int j = OverlayTexture.packUv(OverlayTexture.getU(1.0f), 10);
         } else {
             k = OverlayTexture.DEFAULT_UV;
         }
-        MinecraftClient.getInstance().getBlockRenderManager().renderBlockAsEntity(arg, arg2, arg3, i, k);
+        MinecraftClient.getInstance().getBlockRenderManager().renderBlockAsEntity(blockState, matrices, vertexConsumers, light, k);
     }
 }
 

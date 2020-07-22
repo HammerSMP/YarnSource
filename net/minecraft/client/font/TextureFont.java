@@ -50,8 +50,8 @@ implements Font {
     private final NativeImage image;
     private final Int2ObjectMap<TextureFontGlyph> glyphs;
 
-    private TextureFont(NativeImage arg, Int2ObjectMap<TextureFontGlyph> int2ObjectMap) {
-        this.image = arg;
+    private TextureFont(NativeImage image, Int2ObjectMap<TextureFontGlyph> int2ObjectMap) {
+        this.image = image;
         this.glyphs = int2ObjectMap;
     }
 
@@ -83,15 +83,15 @@ implements Font {
         private final int advance;
         private final int ascent;
 
-        private TextureFontGlyph(float f, NativeImage arg, int i, int j, int k, int l, int m, int n) {
-            this.scaleFactor = f;
-            this.image = arg;
-            this.x = i;
-            this.y = j;
-            this.width = k;
-            this.height = l;
-            this.advance = m;
-            this.ascent = n;
+        private TextureFontGlyph(float scaleFactor, NativeImage image, int x, int y, int width, int height, int advance, int ascent) {
+            this.scaleFactor = scaleFactor;
+            this.image = image;
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
+            this.advance = advance;
+            this.ascent = ascent;
         }
 
         @Override
@@ -120,8 +120,8 @@ implements Font {
         }
 
         @Override
-        public void upload(int i, int j) {
-            this.image.upload(0, i, j, this.x, this.y, this.width, this.height, false, false);
+        public void upload(int x, int y) {
+            this.image.upload(0, x, y, this.x, this.y, this.width, this.height, false, false);
         }
 
         @Override
@@ -138,21 +138,21 @@ implements Font {
         private final int height;
         private final int ascent;
 
-        public Loader(Identifier arg, int i, int j, List<int[]> list) {
-            this.filename = new Identifier(arg.getNamespace(), "textures/" + arg.getPath());
-            this.chars = list;
-            this.height = i;
-            this.ascent = j;
+        public Loader(Identifier id, int height, int ascent, List<int[]> chars) {
+            this.filename = new Identifier(id.getNamespace(), "textures/" + id.getPath());
+            this.chars = chars;
+            this.height = height;
+            this.ascent = ascent;
         }
 
-        public static Loader fromJson(JsonObject jsonObject) {
-            int i = JsonHelper.getInt(jsonObject, "height", 8);
-            int j = JsonHelper.getInt(jsonObject, "ascent");
+        public static Loader fromJson(JsonObject json) {
+            int i = JsonHelper.getInt(json, "height", 8);
+            int j = JsonHelper.getInt(json, "ascent");
             if (j > i) {
                 throw new JsonParseException("Ascent " + j + " higher than height " + i);
             }
             ArrayList list = Lists.newArrayList();
-            JsonArray jsonArray = JsonHelper.getArray(jsonObject, "chars");
+            JsonArray jsonArray = JsonHelper.getArray(json, "chars");
             for (int k = 0; k < jsonArray.size(); ++k) {
                 int l;
                 String string = JsonHelper.asString(jsonArray.get(k), "chars[" + k + "]");
@@ -165,7 +165,7 @@ implements Font {
             if (list.isEmpty() || ((int[])list.get(0)).length == 0) {
                 throw new JsonParseException("Expected to find data in chars, found none.");
             }
-            return new Loader(new Identifier(JsonHelper.getString(jsonObject, "file")), i, j, list);
+            return new Loader(new Identifier(JsonHelper.getString(json, "file")), i, j, list);
         }
 
         /*
@@ -175,8 +175,8 @@ implements Font {
          */
         @Override
         @Nullable
-        public Font load(ResourceManager arg) {
-            try (Resource lv = arg.getResource(this.filename);){
+        public Font load(ResourceManager manager) {
+            try (Resource lv = manager.getResource(this.filename);){
                 NativeImage lv2 = NativeImage.read(NativeImage.Format.ABGR, lv.getInputStream());
                 int i = lv2.getWidth();
                 int j = lv2.getHeight();
@@ -213,13 +213,13 @@ implements Font {
             }
         }
 
-        private int findCharacterStartX(NativeImage arg, int i, int j, int k, int l) {
+        private int findCharacterStartX(NativeImage image, int characterWidth, int characterHeight, int charPosX, int charPosY) {
             int m;
-            for (m = i - 1; m >= 0; --m) {
-                int n = k * i + m;
-                for (int o = 0; o < j; ++o) {
-                    int p = l * j + o;
-                    if (arg.getPixelOpacity(n, p) == 0) continue;
+            for (m = characterWidth - 1; m >= 0; --m) {
+                int n = charPosX * characterWidth + m;
+                for (int o = 0; o < characterHeight; ++o) {
+                    int p = charPosY * characterHeight + o;
+                    if (image.getPixelOpacity(n, p) == 0) continue;
                     return m + 1;
                 }
             }

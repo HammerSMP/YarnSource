@@ -22,25 +22,25 @@ public class ShulkerBoxScreen
 extends HandledScreen<ShulkerBoxScreenHandler> {
     private static final Identifier TEXTURE = new Identifier("textures/gui/container/shulker_box.png");
 
-    public ShulkerBoxScreen(ShulkerBoxScreenHandler arg, PlayerInventory arg2, Text arg3) {
-        super(arg, arg2, arg3);
+    public ShulkerBoxScreen(ShulkerBoxScreenHandler handler, PlayerInventory inventory, Text title) {
+        super(handler, inventory, title);
         ++this.backgroundHeight;
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.renderBackground(arg);
-        super.render(arg, i, j, f);
-        this.drawMouseoverTooltip(arg, i, j);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.renderBackground(matrices);
+        super.render(matrices, mouseX, mouseY, delta);
+        this.drawMouseoverTooltip(matrices, mouseX, mouseY);
     }
 
     @Override
-    protected void drawBackground(MatrixStack arg, float f, int i, int j) {
+    protected void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY) {
         RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
         this.client.getTextureManager().bindTexture(TEXTURE);
         int k = (this.width - this.backgroundWidth) / 2;
         int l = (this.height - this.backgroundHeight) / 2;
-        this.drawTexture(arg, k, l, 0, 0, this.backgroundWidth, this.backgroundHeight);
+        this.drawTexture(matrices, k, l, 0, 0, this.backgroundWidth, this.backgroundHeight);
     }
 }
 

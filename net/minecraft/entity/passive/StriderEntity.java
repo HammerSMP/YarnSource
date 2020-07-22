@@ -51,7 +51,6 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.mob.ZombieEntity;
-import net.minecraft.entity.mob.ZombifiedPiglinEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -101,7 +100,7 @@ Saddleable {
         this.setPathfindingPenalty(PathNodeType.DAMAGE_FIRE, 0.0f);
     }
 
-    public static boolean canSpawn(EntityType<StriderEntity> arg, WorldAccess arg2, SpawnReason arg3, BlockPos arg4, Random random) {
+    public static boolean canSpawn(EntityType<StriderEntity> type, WorldAccess arg2, SpawnReason spawnReason, BlockPos arg4, Random random) {
         BlockPos.Mutable lv = arg4.mutableCopy();
         do {
             lv.move(Direction.UP);
@@ -110,11 +109,11 @@ Saddleable {
     }
 
     @Override
-    public void onTrackedDataSet(TrackedData<?> arg) {
-        if (BOOST_TIME.equals(arg) && this.world.isClient) {
+    public void onTrackedDataSet(TrackedData<?> data) {
+        if (BOOST_TIME.equals(data) && this.world.isClient) {
             this.saddledComponent.boost();
         }
-        super.onTrackedDataSet(arg);
+        super.onTrackedDataSet(data);
     }
 
     @Override
@@ -126,15 +125,15 @@ Saddleable {
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
-        this.saddledComponent.toTag(arg);
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
+        this.saddledComponent.toTag(tag);
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        this.saddledComponent.fromTag(arg);
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        this.saddledComponent.fromTag(tag);
     }
 
     @Override
@@ -148,10 +147,10 @@ Saddleable {
     }
 
     @Override
-    public void saddle(@Nullable SoundCategory arg) {
+    public void saddle(@Nullable SoundCategory sound) {
         this.saddledComponent.setSaddled(true);
-        if (arg != null) {
-            this.world.playSoundFromEntity(null, this, SoundEvents.ENTITY_STRIDER_SADDLE, arg, 0.5f, 1.0f);
+        if (sound != null) {
+            this.world.playSoundFromEntity(null, this, SoundEvents.ENTITY_STRIDER_SADDLE, sound, 0.5f, 1.0f);
         }
     }
 
@@ -169,8 +168,8 @@ Saddleable {
         this.goalSelector.add(9, new LookAtEntityGoal(this, StriderEntity.class, 8.0f));
     }
 
-    public void setCold(boolean bl) {
-        this.dataTracker.set(COLD, bl);
+    public void setCold(boolean cold) {
+        this.dataTracker.set(COLD, cold);
     }
 
     public boolean isCold() {
@@ -181,15 +180,15 @@ Saddleable {
     }
 
     @Override
-    public boolean canWalkOnFluid(Fluid arg) {
-        return arg.isIn(FluidTags.LAVA);
+    public boolean canWalkOnFluid(Fluid fluid) {
+        return fluid.isIn(FluidTags.LAVA);
     }
 
     @Override
     @Nullable
-    public Box getHardCollisionBox(Entity arg) {
-        if (arg.isPushable()) {
-            return arg.getBoundingBox();
+    public Box getHardCollisionBox(Entity collidingEntity) {
+        if (collidingEntity.isPushable()) {
+            return collidingEntity.getBoundingBox();
         }
         return null;
     }
@@ -217,8 +216,8 @@ Saddleable {
     }
 
     @Override
-    public boolean canSpawn(WorldView arg) {
-        return arg.intersectsEntities(this);
+    public boolean canSpawn(WorldView world) {
+        return world.intersectsEntities(this);
     }
 
     @Override
@@ -231,8 +230,8 @@ Saddleable {
     }
 
     @Override
-    public Vec3d updatePassengerForDismount(LivingEntity arg) {
-        Vec3d[] lvs = new Vec3d[]{StriderEntity.getPassengerDismountOffset(this.getWidth(), arg.getWidth(), arg.yaw), StriderEntity.getPassengerDismountOffset(this.getWidth(), arg.getWidth(), arg.yaw - 22.5f), StriderEntity.getPassengerDismountOffset(this.getWidth(), arg.getWidth(), arg.yaw + 22.5f), StriderEntity.getPassengerDismountOffset(this.getWidth(), arg.getWidth(), arg.yaw - 45.0f), StriderEntity.getPassengerDismountOffset(this.getWidth(), arg.getWidth(), arg.yaw + 45.0f)};
+    public Vec3d updatePassengerForDismount(LivingEntity passenger) {
+        Vec3d[] lvs = new Vec3d[]{StriderEntity.getPassengerDismountOffset(this.getWidth(), passenger.getWidth(), passenger.yaw), StriderEntity.getPassengerDismountOffset(this.getWidth(), passenger.getWidth(), passenger.yaw - 22.5f), StriderEntity.getPassengerDismountOffset(this.getWidth(), passenger.getWidth(), passenger.yaw + 22.5f), StriderEntity.getPassengerDismountOffset(this.getWidth(), passenger.getWidth(), passenger.yaw - 45.0f), StriderEntity.getPassengerDismountOffset(this.getWidth(), passenger.getWidth(), passenger.yaw + 45.0f)};
         LinkedHashSet set = Sets.newLinkedHashSet();
         double d = this.getBoundingBox().maxY;
         double e = this.getBoundingBox().minY - 0.5;
@@ -245,23 +244,23 @@ Saddleable {
             }
         }
         for (BlockPos lv3 : set) {
-            if (this.world.getFluidState(lv3).isIn(FluidTags.LAVA)) continue;
-            for (EntityPose lv4 : arg.getPoses()) {
-                Vec3d lv6;
-                Box lv5;
-                double g = this.world.getCollisionHeightAt(lv3);
-                if (!Dismounting.canDismountInBlock(g) || !Dismounting.canPlaceEntityAt(this.world, arg, (lv5 = arg.getBoundingBox(lv4)).offset(lv6 = Vec3d.ofCenter(lv3, g)))) continue;
-                arg.setPose(lv4);
-                return lv6;
+            double g;
+            if (this.world.getFluidState(lv3).isIn(FluidTags.LAVA) || !Dismounting.canDismountInBlock(g = this.world.getDismountHeight(lv3))) continue;
+            Vec3d lv4 = Vec3d.ofCenter(lv3, g);
+            for (EntityPose lv5 : passenger.getPoses()) {
+                Box lv6 = passenger.getBoundingBox(lv5);
+                if (!Dismounting.canPlaceEntityAt(this.world, passenger, lv6.offset(lv4))) continue;
+                passenger.setPose(lv5);
+                return lv4;
             }
         }
         return new Vec3d(this.getX(), this.getBoundingBox().maxY, this.getZ());
     }
 
     @Override
-    public void travel(Vec3d arg) {
+    public void travel(Vec3d movementInput) {
         this.setMovementSpeed(this.getSpeed());
-        this.travel(this, this.saddledComponent, arg);
+        this.travel(this, this.saddledComponent, movementInput);
     }
 
     public float getSpeed() {
@@ -274,8 +273,8 @@ Saddleable {
     }
 
     @Override
-    public void setMovementInput(Vec3d arg) {
-        super.travel(arg);
+    public void setMovementInput(Vec3d movementInput) {
+        super.travel(movementInput);
     }
 
     @Override
@@ -284,7 +283,7 @@ Saddleable {
     }
 
     @Override
-    protected void playStepSound(BlockPos arg, BlockState arg2) {
+    protected void playStepSound(BlockPos pos, BlockState state) {
         this.playSound(this.isInLava() ? SoundEvents.ENTITY_STRIDER_STEP_LAVA : SoundEvents.ENTITY_STRIDER_STEP, 1.0f, 1.0f);
     }
 
@@ -294,13 +293,13 @@ Saddleable {
     }
 
     @Override
-    protected void fall(double d, boolean bl, BlockState arg, BlockPos arg2) {
+    protected void fall(double heightDifference, boolean onGround, BlockState landedState, BlockPos landedPosition) {
         this.checkBlockCollision();
         if (this.isInLava()) {
             this.fallDistance = 0.0f;
             return;
         }
-        super.fall(d, bl, arg, arg2);
+        super.fall(heightDifference, onGround, landedState, landedPosition);
     }
 
     @Override
@@ -356,7 +355,7 @@ Saddleable {
     }
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource arg) {
+    protected SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.ENTITY_STRIDER_HURT;
     }
 
@@ -366,7 +365,7 @@ Saddleable {
     }
 
     @Override
-    protected boolean canAddPassenger(Entity arg) {
+    protected boolean canAddPassenger(Entity passenger) {
         return this.getPassengerList().isEmpty() && !this.isSubmergedIn(FluidTags.LAVA);
     }
 
@@ -381,13 +380,13 @@ Saddleable {
     }
 
     @Override
-    protected EntityNavigation createNavigation(World arg) {
-        return new Navigation(this, arg);
+    protected EntityNavigation createNavigation(World world) {
+        return new Navigation(this, world);
     }
 
     @Override
-    public float getPathfindingFavor(BlockPos arg, WorldView arg2) {
-        if (arg2.getBlockState(arg).getFluidState().isIn(FluidTags.LAVA)) {
+    public float getPathfindingFavor(BlockPos pos, WorldView world) {
+        if (world.getBlockState(pos).getFluidState().isIn(FluidTags.LAVA)) {
             return 10.0f;
         }
         return 0.0f;
@@ -399,8 +398,8 @@ Saddleable {
     }
 
     @Override
-    public boolean isBreedingItem(ItemStack arg) {
-        return BREEDING_INGREDIENT.test(arg);
+    public boolean isBreedingItem(ItemStack stack) {
+        return BREEDING_INGREDIENT.test(stack);
     }
 
     @Override
@@ -412,19 +411,19 @@ Saddleable {
     }
 
     @Override
-    public ActionResult interactMob(PlayerEntity arg, Hand arg2) {
-        boolean bl = this.isBreedingItem(arg.getStackInHand(arg2));
-        if (!bl && this.isSaddled() && !this.hasPassengers() && !arg.shouldCancelInteraction()) {
+    public ActionResult interactMob(PlayerEntity player, Hand hand) {
+        boolean bl = this.isBreedingItem(player.getStackInHand(hand));
+        if (!bl && this.isSaddled() && !this.hasPassengers() && !player.shouldCancelInteraction()) {
             if (!this.world.isClient) {
-                arg.startRiding(this);
+                player.startRiding(this);
             }
             return ActionResult.success(this.world.isClient);
         }
-        ActionResult lv = super.interactMob(arg, arg2);
+        ActionResult lv = super.interactMob(player, hand);
         if (!lv.isAccepted()) {
-            ItemStack lv2 = arg.getStackInHand(arg2);
+            ItemStack lv2 = player.getStackInHand(hand);
             if (lv2.getItem() == Items.SADDLE) {
-                return lv2.useOnEntity(arg, this, arg2);
+                return lv2.useOnEntity(player, this, hand);
             }
             return ActionResult.PASS;
         }
@@ -442,45 +441,30 @@ Saddleable {
 
     @Override
     @Nullable
-    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
-        ZombifiedPiglinEntity lv9;
-        StriderData.RiderType lv6;
-        ZombieEntity.ZombieData lv = null;
-        if (arg4 instanceof StriderData) {
-            StriderData.RiderType lv2 = ((StriderData)arg4).type;
-        } else if (!this.isBaby()) {
-            StriderData.RiderType lv5;
-            if (this.random.nextInt(30) == 0) {
-                StriderData.RiderType lv3 = StriderData.RiderType.PIGLIN_RIDER;
-                lv = new ZombieEntity.ZombieData(ZombieEntity.method_29936(this.random), false);
-            } else if (this.random.nextInt(10) == 0) {
-                StriderData.RiderType lv4 = StriderData.RiderType.BABY_RIDER;
-            } else {
-                lv5 = StriderData.RiderType.NO_RIDER;
-            }
-            arg4 = new StriderData(lv5);
-            ((PassiveEntity.PassiveData)arg4).setBabyChance(lv5 == StriderData.RiderType.NO_RIDER ? 0.5f : 0.0f);
-        } else {
-            lv6 = StriderData.RiderType.NO_RIDER;
+    public EntityData initialize(class_5425 arg, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable CompoundTag entityTag) {
+        if (this.isBaby()) {
+            return super.initialize(arg, difficulty, spawnReason, entityData, entityTag);
         }
-        PathAwareEntity lv7 = null;
-        if (lv6 == StriderData.RiderType.BABY_RIDER) {
-            StriderEntity lv8 = EntityType.STRIDER.create(arg.getWorld());
-            if (lv8 != null) {
-                lv7 = lv8;
-                lv8.setBreedingAge(-24000);
-            }
-        } else if (lv6 == StriderData.RiderType.PIGLIN_RIDER && (lv9 = EntityType.ZOMBIFIED_PIGLIN.create(arg.getWorld())) != null) {
-            lv7 = lv9;
+        if (this.random.nextInt(30) == 0) {
+            MobEntity lv = EntityType.ZOMBIFIED_PIGLIN.create(arg.getWorld());
+            entityData = this.method_30336(arg, difficulty, lv, new ZombieEntity.ZombieData(ZombieEntity.method_29936(this.random), false));
             this.saddle(null);
+        } else if (this.random.nextInt(10) == 0) {
+            PassiveEntity lv2 = EntityType.STRIDER.create(arg.getWorld());
+            lv2.setBreedingAge(-24000);
+            entityData = this.method_30336(arg, difficulty, lv2, null);
+        } else {
+            entityData = new PassiveEntity.PassiveData(0.5f);
         }
-        if (lv7 != null) {
-            lv7.refreshPositionAndAngles(this.getX(), this.getY(), this.getZ(), this.yaw, 0.0f);
-            lv7.initialize(arg, arg2, SpawnReason.JOCKEY, lv, null);
-            lv7.startRiding(this, true);
-            arg.spawnEntity(lv7);
-        }
-        return super.initialize(arg, arg2, arg3, arg4, arg5);
+        return super.initialize(arg, difficulty, spawnReason, entityData, entityTag);
+    }
+
+    private EntityData method_30336(class_5425 arg, LocalDifficulty arg2, MobEntity arg3, @Nullable EntityData arg4) {
+        arg3.refreshPositionAndAngles(this.getX(), this.getY(), this.getZ(), this.yaw, 0.0f);
+        arg3.initialize(arg, arg2, SpawnReason.JOCKEY, arg4, null);
+        arg3.startRiding(this, true);
+        arg.spawnEntity(arg3);
+        return new PassiveEntity.PassiveData(0.0f);
     }
 
     @Override
@@ -490,43 +474,27 @@ Saddleable {
 
     static class Navigation
     extends MobNavigation {
-        Navigation(StriderEntity arg, World arg2) {
-            super(arg, arg2);
+        Navigation(StriderEntity entity, World world) {
+            super(entity, world);
         }
 
         @Override
-        protected PathNodeNavigator createPathNodeNavigator(int i) {
+        protected PathNodeNavigator createPathNodeNavigator(int range) {
             this.nodeMaker = new LandPathNodeMaker();
-            return new PathNodeNavigator(this.nodeMaker, i);
+            return new PathNodeNavigator(this.nodeMaker, range);
         }
 
         @Override
-        protected boolean canWalkOnPath(PathNodeType arg) {
-            if (arg == PathNodeType.LAVA || arg == PathNodeType.DAMAGE_FIRE || arg == PathNodeType.DANGER_FIRE) {
+        protected boolean canWalkOnPath(PathNodeType pathType) {
+            if (pathType == PathNodeType.LAVA || pathType == PathNodeType.DAMAGE_FIRE || pathType == PathNodeType.DANGER_FIRE) {
                 return true;
             }
-            return super.canWalkOnPath(arg);
+            return super.canWalkOnPath(pathType);
         }
 
         @Override
-        public boolean isValidPosition(BlockPos arg) {
-            return this.world.getBlockState(arg).isOf(Blocks.LAVA) || super.isValidPosition(arg);
-        }
-    }
-
-    public static class StriderData
-    extends PassiveEntity.PassiveData {
-        public final RiderType type;
-
-        public StriderData(RiderType arg) {
-            this.type = arg;
-        }
-
-        public static enum RiderType {
-            NO_RIDER,
-            BABY_RIDER,
-            PIGLIN_RIDER;
-
+        public boolean isValidPosition(BlockPos pos) {
+            return this.world.getBlockState(pos).isOf(Blocks.LAVA) || super.isValidPosition(pos);
         }
     }
 }

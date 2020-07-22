@@ -28,29 +28,29 @@ extends Block {
     }
 
     @Override
-    public void onBlockAdded(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
-        if (arg2.getDimension().isUltrawarm()) {
-            arg2.setBlockState(arg3, Blocks.SPONGE.getDefaultState(), 3);
-            arg2.syncWorldEvent(2009, arg3, 0);
-            arg2.playSound(null, arg3, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.BLOCKS, 1.0f, (1.0f + arg2.getRandom().nextFloat() * 0.2f) * 0.7f);
+    public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
+        if (world.getDimension().isUltrawarm()) {
+            world.setBlockState(pos, Blocks.SPONGE.getDefaultState(), 3);
+            world.syncWorldEvent(2009, pos, 0);
+            world.playSound(null, pos, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.BLOCKS, 1.0f, (1.0f + world.getRandom().nextFloat() * 0.2f) * 0.7f);
         }
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void randomDisplayTick(BlockState arg, World arg2, BlockPos arg3, Random random) {
+    public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
         Direction lv = Direction.random(random);
         if (lv == Direction.UP) {
             return;
         }
-        BlockPos lv2 = arg3.offset(lv);
-        BlockState lv3 = arg2.getBlockState(lv2);
-        if (arg.isOpaque() && lv3.isSideSolidFullSquare(arg2, lv2, lv.getOpposite())) {
+        BlockPos lv2 = pos.offset(lv);
+        BlockState lv3 = world.getBlockState(lv2);
+        if (state.isOpaque() && lv3.isSideSolidFullSquare(world, lv2, lv.getOpposite())) {
             return;
         }
-        double d = arg3.getX();
-        double e = arg3.getY();
-        double f = arg3.getZ();
+        double d = pos.getX();
+        double e = pos.getY();
+        double f = pos.getZ();
         if (lv == Direction.DOWN) {
             e -= 0.05;
             d += random.nextDouble();
@@ -65,7 +65,7 @@ extends Block {
                 f = lv == Direction.SOUTH ? (f += 1.1) : (f += 0.05);
             }
         }
-        arg2.addParticle(ParticleTypes.DRIPPING_WATER, d, e, f, 0.0, 0.0, 0.0);
+        world.addParticle(ParticleTypes.DRIPPING_WATER, d, e, f, 0.0, 0.0, 0.0);
     }
 }
 

@@ -59,12 +59,12 @@ implements ReadableProfiler {
     private LocatedInfo currentInfo;
     private final boolean checkTimeout;
 
-    public ProfilerSystem(LongSupplier longSupplier, IntSupplier intSupplier, boolean bl) {
-        this.startTime = longSupplier.getAsLong();
-        this.timeGetter = longSupplier;
-        this.startTick = intSupplier.getAsInt();
-        this.endTickGetter = intSupplier;
-        this.checkTimeout = bl;
+    public ProfilerSystem(LongSupplier timeGetter, IntSupplier tickGetter, boolean checkTimeout) {
+        this.startTime = timeGetter.getAsLong();
+        this.timeGetter = timeGetter;
+        this.startTick = tickGetter.getAsInt();
+        this.endTickGetter = tickGetter;
+        this.checkTimeout = checkTimeout;
     }
 
     @Override
@@ -93,23 +93,23 @@ implements ReadableProfiler {
     }
 
     @Override
-    public void push(String string) {
+    public void push(String location) {
         if (!this.tickStarted) {
-            LOGGER.error("Cannot push '{}' to profiler if profiler tick hasn't started - missing startTick()?", (Object)string);
+            LOGGER.error("Cannot push '{}' to profiler if profiler tick hasn't started - missing startTick()?", (Object)location);
             return;
         }
         if (!this.location.isEmpty()) {
             this.location = this.location + '\u001e';
         }
-        this.location = this.location + string;
+        this.location = this.location + location;
         this.path.add(this.location);
         this.timeList.add(Util.getMeasuringTimeNano());
         this.currentInfo = null;
     }
 
     @Override
-    public void push(java.util.function.Supplier<String> supplier) {
-        this.push(supplier.get());
+    public void push(java.util.function.Supplier<String> locationGetter) {
+        this.push(locationGetter.get());
     }
 
     @Override
@@ -137,16 +137,16 @@ implements ReadableProfiler {
     }
 
     @Override
-    public void swap(String string) {
+    public void swap(String location) {
         this.pop();
-        this.push(string);
+        this.push(location);
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void swap(java.util.function.Supplier<String> supplier) {
+    public void swap(java.util.function.Supplier<String> locationGetter) {
         this.pop();
-        this.push(supplier);
+        this.push(locationGetter);
     }
 
     private LocatedInfo getCurrentInfo() {
@@ -157,13 +157,13 @@ implements ReadableProfiler {
     }
 
     @Override
-    public void visit(String string) {
-        this.getCurrentInfo().counts.addTo((Object)string, 1L);
+    public void visit(String marker) {
+        this.getCurrentInfo().counts.addTo((Object)marker, 1L);
     }
 
     @Override
-    public void visit(java.util.function.Supplier<String> supplier) {
-        this.getCurrentInfo().counts.addTo((Object)supplier.get(), 1L);
+    public void visit(java.util.function.Supplier<String> markerGetter) {
+        this.getCurrentInfo().counts.addTo((Object)markerGetter.get(), 1L);
     }
 
     @Override

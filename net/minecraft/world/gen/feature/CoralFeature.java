@@ -36,23 +36,23 @@ extends Feature<DefaultFeatureConfig> {
 
     protected abstract boolean spawnCoral(WorldAccess var1, Random var2, BlockPos var3, BlockState var4);
 
-    protected boolean spawnCoralPiece(WorldAccess arg, Random random, BlockPos arg2, BlockState arg3) {
-        BlockPos lv = arg2.up();
-        BlockState lv2 = arg.getBlockState(arg2);
-        if (!lv2.isOf(Blocks.WATER) && !lv2.isIn(BlockTags.CORALS) || !arg.getBlockState(lv).isOf(Blocks.WATER)) {
+    protected boolean spawnCoralPiece(WorldAccess world, Random random, BlockPos pos, BlockState state) {
+        BlockPos lv = pos.up();
+        BlockState lv2 = world.getBlockState(pos);
+        if (!lv2.isOf(Blocks.WATER) && !lv2.isIn(BlockTags.CORALS) || !world.getBlockState(lv).isOf(Blocks.WATER)) {
             return false;
         }
-        arg.setBlockState(arg2, arg3, 3);
+        world.setBlockState(pos, state, 3);
         if (random.nextFloat() < 0.25f) {
-            arg.setBlockState(lv, ((Block)BlockTags.CORALS.getRandom(random)).getDefaultState(), 2);
+            world.setBlockState(lv, ((Block)BlockTags.CORALS.getRandom(random)).getDefaultState(), 2);
         } else if (random.nextFloat() < 0.05f) {
-            arg.setBlockState(lv, (BlockState)Blocks.SEA_PICKLE.getDefaultState().with(SeaPickleBlock.PICKLES, random.nextInt(4) + 1), 2);
+            world.setBlockState(lv, (BlockState)Blocks.SEA_PICKLE.getDefaultState().with(SeaPickleBlock.PICKLES, random.nextInt(4) + 1), 2);
         }
         for (Direction lv3 : Direction.Type.HORIZONTAL) {
             BlockPos lv4;
-            if (!(random.nextFloat() < 0.2f) || !arg.getBlockState(lv4 = arg2.offset(lv3)).isOf(Blocks.WATER)) continue;
+            if (!(random.nextFloat() < 0.2f) || !world.getBlockState(lv4 = pos.offset(lv3)).isOf(Blocks.WATER)) continue;
             BlockState lv5 = (BlockState)((Block)BlockTags.WALL_CORALS.getRandom(random)).getDefaultState().with(DeadCoralWallFanBlock.FACING, lv3);
-            arg.setBlockState(lv4, lv5, 2);
+            world.setBlockState(lv4, lv5, 2);
         }
         return true;
     }

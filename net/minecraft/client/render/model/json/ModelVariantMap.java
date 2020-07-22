@@ -48,18 +48,18 @@ public class ModelVariantMap {
     private final Map<String, WeightedUnbakedModel> variantMap = Maps.newLinkedHashMap();
     private MultipartUnbakedModel multipartModel;
 
-    public static ModelVariantMap deserialize(DeserializationContext arg, Reader reader) {
-        return JsonHelper.deserialize(arg.gson, reader, ModelVariantMap.class);
+    public static ModelVariantMap deserialize(DeserializationContext context, Reader reader) {
+        return JsonHelper.deserialize(context.gson, reader, ModelVariantMap.class);
     }
 
-    public ModelVariantMap(Map<String, WeightedUnbakedModel> map, MultipartUnbakedModel arg) {
-        this.multipartModel = arg;
-        this.variantMap.putAll(map);
+    public ModelVariantMap(Map<String, WeightedUnbakedModel> variantMap, MultipartUnbakedModel multipartModel) {
+        this.multipartModel = multipartModel;
+        this.variantMap.putAll(variantMap);
     }
 
-    public ModelVariantMap(List<ModelVariantMap> list) {
+    public ModelVariantMap(List<ModelVariantMap> variantMapList) {
         ModelVariantMap lv = null;
-        for (ModelVariantMap lv2 : list) {
+        for (ModelVariantMap lv2 : variantMapList) {
             if (lv2.hasMultipartModel()) {
                 this.variantMap.clear();
                 lv = lv2;
@@ -71,12 +71,12 @@ public class ModelVariantMap {
         }
     }
 
-    public boolean equals(Object object) {
-        if (this == object) {
+    public boolean equals(Object o) {
+        if (this == o) {
             return true;
         }
-        if (object instanceof ModelVariantMap) {
-            ModelVariantMap lv = (ModelVariantMap)object;
+        if (o instanceof ModelVariantMap) {
+            ModelVariantMap lv = (ModelVariantMap)o;
             if (this.variantMap.equals(lv.variantMap)) {
                 return this.hasMultipartModel() ? this.multipartModel.equals(lv.multipartModel) : !lv.hasMultipartModel();
             }
@@ -113,28 +113,28 @@ public class ModelVariantMap {
             return new ModelVariantMap(map, lv);
         }
 
-        protected Map<String, WeightedUnbakedModel> deserializeVariants(JsonDeserializationContext jsonDeserializationContext, JsonObject jsonObject) {
+        protected Map<String, WeightedUnbakedModel> deserializeVariants(JsonDeserializationContext context, JsonObject object) {
             HashMap map = Maps.newHashMap();
-            if (jsonObject.has("variants")) {
-                JsonObject jsonObject2 = JsonHelper.getObject(jsonObject, "variants");
+            if (object.has("variants")) {
+                JsonObject jsonObject2 = JsonHelper.getObject(object, "variants");
                 for (Map.Entry entry : jsonObject2.entrySet()) {
-                    map.put(entry.getKey(), jsonDeserializationContext.deserialize((JsonElement)entry.getValue(), WeightedUnbakedModel.class));
+                    map.put(entry.getKey(), context.deserialize((JsonElement)entry.getValue(), WeightedUnbakedModel.class));
                 }
             }
             return map;
         }
 
         @Nullable
-        protected MultipartUnbakedModel deserializeMultipart(JsonDeserializationContext jsonDeserializationContext, JsonObject jsonObject) {
-            if (!jsonObject.has("multipart")) {
+        protected MultipartUnbakedModel deserializeMultipart(JsonDeserializationContext context, JsonObject object) {
+            if (!object.has("multipart")) {
                 return null;
             }
-            JsonArray jsonArray = JsonHelper.getArray(jsonObject, "multipart");
-            return (MultipartUnbakedModel)jsonDeserializationContext.deserialize((JsonElement)jsonArray, MultipartUnbakedModel.class);
+            JsonArray jsonArray = JsonHelper.getArray(object, "multipart");
+            return (MultipartUnbakedModel)context.deserialize((JsonElement)jsonArray, MultipartUnbakedModel.class);
         }
 
-        public /* synthetic */ Object deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
-            return this.deserialize(jsonElement, type, jsonDeserializationContext);
+        public /* synthetic */ Object deserialize(JsonElement functionJson, Type unused, JsonDeserializationContext context) throws JsonParseException {
+            return this.deserialize(functionJson, unused, context);
         }
     }
 
@@ -147,8 +147,8 @@ public class ModelVariantMap {
             return this.stateFactory;
         }
 
-        public void setStateFactory(StateManager<Block, BlockState> arg) {
-            this.stateFactory = arg;
+        public void setStateFactory(StateManager<Block, BlockState> stateFactory) {
+            this.stateFactory = stateFactory;
         }
     }
 }

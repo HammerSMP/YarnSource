@@ -21,8 +21,8 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Util;
 
 public class MeCommand {
-    public static void register(CommandDispatcher<ServerCommandSource> commandDispatcher) {
-        commandDispatcher.register((LiteralArgumentBuilder)CommandManager.literal("me").then(CommandManager.argument("action", StringArgumentType.greedyString()).executes(commandContext -> {
+    public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
+        dispatcher.register((LiteralArgumentBuilder)CommandManager.literal("me").then(CommandManager.argument("action", StringArgumentType.greedyString()).executes(commandContext -> {
             TranslatableText lv = new TranslatableText("chat.type.emote", ((ServerCommandSource)commandContext.getSource()).getDisplayName(), StringArgumentType.getString((CommandContext)commandContext, (String)"action"));
             Entity lv2 = ((ServerCommandSource)commandContext.getSource()).getEntity();
             if (lv2 != null) {

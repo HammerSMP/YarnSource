@@ -12,19 +12,14 @@ package net.minecraft.world;
 
 import com.google.common.collect.Maps;
 import com.mojang.datafixers.DataFixer;
-import java.io.DataInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PushbackInputStream;
 import java.util.Map;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import net.minecraft.SharedConstants;
-import net.minecraft.datafixer.DataFixTypes;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtHelper;
-import net.minecraft.nbt.NbtIo;
 import net.minecraft.world.PersistentState;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -35,95 +30,79 @@ public class PersistentStateManager {
     private final DataFixer dataFixer;
     private final File directory;
 
-    public PersistentStateManager(File file, DataFixer dataFixer) {
+    public PersistentStateManager(File directory, DataFixer dataFixer) {
         this.dataFixer = dataFixer;
-        this.directory = file;
+        this.directory = directory;
     }
 
-    private File getFile(String string) {
-        return new File(this.directory, string + ".dat");
+    private File getFile(String id) {
+        return new File(this.directory, id + ".dat");
     }
 
-    public <T extends PersistentState> T getOrCreate(Supplier<T> supplier, String string) {
-        T lv = this.get(supplier, string);
+    public <T extends PersistentState> T getOrCreate(Supplier<T> factory, String id) {
+        T lv = this.get(factory, id);
         if (lv != null) {
             return lv;
         }
-        PersistentState lv2 = (PersistentState)supplier.get();
+        PersistentState lv2 = (PersistentState)factory.get();
         this.set(lv2);
         return (T)lv2;
     }
 
     @Nullable
-    public <T extends PersistentState> T get(Supplier<T> supplier, String string) {
-        PersistentState lv = this.loadedStates.get(string);
-        if (lv == null && !this.loadedStates.containsKey(string)) {
-            lv = this.readFromFile(supplier, string);
-            this.loadedStates.put(string, lv);
+    public <T extends PersistentState> T get(Supplier<T> factory, String id) {
+        PersistentState lv = this.loadedStates.get(id);
+        if (lv == null && !this.loadedStates.containsKey(id)) {
+            lv = this.readFromFile(factory, id);
+            this.loadedStates.put(id, lv);
         }
         return (T)lv;
     }
 
     @Nullable
-    private <T extends PersistentState> T readFromFile(Supplier<T> supplier, String string) {
+    private <T extends PersistentState> T readFromFile(Supplier<T> factory, String id) {
         try {
-            File file = this.getFile(string);
+            File file = this.getFile(id);
             if (file.exists()) {
-                PersistentState lv = (PersistentState)supplier.get();
-                CompoundTag lv2 = this.readTag(string, SharedConstants.getGameVersion().getWorldVersion());
+                PersistentState lv = (PersistentState)factory.get();
+                CompoundTag lv2 = this.readTag(id, SharedConstants.getGameVersion().getWorldVersion());
                 lv.fromTag(lv2.getCompound("data"));
                 return (T)lv;
             }
         }
         catch (Exception exception) {
-            LOGGER.error("Error loading saved data: {}", (Object)string, (Object)exception);
+            LOGGER.error("Error loading saved data: {}", (Object)id, (Object)exception);
         }
         return null;
     }
 
-    public void set(PersistentState arg) {
-        this.loadedStates.put(arg.getId(), arg);
+    public void set(PersistentState state) {
+        this.loadedStates.put(state.getId(), state);
     }
 
     /*
-     * WARNING - void declaration
+     * Exception decompiling
      */
-    public CompoundTag readTag(String string, int i) throws IOException {
-        File file = this.getFile(string);
-        try (PushbackInputStream pushbackInputStream = new PushbackInputStream(new FileInputStream(file), 2);){
-            void lv3;
-            Object object;
-            if (this.isCompressed(pushbackInputStream)) {
-                CompoundTag lv = NbtIo.readCompressed(pushbackInputStream);
-            } else {
-                DataInputStream dataInputStream = new DataInputStream(pushbackInputStream);
-                object = null;
-                try {
-                    CompoundTag lv2 = NbtIo.read(dataInputStream);
-                }
-                catch (Throwable throwable) {
-                    object = throwable;
-                    throw throwable;
-                }
-                finally {
-                    if (dataInputStream != null) {
-                        if (object != null) {
-                            try {
-                                dataInputStream.close();
-                            }
-                            catch (Throwable throwable) {
-                                ((Throwable)object).addSuppressed(throwable);
-                            }
-                        } else {
-                            dataInputStream.close();
-                        }
-                    }
-                }
-            }
-            int j = lv3.contains("DataVersion", 99) ? lv3.getInt("DataVersion") : 1343;
-            object = NbtHelper.update(this.dataFixer, DataFixTypes.SAVED_DATA, (CompoundTag)lv3, j, i);
-            return object;
-        }
+    public CompoundTag readTag(String id, int dataVersion) throws IOException {
+        /*
+         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
+         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [0[TRYBLOCK]], but top level block is 8[TRYBLOCK]
+         * org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:428)
+         * org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:477)
+         * org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:619)
+         * org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:779)
+         * org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:251)
+         * org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:185)
+         * org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
+         * org.benf.cfr.reader.entities.Method.analyse(Method.java:463)
+         * org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1001)
+         * org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:888)
+         * org.benf.cfr.reader.Driver.doJarVersionTypes(Driver.java:252)
+         * org.benf.cfr.reader.Driver.doJar(Driver.java:134)
+         * org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:65)
+         * org.benf.cfr.reader.Main.main(Main.java:49)
+         */
+        throw new IllegalStateException(Decompilation failed);
     }
 
     private boolean isCompressed(PushbackInputStream pushbackInputStream) throws IOException {

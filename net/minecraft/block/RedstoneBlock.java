@@ -17,12 +17,12 @@ extends Block {
     }
 
     @Override
-    public boolean emitsRedstonePower(BlockState arg) {
+    public boolean emitsRedstonePower(BlockState state) {
         return true;
     }
 
     @Override
-    public int getWeakRedstonePower(BlockState arg, BlockView arg2, BlockPos arg3, Direction arg4) {
+    public int getWeakRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction direction) {
         return 15;
     }
 }

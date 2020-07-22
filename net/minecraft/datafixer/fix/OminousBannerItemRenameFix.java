@@ -30,8 +30,8 @@ import net.minecraft.datafixer.schema.IdentifierNormalizingSchema;
 
 public class OminousBannerItemRenameFix
 extends DataFix {
-    public OminousBannerItemRenameFix(Schema schema, boolean bl) {
-        super(schema, bl);
+    public OminousBannerItemRenameFix(Schema outputSchema, boolean changesType) {
+        super(outputSchema, changesType);
     }
 
     private Dynamic<?> fixBannerName(Dynamic<?> dynamic) {

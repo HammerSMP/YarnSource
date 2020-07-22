@@ -36,7 +36,7 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.command.arguments.ArgumentTypes;
+import net.minecraft.command.argument.ArgumentTypes;
 import net.minecraft.command.suggestion.SuggestionProviders;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketByteBuf;
@@ -50,16 +50,16 @@ implements Packet<ClientPlayPacketListener> {
     public CommandTreeS2CPacket() {
     }
 
-    public CommandTreeS2CPacket(RootCommandNode<CommandSource> rootCommandNode) {
-        this.commandTree = rootCommandNode;
+    public CommandTreeS2CPacket(RootCommandNode<CommandSource> commandTree) {
+        this.commandTree = commandTree;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        CommandNodeData[] lvs = new CommandNodeData[arg.readVarInt()];
+    public void read(PacketByteBuf buf) throws IOException {
+        CommandNodeData[] lvs = new CommandNodeData[buf.readVarInt()];
         ArrayDeque<CommandNodeData> deque = new ArrayDeque<CommandNodeData>(lvs.length);
         for (int i = 0; i < lvs.length; ++i) {
-            lvs[i] = this.readCommandNode(arg);
+            lvs[i] = this.readCommandNode(buf);
             deque.add(lvs[i]);
         }
         while (!deque.isEmpty()) {
@@ -74,11 +74,11 @@ implements Packet<ClientPlayPacketListener> {
             if (bl) continue;
             throw new IllegalStateException("Server sent an impossible command tree");
         }
-        this.commandTree = (RootCommandNode)lvs[arg.readVarInt()].node;
+        this.commandTree = (RootCommandNode)lvs[buf.readVarInt()].node;
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
+    public void write(PacketByteBuf buf) throws IOException {
         HashMap map = Maps.newHashMap();
         ArrayDeque<Object> deque = new ArrayDeque<Object>();
         deque.add(this.commandTree);
@@ -95,79 +95,79 @@ implements Packet<ClientPlayPacketListener> {
         for (Map.Entry entry : map.entrySet()) {
             commandNodes[((Integer)entry.getValue()).intValue()] = (CommandNode)entry.getKey();
         }
-        arg.writeVarInt(commandNodes.length);
+        buf.writeVarInt(commandNodes.length);
         for (CommandNode commandNode2 : commandNodes) {
-            this.writeNode(arg, (CommandNode<CommandSource>)commandNode2, map);
+            this.writeNode(buf, (CommandNode<CommandSource>)commandNode2, map);
         }
-        arg.writeVarInt((Integer)map.get(this.commandTree));
+        buf.writeVarInt((Integer)map.get(this.commandTree));
     }
 
-    private CommandNodeData readCommandNode(PacketByteBuf arg) {
-        byte b = arg.readByte();
-        int[] is = arg.readIntArray();
-        int i = (b & 8) != 0 ? arg.readVarInt() : 0;
-        ArgumentBuilder<CommandSource, ?> argumentBuilder = this.readArgumentBuilder(arg, b);
+    private CommandNodeData readCommandNode(PacketByteBuf buf) {
+        byte b = buf.readByte();
+        int[] is = buf.readIntArray();
+        int i = (b & 8) != 0 ? buf.readVarInt() : 0;
+        ArgumentBuilder<CommandSource, ?> argumentBuilder = this.readArgumentBuilder(buf, b);
         return new CommandNodeData(argumentBuilder, b, i, is);
     }
 
     @Nullable
-    private ArgumentBuilder<CommandSource, ?> readArgumentBuilder(PacketByteBuf arg, byte b) {
+    private ArgumentBuilder<CommandSource, ?> readArgumentBuilder(PacketByteBuf buf, byte b) {
         int i = b & 3;
         if (i == 2) {
-            String string = arg.readString(32767);
-            ArgumentType<?> argumentType = ArgumentTypes.fromPacket(arg);
+            String string = buf.readString(32767);
+            ArgumentType<?> argumentType = ArgumentTypes.fromPacket(buf);
             if (argumentType == null) {
                 return null;
             }
             RequiredArgumentBuilder requiredArgumentBuilder = RequiredArgumentBuilder.argument((String)string, argumentType);
             if ((b & 0x10) != 0) {
-                requiredArgumentBuilder.suggests(SuggestionProviders.byId(arg.readIdentifier()));
+                requiredArgumentBuilder.suggests(SuggestionProviders.byId(buf.readIdentifier()));
             }
             return requiredArgumentBuilder;
         }
         if (i == 1) {
-            return LiteralArgumentBuilder.literal((String)arg.readString(32767));
+            return LiteralArgumentBuilder.literal((String)buf.readString(32767));
         }
         return null;
     }
 
-    private void writeNode(PacketByteBuf arg, CommandNode<CommandSource> commandNode, Map<CommandNode<CommandSource>, Integer> map) {
+    private void writeNode(PacketByteBuf buf, CommandNode<CommandSource> node, Map<CommandNode<CommandSource>, Integer> map) {
         int b = 0;
-        if (commandNode.getRedirect() != null) {
+        if (node.getRedirect() != null) {
             b = (byte)(b | 8);
         }
-        if (commandNode.getCommand() != null) {
+        if (node.getCommand() != null) {
             b = (byte)(b | 4);
         }
-        if (commandNode instanceof RootCommandNode) {
+        if (node instanceof RootCommandNode) {
             b = (byte)(b | 0);
-        } else if (commandNode instanceof ArgumentCommandNode) {
+        } else if (node instanceof ArgumentCommandNode) {
             b = (byte)(b | 2);
-            if (((ArgumentCommandNode)commandNode).getCustomSuggestions() != null) {
+            if (((ArgumentCommandNode)node).getCustomSuggestions() != null) {
                 b = (byte)(b | 0x10);
             }
-        } else if (commandNode instanceof LiteralCommandNode) {
+        } else if (node instanceof LiteralCommandNode) {
             b = (byte)(b | 1);
         } else {
-            throw new UnsupportedOperationException("Unknown node type " + commandNode);
+            throw new UnsupportedOperationException("Unknown node type " + node);
         }
-        arg.writeByte(b);
-        arg.writeVarInt(commandNode.getChildren().size());
-        for (CommandNode commandNode2 : commandNode.getChildren()) {
-            arg.writeVarInt(map.get((Object)commandNode2));
+        buf.writeByte(b);
+        buf.writeVarInt(node.getChildren().size());
+        for (CommandNode commandNode2 : node.getChildren()) {
+            buf.writeVarInt(map.get((Object)commandNode2));
         }
-        if (commandNode.getRedirect() != null) {
-            arg.writeVarInt(map.get((Object)commandNode.getRedirect()));
+        if (node.getRedirect() != null) {
+            buf.writeVarInt(map.get((Object)node.getRedirect()));
         }
-        if (commandNode instanceof ArgumentCommandNode) {
-            ArgumentCommandNode argumentCommandNode = (ArgumentCommandNode)commandNode;
-            arg.writeString(argumentCommandNode.getName());
-            ArgumentTypes.toPacket(arg, argumentCommandNode.getType());
+        if (node instanceof ArgumentCommandNode) {
+            ArgumentCommandNode argumentCommandNode = (ArgumentCommandNode)node;
+            buf.writeString(argumentCommandNode.getName());
+            ArgumentTypes.toPacket(buf, argumentCommandNode.getType());
             if (argumentCommandNode.getCustomSuggestions() != null) {
-                arg.writeIdentifier(SuggestionProviders.computeName((SuggestionProvider<CommandSource>)argumentCommandNode.getCustomSuggestions()));
+                buf.writeIdentifier(SuggestionProviders.computeName((SuggestionProvider<CommandSource>)argumentCommandNode.getCustomSuggestions()));
             }
-        } else if (commandNode instanceof LiteralCommandNode) {
-            arg.writeString(((LiteralCommandNode)commandNode).getLiteral());
+        } else if (node instanceof LiteralCommandNode) {
+            buf.writeString(((LiteralCommandNode)node).getLiteral());
         }
     }
 
@@ -189,23 +189,23 @@ implements Packet<ClientPlayPacketListener> {
         private final int[] childNodeIndices;
         private CommandNode<CommandSource> node;
 
-        private CommandNodeData(@Nullable ArgumentBuilder<CommandSource, ?> argumentBuilder, byte b, int i, int[] is) {
+        private CommandNodeData(@Nullable ArgumentBuilder<CommandSource, ?> argumentBuilder, byte flags, int redirectNodeIndex, int[] childNodeIndices) {
             this.argumentBuilder = argumentBuilder;
-            this.flags = b;
-            this.redirectNodeIndex = i;
-            this.childNodeIndices = is;
+            this.flags = flags;
+            this.redirectNodeIndex = redirectNodeIndex;
+            this.childNodeIndices = childNodeIndices;
         }
 
-        public boolean build(CommandNodeData[] args) {
+        public boolean build(CommandNodeData[] previousNodes) {
             if (this.node == null) {
                 if (this.argumentBuilder == null) {
                     this.node = new RootCommandNode();
                 } else {
                     if ((this.flags & 8) != 0) {
-                        if (args[this.redirectNodeIndex].node == null) {
+                        if (previousNodes[this.redirectNodeIndex].node == null) {
                             return false;
                         }
-                        this.argumentBuilder.redirect(args[this.redirectNodeIndex].node);
+                        this.argumentBuilder.redirect(previousNodes[this.redirectNodeIndex].node);
                     }
                     if ((this.flags & 4) != 0) {
                         this.argumentBuilder.executes(commandContext -> 0);
@@ -214,11 +214,11 @@ implements Packet<ClientPlayPacketListener> {
                 }
             }
             for (int i : this.childNodeIndices) {
-                if (args[i].node != null) continue;
+                if (previousNodes[i].node != null) continue;
                 return false;
             }
             for (int j : this.childNodeIndices) {
-                CommandNode<CommandSource> commandNode = args[j].node;
+                CommandNode<CommandSource> commandNode = previousNodes[j].node;
                 if (commandNode instanceof RootCommandNode) continue;
                 this.node.addChild(commandNode);
             }

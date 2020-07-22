@@ -53,9 +53,9 @@ implements AutoCloseable {
         }
     }
 
-    private SessionLock(FileChannel fileChannel, FileLock fileLock) {
-        this.channel = fileChannel;
-        this.lock = fileLock;
+    private SessionLock(FileChannel channel, FileLock lock) {
+        this.channel = channel;
+        this.lock = lock;
     }
 
     @Override
@@ -111,8 +111,8 @@ implements AutoCloseable {
 
     public static class AlreadyLockedException
     extends IOException {
-        private AlreadyLockedException(Path path, String string) {
-            super(path.toAbsolutePath() + ": " + string);
+        private AlreadyLockedException(Path path, String message) {
+            super(path.toAbsolutePath() + ": " + message);
         }
 
         public static AlreadyLockedException create(Path path) {

@@ -28,9 +28,9 @@ public class SpriteIdentifier {
     @Nullable
     private RenderLayer layer;
 
-    public SpriteIdentifier(Identifier arg, Identifier arg2) {
-        this.atlas = arg;
-        this.texture = arg2;
+    public SpriteIdentifier(Identifier atlas, Identifier texture) {
+        this.atlas = atlas;
+        this.texture = texture;
     }
 
     public Identifier getAtlasId() {
@@ -45,19 +45,19 @@ public class SpriteIdentifier {
         return MinecraftClient.getInstance().getSpriteAtlas(this.getAtlasId()).apply(this.getTextureId());
     }
 
-    public RenderLayer getRenderLayer(Function<Identifier, RenderLayer> function) {
+    public RenderLayer getRenderLayer(Function<Identifier, RenderLayer> layerFactory) {
         if (this.layer == null) {
-            this.layer = function.apply(this.atlas);
+            this.layer = layerFactory.apply(this.atlas);
         }
         return this.layer;
     }
 
-    public VertexConsumer getVertexConsumer(VertexConsumerProvider arg, Function<Identifier, RenderLayer> function) {
-        return this.getSprite().getTextureSpecificVertexConsumer(arg.getBuffer(this.getRenderLayer(function)));
+    public VertexConsumer getVertexConsumer(VertexConsumerProvider vertexConsumers, Function<Identifier, RenderLayer> layerFactory) {
+        return this.getSprite().getTextureSpecificVertexConsumer(vertexConsumers.getBuffer(this.getRenderLayer(layerFactory)));
     }
 
     public VertexConsumer method_30001(VertexConsumerProvider arg, Function<Identifier, RenderLayer> function, boolean bl) {
-        return this.getSprite().getTextureSpecificVertexConsumer(ItemRenderer.method_29711(arg, this.getRenderLayer(function), true, bl));
+        return this.getSprite().getTextureSpecificVertexConsumer(ItemRenderer.getDirectGlintVertexConsumer(arg, this.getRenderLayer(function), true, bl));
     }
 
     public boolean equals(Object object) {

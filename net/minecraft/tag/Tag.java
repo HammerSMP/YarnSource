@@ -29,14 +29,14 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
-import net.minecraft.class_5414;
 import net.minecraft.tag.SetTag;
+import net.minecraft.tag.TagGroup;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 
 public interface Tag<T> {
-    public static <T> Codec<Tag<T>> method_28134(Supplier<class_5414<T>> supplier) {
-        return Identifier.CODEC.flatXmap(arg -> Optional.ofNullable(((class_5414)supplier.get()).method_30210((Identifier)arg)).map(DataResult::success).orElseGet(() -> DataResult.error((String)("Unknown tag: " + arg))), arg -> Optional.ofNullable(((class_5414)supplier.get()).method_30205(arg)).map(DataResult::success).orElseGet(() -> DataResult.error((String)("Unknown tag: " + arg))));
+    public static <T> Codec<Tag<T>> codec(Supplier<TagGroup<T>> groupGetter) {
+        return Identifier.CODEC.flatXmap(arg -> Optional.ofNullable(((TagGroup)groupGetter.get()).getTag((Identifier)arg)).map(DataResult::success).orElseGet(() -> DataResult.error((String)("Unknown tag: " + arg))), arg -> Optional.ofNullable(((TagGroup)groupGetter.get()).getUncheckedTagId(arg)).map(DataResult::success).orElseGet(() -> DataResult.error((String)("Unknown tag: " + arg))));
     }
 
     public boolean contains(T var1);
@@ -48,8 +48,8 @@ public interface Tag<T> {
         return list.get(random.nextInt(list.size()));
     }
 
-    public static <T> Tag<T> of(Set<T> set) {
-        return SetTag.method_29900(set);
+    public static <T> Tag<T> of(Set<T> values) {
+        return SetTag.of(values);
     }
 
     public static interface Identified<T>
@@ -61,23 +61,23 @@ public interface Tag<T> {
     implements Entry {
         private final Identifier id;
 
-        public TagEntry(Identifier arg) {
-            this.id = arg;
+        public TagEntry(Identifier id) {
+            this.id = id;
         }
 
         @Override
-        public <T> boolean resolve(Function<Identifier, Tag<T>> function, Function<Identifier, T> function2, Consumer<T> consumer) {
-            Tag<T> lv = function.apply(this.id);
+        public <T> boolean resolve(Function<Identifier, Tag<T>> tagGetter, Function<Identifier, T> objectGetter, Consumer<T> collector) {
+            Tag<T> lv = tagGetter.apply(this.id);
             if (lv == null) {
                 return false;
             }
-            lv.values().forEach(consumer);
+            lv.values().forEach(collector);
             return true;
         }
 
         @Override
-        public void addToJson(JsonArray jsonArray) {
-            jsonArray.add("#" + this.id);
+        public void addToJson(JsonArray json) {
+            json.add("#" + this.id);
         }
 
         public String toString() {
@@ -89,23 +89,23 @@ public interface Tag<T> {
     implements Entry {
         private final Identifier id;
 
-        public ObjectEntry(Identifier arg) {
-            this.id = arg;
+        public ObjectEntry(Identifier id) {
+            this.id = id;
         }
 
         @Override
-        public <T> boolean resolve(Function<Identifier, Tag<T>> function, Function<Identifier, T> function2, Consumer<T> consumer) {
-            T object = function2.apply(this.id);
+        public <T> boolean resolve(Function<Identifier, Tag<T>> tagGetter, Function<Identifier, T> objectGetter, Consumer<T> collector) {
+            T object = objectGetter.apply(this.id);
             if (object == null) {
                 return false;
             }
-            consumer.accept(object);
+            collector.accept(object);
             return true;
         }
 
         @Override
-        public void addToJson(JsonArray jsonArray) {
-            jsonArray.add(this.id.toString());
+        public void addToJson(JsonArray json) {
+            json.add(this.id.toString());
         }
 
         public String toString() {
@@ -126,27 +126,27 @@ public interface Tag<T> {
             return new Builder();
         }
 
-        public Builder add(TrackedEntry arg) {
-            this.entries.add(arg);
+        public Builder add(TrackedEntry trackedEntry) {
+            this.entries.add(trackedEntry);
             return this;
         }
 
-        public Builder add(Entry arg, String string) {
-            return this.add(new TrackedEntry(arg, string));
+        public Builder add(Entry entry, String source) {
+            return this.add(new TrackedEntry(entry, source));
         }
 
-        public Builder add(Identifier arg, String string) {
-            return this.add(new ObjectEntry(arg), string);
+        public Builder add(Identifier id, String source) {
+            return this.add(new ObjectEntry(id), source);
         }
 
-        public Builder addTag(Identifier arg, String string) {
-            return this.add(new TagEntry(arg), string);
+        public Builder addTag(Identifier id, String source) {
+            return this.add(new TagEntry(id), source);
         }
 
-        public <T> Optional<Tag<T>> build(Function<Identifier, Tag<T>> function, Function<Identifier, T> function2) {
+        public <T> Optional<Tag<T>> build(Function<Identifier, Tag<T>> tagGetter, Function<Identifier, T> objectGetter) {
             ImmutableSet.Builder builder = ImmutableSet.builder();
             for (TrackedEntry lv : this.entries) {
-                if (lv.getEntry().resolve(function, function2, ((ImmutableSet.Builder)builder)::add)) continue;
+                if (lv.getEntry().resolve(tagGetter, objectGetter, ((ImmutableSet.Builder)builder)::add)) continue;
                 return Optional.empty();
             }
             return Optional.of(Tag.of(builder.build()));
@@ -156,12 +156,12 @@ public interface Tag<T> {
             return this.entries.stream();
         }
 
-        public <T> Stream<TrackedEntry> streamUnresolvedEntries(Function<Identifier, Tag<T>> function, Function<Identifier, T> function2) {
-            return this.streamEntries().filter(arg -> !arg.getEntry().resolve(function, function2, object -> {}));
+        public <T> Stream<TrackedEntry> streamUnresolvedEntries(Function<Identifier, Tag<T>> tagGetter, Function<Identifier, T> objectGetter) {
+            return this.streamEntries().filter(arg -> !arg.getEntry().resolve(tagGetter, objectGetter, object -> {}));
         }
 
-        public Builder read(JsonObject jsonObject, String string) {
-            JsonArray jsonArray = JsonHelper.getArray(jsonObject, "values");
+        public Builder read(JsonObject json, String source) {
+            JsonArray jsonArray = JsonHelper.getArray(json, "values");
             ArrayList list = Lists.newArrayList();
             for (JsonElement jsonElement : jsonArray) {
                 String string2 = JsonHelper.asString(jsonElement, "value");
@@ -171,10 +171,10 @@ public interface Tag<T> {
                 }
                 list.add(new ObjectEntry(new Identifier(string2)));
             }
-            if (JsonHelper.getBoolean(jsonObject, "replace", false)) {
+            if (JsonHelper.getBoolean(json, "replace", false)) {
                 this.entries.clear();
             }
-            list.forEach(arg -> this.entries.add(new TrackedEntry((Entry)arg, string)));
+            list.forEach(arg -> this.entries.add(new TrackedEntry((Entry)arg, source)));
             return this;
         }
 
@@ -194,9 +194,9 @@ public interface Tag<T> {
         private final Entry entry;
         private final String source;
 
-        private TrackedEntry(Entry arg, String string) {
-            this.entry = arg;
-            this.source = string;
+        private TrackedEntry(Entry entry, String source) {
+            this.entry = entry;
+            this.source = source;
         }
 
         public Entry getEntry() {

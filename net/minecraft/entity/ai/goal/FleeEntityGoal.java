@@ -30,25 +30,25 @@ extends Goal {
     protected final Predicate<LivingEntity> inclusionSelector;
     private final TargetPredicate withinRangePredicate;
 
-    public FleeEntityGoal(PathAwareEntity arg2, Class<T> class_, float f, double d, double e) {
-        this(arg2, class_, arg -> true, f, d, e, EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR::test);
+    public FleeEntityGoal(PathAwareEntity mob, Class<T> fleeFromType, float distance, double slowSpeed, double fastSpeed) {
+        this(mob, fleeFromType, arg -> true, distance, slowSpeed, fastSpeed, EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR::test);
     }
 
-    public FleeEntityGoal(PathAwareEntity arg, Class<T> class_, Predicate<LivingEntity> predicate, float f, double d, double e, Predicate<LivingEntity> predicate2) {
-        this.mob = arg;
-        this.classToFleeFrom = class_;
-        this.extraInclusionSelector = predicate;
-        this.fleeDistance = f;
-        this.slowSpeed = d;
-        this.fastSpeed = e;
-        this.inclusionSelector = predicate2;
-        this.fleeingEntityNavigation = arg.getNavigation();
+    public FleeEntityGoal(PathAwareEntity mob, Class<T> fleeFromType, Predicate<LivingEntity> extraInclusionSelector, float distance, double slowSpeed, double fastSpeed, Predicate<LivingEntity> inclusionSelector) {
+        this.mob = mob;
+        this.classToFleeFrom = fleeFromType;
+        this.extraInclusionSelector = extraInclusionSelector;
+        this.fleeDistance = distance;
+        this.slowSpeed = slowSpeed;
+        this.fastSpeed = fastSpeed;
+        this.inclusionSelector = inclusionSelector;
+        this.fleeingEntityNavigation = mob.getNavigation();
         this.setControls(EnumSet.of(Goal.Control.MOVE));
-        this.withinRangePredicate = new TargetPredicate().setBaseMaxDistance(f).setPredicate(predicate2.and(predicate));
+        this.withinRangePredicate = new TargetPredicate().setBaseMaxDistance(distance).setPredicate(inclusionSelector.and(extraInclusionSelector));
     }
 
-    public FleeEntityGoal(PathAwareEntity arg2, Class<T> class_, float f, double d, double e, Predicate<LivingEntity> predicate) {
-        this(arg2, class_, arg -> true, f, d, e, predicate);
+    public FleeEntityGoal(PathAwareEntity fleeingEntity, Class<T> classToFleeFrom, float fleeDistance, double fleeSlowSpeed, double fleeFastSpeed, Predicate<LivingEntity> inclusionSelector) {
+        this(fleeingEntity, classToFleeFrom, arg -> true, fleeDistance, fleeSlowSpeed, fleeFastSpeed, inclusionSelector);
     }
 
     @Override

@@ -42,13 +42,13 @@ public class AttributeContainer {
     private final Set<EntityAttributeInstance> tracked = Sets.newHashSet();
     private final DefaultAttributeContainer fallback;
 
-    public AttributeContainer(DefaultAttributeContainer arg) {
-        this.fallback = arg;
+    public AttributeContainer(DefaultAttributeContainer defaultAttributes) {
+        this.fallback = defaultAttributes;
     }
 
-    private void updateTrackedStatus(EntityAttributeInstance arg) {
-        if (arg.getAttribute().isTracked()) {
-            this.tracked.add(arg);
+    private void updateTrackedStatus(EntityAttributeInstance instance) {
+        if (instance.getAttribute().isTracked()) {
+            this.tracked.add(instance);
         }
     }
 
@@ -61,36 +61,36 @@ public class AttributeContainer {
     }
 
     @Nullable
-    public EntityAttributeInstance getCustomInstance(EntityAttribute arg2) {
-        return this.custom.computeIfAbsent(arg2, arg -> this.fallback.createOverride(this::updateTrackedStatus, (EntityAttribute)arg));
+    public EntityAttributeInstance getCustomInstance(EntityAttribute attribute) {
+        return this.custom.computeIfAbsent(attribute, arg -> this.fallback.createOverride(this::updateTrackedStatus, (EntityAttribute)arg));
     }
 
-    public boolean hasAttribute(EntityAttribute arg) {
-        return this.custom.get(arg) != null || this.fallback.method_27310(arg);
+    public boolean hasAttribute(EntityAttribute attribute) {
+        return this.custom.get(attribute) != null || this.fallback.method_27310(attribute);
     }
 
-    public boolean hasModifierForAttribute(EntityAttribute arg, UUID uUID) {
-        EntityAttributeInstance lv = this.custom.get(arg);
-        return lv != null ? lv.getModifier(uUID) != null : this.fallback.method_27309(arg, uUID);
+    public boolean hasModifierForAttribute(EntityAttribute attribute, UUID uuid) {
+        EntityAttributeInstance lv = this.custom.get(attribute);
+        return lv != null ? lv.getModifier(uuid) != null : this.fallback.method_27309(attribute, uuid);
     }
 
-    public double getValue(EntityAttribute arg) {
-        EntityAttributeInstance lv = this.custom.get(arg);
-        return lv != null ? lv.getValue() : this.fallback.getValue(arg);
+    public double getValue(EntityAttribute attribute) {
+        EntityAttributeInstance lv = this.custom.get(attribute);
+        return lv != null ? lv.getValue() : this.fallback.getValue(attribute);
     }
 
-    public double getBaseValue(EntityAttribute arg) {
-        EntityAttributeInstance lv = this.custom.get(arg);
-        return lv != null ? lv.getBaseValue() : this.fallback.getBaseValue(arg);
+    public double getBaseValue(EntityAttribute attribute) {
+        EntityAttributeInstance lv = this.custom.get(attribute);
+        return lv != null ? lv.getBaseValue() : this.fallback.getBaseValue(attribute);
     }
 
-    public double getModifierValue(EntityAttribute arg, UUID uUID) {
-        EntityAttributeInstance lv = this.custom.get(arg);
-        return lv != null ? lv.getModifier(uUID).getValue() : this.fallback.getModifierValue(arg, uUID);
+    public double getModifierValue(EntityAttribute attribute, UUID uuid) {
+        EntityAttributeInstance lv = this.custom.get(attribute);
+        return lv != null ? lv.getModifier(uuid).getValue() : this.fallback.getModifierValue(attribute, uuid);
     }
 
-    public void removeModifiers(Multimap<EntityAttribute, EntityAttributeModifier> multimap) {
-        multimap.asMap().forEach((arg, collection) -> {
+    public void removeModifiers(Multimap<EntityAttribute, EntityAttributeModifier> attributeModifiers) {
+        attributeModifiers.asMap().forEach((arg, collection) -> {
             EntityAttributeInstance lv = this.custom.get(arg);
             if (lv != null) {
                 collection.forEach(lv::removeModifier);
@@ -98,8 +98,8 @@ public class AttributeContainer {
         });
     }
 
-    public void addTemporaryModifiers(Multimap<EntityAttribute, EntityAttributeModifier> multimap) {
-        multimap.forEach((arg, arg2) -> {
+    public void addTemporaryModifiers(Multimap<EntityAttribute, EntityAttributeModifier> attributeModifiers) {
+        attributeModifiers.forEach((arg, arg2) -> {
             EntityAttributeInstance lv = this.getCustomInstance((EntityAttribute)arg);
             if (lv != null) {
                 lv.removeModifier((EntityAttributeModifier)arg2);
@@ -109,8 +109,8 @@ public class AttributeContainer {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public void setFrom(AttributeContainer arg2) {
-        arg2.custom.values().forEach(arg -> {
+    public void setFrom(AttributeContainer other) {
+        other.custom.values().forEach(arg -> {
             EntityAttributeInstance lv = this.getCustomInstance(arg.getAttribute());
             if (lv != null) {
                 lv.setFrom((EntityAttributeInstance)arg);
@@ -126,9 +126,9 @@ public class AttributeContainer {
         return lv;
     }
 
-    public void fromTag(ListTag arg) {
-        for (int i = 0; i < arg.size(); ++i) {
-            CompoundTag lv = arg.getCompound(i);
+    public void fromTag(ListTag tag) {
+        for (int i = 0; i < tag.size(); ++i) {
+            CompoundTag lv = tag.getCompound(i);
             String string = lv.getString("Name");
             Util.ifPresentOrElse(Registry.ATTRIBUTE.getOrEmpty(Identifier.tryParse(string)), arg2 -> {
                 EntityAttributeInstance lv = this.getCustomInstance((EntityAttribute)arg2);

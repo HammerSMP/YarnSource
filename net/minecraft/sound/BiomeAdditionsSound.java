@@ -24,9 +24,9 @@ public class BiomeAdditionsSound {
     private SoundEvent event;
     private double chance;
 
-    public BiomeAdditionsSound(SoundEvent arg, double d) {
-        this.event = arg;
-        this.chance = d;
+    public BiomeAdditionsSound(SoundEvent event, double chance) {
+        this.event = event;
+        this.chance = chance;
     }
 
     @Environment(value=EnvType.CLIENT)

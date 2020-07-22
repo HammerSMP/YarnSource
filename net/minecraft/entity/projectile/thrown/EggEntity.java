@@ -28,18 +28,18 @@ extends ThrownItemEntity {
         super((EntityType<? extends ThrownItemEntity>)arg, arg2);
     }
 
-    public EggEntity(World arg, LivingEntity arg2) {
-        super((EntityType<? extends ThrownItemEntity>)EntityType.EGG, arg2, arg);
+    public EggEntity(World world, LivingEntity owner) {
+        super((EntityType<? extends ThrownItemEntity>)EntityType.EGG, owner, world);
     }
 
-    public EggEntity(World arg, double d, double e, double f) {
-        super((EntityType<? extends ThrownItemEntity>)EntityType.EGG, d, e, f, arg);
+    public EggEntity(World world, double x, double y, double z) {
+        super((EntityType<? extends ThrownItemEntity>)EntityType.EGG, x, y, z, world);
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void handleStatus(byte b) {
-        if (b == 3) {
+    public void handleStatus(byte status) {
+        if (status == 3) {
             double d = 0.08;
             for (int i = 0; i < 8; ++i) {
                 this.world.addParticle(new ItemStackParticleEffect(ParticleTypes.ITEM, this.getStack()), this.getX(), this.getY(), this.getZ(), ((double)this.random.nextFloat() - 0.5) * 0.08, ((double)this.random.nextFloat() - 0.5) * 0.08, ((double)this.random.nextFloat() - 0.5) * 0.08);
@@ -48,14 +48,14 @@ extends ThrownItemEntity {
     }
 
     @Override
-    protected void onEntityHit(EntityHitResult arg) {
-        super.onEntityHit(arg);
-        arg.getEntity().damage(DamageSource.thrownProjectile(this, this.getOwner()), 0.0f);
+    protected void onEntityHit(EntityHitResult entityHitResult) {
+        super.onEntityHit(entityHitResult);
+        entityHitResult.getEntity().damage(DamageSource.thrownProjectile(this, this.getOwner()), 0.0f);
     }
 
     @Override
-    protected void onCollision(HitResult arg) {
-        super.onCollision(arg);
+    protected void onCollision(HitResult hitResult) {
+        super.onCollision(hitResult);
         if (!this.world.isClient) {
             if (this.random.nextInt(8) == 0) {
                 int i = 1;

@@ -10,32 +10,32 @@ import net.minecraft.util.registry.Registry;
 
 public class ModelIds {
     @Deprecated
-    public static Identifier getMinecraftNamespacedBlock(String string) {
-        return new Identifier("minecraft", "block/" + string);
+    public static Identifier getMinecraftNamespacedBlock(String name) {
+        return new Identifier("minecraft", "block/" + name);
     }
 
-    public static Identifier getMinecraftNamespacedItem(String string) {
-        return new Identifier("minecraft", "item/" + string);
+    public static Identifier getMinecraftNamespacedItem(String name) {
+        return new Identifier("minecraft", "item/" + name);
     }
 
-    public static Identifier getBlockSubModelId(Block arg, String string) {
-        Identifier lv = Registry.BLOCK.getId(arg);
-        return new Identifier(lv.getNamespace(), "block/" + lv.getPath() + string);
+    public static Identifier getBlockSubModelId(Block block, String suffix) {
+        Identifier lv = Registry.BLOCK.getId(block);
+        return new Identifier(lv.getNamespace(), "block/" + lv.getPath() + suffix);
     }
 
-    public static Identifier getBlockModelId(Block arg) {
-        Identifier lv = Registry.BLOCK.getId(arg);
+    public static Identifier getBlockModelId(Block block) {
+        Identifier lv = Registry.BLOCK.getId(block);
         return new Identifier(lv.getNamespace(), "block/" + lv.getPath());
     }
 
-    public static Identifier getItemModelId(Item arg) {
-        Identifier lv = Registry.ITEM.getId(arg);
+    public static Identifier getItemModelId(Item item) {
+        Identifier lv = Registry.ITEM.getId(item);
         return new Identifier(lv.getNamespace(), "item/" + lv.getPath());
     }
 
-    public static Identifier getItemSubModelId(Item arg, String string) {
-        Identifier lv = Registry.ITEM.getId(arg);
-        return new Identifier(lv.getNamespace(), "item/" + lv.getPath() + string);
+    public static Identifier getItemSubModelId(Item item, String suffix) {
+        Identifier lv = Registry.ITEM.getId(item);
+        return new Identifier(lv.getNamespace(), "item/" + lv.getPath() + suffix);
     }
 }
 

@@ -21,8 +21,8 @@ import net.minecraft.datafixer.fix.ChoiceFix;
 
 public class BlockEntityBannerColorFix
 extends ChoiceFix {
-    public BlockEntityBannerColorFix(Schema schema, boolean bl) {
-        super(schema, bl, "BlockEntityBannerColorFix", TypeReferences.BLOCK_ENTITY, "minecraft:banner");
+    public BlockEntityBannerColorFix(Schema outputSchema, boolean changesType) {
+        super(outputSchema, changesType, "BlockEntityBannerColorFix", TypeReferences.BLOCK_ENTITY, "minecraft:banner");
     }
 
     public Dynamic<?> fixBannerColor(Dynamic<?> dynamic2) {
@@ -32,8 +32,8 @@ extends ChoiceFix {
     }
 
     @Override
-    protected Typed<?> transform(Typed<?> typed) {
-        return typed.update(DSL.remainderFinder(), this::fixBannerColor);
+    protected Typed<?> transform(Typed<?> inputType) {
+        return inputType.update(DSL.remainderFinder(), this::fixBannerColor);
     }
 }
 

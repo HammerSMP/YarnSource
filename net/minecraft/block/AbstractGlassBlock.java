@@ -25,18 +25,18 @@ extends TransparentBlock {
     }
 
     @Override
-    public VoxelShape getVisualShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
+    public VoxelShape getVisualShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
         return VoxelShapes.empty();
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public float getAmbientOcclusionLightLevel(BlockState arg, BlockView arg2, BlockPos arg3) {
+    public float getAmbientOcclusionLightLevel(BlockState state, BlockView world, BlockPos pos) {
         return 1.0f;
     }
 
     @Override
-    public boolean isTranslucent(BlockState arg, BlockView arg2, BlockPos arg3) {
+    public boolean isTranslucent(BlockState state, BlockView world, BlockPos pos) {
         return true;
     }
 }

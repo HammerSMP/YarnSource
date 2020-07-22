@@ -19,8 +19,8 @@ public class ScheduleRule {
     private final List<ScheduleRuleEntry> entries = Lists.newArrayList();
     private int prioritizedEntryIndex;
 
-    public ScheduleRule add(int i, float f) {
-        this.entries.add(new ScheduleRuleEntry(i, f));
+    public ScheduleRule add(int startTime, float priority) {
+        this.entries.add(new ScheduleRuleEntry(startTime, priority));
         this.sort();
         return this;
     }
@@ -33,18 +33,18 @@ public class ScheduleRule {
         this.prioritizedEntryIndex = 0;
     }
 
-    public float getPriority(int i) {
+    public float getPriority(int time) {
         ScheduleRuleEntry lv3;
         if (this.entries.size() <= 0) {
             return 0.0f;
         }
         ScheduleRuleEntry lv = this.entries.get(this.prioritizedEntryIndex);
         ScheduleRuleEntry lv2 = this.entries.get(this.entries.size() - 1);
-        boolean bl = i < lv.getStartTime();
+        boolean bl = time < lv.getStartTime();
         int j = bl ? 0 : this.prioritizedEntryIndex;
         float f = bl ? lv2.getPriority() : lv.getPriority();
         int k = j;
-        while (k < this.entries.size() && (lv3 = this.entries.get(k)).getStartTime() <= i) {
+        while (k < this.entries.size() && (lv3 = this.entries.get(k)).getStartTime() <= time) {
             this.prioritizedEntryIndex = k++;
             f = lv3.getPriority();
         }

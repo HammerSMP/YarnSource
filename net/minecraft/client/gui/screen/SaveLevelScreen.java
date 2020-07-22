@@ -26,10 +26,10 @@ extends Screen {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         this.renderBackgroundTexture(0);
-        this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 70, 0xFFFFFF);
-        super.render(arg, i, j, f);
+        this.drawCenteredText(matrices, this.textRenderer, this.title, this.width / 2, 70, 0xFFFFFF);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 }
 

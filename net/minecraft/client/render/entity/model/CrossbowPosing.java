@@ -18,24 +18,24 @@ import net.minecraft.util.math.MathHelper;
 
 @Environment(value=EnvType.CLIENT)
 public class CrossbowPosing {
-    public static void hold(ModelPart arg, ModelPart arg2, ModelPart arg3, boolean bl) {
-        ModelPart lv = bl ? arg : arg2;
-        ModelPart lv2 = bl ? arg2 : arg;
-        lv.yaw = (bl ? -0.3f : 0.3f) + arg3.yaw;
-        lv2.yaw = (bl ? 0.6f : -0.6f) + arg3.yaw;
-        lv.pitch = -1.5707964f + arg3.pitch + 0.1f;
-        lv2.pitch = -1.5f + arg3.pitch;
+    public static void hold(ModelPart holdingArm, ModelPart otherArm, ModelPart head, boolean rightArmed) {
+        ModelPart lv = rightArmed ? holdingArm : otherArm;
+        ModelPart lv2 = rightArmed ? otherArm : holdingArm;
+        lv.yaw = (rightArmed ? -0.3f : 0.3f) + head.yaw;
+        lv2.yaw = (rightArmed ? 0.6f : -0.6f) + head.yaw;
+        lv.pitch = -1.5707964f + head.pitch + 0.1f;
+        lv2.pitch = -1.5f + head.pitch;
     }
 
-    public static void charge(ModelPart arg, ModelPart arg2, LivingEntity arg3, boolean bl) {
-        ModelPart lv = bl ? arg : arg2;
-        ModelPart lv2 = bl ? arg2 : arg;
-        lv.yaw = bl ? -0.8f : 0.8f;
+    public static void charge(ModelPart holdingArm, ModelPart pullingArm, LivingEntity actor, boolean rightArmed) {
+        ModelPart lv = rightArmed ? holdingArm : pullingArm;
+        ModelPart lv2 = rightArmed ? pullingArm : holdingArm;
+        lv.yaw = rightArmed ? -0.8f : 0.8f;
         lv2.pitch = lv.pitch = -0.97079635f;
-        float f = CrossbowItem.getPullTime(arg3.getActiveItem());
-        float g = MathHelper.clamp((float)arg3.getItemUseTime(), 0.0f, f);
+        float f = CrossbowItem.getPullTime(actor.getActiveItem());
+        float g = MathHelper.clamp((float)actor.getItemUseTime(), 0.0f, f);
         float h = g / f;
-        lv2.yaw = MathHelper.lerp(h, 0.4f, 0.85f) * (float)(bl ? 1 : -1);
+        lv2.yaw = MathHelper.lerp(h, 0.4f, 0.85f) * (float)(rightArmed ? 1 : -1);
         lv2.pitch = MathHelper.lerp(h, lv2.pitch, -1.5707964f);
     }
 

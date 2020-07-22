@@ -15,9 +15,9 @@ extends Goal {
     private LivingEntity target;
     private final float velocity;
 
-    public PounceAtTargetGoal(MobEntity arg, float f) {
-        this.mob = arg;
-        this.velocity = f;
+    public PounceAtTargetGoal(MobEntity mob, float velocity) {
+        this.mob = mob;
+        this.velocity = velocity;
         this.setControls(EnumSet.of(Goal.Control.JUMP, Goal.Control.MOVE));
     }
 

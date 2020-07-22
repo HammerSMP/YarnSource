@@ -25,24 +25,24 @@ implements Packet<ClientPlayPacketListener> {
     public BlockEntityUpdateS2CPacket() {
     }
 
-    public BlockEntityUpdateS2CPacket(BlockPos arg, int i, CompoundTag arg2) {
-        this.pos = arg;
-        this.blockEntityType = i;
-        this.tag = arg2;
+    public BlockEntityUpdateS2CPacket(BlockPos pos, int blockEntityType, CompoundTag tag) {
+        this.pos = pos;
+        this.blockEntityType = blockEntityType;
+        this.tag = tag;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.pos = arg.readBlockPos();
-        this.blockEntityType = arg.readUnsignedByte();
-        this.tag = arg.readCompoundTag();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.pos = buf.readBlockPos();
+        this.blockEntityType = buf.readUnsignedByte();
+        this.tag = buf.readCompoundTag();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeBlockPos(this.pos);
-        arg.writeByte((byte)this.blockEntityType);
-        arg.writeCompoundTag(this.tag);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeBlockPos(this.pos);
+        buf.writeByte((byte)this.blockEntityType);
+        buf.writeCompoundTag(this.tag);
     }
 
     @Override

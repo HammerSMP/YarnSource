@@ -22,32 +22,32 @@ extends Task<LivingEntity> {
     private final int duration;
     private final BiPredicate<LivingEntity, LivingEntity> field_25157;
 
-    public DefeatTargetTask(int i, BiPredicate<LivingEntity, LivingEntity> biPredicate) {
+    public DefeatTargetTask(int duration, BiPredicate<LivingEntity, LivingEntity> biPredicate) {
         super((Map<MemoryModuleType<?>, MemoryModuleState>)ImmutableMap.of(MemoryModuleType.ATTACK_TARGET, (Object)((Object)MemoryModuleState.VALUE_PRESENT), MemoryModuleType.ANGRY_AT, (Object)((Object)MemoryModuleState.REGISTERED), MemoryModuleType.CELEBRATE_LOCATION, (Object)((Object)MemoryModuleState.VALUE_ABSENT), MemoryModuleType.DANCING, (Object)((Object)MemoryModuleState.REGISTERED)));
-        this.duration = i;
+        this.duration = duration;
         this.field_25157 = biPredicate;
     }
 
     @Override
-    protected boolean shouldRun(ServerWorld arg, LivingEntity arg2) {
-        return this.getAttackTarget(arg2).isDead();
+    protected boolean shouldRun(ServerWorld world, LivingEntity entity) {
+        return this.getAttackTarget(entity).isDead();
     }
 
     @Override
-    protected void run(ServerWorld arg, LivingEntity arg2, long l) {
-        LivingEntity lv = this.getAttackTarget(arg2);
-        if (this.field_25157.test(arg2, lv)) {
-            arg2.getBrain().remember(MemoryModuleType.DANCING, true, this.duration);
+    protected void run(ServerWorld world, LivingEntity entity, long time) {
+        LivingEntity lv = this.getAttackTarget(entity);
+        if (this.field_25157.test(entity, lv)) {
+            entity.getBrain().remember(MemoryModuleType.DANCING, true, this.duration);
         }
-        arg2.getBrain().remember(MemoryModuleType.CELEBRATE_LOCATION, lv.getBlockPos(), this.duration);
-        if (lv.getType() != EntityType.PLAYER || arg.getGameRules().getBoolean(GameRules.FORGIVE_DEAD_PLAYERS)) {
-            arg2.getBrain().forget(MemoryModuleType.ATTACK_TARGET);
-            arg2.getBrain().forget(MemoryModuleType.ANGRY_AT);
+        entity.getBrain().remember(MemoryModuleType.CELEBRATE_LOCATION, lv.getBlockPos(), this.duration);
+        if (lv.getType() != EntityType.PLAYER || world.getGameRules().getBoolean(GameRules.FORGIVE_DEAD_PLAYERS)) {
+            entity.getBrain().forget(MemoryModuleType.ATTACK_TARGET);
+            entity.getBrain().forget(MemoryModuleType.ANGRY_AT);
         }
     }
 
-    private LivingEntity getAttackTarget(LivingEntity arg) {
-        return arg.getBrain().getOptionalMemory(MemoryModuleType.ATTACK_TARGET).get();
+    private LivingEntity getAttackTarget(LivingEntity entity) {
+        return entity.getBrain().getOptionalMemory(MemoryModuleType.ATTACK_TARGET).get();
     }
 }
 

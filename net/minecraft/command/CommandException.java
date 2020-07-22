@@ -13,9 +13,9 @@ public class CommandException
 extends RuntimeException {
     private final Text message;
 
-    public CommandException(Text arg) {
-        super(arg.getString(), null, CommandSyntaxException.ENABLE_COMMAND_STACK_TRACES, CommandSyntaxException.ENABLE_COMMAND_STACK_TRACES);
-        this.message = arg;
+    public CommandException(Text message) {
+        super(message.getString(), null, CommandSyntaxException.ENABLE_COMMAND_STACK_TRACES, CommandSyntaxException.ENABLE_COMMAND_STACK_TRACES);
+        this.message = message;
     }
 
     public Text getTextMessage() {

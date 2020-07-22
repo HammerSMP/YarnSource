@@ -40,14 +40,14 @@ extends AbstractCriterion<Conditions> {
         return new Conditions(arg, lv, lv2, lv3);
     }
 
-    public void trigger(ServerPlayerEntity arg, ItemStack arg2, FishingBobberEntity arg32, Collection<ItemStack> collection) {
-        LootContext lv = EntityPredicate.createAdvancementEntityLootContext(arg, arg32.getHookedEntity() != null ? arg32.getHookedEntity() : arg32);
-        this.test(arg, arg3 -> arg3.test(arg2, lv, collection));
+    public void trigger(ServerPlayerEntity player, ItemStack rod, FishingBobberEntity bobber, Collection<ItemStack> fishingLoots) {
+        LootContext lv = EntityPredicate.createAdvancementEntityLootContext(player, bobber.getHookedEntity() != null ? bobber.getHookedEntity() : bobber);
+        this.test(player, arg3 -> arg3.test(rod, lv, fishingLoots));
     }
 
     @Override
-    public /* synthetic */ AbstractCriterionConditions conditionsFromJson(JsonObject jsonObject, EntityPredicate.Extended arg, AdvancementEntityPredicateDeserializer arg2) {
-        return this.conditionsFromJson(jsonObject, arg, arg2);
+    public /* synthetic */ AbstractCriterionConditions conditionsFromJson(JsonObject obj, EntityPredicate.Extended playerPredicate, AdvancementEntityPredicateDeserializer predicateDeserializer) {
+        return this.conditionsFromJson(obj, playerPredicate, predicateDeserializer);
     }
 
     public static class Conditions
@@ -56,32 +56,32 @@ extends AbstractCriterion<Conditions> {
         private final EntityPredicate.Extended hookedEntity;
         private final ItemPredicate caughtItem;
 
-        public Conditions(EntityPredicate.Extended arg, ItemPredicate arg2, EntityPredicate.Extended arg3, ItemPredicate arg4) {
-            super(ID, arg);
-            this.rod = arg2;
-            this.hookedEntity = arg3;
-            this.caughtItem = arg4;
+        public Conditions(EntityPredicate.Extended player, ItemPredicate rod, EntityPredicate.Extended hookedEntity, ItemPredicate caughtItem) {
+            super(ID, player);
+            this.rod = rod;
+            this.hookedEntity = hookedEntity;
+            this.caughtItem = caughtItem;
         }
 
-        public static Conditions create(ItemPredicate arg, EntityPredicate arg2, ItemPredicate arg3) {
-            return new Conditions(EntityPredicate.Extended.EMPTY, arg, EntityPredicate.Extended.ofLegacy(arg2), arg3);
+        public static Conditions create(ItemPredicate rod, EntityPredicate bobber, ItemPredicate item) {
+            return new Conditions(EntityPredicate.Extended.EMPTY, rod, EntityPredicate.Extended.ofLegacy(bobber), item);
         }
 
-        public boolean test(ItemStack arg, LootContext arg2, Collection<ItemStack> collection) {
-            if (!this.rod.test(arg)) {
+        public boolean test(ItemStack rod, LootContext hookedEntityContext, Collection<ItemStack> fishingLoots) {
+            if (!this.rod.test(rod)) {
                 return false;
             }
-            if (!this.hookedEntity.test(arg2)) {
+            if (!this.hookedEntity.test(hookedEntityContext)) {
                 return false;
             }
             if (this.caughtItem != ItemPredicate.ANY) {
                 ItemEntity lv2;
                 boolean bl = false;
-                Entity lv = arg2.get(LootContextParameters.THIS_ENTITY);
+                Entity lv = hookedEntityContext.get(LootContextParameters.THIS_ENTITY);
                 if (lv instanceof ItemEntity && this.caughtItem.test((lv2 = (ItemEntity)lv).getStack())) {
                     bl = true;
                 }
-                for (ItemStack lv3 : collection) {
+                for (ItemStack lv3 : fishingLoots) {
                     if (!this.caughtItem.test(lv3)) continue;
                     bl = true;
                     break;
@@ -94,10 +94,10 @@ extends AbstractCriterion<Conditions> {
         }
 
         @Override
-        public JsonObject toJson(AdvancementEntityPredicateSerializer arg) {
-            JsonObject jsonObject = super.toJson(arg);
+        public JsonObject toJson(AdvancementEntityPredicateSerializer predicateSerializer) {
+            JsonObject jsonObject = super.toJson(predicateSerializer);
             jsonObject.add("rod", this.rod.toJson());
-            jsonObject.add("entity", this.hookedEntity.toJson(arg));
+            jsonObject.add("entity", this.hookedEntity.toJson(predicateSerializer));
             jsonObject.add("item", this.caughtItem.toJson());
             return jsonObject;
         }

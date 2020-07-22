@@ -68,8 +68,8 @@ import net.minecraft.util.crash.CrashReport;
 import net.minecraft.util.dynamic.RegistryOps;
 import net.minecraft.util.logging.UncaughtExceptionLogger;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.registry.DynamicRegistryManager;
 import net.minecraft.util.registry.RegistryKey;
-import net.minecraft.util.registry.RegistryTracker;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.SaveProperties;
 import net.minecraft.world.World;
@@ -87,7 +87,7 @@ public class Main {
     /*
      * WARNING - void declaration
      */
-    public static void main(String[] strings) {
+    public static void main(String[] args) {
         OptionParser optionParser = new OptionParser();
         OptionSpecBuilder optionSpec = optionParser.accepts("nogui");
         OptionSpecBuilder optionSpec2 = optionParser.accepts("initSettings", "Initializes 'server.properties' and 'eula.txt', then quits");
@@ -105,7 +105,7 @@ public class Main {
         NonOptionArgumentSpec optionSpec14 = optionParser.nonOptions();
         try {
             void lv10;
-            OptionSet optionSet = optionParser.parse(strings);
+            OptionSet optionSet = optionParser.parse(args);
             if (optionSet.has((OptionSpec)optionSpec8)) {
                 optionParser.printHelpOn((OutputStream)System.err);
                 return;
@@ -113,7 +113,7 @@ public class Main {
             CrashReport.initCrashReport();
             Bootstrap.initialize();
             Bootstrap.logMissing();
-            Util.method_29476();
+            Util.startTimerHack();
             Path path = Paths.get("server.properties", new String[0]);
             ServerPropertiesLoader lv = new ServerPropertiesLoader(path);
             lv.store();
@@ -153,7 +153,7 @@ public class Main {
                 return;
             }
             lv10.loadRegistryTags();
-            RegistryTracker.Modifiable lv11 = RegistryTracker.create();
+            DynamicRegistryManager.Impl lv11 = DynamicRegistryManager.create();
             RegistryOps<Tag> lv12 = RegistryOps.of(NbtOps.INSTANCE, lv10.getResourceManager(), lv11);
             SaveProperties lv13 = lv5.readLevelProperties(lv12, lv8);
             if (lv13 == null) {
@@ -165,7 +165,7 @@ public class Main {
                 } else {
                     ServerPropertiesHandler lv16 = lv.getPropertiesHandler();
                     lv17 = new LevelInfo(lv16.levelName, lv16.gameMode, lv16.hardcore, lv16.difficulty, false, new GameRules(), lv8);
-                    lv18 = optionSet.has((OptionSpec)optionSpec4) ? lv16.field_24623.withBonusChest() : lv16.field_24623;
+                    lv18 = optionSet.has((OptionSpec)optionSpec4) ? lv16.generatorOptions.withBonusChest() : lv16.generatorOptions;
                 }
                 lv13 = new LevelProperties(lv17, lv18, Lifecycle.stable());
             }
@@ -190,9 +190,9 @@ public class Main {
         }
     }
 
-    private static void forceUpgradeWorld(LevelStorage.Session arg, DataFixer dataFixer, boolean bl, BooleanSupplier booleanSupplier, ImmutableSet<RegistryKey<World>> immutableSet) {
+    private static void forceUpgradeWorld(LevelStorage.Session session, DataFixer dataFixer, boolean eraseCache, BooleanSupplier booleanSupplier, ImmutableSet<RegistryKey<World>> worlds) {
         LOGGER.info("Forcing world upgrade!");
-        WorldUpdater lv = new WorldUpdater(arg, dataFixer, immutableSet, bl);
+        WorldUpdater lv = new WorldUpdater(session, dataFixer, worlds, eraseCache);
         Text lv2 = null;
         while (!lv.isDone()) {
             int i;
@@ -216,14 +216,14 @@ public class Main {
         }
     }
 
-    private static /* synthetic */ MinecraftDedicatedServer method_29734(RegistryTracker.Modifiable arg, LevelStorage.Session arg2, ResourcePackManager arg3, ServerResourceManager arg4, SaveProperties arg5, ServerPropertiesLoader arg6, MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository, UserCache arg7, OptionSet optionSet, OptionSpec optionSpec, OptionSpec optionSpec2, OptionSpec optionSpec3, OptionSpec optionSpec4, OptionSpec optionSpec5, OptionSpec optionSpec6, Thread thread) {
+    private static /* synthetic */ MinecraftDedicatedServer method_29734(DynamicRegistryManager.Impl registryTracker, LevelStorage.Session session, ResourcePackManager resourcePackManager, ServerResourceManager serverResourceManager, SaveProperties saveProperties, ServerPropertiesLoader propertiesLoader, MinecraftSessionService sessionService, GameProfileRepository profileRepository, UserCache userCache, OptionSet optionSet, OptionSpec serverName, OptionSpec serverPort, OptionSpec demo, OptionSpec serverId, OptionSpec noGui, OptionSpec nonOptions, Thread serverThread) {
         boolean bl;
-        MinecraftDedicatedServer lv = new MinecraftDedicatedServer(thread, arg, arg2, arg3, arg4, arg5, arg6, Schemas.getFixer(), minecraftSessionService, gameProfileRepository, arg7, WorldGenerationProgressLogger::new);
-        lv.setServerName((String)optionSet.valueOf(optionSpec));
-        lv.setServerPort((Integer)optionSet.valueOf(optionSpec2));
-        lv.setDemo(optionSet.has(optionSpec3));
-        lv.setServerId((String)optionSet.valueOf(optionSpec4));
-        boolean bl2 = bl = !optionSet.has(optionSpec5) && !optionSet.valuesOf(optionSpec6).contains("nogui");
+        MinecraftDedicatedServer lv = new MinecraftDedicatedServer(serverThread, registryTracker, session, resourcePackManager, serverResourceManager, saveProperties, propertiesLoader, Schemas.getFixer(), sessionService, profileRepository, userCache, WorldGenerationProgressLogger::new);
+        lv.setServerName((String)optionSet.valueOf(serverName));
+        lv.setServerPort((Integer)optionSet.valueOf(serverPort));
+        lv.setDemo(optionSet.has(demo));
+        lv.setServerId((String)optionSet.valueOf(serverId));
+        boolean bl2 = bl = !optionSet.has(noGui) && !optionSet.valuesOf(nonOptions).contains("nogui");
         if (bl && !GraphicsEnvironment.isHeadless()) {
             lv.createGui();
         }

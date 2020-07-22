@@ -48,81 +48,81 @@ extends Feature<TreeFeatureConfig> {
         super(codec);
     }
 
-    public static boolean canTreeReplace(TestableWorld arg2, BlockPos arg22) {
-        return TreeFeature.canReplace(arg2, arg22) || arg2.testBlockState(arg22, arg -> arg.isIn(BlockTags.LOGS));
+    public static boolean canTreeReplace(TestableWorld world, BlockPos pos) {
+        return TreeFeature.canReplace(world, pos) || world.testBlockState(pos, state -> state.isIn(BlockTags.LOGS));
     }
 
-    private static boolean isVine(TestableWorld arg2, BlockPos arg22) {
-        return arg2.testBlockState(arg22, arg -> arg.isOf(Blocks.VINE));
+    private static boolean isVine(TestableWorld world, BlockPos pos) {
+        return world.testBlockState(pos, state -> state.isOf(Blocks.VINE));
     }
 
-    private static boolean isWater(TestableWorld arg2, BlockPos arg22) {
-        return arg2.testBlockState(arg22, arg -> arg.isOf(Blocks.WATER));
+    private static boolean isWater(TestableWorld world, BlockPos pos) {
+        return world.testBlockState(pos, state -> state.isOf(Blocks.WATER));
     }
 
-    public static boolean isAirOrLeaves(TestableWorld arg2, BlockPos arg22) {
-        return arg2.testBlockState(arg22, arg -> arg.isAir() || arg.isIn(BlockTags.LEAVES));
+    public static boolean isAirOrLeaves(TestableWorld world, BlockPos pos) {
+        return world.testBlockState(pos, state -> state.isAir() || state.isIn(BlockTags.LEAVES));
     }
 
-    private static boolean isDirtOrGrass(TestableWorld arg2, BlockPos arg22) {
-        return arg2.testBlockState(arg22, arg -> {
-            Block lv = arg.getBlock();
+    private static boolean isDirtOrGrass(TestableWorld world, BlockPos pos) {
+        return world.testBlockState(pos, state -> {
+            Block lv = state.getBlock();
             return TreeFeature.isSoil(lv) || lv == Blocks.FARMLAND;
         });
     }
 
-    private static boolean isReplaceablePlant(TestableWorld arg2, BlockPos arg22) {
-        return arg2.testBlockState(arg22, arg -> {
-            Material lv = arg.getMaterial();
+    private static boolean isReplaceablePlant(TestableWorld world, BlockPos pos) {
+        return world.testBlockState(pos, state -> {
+            Material lv = state.getMaterial();
             return lv == Material.REPLACEABLE_PLANT;
         });
     }
 
-    public static void setBlockStateWithoutUpdatingNeighbors(ModifiableWorld arg, BlockPos arg2, BlockState arg3) {
-        arg.setBlockState(arg2, arg3, 19);
+    public static void setBlockStateWithoutUpdatingNeighbors(ModifiableWorld world, BlockPos pos, BlockState state) {
+        world.setBlockState(pos, state, 19);
     }
 
-    public static boolean canReplace(TestableWorld arg, BlockPos arg2) {
-        return TreeFeature.isAirOrLeaves(arg, arg2) || TreeFeature.isReplaceablePlant(arg, arg2) || TreeFeature.isWater(arg, arg2);
+    public static boolean canReplace(TestableWorld arg, BlockPos pos) {
+        return TreeFeature.isAirOrLeaves(arg, pos) || TreeFeature.isReplaceablePlant(arg, pos) || TreeFeature.isWater(arg, pos);
     }
 
-    private boolean generate(ModifiableTestableWorld arg, Random random, BlockPos arg2, Set<BlockPos> set, Set<BlockPos> set2, BlockBox arg3, TreeFeatureConfig arg42) {
+    private boolean generate(ModifiableTestableWorld world, Random random, BlockPos pos, Set<BlockPos> logPositions, Set<BlockPos> leavesPositions, BlockBox box, TreeFeatureConfig config) {
         BlockPos lv2;
-        int i = arg42.trunkPlacer.getHeight(random);
-        int j = arg42.foliagePlacer.getHeight(random, i, arg42);
+        int i = config.trunkPlacer.getHeight(random);
+        int j = config.foliagePlacer.getHeight(random, i, config);
         int k = i - j;
-        int l = arg42.foliagePlacer.getRadius(random, k);
-        if (!arg42.skipFluidCheck) {
+        int l = config.foliagePlacer.getRadius(random, k);
+        if (!config.skipFluidCheck) {
             int q;
-            int m = arg.getTopPosition(Heightmap.Type.OCEAN_FLOOR, arg2).getY();
-            int n = arg.getTopPosition(Heightmap.Type.WORLD_SURFACE, arg2).getY();
-            if (n - m > arg42.maxWaterDepth) {
+            int m = world.getTopPosition(Heightmap.Type.OCEAN_FLOOR, pos).getY();
+            int n = world.getTopPosition(Heightmap.Type.WORLD_SURFACE, pos).getY();
+            if (n - m > config.maxWaterDepth) {
                 return false;
             }
-            if (arg42.heightmap == Heightmap.Type.OCEAN_FLOOR) {
+            if (config.heightmap == Heightmap.Type.OCEAN_FLOOR) {
                 int o = m;
-            } else if (arg42.heightmap == Heightmap.Type.WORLD_SURFACE) {
+            } else if (config.heightmap == Heightmap.Type.WORLD_SURFACE) {
                 int p = n;
             } else {
-                q = arg.getTopPosition(arg42.heightmap, arg2).getY();
+                q = world.getTopPosition(config.heightmap, pos).getY();
             }
-            BlockPos lv = new BlockPos(arg2.getX(), q, arg2.getZ());
+            BlockPos lv = new BlockPos(pos.getX(), q, pos.getZ());
         } else {
-            lv2 = arg2;
+            lv2 = pos;
         }
         if (lv2.getY() < 1 || lv2.getY() + i + 1 > 256) {
             return false;
         }
-        if (!TreeFeature.isDirtOrGrass(arg, lv2.down())) {
+        if (!TreeFeature.isDirtOrGrass(world, lv2.down())) {
             return false;
         }
-        OptionalInt optionalInt = arg42.minimumSize.getMinClippedHeight();
-        int r = this.method_29963(arg, i, lv2, arg42);
+        OptionalInt optionalInt = config.minimumSize.getMinClippedHeight();
+        int r = this.method_29963(world, i, lv2, config);
         if (!(r >= i || optionalInt.isPresent() && r >= optionalInt.getAsInt())) {
             return false;
         }
-        List<FoliagePlacer.TreeNode> list = arg42.trunkPlacer.generate(arg, random, r, lv2, set, arg3, arg42);
-        list.forEach(arg4 -> arg.foliagePlacer.generate(arg, random, arg42, r, (FoliagePlacer.TreeNode)arg4, j, l, set2, arg3));
+        List<FoliagePlacer.TreeNode> list = config.trunkPlacer.generate(world, random, r, lv2, logPositions, box, config);
+        list.forEach(arg4 -> arg.foliagePlacer.generate(world, random, config, r, (FoliagePlacer.TreeNode)arg4, j, l, leavesPositions, box));
         return true;
     }
 
@@ -142,17 +142,17 @@ extends Feature<TreeFeatureConfig> {
     }
 
     @Override
-    protected void setBlockState(ModifiableWorld arg, BlockPos arg2, BlockState arg3) {
-        TreeFeature.setBlockStateWithoutUpdatingNeighbors(arg, arg2, arg3);
+    protected void setBlockState(ModifiableWorld world, BlockPos pos, BlockState state) {
+        TreeFeature.setBlockStateWithoutUpdatingNeighbors(world, pos, state);
     }
 
     @Override
-    public final boolean generate(ServerWorldAccess arg, ChunkGenerator arg2, Random random, BlockPos arg32, TreeFeatureConfig arg4) {
+    public final boolean generate(ServerWorldAccess arg, ChunkGenerator arg2, Random random, BlockPos arg3, TreeFeatureConfig arg4) {
         HashSet set = Sets.newHashSet();
         HashSet set2 = Sets.newHashSet();
         HashSet set3 = Sets.newHashSet();
         BlockBox lv = BlockBox.empty();
-        boolean bl = this.generate(arg, random, arg32, set, set2, lv, arg4);
+        boolean bl = this.generate(arg, random, arg3, set, set2, lv, arg4);
         if (lv.minX > lv.maxX || !bl || set.isEmpty()) {
             return false;
         }
@@ -161,55 +161,55 @@ extends Feature<TreeFeatureConfig> {
             ArrayList list2 = Lists.newArrayList((Iterable)set2);
             list.sort(Comparator.comparingInt(Vec3i::getY));
             list2.sort(Comparator.comparingInt(Vec3i::getY));
-            arg4.decorators.forEach(arg3 -> arg3.generate(arg, random, list, list2, set3, lv));
+            arg4.decorators.forEach(decorator -> decorator.generate(arg, random, list, list2, set3, lv));
         }
         VoxelSet lv2 = this.placeLogsAndLeaves(arg, lv, set, set3);
         Structure.updateCorner(arg, 3, lv2, lv.minX, lv.minY, lv.minZ);
         return true;
     }
 
-    private VoxelSet placeLogsAndLeaves(WorldAccess arg, BlockBox arg2, Set<BlockPos> set, Set<BlockPos> set2) {
+    private VoxelSet placeLogsAndLeaves(WorldAccess world, BlockBox box, Set<BlockPos> logs, Set<BlockPos> leaves) {
         ArrayList list = Lists.newArrayList();
-        BitSetVoxelSet lv = new BitSetVoxelSet(arg2.getBlockCountX(), arg2.getBlockCountY(), arg2.getBlockCountZ());
+        BitSetVoxelSet lv = new BitSetVoxelSet(box.getBlockCountX(), box.getBlockCountY(), box.getBlockCountZ());
         int i = 6;
         for (int j = 0; j < 6; ++j) {
             list.add(Sets.newHashSet());
         }
         BlockPos.Mutable lv2 = new BlockPos.Mutable();
-        for (BlockPos lv3 : Lists.newArrayList(set2)) {
-            if (!arg2.contains(lv3)) continue;
-            ((VoxelSet)lv).set(lv3.getX() - arg2.minX, lv3.getY() - arg2.minY, lv3.getZ() - arg2.minZ, true, true);
+        for (BlockPos lv3 : Lists.newArrayList(leaves)) {
+            if (!box.contains(lv3)) continue;
+            ((VoxelSet)lv).set(lv3.getX() - box.minX, lv3.getY() - box.minY, lv3.getZ() - box.minZ, true, true);
         }
-        for (BlockPos lv4 : Lists.newArrayList(set)) {
-            if (arg2.contains(lv4)) {
-                ((VoxelSet)lv).set(lv4.getX() - arg2.minX, lv4.getY() - arg2.minY, lv4.getZ() - arg2.minZ, true, true);
+        for (BlockPos lv4 : Lists.newArrayList(logs)) {
+            if (box.contains(lv4)) {
+                ((VoxelSet)lv).set(lv4.getX() - box.minX, lv4.getY() - box.minY, lv4.getZ() - box.minZ, true, true);
             }
             for (Direction lv5 : Direction.values()) {
                 BlockState lv6;
                 lv2.set(lv4, lv5);
-                if (set.contains(lv2) || !(lv6 = arg.getBlockState(lv2)).contains(Properties.DISTANCE_1_7)) continue;
+                if (logs.contains(lv2) || !(lv6 = world.getBlockState(lv2)).contains(Properties.DISTANCE_1_7)) continue;
                 ((Set)list.get(0)).add(lv2.toImmutable());
-                TreeFeature.setBlockStateWithoutUpdatingNeighbors(arg, lv2, (BlockState)lv6.with(Properties.DISTANCE_1_7, 1));
-                if (!arg2.contains(lv2)) continue;
-                ((VoxelSet)lv).set(lv2.getX() - arg2.minX, lv2.getY() - arg2.minY, lv2.getZ() - arg2.minZ, true, true);
+                TreeFeature.setBlockStateWithoutUpdatingNeighbors(world, lv2, (BlockState)lv6.with(Properties.DISTANCE_1_7, 1));
+                if (!box.contains(lv2)) continue;
+                ((VoxelSet)lv).set(lv2.getX() - box.minX, lv2.getY() - box.minY, lv2.getZ() - box.minZ, true, true);
             }
         }
         for (int k = 1; k < 6; ++k) {
             Set set3 = (Set)list.get(k - 1);
             Set set4 = (Set)list.get(k);
             for (BlockPos lv7 : set3) {
-                if (arg2.contains(lv7)) {
-                    ((VoxelSet)lv).set(lv7.getX() - arg2.minX, lv7.getY() - arg2.minY, lv7.getZ() - arg2.minZ, true, true);
+                if (box.contains(lv7)) {
+                    ((VoxelSet)lv).set(lv7.getX() - box.minX, lv7.getY() - box.minY, lv7.getZ() - box.minZ, true, true);
                 }
                 for (Direction lv8 : Direction.values()) {
                     int l;
                     BlockState lv9;
                     lv2.set(lv7, lv8);
-                    if (set3.contains(lv2) || set4.contains(lv2) || !(lv9 = arg.getBlockState(lv2)).contains(Properties.DISTANCE_1_7) || (l = lv9.get(Properties.DISTANCE_1_7).intValue()) <= k + 1) continue;
+                    if (set3.contains(lv2) || set4.contains(lv2) || !(lv9 = world.getBlockState(lv2)).contains(Properties.DISTANCE_1_7) || (l = lv9.get(Properties.DISTANCE_1_7).intValue()) <= k + 1) continue;
                     BlockState lv10 = (BlockState)lv9.with(Properties.DISTANCE_1_7, k + 1);
-                    TreeFeature.setBlockStateWithoutUpdatingNeighbors(arg, lv2, lv10);
-                    if (arg2.contains(lv2)) {
-                        ((VoxelSet)lv).set(lv2.getX() - arg2.minX, lv2.getY() - arg2.minY, lv2.getZ() - arg2.minZ, true, true);
+                    TreeFeature.setBlockStateWithoutUpdatingNeighbors(world, lv2, lv10);
+                    if (box.contains(lv2)) {
+                        ((VoxelSet)lv).set(lv2.getX() - box.minX, lv2.getY() - box.minY, lv2.getZ() - box.minZ, true, true);
                     }
                     set4.add(lv2.toImmutable());
                 }

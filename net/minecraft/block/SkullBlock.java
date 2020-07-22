@@ -31,33 +31,33 @@ extends AbstractSkullBlock {
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
         return SHAPE;
     }
 
     @Override
-    public VoxelShape getCullingShape(BlockState arg, BlockView arg2, BlockPos arg3) {
+    public VoxelShape getCullingShape(BlockState state, BlockView world, BlockPos pos) {
         return VoxelShapes.empty();
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext arg) {
-        return (BlockState)this.getDefaultState().with(ROTATION, MathHelper.floor((double)(arg.getPlayerYaw() * 16.0f / 360.0f) + 0.5) & 0xF);
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        return (BlockState)this.getDefaultState().with(ROTATION, MathHelper.floor((double)(ctx.getPlayerYaw() * 16.0f / 360.0f) + 0.5) & 0xF);
     }
 
     @Override
-    public BlockState rotate(BlockState arg, BlockRotation arg2) {
-        return (BlockState)arg.with(ROTATION, arg2.rotate(arg.get(ROTATION), 16));
+    public BlockState rotate(BlockState state, BlockRotation rotation) {
+        return (BlockState)state.with(ROTATION, rotation.rotate(state.get(ROTATION), 16));
     }
 
     @Override
-    public BlockState mirror(BlockState arg, BlockMirror arg2) {
-        return (BlockState)arg.with(ROTATION, arg2.mirror(arg.get(ROTATION), 16));
+    public BlockState mirror(BlockState state, BlockMirror mirror) {
+        return (BlockState)state.with(ROTATION, mirror.mirror(state.get(ROTATION), 16));
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(ROTATION);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(ROTATION);
     }
 
     public static enum Type implements SkullType

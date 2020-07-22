@@ -57,7 +57,7 @@ extends WanderAroundGoal {
     @Nullable
     private Vec3d method_27926() {
         ServerWorld lv = (ServerWorld)this.mob.world;
-        List<VillagerEntity> list = lv.getEntities(EntityType.VILLAGER, this.mob.getBoundingBox().expand(32.0), this::method_27922);
+        List<VillagerEntity> list = lv.getEntitiesByType(EntityType.VILLAGER, this.mob.getBoundingBox().expand(32.0), this::method_27922);
         if (list.isEmpty()) {
             return null;
         }

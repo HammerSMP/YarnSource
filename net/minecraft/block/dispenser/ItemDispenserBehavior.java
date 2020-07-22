@@ -22,31 +22,31 @@ implements DispenserBehavior {
         return lv;
     }
 
-    protected ItemStack dispenseSilently(BlockPointer arg, ItemStack arg2) {
-        Direction lv = arg.getBlockState().get(DispenserBlock.FACING);
-        Position lv2 = DispenserBlock.getOutputLocation(arg);
-        ItemStack lv3 = arg2.split(1);
-        ItemDispenserBehavior.spawnItem(arg.getWorld(), lv3, 6, lv, lv2);
-        return arg2;
+    protected ItemStack dispenseSilently(BlockPointer pointer, ItemStack stack) {
+        Direction lv = pointer.getBlockState().get(DispenserBlock.FACING);
+        Position lv2 = DispenserBlock.getOutputLocation(pointer);
+        ItemStack lv3 = stack.split(1);
+        ItemDispenserBehavior.spawnItem(pointer.getWorld(), lv3, 6, lv, lv2);
+        return stack;
     }
 
-    public static void spawnItem(World arg, ItemStack arg2, int i, Direction arg3, Position arg4) {
-        double d = arg4.getX();
-        double e = arg4.getY();
-        double f = arg4.getZ();
-        e = arg3.getAxis() == Direction.Axis.Y ? (e -= 0.125) : (e -= 0.15625);
-        ItemEntity lv = new ItemEntity(arg, d, e, f, arg2);
-        double g = arg.random.nextDouble() * 0.1 + 0.2;
-        lv.setVelocity(arg.random.nextGaussian() * (double)0.0075f * (double)i + (double)arg3.getOffsetX() * g, arg.random.nextGaussian() * (double)0.0075f * (double)i + (double)0.2f, arg.random.nextGaussian() * (double)0.0075f * (double)i + (double)arg3.getOffsetZ() * g);
-        arg.spawnEntity(lv);
+    public static void spawnItem(World world, ItemStack stack, int offset, Direction side, Position pos) {
+        double d = pos.getX();
+        double e = pos.getY();
+        double f = pos.getZ();
+        e = side.getAxis() == Direction.Axis.Y ? (e -= 0.125) : (e -= 0.15625);
+        ItemEntity lv = new ItemEntity(world, d, e, f, stack);
+        double g = world.random.nextDouble() * 0.1 + 0.2;
+        lv.setVelocity(world.random.nextGaussian() * (double)0.0075f * (double)offset + (double)side.getOffsetX() * g, world.random.nextGaussian() * (double)0.0075f * (double)offset + (double)0.2f, world.random.nextGaussian() * (double)0.0075f * (double)offset + (double)side.getOffsetZ() * g);
+        world.spawnEntity(lv);
     }
 
-    protected void playSound(BlockPointer arg) {
-        arg.getWorld().syncWorldEvent(1000, arg.getBlockPos(), 0);
+    protected void playSound(BlockPointer pointer) {
+        pointer.getWorld().syncWorldEvent(1000, pointer.getBlockPos(), 0);
     }
 
-    protected void spawnParticles(BlockPointer arg, Direction arg2) {
-        arg.getWorld().syncWorldEvent(2000, arg.getBlockPos(), arg2.getId());
+    protected void spawnParticles(BlockPointer pointer, Direction side) {
+        pointer.getWorld().syncWorldEvent(2000, pointer.getBlockPos(), side.getId());
     }
 }
 

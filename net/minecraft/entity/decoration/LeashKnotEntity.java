@@ -38,9 +38,9 @@ extends AbstractDecorationEntity {
         super((EntityType<? extends AbstractDecorationEntity>)arg, arg2);
     }
 
-    public LeashKnotEntity(World arg, BlockPos arg2) {
-        super(EntityType.LEASH_KNOT, arg, arg2);
-        this.updatePosition((double)arg2.getX() + 0.5, (double)arg2.getY() + 0.5, (double)arg2.getZ() + 0.5);
+    public LeashKnotEntity(World world, BlockPos pos) {
+        super(EntityType.LEASH_KNOT, world, pos);
+        this.updatePosition((double)pos.getX() + 0.5, (double)pos.getY() + 0.5, (double)pos.getZ() + 0.5);
         float f = 0.125f;
         float g = 0.1875f;
         float h = 0.25f;
@@ -49,8 +49,8 @@ extends AbstractDecorationEntity {
     }
 
     @Override
-    public void updatePosition(double d, double e, double f) {
-        super.updatePosition((double)MathHelper.floor(d) + 0.5, (double)MathHelper.floor(e) + 0.5, (double)MathHelper.floor(f) + 0.5);
+    public void updatePosition(double x, double y, double z) {
+        super.updatePosition((double)MathHelper.floor(x) + 0.5, (double)MathHelper.floor(y) + 0.5, (double)MathHelper.floor(z) + 0.5);
     }
 
     @Override
@@ -59,7 +59,7 @@ extends AbstractDecorationEntity {
     }
 
     @Override
-    public void setFacing(Direction arg) {
+    public void setFacing(Direction facing) {
     }
 
     @Override
@@ -73,31 +73,31 @@ extends AbstractDecorationEntity {
     }
 
     @Override
-    protected float getEyeHeight(EntityPose arg, EntityDimensions arg2) {
+    protected float getEyeHeight(EntityPose pose, EntityDimensions dimensions) {
         return -0.0625f;
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public boolean shouldRender(double d) {
-        return d < 1024.0;
+    public boolean shouldRender(double distance) {
+        return distance < 1024.0;
     }
 
     @Override
-    public void onBreak(@Nullable Entity arg) {
+    public void onBreak(@Nullable Entity entity) {
         this.playSound(SoundEvents.ENTITY_LEASH_KNOT_BREAK, 1.0f, 1.0f);
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
+    public void writeCustomDataToTag(CompoundTag tag) {
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
+    public void readCustomDataFromTag(CompoundTag tag) {
     }
 
     @Override
-    public ActionResult interact(PlayerEntity arg, Hand arg2) {
+    public ActionResult interact(PlayerEntity player, Hand hand) {
         if (this.world.isClient) {
             return ActionResult.SUCCESS;
         }
@@ -105,13 +105,13 @@ extends AbstractDecorationEntity {
         double d = 7.0;
         List<MobEntity> list = this.world.getNonSpectatingEntities(MobEntity.class, new Box(this.getX() - 7.0, this.getY() - 7.0, this.getZ() - 7.0, this.getX() + 7.0, this.getY() + 7.0, this.getZ() + 7.0));
         for (MobEntity lv : list) {
-            if (lv.getHoldingEntity() != arg) continue;
+            if (lv.getHoldingEntity() != player) continue;
             lv.attachLeash(this, true);
             bl = true;
         }
         if (!bl) {
             this.remove();
-            if (arg.abilities.creativeMode) {
+            if (player.abilities.creativeMode) {
                 for (MobEntity lv2 : list) {
                     if (!lv2.isLeashed() || lv2.getHoldingEntity() != this) continue;
                     lv2.detachLeash(true, false);
@@ -126,17 +126,17 @@ extends AbstractDecorationEntity {
         return this.world.getBlockState(this.attachmentPos).getBlock().isIn(BlockTags.FENCES);
     }
 
-    public static LeashKnotEntity getOrCreate(World arg, BlockPos arg2) {
-        int i = arg2.getX();
-        int j = arg2.getY();
-        int k = arg2.getZ();
-        List<LeashKnotEntity> list = arg.getNonSpectatingEntities(LeashKnotEntity.class, new Box((double)i - 1.0, (double)j - 1.0, (double)k - 1.0, (double)i + 1.0, (double)j + 1.0, (double)k + 1.0));
+    public static LeashKnotEntity getOrCreate(World world, BlockPos pos) {
+        int i = pos.getX();
+        int j = pos.getY();
+        int k = pos.getZ();
+        List<LeashKnotEntity> list = world.getNonSpectatingEntities(LeashKnotEntity.class, new Box((double)i - 1.0, (double)j - 1.0, (double)k - 1.0, (double)i + 1.0, (double)j + 1.0, (double)k + 1.0));
         for (LeashKnotEntity lv : list) {
-            if (!lv.getDecorationBlockPos().equals(arg2)) continue;
+            if (!lv.getDecorationBlockPos().equals(pos)) continue;
             return lv;
         }
-        LeashKnotEntity lv2 = new LeashKnotEntity(arg, arg2);
-        arg.spawnEntity(lv2);
+        LeashKnotEntity lv2 = new LeashKnotEntity(world, pos);
+        world.spawnEntity(lv2);
         lv2.onPlace();
         return lv2;
     }

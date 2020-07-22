@@ -24,9 +24,9 @@ public abstract class ItemNameFix
 extends DataFix {
     private final String name;
 
-    public ItemNameFix(Schema schema, String string) {
-        super(schema, false);
-        this.name = string;
+    public ItemNameFix(Schema outputSchema, String name) {
+        super(outputSchema, false);
+        this.name = name;
     }
 
     public TypeRewriteRule makeRule() {
@@ -39,12 +39,12 @@ extends DataFix {
 
     protected abstract String rename(String var1);
 
-    public static DataFix create(Schema schema, String string, final Function<String, String> function) {
-        return new ItemNameFix(schema, string){
+    public static DataFix create(Schema outputSchema, String name, final Function<String, String> rename) {
+        return new ItemNameFix(outputSchema, name){
 
             @Override
-            protected String rename(String string) {
-                return (String)function.apply(string);
+            protected String rename(String input) {
+                return (String)rename.apply(input);
             }
         };
     }

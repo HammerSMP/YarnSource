@@ -23,10 +23,10 @@ implements Packet<ClientPlayPacketListener> {
     public ScreenHandlerPropertyUpdateS2CPacket() {
     }
 
-    public ScreenHandlerPropertyUpdateS2CPacket(int i, int j, int k) {
-        this.syncId = i;
-        this.propertyId = j;
-        this.value = k;
+    public ScreenHandlerPropertyUpdateS2CPacket(int syncId, int propertyId, int value) {
+        this.syncId = syncId;
+        this.propertyId = propertyId;
+        this.value = value;
     }
 
     @Override
@@ -35,17 +35,17 @@ implements Packet<ClientPlayPacketListener> {
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.syncId = arg.readUnsignedByte();
-        this.propertyId = arg.readShort();
-        this.value = arg.readShort();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.syncId = buf.readUnsignedByte();
+        this.propertyId = buf.readShort();
+        this.value = buf.readShort();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeByte(this.syncId);
-        arg.writeShort(this.propertyId);
-        arg.writeShort(this.value);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeByte(this.syncId);
+        buf.writeShort(this.propertyId);
+        buf.writeShort(this.value);
     }
 
     @Environment(value=EnvType.CLIENT)

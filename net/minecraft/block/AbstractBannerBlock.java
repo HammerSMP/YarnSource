@@ -27,9 +27,9 @@ public abstract class AbstractBannerBlock
 extends BlockWithEntity {
     private final DyeColor color;
 
-    protected AbstractBannerBlock(DyeColor arg, AbstractBlock.Settings arg2) {
-        super(arg2);
-        this.color = arg;
+    protected AbstractBannerBlock(DyeColor color, AbstractBlock.Settings settings) {
+        super(settings);
+        this.color = color;
     }
 
     @Override
@@ -38,26 +38,26 @@ extends BlockWithEntity {
     }
 
     @Override
-    public BlockEntity createBlockEntity(BlockView arg) {
+    public BlockEntity createBlockEntity(BlockView world) {
         return new BannerBlockEntity(this.color);
     }
 
     @Override
-    public void onPlaced(World arg, BlockPos arg2, BlockState arg3, @Nullable LivingEntity arg4, ItemStack arg5) {
+    public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
         BlockEntity lv;
-        if (arg5.hasCustomName() && (lv = arg.getBlockEntity(arg2)) instanceof BannerBlockEntity) {
-            ((BannerBlockEntity)lv).setCustomName(arg5.getName());
+        if (itemStack.hasCustomName() && (lv = world.getBlockEntity(pos)) instanceof BannerBlockEntity) {
+            ((BannerBlockEntity)lv).setCustomName(itemStack.getName());
         }
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public ItemStack getPickStack(BlockView arg, BlockPos arg2, BlockState arg3) {
-        BlockEntity lv = arg.getBlockEntity(arg2);
+    public ItemStack getPickStack(BlockView world, BlockPos pos, BlockState state) {
+        BlockEntity lv = world.getBlockEntity(pos);
         if (lv instanceof BannerBlockEntity) {
-            return ((BannerBlockEntity)lv).getPickStack(arg3);
+            return ((BannerBlockEntity)lv).getPickStack(state);
         }
-        return super.getPickStack(arg, arg2, arg3);
+        return super.getPickStack(world, pos, state);
     }
 
     public DyeColor getColor() {

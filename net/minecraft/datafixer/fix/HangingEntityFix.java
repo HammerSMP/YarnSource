@@ -25,12 +25,12 @@ public class HangingEntityFix
 extends DataFix {
     private static final int[][] OFFSETS = new int[][]{{0, 0, 1}, {-1, 0, 0}, {0, 0, -1}, {1, 0, 0}};
 
-    public HangingEntityFix(Schema schema, boolean bl) {
-        super(schema, bl);
+    public HangingEntityFix(Schema outputSchema, boolean changesType) {
+        super(outputSchema, changesType);
     }
 
-    private Dynamic<?> fixDecorationPosition(Dynamic<?> dynamic, boolean bl, boolean bl2) {
-        if ((bl || bl2) && !dynamic.get("Facing").asNumber().result().isPresent()) {
+    private Dynamic<?> fixDecorationPosition(Dynamic<?> dynamic, boolean isPainting, boolean isItemFrame) {
+        if ((isPainting || isItemFrame) && !dynamic.get("Facing").asNumber().result().isPresent()) {
             int j;
             if (dynamic.get("Direction").asNumber().result().isPresent()) {
                 int i = dynamic.get("Direction").asByte((byte)0) % OFFSETS.length;
@@ -39,7 +39,7 @@ extends DataFix {
                 dynamic = dynamic.set("TileY", dynamic.createInt(dynamic.get("TileY").asInt(0) + is[1]));
                 dynamic = dynamic.set("TileZ", dynamic.createInt(dynamic.get("TileZ").asInt(0) + is[2]));
                 dynamic = dynamic.remove("Direction");
-                if (bl2 && dynamic.get("ItemRotation").asNumber().result().isPresent()) {
+                if (isItemFrame && dynamic.get("ItemRotation").asNumber().result().isPresent()) {
                     dynamic = dynamic.set("ItemRotation", dynamic.createByte((byte)(dynamic.get("ItemRotation").asByte((byte)0) * 2)));
                 }
             } else {

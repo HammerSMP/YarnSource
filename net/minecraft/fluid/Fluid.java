@@ -46,8 +46,8 @@ public abstract class Fluid {
         return this.stateManager;
     }
 
-    protected final void setDefaultState(FluidState arg) {
-        this.defaultState = arg;
+    protected final void setDefaultState(FluidState state) {
+        this.defaultState = state;
     }
 
     public final FluidState getDefaultState() {
@@ -57,13 +57,13 @@ public abstract class Fluid {
     public abstract Item getBucketItem();
 
     @Environment(value=EnvType.CLIENT)
-    protected void randomDisplayTick(World arg, BlockPos arg2, FluidState arg3, Random random) {
+    protected void randomDisplayTick(World world, BlockPos pos, FluidState state, Random random) {
     }
 
-    protected void onScheduledTick(World arg, BlockPos arg2, FluidState arg3) {
+    protected void onScheduledTick(World world, BlockPos pos, FluidState state) {
     }
 
-    protected void onRandomTick(World arg, BlockPos arg2, FluidState arg3, Random random) {
+    protected void onRandomTick(World world, BlockPos pos, FluidState state, Random random) {
     }
 
     @Nullable
@@ -98,12 +98,12 @@ public abstract class Fluid {
 
     public abstract int getLevel(FluidState var1);
 
-    public boolean matchesType(Fluid arg) {
-        return arg == this;
+    public boolean matchesType(Fluid fluid) {
+        return fluid == this;
     }
 
-    public boolean isIn(Tag<Fluid> arg) {
-        return arg.contains(this);
+    public boolean isIn(Tag<Fluid> tag) {
+        return tag.contains(this);
     }
 
     public abstract VoxelShape getShape(FluidState var1, BlockView var2, BlockPos var3);

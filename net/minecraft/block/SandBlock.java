@@ -19,14 +19,14 @@ public class SandBlock
 extends FallingBlock {
     private final int color;
 
-    public SandBlock(int i, AbstractBlock.Settings arg) {
-        super(arg);
-        this.color = i;
+    public SandBlock(int color, AbstractBlock.Settings settings) {
+        super(settings);
+        this.color = color;
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public int getColor(BlockState arg, BlockView arg2, BlockPos arg3) {
+    public int getColor(BlockState state, BlockView world, BlockPos pos) {
         return this.color;
     }
 }

@@ -24,17 +24,17 @@ extends ScreenHandler {
     private final Inventory inventory;
     private final PropertyDelegate propertyDelegate;
 
-    public LecternScreenHandler(int i) {
-        this(i, new SimpleInventory(1), new ArrayPropertyDelegate(1));
+    public LecternScreenHandler(int syncId) {
+        this(syncId, new SimpleInventory(1), new ArrayPropertyDelegate(1));
     }
 
-    public LecternScreenHandler(int i, Inventory arg, PropertyDelegate arg2) {
-        super(ScreenHandlerType.LECTERN, i);
-        LecternScreenHandler.checkSize(arg, 1);
-        LecternScreenHandler.checkDataCount(arg2, 1);
-        this.inventory = arg;
-        this.propertyDelegate = arg2;
-        this.addSlot(new Slot(arg, 0, 0, 0){
+    public LecternScreenHandler(int syncId, Inventory inventory, PropertyDelegate propertyDelegate) {
+        super(ScreenHandlerType.LECTERN, syncId);
+        LecternScreenHandler.checkSize(inventory, 1);
+        LecternScreenHandler.checkDataCount(propertyDelegate, 1);
+        this.inventory = inventory;
+        this.propertyDelegate = propertyDelegate;
+        this.addSlot(new Slot(inventory, 0, 0, 0){
 
             @Override
             public void markDirty() {
@@ -42,17 +42,17 @@ extends ScreenHandler {
                 LecternScreenHandler.this.onContentChanged(this.inventory);
             }
         });
-        this.addProperties(arg2);
+        this.addProperties(propertyDelegate);
     }
 
     @Override
-    public boolean onButtonClick(PlayerEntity arg, int i) {
-        if (i >= 100) {
-            int j = i - 100;
+    public boolean onButtonClick(PlayerEntity player, int id) {
+        if (id >= 100) {
+            int j = id - 100;
             this.setProperty(0, j);
             return true;
         }
-        switch (i) {
+        switch (id) {
             case 2: {
                 int k = this.propertyDelegate.get(0);
                 this.setProperty(0, k + 1);
@@ -64,13 +64,13 @@ extends ScreenHandler {
                 return true;
             }
             case 3: {
-                if (!arg.canModifyBlocks()) {
+                if (!player.canModifyBlocks()) {
                     return false;
                 }
                 ItemStack lv = this.inventory.removeStack(0);
                 this.inventory.markDirty();
-                if (!arg.inventory.insertStack(lv)) {
-                    arg.dropItem(lv, false);
+                if (!player.inventory.insertStack(lv)) {
+                    player.dropItem(lv, false);
                 }
                 return true;
             }
@@ -79,14 +79,14 @@ extends ScreenHandler {
     }
 
     @Override
-    public void setProperty(int i, int j) {
-        super.setProperty(i, j);
+    public void setProperty(int id, int value) {
+        super.setProperty(id, value);
         this.sendContentUpdates();
     }
 
     @Override
-    public boolean canUse(PlayerEntity arg) {
-        return this.inventory.canPlayerUse(arg);
+    public boolean canUse(PlayerEntity player) {
+        return this.inventory.canPlayerUse(player);
     }
 
     @Environment(value=EnvType.CLIENT)

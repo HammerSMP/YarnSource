@@ -62,24 +62,24 @@ public class Advancement {
     private final Set<Advancement> children = Sets.newLinkedHashSet();
     private final Text text;
 
-    public Advancement(Identifier arg, @Nullable Advancement arg22, @Nullable AdvancementDisplay arg3, AdvancementRewards arg4, Map<String, AdvancementCriterion> map, String[][] strings) {
-        this.id = arg;
-        this.display = arg3;
-        this.criteria = ImmutableMap.copyOf(map);
-        this.parent = arg22;
-        this.rewards = arg4;
-        this.requirements = strings;
-        if (arg22 != null) {
-            arg22.addChild(this);
+    public Advancement(Identifier id, @Nullable Advancement parent, @Nullable AdvancementDisplay display, AdvancementRewards rewards, Map<String, AdvancementCriterion> criteria, String[][] requirements) {
+        this.id = id;
+        this.display = display;
+        this.criteria = ImmutableMap.copyOf(criteria);
+        this.parent = parent;
+        this.rewards = rewards;
+        this.requirements = requirements;
+        if (parent != null) {
+            parent.addChild(this);
         }
-        if (arg3 == null) {
-            this.text = new LiteralText(arg.toString());
+        if (display == null) {
+            this.text = new LiteralText(id.toString());
         } else {
-            Text lv = arg3.getTitle();
-            Formatting lv2 = arg3.getFrame().getTitleFormat();
-            MutableText lv3 = Texts.setStyleIfAbsent(lv.shallowCopy(), Style.EMPTY.withColor(lv2)).append("\n").append(arg3.getDescription());
-            MutableText lv4 = lv.shallowCopy().styled(arg2 -> arg2.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, lv3)));
-            this.text = new LiteralText("[").append(lv4).append("]").formatted(lv2);
+            Text lv = display.getTitle();
+            Formatting lv2 = display.getFrame().getTitleFormat();
+            MutableText lv3 = Texts.setStyleIfAbsent(lv.shallowCopy(), Style.EMPTY.withColor(lv2)).append("\n").append(display.getDescription());
+            MutableText lv4 = lv.shallowCopy().styled(arg2 -> arg2.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, lv3)));
+            this.text = Texts.bracketed(lv4).formatted(lv2);
         }
     }
 
@@ -118,22 +118,22 @@ public class Advancement {
         return this.requirements.length;
     }
 
-    public void addChild(Advancement arg) {
-        this.children.add(arg);
+    public void addChild(Advancement child) {
+        this.children.add(child);
     }
 
     public Identifier getId() {
         return this.id;
     }
 
-    public boolean equals(Object object) {
-        if (this == object) {
+    public boolean equals(Object o) {
+        if (this == o) {
             return true;
         }
-        if (!(object instanceof Advancement)) {
+        if (!(o instanceof Advancement)) {
             return false;
         }
-        Advancement lv = (Advancement)object;
+        Advancement lv = (Advancement)o;
         return this.id.equals(lv.id);
     }
 
@@ -158,12 +158,12 @@ public class Advancement {
         private String[][] requirements;
         private CriterionMerger merger = CriterionMerger.AND;
 
-        private Task(@Nullable Identifier arg, @Nullable AdvancementDisplay arg2, AdvancementRewards arg3, Map<String, AdvancementCriterion> map, String[][] strings) {
-            this.parentId = arg;
-            this.display = arg2;
-            this.rewards = arg3;
-            this.criteria = map;
-            this.requirements = strings;
+        private Task(@Nullable Identifier parentId, @Nullable AdvancementDisplay display, AdvancementRewards rewards, Map<String, AdvancementCriterion> criteria, String[][] requirements) {
+            this.parentId = parentId;
+            this.display = display;
+            this.rewards = rewards;
+            this.criteria = criteria;
+            this.requirements = requirements;
         }
 
         private Task() {
@@ -173,26 +173,26 @@ public class Advancement {
             return new Task();
         }
 
-        public Task parent(Advancement arg) {
-            this.parentObj = arg;
+        public Task parent(Advancement parent) {
+            this.parentObj = parent;
             return this;
         }
 
-        public Task parent(Identifier arg) {
-            this.parentId = arg;
+        public Task parent(Identifier parentId) {
+            this.parentId = parentId;
             return this;
         }
 
-        public Task display(ItemStack arg, Text arg2, Text arg3, @Nullable Identifier arg4, AdvancementFrame arg5, boolean bl, boolean bl2, boolean bl3) {
-            return this.display(new AdvancementDisplay(arg, arg2, arg3, arg4, arg5, bl, bl2, bl3));
+        public Task display(ItemStack icon, Text title, Text description, @Nullable Identifier background, AdvancementFrame frame, boolean showToast, boolean announceToChat, boolean hidden) {
+            return this.display(new AdvancementDisplay(icon, title, description, background, frame, showToast, announceToChat, hidden));
         }
 
-        public Task display(ItemConvertible arg, Text arg2, Text arg3, @Nullable Identifier arg4, AdvancementFrame arg5, boolean bl, boolean bl2, boolean bl3) {
-            return this.display(new AdvancementDisplay(new ItemStack(arg.asItem()), arg2, arg3, arg4, arg5, bl, bl2, bl3));
+        public Task display(ItemConvertible icon, Text title, Text description, @Nullable Identifier background, AdvancementFrame frame, boolean showToast, boolean announceToChat, boolean hidden) {
+            return this.display(new AdvancementDisplay(new ItemStack(icon.asItem()), title, description, background, frame, showToast, announceToChat, hidden));
         }
 
-        public Task display(AdvancementDisplay arg) {
-            this.display = arg;
+        public Task display(AdvancementDisplay display) {
+            this.display = display;
             return this;
         }
 
@@ -200,46 +200,46 @@ public class Advancement {
             return this.rewards(arg.build());
         }
 
-        public Task rewards(AdvancementRewards arg) {
-            this.rewards = arg;
+        public Task rewards(AdvancementRewards rewards) {
+            this.rewards = rewards;
             return this;
         }
 
-        public Task criterion(String string, CriterionConditions arg) {
-            return this.criterion(string, new AdvancementCriterion(arg));
+        public Task criterion(String name, CriterionConditions arg) {
+            return this.criterion(name, new AdvancementCriterion(arg));
         }
 
-        public Task criterion(String string, AdvancementCriterion arg) {
-            if (this.criteria.containsKey(string)) {
-                throw new IllegalArgumentException("Duplicate criterion " + string);
+        public Task criterion(String name, AdvancementCriterion arg) {
+            if (this.criteria.containsKey(name)) {
+                throw new IllegalArgumentException("Duplicate criterion " + name);
             }
-            this.criteria.put(string, arg);
+            this.criteria.put(name, arg);
             return this;
         }
 
-        public Task criteriaMerger(CriterionMerger arg) {
-            this.merger = arg;
+        public Task criteriaMerger(CriterionMerger merger) {
+            this.merger = merger;
             return this;
         }
 
-        public boolean findParent(Function<Identifier, Advancement> function) {
+        public boolean findParent(Function<Identifier, Advancement> parentProvider) {
             if (this.parentId == null) {
                 return true;
             }
             if (this.parentObj == null) {
-                this.parentObj = function.apply(this.parentId);
+                this.parentObj = parentProvider.apply(this.parentId);
             }
             return this.parentObj != null;
         }
 
-        public Advancement build(Identifier arg2) {
+        public Advancement build(Identifier id) {
             if (!this.findParent(arg -> null)) {
                 throw new IllegalStateException("Tried to build incomplete advancement!");
             }
             if (this.requirements == null) {
                 this.requirements = this.merger.createRequirements(this.criteria.keySet());
             }
-            return new Advancement(arg2, this.parentObj, this.display, this.rewards, this.criteria, this.requirements);
+            return new Advancement(id, this.parentObj, this.display, this.rewards, this.criteria, this.requirements);
         }
 
         public Advancement build(Consumer<Advancement> consumer, String string) {
@@ -279,25 +279,25 @@ public class Advancement {
             return jsonObject;
         }
 
-        public void toPacket(PacketByteBuf arg) {
+        public void toPacket(PacketByteBuf buf) {
             if (this.parentId == null) {
-                arg.writeBoolean(false);
+                buf.writeBoolean(false);
             } else {
-                arg.writeBoolean(true);
-                arg.writeIdentifier(this.parentId);
+                buf.writeBoolean(true);
+                buf.writeIdentifier(this.parentId);
             }
             if (this.display == null) {
-                arg.writeBoolean(false);
+                buf.writeBoolean(false);
             } else {
-                arg.writeBoolean(true);
-                this.display.toPacket(arg);
+                buf.writeBoolean(true);
+                this.display.toPacket(buf);
             }
-            AdvancementCriterion.criteriaToPacket(this.criteria, arg);
-            arg.writeVarInt(this.requirements.length);
+            AdvancementCriterion.criteriaToPacket(this.criteria, buf);
+            buf.writeVarInt(this.requirements.length);
             for (String[] strings : this.requirements) {
-                arg.writeVarInt(strings.length);
+                buf.writeVarInt(strings.length);
                 for (String string : strings) {
-                    arg.writeString(string);
+                    buf.writeString(string);
                 }
             }
         }
@@ -306,15 +306,15 @@ public class Advancement {
             return "Task Advancement{parentId=" + this.parentId + ", display=" + this.display + ", rewards=" + this.rewards + ", criteria=" + this.criteria + ", requirements=" + Arrays.deepToString((Object[])this.requirements) + '}';
         }
 
-        public static Task fromJson(JsonObject jsonObject, AdvancementEntityPredicateDeserializer arg) {
-            Identifier lv = jsonObject.has("parent") ? new Identifier(JsonHelper.getString(jsonObject, "parent")) : null;
-            AdvancementDisplay lv2 = jsonObject.has("display") ? AdvancementDisplay.fromJson(JsonHelper.getObject(jsonObject, "display")) : null;
-            AdvancementRewards lv3 = jsonObject.has("rewards") ? AdvancementRewards.fromJson(JsonHelper.getObject(jsonObject, "rewards")) : AdvancementRewards.NONE;
-            Map<String, AdvancementCriterion> map = AdvancementCriterion.criteriaFromJson(JsonHelper.getObject(jsonObject, "criteria"), arg);
+        public static Task fromJson(JsonObject obj, AdvancementEntityPredicateDeserializer predicateDeserializer) {
+            Identifier lv = obj.has("parent") ? new Identifier(JsonHelper.getString(obj, "parent")) : null;
+            AdvancementDisplay lv2 = obj.has("display") ? AdvancementDisplay.fromJson(JsonHelper.getObject(obj, "display")) : null;
+            AdvancementRewards lv3 = obj.has("rewards") ? AdvancementRewards.fromJson(JsonHelper.getObject(obj, "rewards")) : AdvancementRewards.NONE;
+            Map<String, AdvancementCriterion> map = AdvancementCriterion.criteriaFromJson(JsonHelper.getObject(obj, "criteria"), predicateDeserializer);
             if (map.isEmpty()) {
                 throw new JsonSyntaxException("Advancement criteria cannot be empty");
             }
-            JsonArray jsonArray = JsonHelper.getArray(jsonObject, "requirements", new JsonArray());
+            JsonArray jsonArray = JsonHelper.getArray(obj, "requirements", new JsonArray());
             String[][] strings = new String[jsonArray.size()][];
             for (int i = 0; i < jsonArray.size(); ++i) {
                 JsonArray jsonArray2 = JsonHelper.asArray(jsonArray.get(i), "requirements[" + i + "]");
@@ -355,15 +355,15 @@ public class Advancement {
             return new Task(lv, lv2, lv3, map, strings);
         }
 
-        public static Task fromPacket(PacketByteBuf arg) {
-            Identifier lv = arg.readBoolean() ? arg.readIdentifier() : null;
-            AdvancementDisplay lv2 = arg.readBoolean() ? AdvancementDisplay.fromPacket(arg) : null;
-            Map<String, AdvancementCriterion> map = AdvancementCriterion.criteriaFromPacket(arg);
-            String[][] strings = new String[arg.readVarInt()][];
+        public static Task fromPacket(PacketByteBuf buf) {
+            Identifier lv = buf.readBoolean() ? buf.readIdentifier() : null;
+            AdvancementDisplay lv2 = buf.readBoolean() ? AdvancementDisplay.fromPacket(buf) : null;
+            Map<String, AdvancementCriterion> map = AdvancementCriterion.criteriaFromPacket(buf);
+            String[][] strings = new String[buf.readVarInt()][];
             for (int i = 0; i < strings.length; ++i) {
-                strings[i] = new String[arg.readVarInt()];
+                strings[i] = new String[buf.readVarInt()];
                 for (int j = 0; j < strings[i].length; ++j) {
-                    strings[i][j] = arg.readString(32767);
+                    strings[i][j] = buf.readString(32767);
                 }
             }
             return new Task(lv, lv2, AdvancementRewards.NONE, map, strings);

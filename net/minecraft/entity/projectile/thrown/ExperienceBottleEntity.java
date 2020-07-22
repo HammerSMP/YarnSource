@@ -20,12 +20,12 @@ extends ThrownItemEntity {
         super((EntityType<? extends ThrownItemEntity>)arg, arg2);
     }
 
-    public ExperienceBottleEntity(World arg, LivingEntity arg2) {
-        super((EntityType<? extends ThrownItemEntity>)EntityType.EXPERIENCE_BOTTLE, arg2, arg);
+    public ExperienceBottleEntity(World world, LivingEntity owner) {
+        super((EntityType<? extends ThrownItemEntity>)EntityType.EXPERIENCE_BOTTLE, owner, world);
     }
 
-    public ExperienceBottleEntity(World arg, double d, double e, double f) {
-        super((EntityType<? extends ThrownItemEntity>)EntityType.EXPERIENCE_BOTTLE, d, e, f, arg);
+    public ExperienceBottleEntity(World world, double x, double y, double z) {
+        super((EntityType<? extends ThrownItemEntity>)EntityType.EXPERIENCE_BOTTLE, x, y, z, world);
     }
 
     @Override
@@ -39,8 +39,8 @@ extends ThrownItemEntity {
     }
 
     @Override
-    protected void onCollision(HitResult arg) {
-        super.onCollision(arg);
+    protected void onCollision(HitResult hitResult) {
+        super.onCollision(hitResult);
         if (!this.world.isClient) {
             int j;
             this.world.syncWorldEvent(2002, this.getBlockPos(), PotionUtil.getColor(Potions.WATER));

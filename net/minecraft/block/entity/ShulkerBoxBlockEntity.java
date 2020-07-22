@@ -56,9 +56,9 @@ Tickable {
     private DyeColor cachedColor;
     private boolean cachedColorUpdateNeeded;
 
-    public ShulkerBoxBlockEntity(@Nullable DyeColor arg) {
+    public ShulkerBoxBlockEntity(@Nullable DyeColor color) {
         super(BlockEntityType.SHULKER_BOX);
-        this.cachedColor = arg;
+        this.cachedColor = color;
     }
 
     public ShulkerBoxBlockEntity() {
@@ -108,18 +108,18 @@ Tickable {
         return this.animationStage;
     }
 
-    public Box getBoundingBox(BlockState arg) {
-        return this.getBoundingBox(arg.get(ShulkerBoxBlock.FACING));
+    public Box getBoundingBox(BlockState state) {
+        return this.getBoundingBox(state.get(ShulkerBoxBlock.FACING));
     }
 
-    public Box getBoundingBox(Direction arg) {
+    public Box getBoundingBox(Direction openDirection) {
         float f = this.getAnimationProgress(1.0f);
-        return VoxelShapes.fullCube().getBoundingBox().stretch(0.5f * f * (float)arg.getOffsetX(), 0.5f * f * (float)arg.getOffsetY(), 0.5f * f * (float)arg.getOffsetZ());
+        return VoxelShapes.fullCube().getBoundingBox().stretch(0.5f * f * (float)openDirection.getOffsetX(), 0.5f * f * (float)openDirection.getOffsetY(), 0.5f * f * (float)openDirection.getOffsetZ());
     }
 
-    private Box getCollisionBox(Direction arg) {
-        Direction lv = arg.getOpposite();
-        return this.getBoundingBox(arg).shrink(lv.getOffsetX(), lv.getOffsetY(), lv.getOffsetZ());
+    private Box getCollisionBox(Direction facing) {
+        Direction lv = facing.getOpposite();
+        return this.getBoundingBox(facing).shrink(lv.getOffsetX(), lv.getOffsetY(), lv.getOffsetZ());
     }
 
     private void pushEntities() {
@@ -129,7 +129,7 @@ Tickable {
         }
         Direction lv2 = lv.get(ShulkerBoxBlock.FACING);
         Box lv3 = this.getCollisionBox(lv2).offset(this.pos);
-        List<Entity> list = this.world.getEntities(null, lv3);
+        List<Entity> list = this.world.getOtherEntities(null, lv3);
         if (list.isEmpty()) {
             return;
         }
@@ -166,20 +166,20 @@ Tickable {
     }
 
     @Override
-    public boolean onSyncedBlockEvent(int i, int j) {
-        if (i == 1) {
-            this.viewerCount = j;
-            if (j == 0) {
+    public boolean onSyncedBlockEvent(int type, int data) {
+        if (type == 1) {
+            this.viewerCount = data;
+            if (data == 0) {
                 this.animationStage = AnimationStage.CLOSING;
                 this.updateNeighborStates();
             }
-            if (j == 1) {
+            if (data == 1) {
                 this.animationStage = AnimationStage.OPENING;
                 this.updateNeighborStates();
             }
             return true;
         }
-        return super.onSyncedBlockEvent(i, j);
+        return super.onSyncedBlockEvent(type, data);
     }
 
     private void updateNeighborStates() {
@@ -187,8 +187,8 @@ Tickable {
     }
 
     @Override
-    public void onOpen(PlayerEntity arg) {
-        if (!arg.isSpectator()) {
+    public void onOpen(PlayerEntity player) {
+        if (!player.isSpectator()) {
             if (this.viewerCount < 0) {
                 this.viewerCount = 0;
             }
@@ -201,8 +201,8 @@ Tickable {
     }
 
     @Override
-    public void onClose(PlayerEntity arg) {
-        if (!arg.isSpectator()) {
+    public void onClose(PlayerEntity player) {
+        if (!player.isSpectator()) {
             --this.viewerCount;
             this.world.addSyncedBlockEvent(this.pos, this.getCachedState().getBlock(), 1, this.viewerCount);
             if (this.viewerCount <= 0) {
@@ -217,29 +217,29 @@ Tickable {
     }
 
     @Override
-    public void fromTag(BlockState arg, CompoundTag arg2) {
-        super.fromTag(arg, arg2);
-        this.deserializeInventory(arg2);
+    public void fromTag(BlockState state, CompoundTag tag) {
+        super.fromTag(state, tag);
+        this.deserializeInventory(tag);
     }
 
     @Override
-    public CompoundTag toTag(CompoundTag arg) {
-        super.toTag(arg);
-        return this.serializeInventory(arg);
+    public CompoundTag toTag(CompoundTag tag) {
+        super.toTag(tag);
+        return this.serializeInventory(tag);
     }
 
-    public void deserializeInventory(CompoundTag arg) {
+    public void deserializeInventory(CompoundTag tag) {
         this.inventory = DefaultedList.ofSize(this.size(), ItemStack.EMPTY);
-        if (!this.deserializeLootTable(arg) && arg.contains("Items", 9)) {
-            Inventories.fromTag(arg, this.inventory);
+        if (!this.deserializeLootTable(tag) && tag.contains("Items", 9)) {
+            Inventories.fromTag(tag, this.inventory);
         }
     }
 
-    public CompoundTag serializeInventory(CompoundTag arg) {
-        if (!this.serializeLootTable(arg)) {
-            Inventories.toTag(arg, this.inventory, false);
+    public CompoundTag serializeInventory(CompoundTag tag) {
+        if (!this.serializeLootTable(tag)) {
+            Inventories.toTag(tag, this.inventory, false);
         }
-        return arg;
+        return tag;
     }
 
     @Override
@@ -248,22 +248,22 @@ Tickable {
     }
 
     @Override
-    protected void setInvStackList(DefaultedList<ItemStack> arg) {
-        this.inventory = arg;
+    protected void setInvStackList(DefaultedList<ItemStack> list) {
+        this.inventory = list;
     }
 
     @Override
-    public int[] getAvailableSlots(Direction arg) {
+    public int[] getAvailableSlots(Direction side) {
         return AVAILABLE_SLOTS;
     }
 
     @Override
-    public boolean canInsert(int i, ItemStack arg, @Nullable Direction arg2) {
-        return !(Block.getBlockFromItem(arg.getItem()) instanceof ShulkerBoxBlock);
+    public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
+        return !(Block.getBlockFromItem(stack.getItem()) instanceof ShulkerBoxBlock);
     }
 
     @Override
-    public boolean canExtract(int i, ItemStack arg, Direction arg2) {
+    public boolean canExtract(int slot, ItemStack stack, Direction dir) {
         return true;
     }
 
@@ -282,8 +282,8 @@ Tickable {
     }
 
     @Override
-    protected ScreenHandler createScreenHandler(int i, PlayerInventory arg) {
-        return new ShulkerBoxScreenHandler(i, arg, this);
+    protected ScreenHandler createScreenHandler(int syncId, PlayerInventory playerInventory) {
+        return new ShulkerBoxScreenHandler(syncId, playerInventory, this);
     }
 
     public boolean suffocates() {

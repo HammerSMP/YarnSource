@@ -52,8 +52,8 @@ extends WaterCreatureEntity {
     }
 
     @Override
-    protected float getActiveEyeHeight(EntityPose arg, EntityDimensions arg2) {
-        return arg2.height * 0.65f;
+    protected float getActiveEyeHeight(EntityPose pose, EntityDimensions dimensions) {
+        return dimensions.height * 0.65f;
     }
 
     public static DefaultAttributeContainer.Builder createFishAttributes() {
@@ -65,12 +65,12 @@ extends WaterCreatureEntity {
         return super.cannotDespawn() || this.isFromBucket();
     }
 
-    public static boolean canSpawn(EntityType<? extends FishEntity> arg, WorldAccess arg2, SpawnReason arg3, BlockPos arg4, Random random) {
-        return arg2.getBlockState(arg4).isOf(Blocks.WATER) && arg2.getBlockState(arg4.up()).isOf(Blocks.WATER);
+    public static boolean canSpawn(EntityType<? extends FishEntity> type, WorldAccess world, SpawnReason spawnReason, BlockPos pos, Random random) {
+        return world.getBlockState(pos).isOf(Blocks.WATER) && world.getBlockState(pos.up()).isOf(Blocks.WATER);
     }
 
     @Override
-    public boolean canImmediatelyDespawn(double d) {
+    public boolean canImmediatelyDespawn(double distanceSquared) {
         return !this.isFromBucket() && !this.hasCustomName();
     }
 
@@ -89,20 +89,20 @@ extends WaterCreatureEntity {
         return this.dataTracker.get(FROM_BUCKET);
     }
 
-    public void setFromBucket(boolean bl) {
-        this.dataTracker.set(FROM_BUCKET, bl);
+    public void setFromBucket(boolean fromBucket) {
+        this.dataTracker.set(FROM_BUCKET, fromBucket);
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
-        arg.putBoolean("FromBucket", this.isFromBucket());
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
+        tag.putBoolean("FromBucket", this.isFromBucket());
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        this.setFromBucket(arg.getBoolean("FromBucket"));
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        this.setFromBucket(tag.getBoolean("FromBucket"));
     }
 
     @Override
@@ -114,21 +114,21 @@ extends WaterCreatureEntity {
     }
 
     @Override
-    protected EntityNavigation createNavigation(World arg) {
-        return new SwimNavigation(this, arg);
+    protected EntityNavigation createNavigation(World world) {
+        return new SwimNavigation(this, world);
     }
 
     @Override
-    public void travel(Vec3d arg) {
+    public void travel(Vec3d movementInput) {
         if (this.canMoveVoluntarily() && this.isTouchingWater()) {
-            this.updateVelocity(0.01f, arg);
+            this.updateVelocity(0.01f, movementInput);
             this.move(MovementType.SELF, this.getVelocity());
             this.setVelocity(this.getVelocity().multiply(0.9));
             if (this.getTarget() == null) {
                 this.setVelocity(this.getVelocity().add(0.0, -0.005, 0.0));
             }
         } else {
-            super.travel(arg);
+            super.travel(movementInput);
         }
     }
 
@@ -144,30 +144,30 @@ extends WaterCreatureEntity {
     }
 
     @Override
-    protected ActionResult interactMob(PlayerEntity arg, Hand arg2) {
-        ItemStack lv = arg.getStackInHand(arg2);
+    protected ActionResult interactMob(PlayerEntity player, Hand hand) {
+        ItemStack lv = player.getStackInHand(hand);
         if (lv.getItem() == Items.WATER_BUCKET && this.isAlive()) {
             this.playSound(SoundEvents.ITEM_BUCKET_FILL_FISH, 1.0f, 1.0f);
             lv.decrement(1);
             ItemStack lv2 = this.getFishBucketItem();
             this.copyDataToStack(lv2);
             if (!this.world.isClient) {
-                Criteria.FILLED_BUCKET.trigger((ServerPlayerEntity)arg, lv2);
+                Criteria.FILLED_BUCKET.trigger((ServerPlayerEntity)player, lv2);
             }
             if (lv.isEmpty()) {
-                arg.setStackInHand(arg2, lv2);
-            } else if (!arg.inventory.insertStack(lv2)) {
-                arg.dropItem(lv2, false);
+                player.setStackInHand(hand, lv2);
+            } else if (!player.inventory.insertStack(lv2)) {
+                player.dropItem(lv2, false);
             }
             this.remove();
             return ActionResult.success(this.world.isClient);
         }
-        return super.interactMob(arg, arg2);
+        return super.interactMob(player, hand);
     }
 
-    protected void copyDataToStack(ItemStack arg) {
+    protected void copyDataToStack(ItemStack stack) {
         if (this.hasCustomName()) {
-            arg.setCustomName(this.getCustomName());
+            stack.setCustomName(this.getCustomName());
         }
     }
 
@@ -185,16 +185,16 @@ extends WaterCreatureEntity {
     }
 
     @Override
-    protected void playStepSound(BlockPos arg, BlockState arg2) {
+    protected void playStepSound(BlockPos pos, BlockState state) {
     }
 
     static class FishMoveControl
     extends MoveControl {
         private final FishEntity fish;
 
-        FishMoveControl(FishEntity arg) {
-            super(arg);
-            this.fish = arg;
+        FishMoveControl(FishEntity owner) {
+            super(owner);
+            this.fish = owner;
         }
 
         @Override
@@ -226,9 +226,9 @@ extends WaterCreatureEntity {
     extends SwimAroundGoal {
         private final FishEntity fish;
 
-        public SwimToRandomPlaceGoal(FishEntity arg) {
-            super(arg, 1.0, 40);
-            this.fish = arg;
+        public SwimToRandomPlaceGoal(FishEntity fish) {
+            super(fish, 1.0, 40);
+            this.fish = fish;
         }
 
         @Override

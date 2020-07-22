@@ -34,10 +34,10 @@ extends Screen {
     private final Text message;
     private final boolean isHardcore;
 
-    public DeathScreen(@Nullable Text arg, boolean bl) {
-        super(new TranslatableText(bl ? "deathScreen.title.hardcore" : "deathScreen.title"));
-        this.message = arg;
-        this.isHardcore = bl;
+    public DeathScreen(@Nullable Text message, boolean isHardcore) {
+        super(new TranslatableText(isHardcore ? "deathScreen.title.hardcore" : "deathScreen.title"));
+        this.message = message;
+        this.isHardcore = isHardcore;
     }
 
     @Override
@@ -69,8 +69,8 @@ extends Screen {
         return false;
     }
 
-    private void onConfirmQuit(boolean bl) {
-        if (bl) {
+    private void onConfirmQuit(boolean quit) {
+        if (quit) {
             this.quitLevel();
         } else {
             this.client.player.requestRespawn();
@@ -87,51 +87,51 @@ extends Screen {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.fillGradient(arg, 0, 0, this.width, this.height, 0x60500000, -1602211792);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.fillGradient(matrices, 0, 0, this.width, this.height, 0x60500000, -1602211792);
         RenderSystem.pushMatrix();
         RenderSystem.scalef(2.0f, 2.0f, 2.0f);
-        this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2 / 2, 30, 0xFFFFFF);
+        this.drawCenteredText(matrices, this.textRenderer, this.title, this.width / 2 / 2, 30, 0xFFFFFF);
         RenderSystem.popMatrix();
         if (this.message != null) {
-            this.drawCenteredText(arg, this.textRenderer, this.message, this.width / 2, 85, 0xFFFFFF);
+            this.drawCenteredText(matrices, this.textRenderer, this.message, this.width / 2, 85, 0xFFFFFF);
         }
-        this.drawCenteredString(arg, this.textRenderer, I18n.translate("deathScreen.score", new Object[0]) + ": " + (Object)((Object)Formatting.YELLOW) + this.client.player.getScore(), this.width / 2, 100, 0xFFFFFF);
-        if (this.message != null && j > 85) {
+        this.drawCenteredString(matrices, this.textRenderer, I18n.translate("deathScreen.score", new Object[0]) + ": " + (Object)((Object)Formatting.YELLOW) + this.client.player.getScore(), this.width / 2, 100, 0xFFFFFF);
+        if (this.message != null && mouseY > 85) {
             this.textRenderer.getClass();
-            if (j < 85 + 9) {
-                Style lv = this.getTextComponentUnderMouse(i);
-                this.renderTextHoverEffect(arg, lv, i, j);
+            if (mouseY < 85 + 9) {
+                Style lv = this.getTextComponentUnderMouse(mouseX);
+                this.renderTextHoverEffect(matrices, lv, mouseX, mouseY);
             }
         }
-        super.render(arg, i, j, f);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 
     @Nullable
-    private Style getTextComponentUnderMouse(int i) {
+    private Style getTextComponentUnderMouse(int mouseX) {
         if (this.message == null) {
             return null;
         }
         int j = this.client.textRenderer.getWidth(this.message);
         int k = this.width / 2 - j / 2;
         int l = this.width / 2 + j / 2;
-        if (i < k || i > l) {
+        if (mouseX < k || mouseX > l) {
             return null;
         }
-        return this.client.textRenderer.getTextHandler().trimToWidth(this.message, i - k);
+        return this.client.textRenderer.getTextHandler().trimToWidth(this.message, mouseX - k);
     }
 
     @Override
-    public boolean mouseClicked(double d, double e, int i) {
-        if (this.message != null && e > 85.0) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (this.message != null && mouseY > 85.0) {
             Style lv;
             this.textRenderer.getClass();
-            if (e < (double)(85 + 9) && (lv = this.getTextComponentUnderMouse((int)d)) != null && lv.getClickEvent() != null && lv.getClickEvent().getAction() == ClickEvent.Action.OPEN_URL) {
+            if (mouseY < (double)(85 + 9) && (lv = this.getTextComponentUnderMouse((int)mouseX)) != null && lv.getClickEvent() != null && lv.getClickEvent().getAction() == ClickEvent.Action.OPEN_URL) {
                 this.handleTextClick(lv);
                 return false;
             }
         }
-        return super.mouseClicked(d, e, i);
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override

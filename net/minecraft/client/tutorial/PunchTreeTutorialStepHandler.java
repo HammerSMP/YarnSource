@@ -35,8 +35,8 @@ implements TutorialStepHandler {
     private int ticks;
     private int field_5635;
 
-    public PunchTreeTutorialStepHandler(TutorialManager arg) {
-        this.manager = arg;
+    public PunchTreeTutorialStepHandler(TutorialManager manager) {
+        this.manager = manager;
     }
 
     @Override
@@ -72,8 +72,8 @@ implements TutorialStepHandler {
     }
 
     @Override
-    public void onBlockAttacked(ClientWorld arg, BlockPos arg2, BlockState arg3, float f) {
-        boolean bl = arg3.isIn(BlockTags.LOGS);
+    public void onBlockAttacked(ClientWorld client, BlockPos pos, BlockState state, float f) {
+        boolean bl = state.isIn(BlockTags.LOGS);
         if (bl && f > 0.0f) {
             if (this.toast != null) {
                 this.toast.setProgress(f);
@@ -89,8 +89,8 @@ implements TutorialStepHandler {
     }
 
     @Override
-    public void onSlotUpdate(ItemStack arg) {
-        if (ItemTags.LOGS.contains(arg.getItem())) {
+    public void onSlotUpdate(ItemStack stack) {
+        if (ItemTags.LOGS.contains(stack.getItem())) {
             this.manager.setStep(TutorialStep.CRAFT_PLANKS);
             return;
         }

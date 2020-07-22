@@ -22,21 +22,21 @@ extends CombinedEntry {
     }
 
     @Override
-    protected EntryCombiner combine(EntryCombiner[] args) {
-        switch (args.length) {
+    protected EntryCombiner combine(EntryCombiner[] children) {
+        switch (children.length) {
             case 0: {
                 return ALWAYS_TRUE;
             }
             case 1: {
-                return args[0];
+                return children[0];
             }
             case 2: {
-                return args[0].and(args[1]);
+                return children[0].and(children[1]);
             }
         }
-        return (arg, consumer) -> {
-            for (EntryCombiner lv : args) {
-                if (lv.expand(arg, consumer)) continue;
+        return (context, lootChoiceExpander) -> {
+            for (EntryCombiner lv : children) {
+                if (lv.expand(context, lootChoiceExpander)) continue;
                 return false;
             }
             return true;

@@ -15,7 +15,7 @@ extends MobEntity {
     }
 
     @Override
-    public boolean canBeLeashedBy(PlayerEntity arg) {
+    public boolean canBeLeashedBy(PlayerEntity player) {
         return false;
     }
 }

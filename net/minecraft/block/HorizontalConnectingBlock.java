@@ -43,25 +43,25 @@ implements Waterloggable {
     protected final VoxelShape[] boundingShapes;
     private final Object2IntMap<BlockState> SHAPE_INDEX_CACHE = new Object2IntOpenHashMap();
 
-    protected HorizontalConnectingBlock(float f, float g, float h, float i, float j, AbstractBlock.Settings arg) {
-        super(arg);
-        this.collisionShapes = this.createShapes(f, g, j, 0.0f, j);
-        this.boundingShapes = this.createShapes(f, g, h, 0.0f, i);
+    protected HorizontalConnectingBlock(float radius1, float radius2, float boundingHeight1, float boundingHeight2, float collisionHeight, AbstractBlock.Settings settings) {
+        super(settings);
+        this.collisionShapes = this.createShapes(radius1, radius2, collisionHeight, 0.0f, collisionHeight);
+        this.boundingShapes = this.createShapes(radius1, radius2, boundingHeight1, 0.0f, boundingHeight2);
         for (BlockState lv : this.stateManager.getStates()) {
             this.getShapeIndex(lv);
         }
     }
 
-    protected VoxelShape[] createShapes(float f, float g, float h, float i, float j) {
-        float k = 8.0f - f;
-        float l = 8.0f + f;
-        float m = 8.0f - g;
-        float n = 8.0f + g;
-        VoxelShape lv = Block.createCuboidShape(k, 0.0, k, l, h, l);
-        VoxelShape lv2 = Block.createCuboidShape(m, i, 0.0, n, j, n);
-        VoxelShape lv3 = Block.createCuboidShape(m, i, m, n, j, 16.0);
-        VoxelShape lv4 = Block.createCuboidShape(0.0, i, m, n, j, n);
-        VoxelShape lv5 = Block.createCuboidShape(m, i, m, 16.0, j, n);
+    protected VoxelShape[] createShapes(float radius1, float radius2, float height1, float offset2, float height2) {
+        float k = 8.0f - radius1;
+        float l = 8.0f + radius1;
+        float m = 8.0f - radius2;
+        float n = 8.0f + radius2;
+        VoxelShape lv = Block.createCuboidShape(k, 0.0, k, l, height1, l);
+        VoxelShape lv2 = Block.createCuboidShape(m, offset2, 0.0, n, height2, n);
+        VoxelShape lv3 = Block.createCuboidShape(m, offset2, m, n, height2, 16.0);
+        VoxelShape lv4 = Block.createCuboidShape(0.0, offset2, m, n, height2, n);
+        VoxelShape lv5 = Block.createCuboidShape(m, offset2, m, 16.0, height2, n);
         VoxelShape lv6 = VoxelShapes.union(lv2, lv5);
         VoxelShape lv7 = VoxelShapes.union(lv3, lv4);
         VoxelShape[] lvs = new VoxelShape[]{VoxelShapes.empty(), lv3, lv4, lv7, lv2, VoxelShapes.union(lv3, lv2), VoxelShapes.union(lv4, lv2), VoxelShapes.union(lv7, lv2), lv5, VoxelShapes.union(lv3, lv5), VoxelShapes.union(lv4, lv5), VoxelShapes.union(lv7, lv5), lv6, VoxelShapes.union(lv3, lv6), VoxelShapes.union(lv4, lv6), VoxelShapes.union(lv7, lv6)};
@@ -72,26 +72,26 @@ implements Waterloggable {
     }
 
     @Override
-    public boolean isTranslucent(BlockState arg, BlockView arg2, BlockPos arg3) {
-        return arg.get(WATERLOGGED) == false;
+    public boolean isTranslucent(BlockState state, BlockView world, BlockPos pos) {
+        return state.get(WATERLOGGED) == false;
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
-        return this.boundingShapes[this.getShapeIndex(arg)];
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        return this.boundingShapes[this.getShapeIndex(state)];
     }
 
     @Override
-    public VoxelShape getCollisionShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
-        return this.collisionShapes[this.getShapeIndex(arg)];
+    public VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        return this.collisionShapes[this.getShapeIndex(state)];
     }
 
-    private static int getDirectionMask(Direction arg) {
-        return 1 << arg.getHorizontal();
+    private static int getDirectionMask(Direction dir) {
+        return 1 << dir.getHorizontal();
     }
 
-    protected int getShapeIndex(BlockState arg2) {
-        return this.SHAPE_INDEX_CACHE.computeIntIfAbsent((Object)arg2, arg -> {
+    protected int getShapeIndex(BlockState state) {
+        return this.SHAPE_INDEX_CACHE.computeIntIfAbsent((Object)state, arg -> {
             int i = 0;
             if (arg.get(NORTH).booleanValue()) {
                 i |= HorizontalConnectingBlock.getDirectionMask(Direction.NORTH);
@@ -110,45 +110,45 @@ implements Waterloggable {
     }
 
     @Override
-    public FluidState getFluidState(BlockState arg) {
-        if (arg.get(WATERLOGGED).booleanValue()) {
+    public FluidState getFluidState(BlockState state) {
+        if (state.get(WATERLOGGED).booleanValue()) {
             return Fluids.WATER.getStill(false);
         }
-        return super.getFluidState(arg);
+        return super.getFluidState(state);
     }
 
     @Override
-    public boolean canPathfindThrough(BlockState arg, BlockView arg2, BlockPos arg3, NavigationType arg4) {
+    public boolean canPathfindThrough(BlockState state, BlockView world, BlockPos pos, NavigationType type) {
         return false;
     }
 
     @Override
-    public BlockState rotate(BlockState arg, BlockRotation arg2) {
-        switch (arg2) {
+    public BlockState rotate(BlockState state, BlockRotation rotation) {
+        switch (rotation) {
             case CLOCKWISE_180: {
-                return (BlockState)((BlockState)((BlockState)((BlockState)arg.with(NORTH, arg.get(SOUTH))).with(EAST, arg.get(WEST))).with(SOUTH, arg.get(NORTH))).with(WEST, arg.get(EAST));
+                return (BlockState)((BlockState)((BlockState)((BlockState)state.with(NORTH, state.get(SOUTH))).with(EAST, state.get(WEST))).with(SOUTH, state.get(NORTH))).with(WEST, state.get(EAST));
             }
             case COUNTERCLOCKWISE_90: {
-                return (BlockState)((BlockState)((BlockState)((BlockState)arg.with(NORTH, arg.get(EAST))).with(EAST, arg.get(SOUTH))).with(SOUTH, arg.get(WEST))).with(WEST, arg.get(NORTH));
+                return (BlockState)((BlockState)((BlockState)((BlockState)state.with(NORTH, state.get(EAST))).with(EAST, state.get(SOUTH))).with(SOUTH, state.get(WEST))).with(WEST, state.get(NORTH));
             }
             case CLOCKWISE_90: {
-                return (BlockState)((BlockState)((BlockState)((BlockState)arg.with(NORTH, arg.get(WEST))).with(EAST, arg.get(NORTH))).with(SOUTH, arg.get(EAST))).with(WEST, arg.get(SOUTH));
+                return (BlockState)((BlockState)((BlockState)((BlockState)state.with(NORTH, state.get(WEST))).with(EAST, state.get(NORTH))).with(SOUTH, state.get(EAST))).with(WEST, state.get(SOUTH));
             }
         }
-        return arg;
+        return state;
     }
 
     @Override
-    public BlockState mirror(BlockState arg, BlockMirror arg2) {
-        switch (arg2) {
+    public BlockState mirror(BlockState state, BlockMirror mirror) {
+        switch (mirror) {
             case LEFT_RIGHT: {
-                return (BlockState)((BlockState)arg.with(NORTH, arg.get(SOUTH))).with(SOUTH, arg.get(NORTH));
+                return (BlockState)((BlockState)state.with(NORTH, state.get(SOUTH))).with(SOUTH, state.get(NORTH));
             }
             case FRONT_BACK: {
-                return (BlockState)((BlockState)arg.with(EAST, arg.get(WEST))).with(WEST, arg.get(EAST));
+                return (BlockState)((BlockState)state.with(EAST, state.get(WEST))).with(WEST, state.get(EAST));
             }
         }
-        return super.mirror(arg, arg2);
+        return super.mirror(state, mirror);
     }
 }
 

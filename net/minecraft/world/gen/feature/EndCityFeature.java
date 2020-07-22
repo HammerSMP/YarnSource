@@ -15,6 +15,7 @@ import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.registry.DynamicRegistryManager;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.source.BiomeSource;
@@ -30,7 +31,7 @@ extends StructureFeature<DefaultFeatureConfig> {
     }
 
     @Override
-    protected boolean method_27219() {
+    protected boolean isUniformDistribution() {
         return false;
     }
 
@@ -44,8 +45,8 @@ extends StructureFeature<DefaultFeatureConfig> {
         return Start::new;
     }
 
-    private static int getGenerationHeight(int i, int j, ChunkGenerator arg) {
-        Random random = new Random(i + j * 10387313);
+    private static int getGenerationHeight(int chunkX, int chunkZ, ChunkGenerator chunkGenerator) {
+        Random random = new Random(chunkX + chunkZ * 10387313);
         BlockRotation lv = BlockRotation.random(random);
         int k = 5;
         int l = 5;
@@ -57,12 +58,12 @@ extends StructureFeature<DefaultFeatureConfig> {
         } else if (lv == BlockRotation.COUNTERCLOCKWISE_90) {
             l = -5;
         }
-        int m = (i << 4) + 7;
-        int n = (j << 4) + 7;
-        int o = arg.getHeightInGround(m, n, Heightmap.Type.WORLD_SURFACE_WG);
-        int p = arg.getHeightInGround(m, n + l, Heightmap.Type.WORLD_SURFACE_WG);
-        int q = arg.getHeightInGround(m + k, n, Heightmap.Type.WORLD_SURFACE_WG);
-        int r = arg.getHeightInGround(m + k, n + l, Heightmap.Type.WORLD_SURFACE_WG);
+        int m = (chunkX << 4) + 7;
+        int n = (chunkZ << 4) + 7;
+        int o = chunkGenerator.getHeightInGround(m, n, Heightmap.Type.WORLD_SURFACE_WG);
+        int p = chunkGenerator.getHeightInGround(m, n + l, Heightmap.Type.WORLD_SURFACE_WG);
+        int q = chunkGenerator.getHeightInGround(m + k, n, Heightmap.Type.WORLD_SURFACE_WG);
+        int r = chunkGenerator.getHeightInGround(m + k, n + l, Heightmap.Type.WORLD_SURFACE_WG);
         return Math.min(Math.min(o, p), Math.min(q, r));
     }
 
@@ -73,14 +74,14 @@ extends StructureFeature<DefaultFeatureConfig> {
         }
 
         @Override
-        public void init(ChunkGenerator arg, StructureManager arg2, int i, int j, Biome arg3, DefaultFeatureConfig arg4) {
+        public void init(DynamicRegistryManager arg, ChunkGenerator arg2, StructureManager arg3, int i, int j, Biome arg4, DefaultFeatureConfig arg5) {
             BlockRotation lv = BlockRotation.random(this.random);
-            int k = EndCityFeature.getGenerationHeight(i, j, arg);
+            int k = EndCityFeature.getGenerationHeight(i, j, arg2);
             if (k < 60) {
                 return;
             }
             BlockPos lv2 = new BlockPos(i * 16 + 8, k, j * 16 + 8);
-            EndCityGenerator.addPieces(arg2, lv2, lv, this.children, this.random);
+            EndCityGenerator.addPieces(arg3, lv2, lv, this.children, this.random);
             this.setBoundingBoxFromChildren();
         }
     }

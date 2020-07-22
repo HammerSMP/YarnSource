@@ -17,22 +17,27 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 public class ItemUsageContext {
-    protected final PlayerEntity player;
-    protected final Hand hand;
-    protected final BlockHitResult hit;
-    protected final World world;
-    protected final ItemStack stack;
+    @Nullable
+    private final PlayerEntity player;
+    private final Hand hand;
+    private final BlockHitResult hit;
+    private final World world;
+    private final ItemStack stack;
 
-    public ItemUsageContext(PlayerEntity arg, Hand arg2, BlockHitResult arg3) {
-        this(arg.world, arg, arg2, arg.getStackInHand(arg2), arg3);
+    public ItemUsageContext(PlayerEntity player, Hand hand, BlockHitResult hit) {
+        this(player.world, player, hand, player.getStackInHand(hand), hit);
     }
 
-    protected ItemUsageContext(World arg, @Nullable PlayerEntity arg2, Hand arg3, ItemStack arg4, BlockHitResult arg5) {
-        this.player = arg2;
-        this.hand = arg3;
-        this.hit = arg5;
-        this.stack = arg4;
-        this.world = arg;
+    protected ItemUsageContext(World world, @Nullable PlayerEntity player, Hand hand, ItemStack stack, BlockHitResult hit) {
+        this.player = player;
+        this.hand = hand;
+        this.hit = hit;
+        this.stack = stack;
+        this.world = world;
+    }
+
+    protected final BlockHitResult method_30344() {
+        return this.hit;
     }
 
     public BlockPos getBlockPos() {

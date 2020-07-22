@@ -17,8 +17,8 @@ import net.minecraft.server.world.ServerWorld;
 
 public class LookAroundTask
 extends Task<MobEntity> {
-    public LookAroundTask(int i, int j) {
-        super((Map<MemoryModuleType<?>, MemoryModuleState>)ImmutableMap.of(MemoryModuleType.LOOK_TARGET, (Object)((Object)MemoryModuleState.VALUE_PRESENT)), i, j);
+    public LookAroundTask(int minRunTime, int maxRunTime) {
+        super((Map<MemoryModuleType<?>, MemoryModuleState>)ImmutableMap.of(MemoryModuleType.LOOK_TARGET, (Object)((Object)MemoryModuleState.VALUE_PRESENT)), minRunTime, maxRunTime);
     }
 
     @Override
@@ -37,18 +37,18 @@ extends Task<MobEntity> {
     }
 
     @Override
-    protected /* synthetic */ boolean shouldKeepRunning(ServerWorld arg, LivingEntity arg2, long l) {
-        return this.shouldKeepRunning(arg, (MobEntity)arg2, l);
+    protected /* synthetic */ boolean shouldKeepRunning(ServerWorld world, LivingEntity entity, long time) {
+        return this.shouldKeepRunning(world, (MobEntity)entity, time);
     }
 
     @Override
-    protected /* synthetic */ void finishRunning(ServerWorld arg, LivingEntity arg2, long l) {
-        this.finishRunning(arg, (MobEntity)arg2, l);
+    protected /* synthetic */ void finishRunning(ServerWorld world, LivingEntity entity, long time) {
+        this.finishRunning(world, (MobEntity)entity, time);
     }
 
     @Override
-    protected /* synthetic */ void keepRunning(ServerWorld arg, LivingEntity arg2, long l) {
-        this.keepRunning(arg, (MobEntity)arg2, l);
+    protected /* synthetic */ void keepRunning(ServerWorld world, LivingEntity entity, long time) {
+        this.keepRunning(world, (MobEntity)entity, time);
     }
 }
 

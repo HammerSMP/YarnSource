@@ -10,10 +10,9 @@ import com.mojang.serialization.Codec;
 import java.util.Random;
 import java.util.stream.Stream;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.WorldAccess;
-import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.decorator.Decorator;
 import net.minecraft.world.gen.decorator.DecoratorConfig;
+import net.minecraft.world.gen.decorator.DecoratorContext;
 
 public abstract class SimpleDecorator<DC extends DecoratorConfig>
 extends Decorator<DC> {
@@ -22,8 +21,8 @@ extends Decorator<DC> {
     }
 
     @Override
-    public final Stream<BlockPos> getPositions(WorldAccess arg, ChunkGenerator arg2, Random random, DC arg3, BlockPos arg4) {
-        return this.getPositions(random, arg3, arg4);
+    public final Stream<BlockPos> getPositions(DecoratorContext context, Random random, DC config, BlockPos pos) {
+        return this.getPositions(random, config, pos);
     }
 
     protected abstract Stream<BlockPos> getPositions(Random var1, DC var2, BlockPos var3);

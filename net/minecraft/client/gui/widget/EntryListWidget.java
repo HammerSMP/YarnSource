@@ -52,25 +52,25 @@ implements Drawable {
     private boolean scrolling;
     private E selected;
 
-    public EntryListWidget(MinecraftClient arg, int i, int j, int k, int l, int m) {
-        this.client = arg;
-        this.width = i;
-        this.height = j;
-        this.top = k;
-        this.bottom = l;
-        this.itemHeight = m;
+    public EntryListWidget(MinecraftClient client, int width, int height, int top, int bottom, int itemHeight) {
+        this.client = client;
+        this.width = width;
+        this.height = height;
+        this.top = top;
+        this.bottom = bottom;
+        this.itemHeight = itemHeight;
         this.left = 0;
-        this.right = i;
+        this.right = width;
     }
 
-    public void setRenderSelection(boolean bl) {
-        this.renderSelection = bl;
+    public void setRenderSelection(boolean renderSelection) {
+        this.renderSelection = renderSelection;
     }
 
-    protected void setRenderHeader(boolean bl, int i) {
-        this.renderHeader = bl;
-        this.headerHeight = i;
-        if (!bl) {
+    protected void setRenderHeader(boolean renderHeader, int headerHeight) {
+        this.renderHeader = renderHeader;
+        this.headerHeight = headerHeight;
+        if (!renderHeader) {
             this.headerHeight = 0;
         }
     }
@@ -84,8 +84,8 @@ implements Drawable {
         return this.selected;
     }
 
-    public void setSelected(@Nullable E arg) {
-        this.selected = arg;
+    public void setSelected(@Nullable E entry) {
+        this.selected = entry;
     }
 
     @Nullable
@@ -101,17 +101,17 @@ implements Drawable {
         this.children.clear();
     }
 
-    protected void replaceEntries(Collection<E> collection) {
+    protected void replaceEntries(Collection<E> newEntries) {
         this.children.clear();
-        this.children.addAll(collection);
+        this.children.addAll(newEntries);
     }
 
-    protected E getEntry(int i) {
-        return (E)((Entry)this.children().get(i));
+    protected E getEntry(int index) {
+        return (E)((Entry)this.children().get(index));
     }
 
-    protected int addEntry(E arg) {
-        this.children.add(arg);
+    protected int addEntry(E entry) {
+        this.children.add(entry);
         return this.children.size() - 1;
     }
 
@@ -119,57 +119,57 @@ implements Drawable {
         return this.children().size();
     }
 
-    protected boolean isSelectedItem(int i) {
-        return Objects.equals(this.getSelected(), this.children().get(i));
+    protected boolean isSelectedItem(int index) {
+        return Objects.equals(this.getSelected(), this.children().get(index));
     }
 
     @Nullable
-    protected final E getEntryAtPosition(double d, double e) {
+    protected final E getEntryAtPosition(double x, double y) {
         int i = this.getRowWidth() / 2;
         int j = this.left + this.width / 2;
         int k = j - i;
         int l = j + i;
-        int m = MathHelper.floor(e - (double)this.top) - this.headerHeight + (int)this.getScrollAmount() - 4;
+        int m = MathHelper.floor(y - (double)this.top) - this.headerHeight + (int)this.getScrollAmount() - 4;
         int n = m / this.itemHeight;
-        if (d < (double)this.getScrollbarPositionX() && d >= (double)k && d <= (double)l && n >= 0 && m >= 0 && n < this.getItemCount()) {
+        if (x < (double)this.getScrollbarPositionX() && x >= (double)k && x <= (double)l && n >= 0 && m >= 0 && n < this.getItemCount()) {
             return (E)((Entry)this.children().get(n));
         }
         return null;
     }
 
-    public void updateSize(int i, int j, int k, int l) {
-        this.width = i;
-        this.height = j;
-        this.top = k;
-        this.bottom = l;
+    public void updateSize(int width, int height, int top, int bottom) {
+        this.width = width;
+        this.height = height;
+        this.top = top;
+        this.bottom = bottom;
         this.left = 0;
-        this.right = i;
+        this.right = width;
     }
 
-    public void setLeftPos(int i) {
-        this.left = i;
-        this.right = i + this.width;
+    public void setLeftPos(int left) {
+        this.left = left;
+        this.right = left + this.width;
     }
 
     protected int getMaxPosition() {
         return this.getItemCount() * this.itemHeight + this.headerHeight;
     }
 
-    protected void clickedHeader(int i, int j) {
+    protected void clickedHeader(int x, int y) {
     }
 
-    protected void renderHeader(MatrixStack arg, int i, int j, Tessellator arg2) {
+    protected void renderHeader(MatrixStack matrices, int x, int y, Tessellator arg2) {
     }
 
-    protected void renderBackground(MatrixStack arg) {
+    protected void renderBackground(MatrixStack matrices) {
     }
 
     protected void renderDecorations(MatrixStack arg, int i, int j) {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.renderBackground(arg);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.renderBackground(matrices);
         int k = this.getScrollbarPositionX();
         int l = k + 6;
         Tessellator lv = Tessellator.getInstance();
@@ -186,9 +186,9 @@ implements Drawable {
         int m = this.getRowLeft();
         int n = this.top + 4 - (int)this.getScrollAmount();
         if (this.renderHeader) {
-            this.renderHeader(arg, m, n, lv);
+            this.renderHeader(matrices, m, n, lv);
         }
-        this.renderList(arg, m, n, i, j, f);
+        this.renderList(matrices, m, n, mouseX, mouseY, delta);
         this.client.getTextureManager().bindTexture(DrawableHelper.BACKGROUND_TEXTURE);
         RenderSystem.enableDepthTest();
         RenderSystem.depthFunc(519);
@@ -245,20 +245,20 @@ implements Drawable {
             lv2.vertex(k, s, 0.0).texture(0.0f, 0.0f).color(192, 192, 192, 255).next();
             lv.draw();
         }
-        this.renderDecorations(arg, i, j);
+        this.renderDecorations(matrices, mouseX, mouseY);
         RenderSystem.enableTexture();
         RenderSystem.shadeModel(7424);
         RenderSystem.enableAlphaTest();
         RenderSystem.disableBlend();
     }
 
-    protected void centerScrollOn(E arg) {
-        this.setScrollAmount(this.children().indexOf(arg) * this.itemHeight + this.itemHeight / 2 - (this.bottom - this.top) / 2);
+    protected void centerScrollOn(E entry) {
+        this.setScrollAmount(this.children().indexOf(entry) * this.itemHeight + this.itemHeight / 2 - (this.bottom - this.top) / 2);
     }
 
-    protected void ensureVisible(E arg) {
+    protected void ensureVisible(E entry) {
         int k;
-        int i = this.getRowTop(this.children().indexOf(arg));
+        int i = this.getRowTop(this.children().indexOf(entry));
         int j = i - this.top - 4 - this.itemHeight;
         if (j < 0) {
             this.scroll(j);
@@ -268,24 +268,24 @@ implements Drawable {
         }
     }
 
-    private void scroll(int i) {
-        this.setScrollAmount(this.getScrollAmount() + (double)i);
+    private void scroll(int amount) {
+        this.setScrollAmount(this.getScrollAmount() + (double)amount);
     }
 
     public double getScrollAmount() {
         return this.scrollAmount;
     }
 
-    public void setScrollAmount(double d) {
-        this.scrollAmount = MathHelper.clamp(d, 0.0, (double)this.getMaxScroll());
+    public void setScrollAmount(double amount) {
+        this.scrollAmount = MathHelper.clamp(amount, 0.0, (double)this.getMaxScroll());
     }
 
     private int getMaxScroll() {
         return Math.max(0, this.getMaxPosition() - (this.bottom - this.top - 4));
     }
 
-    protected void updateScrollingState(double d, double e, int i) {
-        this.scrolling = i == 0 && d >= (double)this.getScrollbarPositionX() && d < (double)(this.getScrollbarPositionX() + 6);
+    protected void updateScrollingState(double mouseX, double mouseY, int button) {
+        this.scrolling = button == 0 && mouseX >= (double)this.getScrollbarPositionX() && mouseX < (double)(this.getScrollbarPositionX() + 6);
     }
 
     protected int getScrollbarPositionX() {
@@ -293,79 +293,79 @@ implements Drawable {
     }
 
     @Override
-    public boolean mouseClicked(double d, double e, int i) {
-        this.updateScrollingState(d, e, i);
-        if (!this.isMouseOver(d, e)) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        this.updateScrollingState(mouseX, mouseY, button);
+        if (!this.isMouseOver(mouseX, mouseY)) {
             return false;
         }
-        E lv = this.getEntryAtPosition(d, e);
+        E lv = this.getEntryAtPosition(mouseX, mouseY);
         if (lv != null) {
-            if (lv.mouseClicked(d, e, i)) {
+            if (lv.mouseClicked(mouseX, mouseY, button)) {
                 this.setFocused((Element)lv);
                 this.setDragging(true);
                 return true;
             }
-        } else if (i == 0) {
-            this.clickedHeader((int)(d - (double)(this.left + this.width / 2 - this.getRowWidth() / 2)), (int)(e - (double)this.top) + (int)this.getScrollAmount() - 4);
+        } else if (button == 0) {
+            this.clickedHeader((int)(mouseX - (double)(this.left + this.width / 2 - this.getRowWidth() / 2)), (int)(mouseY - (double)this.top) + (int)this.getScrollAmount() - 4);
             return true;
         }
         return this.scrolling;
     }
 
     @Override
-    public boolean mouseReleased(double d, double e, int i) {
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
         if (this.getFocused() != null) {
-            this.getFocused().mouseReleased(d, e, i);
+            this.getFocused().mouseReleased(mouseX, mouseY, button);
         }
         return false;
     }
 
     @Override
-    public boolean mouseDragged(double d, double e, int i, double f, double g) {
-        if (super.mouseDragged(d, e, i, f, g)) {
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+        if (super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)) {
             return true;
         }
-        if (i != 0 || !this.scrolling) {
+        if (button != 0 || !this.scrolling) {
             return false;
         }
-        if (e < (double)this.top) {
+        if (mouseY < (double)this.top) {
             this.setScrollAmount(0.0);
-        } else if (e > (double)this.bottom) {
+        } else if (mouseY > (double)this.bottom) {
             this.setScrollAmount(this.getMaxScroll());
         } else {
             double h = Math.max(1, this.getMaxScroll());
             int j = this.bottom - this.top;
             int k = MathHelper.clamp((int)((float)(j * j) / (float)this.getMaxPosition()), 32, j - 8);
             double l = Math.max(1.0, h / (double)(j - k));
-            this.setScrollAmount(this.getScrollAmount() + g * l);
+            this.setScrollAmount(this.getScrollAmount() + deltaY * l);
         }
         return true;
     }
 
     @Override
-    public boolean mouseScrolled(double d, double e, double f) {
-        this.setScrollAmount(this.getScrollAmount() - f * (double)this.itemHeight / 2.0);
+    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+        this.setScrollAmount(this.getScrollAmount() - amount * (double)this.itemHeight / 2.0);
         return true;
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (super.keyPressed(i, j, k)) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (super.keyPressed(keyCode, scanCode, modifiers)) {
             return true;
         }
-        if (i == 264) {
+        if (keyCode == 264) {
             this.moveSelection(MoveDirection.DOWN);
             return true;
         }
-        if (i == 265) {
+        if (keyCode == 265) {
             this.moveSelection(MoveDirection.UP);
             return true;
         }
         return false;
     }
 
-    protected void moveSelection(MoveDirection arg2) {
-        this.moveSelectionIf(arg2, arg -> true);
+    protected void moveSelection(MoveDirection direction) {
+        this.moveSelectionIf(direction, entry -> true);
     }
 
     protected void method_30015() {
@@ -376,9 +376,9 @@ implements Drawable {
         }
     }
 
-    protected void moveSelectionIf(MoveDirection arg, Predicate<E> predicate) {
+    protected void moveSelectionIf(MoveDirection direction, Predicate<E> predicate) {
         int i;
-        int n = i = arg == MoveDirection.UP ? -1 : 1;
+        int n = i = direction == MoveDirection.UP ? -1 : 1;
         if (!this.children().isEmpty()) {
             int k;
             int j = this.children().indexOf(this.getSelected());
@@ -395,11 +395,11 @@ implements Drawable {
     }
 
     @Override
-    public boolean isMouseOver(double d, double e) {
-        return e >= (double)this.top && e <= (double)this.bottom && d >= (double)this.left && d <= (double)this.right;
+    public boolean isMouseOver(double mouseX, double mouseY) {
+        return mouseY >= (double)this.top && mouseY <= (double)this.bottom && mouseX >= (double)this.left && mouseX <= (double)this.right;
     }
 
-    protected void renderList(MatrixStack arg, int i, int j, int k, int l, float f) {
+    protected void renderList(MatrixStack matrices, int x, int y, int mouseX, int mouseY, float delta) {
         int m = this.getItemCount();
         Tessellator lv = Tessellator.getInstance();
         BufferBuilder lv2 = lv.getBuffer();
@@ -407,7 +407,7 @@ implements Drawable {
             int o = this.getRowTop(n);
             int p = this.getRowBottom(n);
             if (p < this.top || o > this.bottom) continue;
-            int q = j + n * this.itemHeight + this.headerHeight;
+            int q = y + n * this.itemHeight + this.headerHeight;
             int r = this.itemHeight - 4;
             E lv3 = this.getEntry(n);
             int s = this.getRowWidth();
@@ -433,7 +433,7 @@ implements Drawable {
                 RenderSystem.enableTexture();
             }
             int v = this.getRowLeft();
-            ((Entry)lv3).render(arg, n, o, v, s, r, k, l, this.isMouseOver(k, l) && Objects.equals(this.getEntryAtPosition(k, l), lv3), f);
+            ((Entry)lv3).render(matrices, n, o, v, s, r, mouseX, mouseY, this.isMouseOver(mouseX, mouseY) && Objects.equals(this.getEntryAtPosition(mouseX, mouseY), lv3), delta);
         }
     }
 
@@ -441,29 +441,29 @@ implements Drawable {
         return this.left + this.width / 2 - this.getRowWidth() / 2 + 2;
     }
 
-    protected int getRowTop(int i) {
-        return this.top + 4 - (int)this.getScrollAmount() + i * this.itemHeight + this.headerHeight;
+    protected int getRowTop(int index) {
+        return this.top + 4 - (int)this.getScrollAmount() + index * this.itemHeight + this.headerHeight;
     }
 
-    private int getRowBottom(int i) {
-        return this.getRowTop(i) + this.itemHeight;
+    private int getRowBottom(int index) {
+        return this.getRowTop(index) + this.itemHeight;
     }
 
     protected boolean isFocused() {
         return false;
     }
 
-    protected E remove(int i) {
-        Entry lv = (Entry)this.children.get(i);
-        if (this.removeEntry((Entry)this.children.get(i))) {
+    protected E remove(int index) {
+        Entry lv = (Entry)this.children.get(index);
+        if (this.removeEntry((Entry)this.children.get(index))) {
             return (E)lv;
         }
         return null;
     }
 
-    protected boolean removeEntry(E arg) {
-        boolean bl = this.children.remove(arg);
-        if (bl && arg == this.getSelected()) {
+    protected boolean removeEntry(E entry) {
+        boolean bl = this.children.remove(entry);
+        if (bl && entry == this.getSelected()) {
             this.setSelected(null);
         }
         return bl;
@@ -516,23 +516,23 @@ implements Drawable {
         }
 
         @Override
-        public /* synthetic */ Object remove(int i) {
-            return this.remove(i);
+        public /* synthetic */ Object remove(int index) {
+            return this.remove(index);
         }
 
         @Override
-        public /* synthetic */ void add(int i, Object object) {
-            this.add(i, (E)((Entry)object));
+        public /* synthetic */ void add(int index, Object entry) {
+            this.add(index, (E)((Entry)entry));
         }
 
         @Override
-        public /* synthetic */ Object set(int i, Object object) {
-            return this.set(i, (E)((Entry)object));
+        public /* synthetic */ Object set(int index, Object entry) {
+            return this.set(index, (E)((Entry)entry));
         }
 
         @Override
-        public /* synthetic */ Object get(int i) {
-            return this.get(i);
+        public /* synthetic */ Object get(int index) {
+            return this.get(index);
         }
     }
 
@@ -545,8 +545,8 @@ implements Drawable {
         public abstract void render(MatrixStack var1, int var2, int var3, int var4, int var5, int var6, int var7, int var8, boolean var9, float var10);
 
         @Override
-        public boolean isMouseOver(double d, double e) {
-            return Objects.equals(this.list.getEntryAtPosition(d, e), this);
+        public boolean isMouseOver(double mouseX, double mouseY) {
+            return Objects.equals(this.list.getEntryAtPosition(mouseX, mouseY), this);
         }
     }
 

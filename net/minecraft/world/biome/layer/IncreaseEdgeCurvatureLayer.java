@@ -13,42 +13,42 @@ public enum IncreaseEdgeCurvatureLayer implements DiagonalCrossSamplingLayer
 
 
     @Override
-    public int sample(LayerRandomnessSource arg, int i, int j, int k, int l, int m) {
-        if (!(!BiomeLayers.isShallowOcean(m) || BiomeLayers.isShallowOcean(l) && BiomeLayers.isShallowOcean(k) && BiomeLayers.isShallowOcean(i) && BiomeLayers.isShallowOcean(j))) {
+    public int sample(LayerRandomnessSource context, int sw, int se, int ne, int nw, int center) {
+        if (!(!BiomeLayers.isShallowOcean(center) || BiomeLayers.isShallowOcean(nw) && BiomeLayers.isShallowOcean(ne) && BiomeLayers.isShallowOcean(sw) && BiomeLayers.isShallowOcean(se))) {
             int n = 1;
             int o = 1;
-            if (!BiomeLayers.isShallowOcean(l) && arg.nextInt(n++) == 0) {
-                o = l;
+            if (!BiomeLayers.isShallowOcean(nw) && context.nextInt(n++) == 0) {
+                o = nw;
             }
-            if (!BiomeLayers.isShallowOcean(k) && arg.nextInt(n++) == 0) {
-                o = k;
+            if (!BiomeLayers.isShallowOcean(ne) && context.nextInt(n++) == 0) {
+                o = ne;
             }
-            if (!BiomeLayers.isShallowOcean(i) && arg.nextInt(n++) == 0) {
-                o = i;
+            if (!BiomeLayers.isShallowOcean(sw) && context.nextInt(n++) == 0) {
+                o = sw;
             }
-            if (!BiomeLayers.isShallowOcean(j) && arg.nextInt(n++) == 0) {
-                o = j;
+            if (!BiomeLayers.isShallowOcean(se) && context.nextInt(n++) == 0) {
+                o = se;
             }
-            if (arg.nextInt(3) == 0) {
+            if (context.nextInt(3) == 0) {
                 return o;
             }
-            return o == 4 ? 4 : m;
+            return o == 4 ? 4 : center;
         }
-        if (!BiomeLayers.isShallowOcean(m) && (BiomeLayers.isShallowOcean(l) || BiomeLayers.isShallowOcean(i) || BiomeLayers.isShallowOcean(k) || BiomeLayers.isShallowOcean(j)) && arg.nextInt(5) == 0) {
-            if (BiomeLayers.isShallowOcean(l)) {
-                return m == 4 ? 4 : l;
+        if (!BiomeLayers.isShallowOcean(center) && (BiomeLayers.isShallowOcean(nw) || BiomeLayers.isShallowOcean(sw) || BiomeLayers.isShallowOcean(ne) || BiomeLayers.isShallowOcean(se)) && context.nextInt(5) == 0) {
+            if (BiomeLayers.isShallowOcean(nw)) {
+                return center == 4 ? 4 : nw;
             }
-            if (BiomeLayers.isShallowOcean(i)) {
-                return m == 4 ? 4 : i;
+            if (BiomeLayers.isShallowOcean(sw)) {
+                return center == 4 ? 4 : sw;
             }
-            if (BiomeLayers.isShallowOcean(k)) {
-                return m == 4 ? 4 : k;
+            if (BiomeLayers.isShallowOcean(ne)) {
+                return center == 4 ? 4 : ne;
             }
-            if (BiomeLayers.isShallowOcean(j)) {
-                return m == 4 ? 4 : j;
+            if (BiomeLayers.isShallowOcean(se)) {
+                return center == 4 ? 4 : se;
             }
         }
-        return m;
+        return center;
     }
 }
 

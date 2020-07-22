@@ -41,11 +41,11 @@ extends AbstractTeam {
     private AbstractTeam.CollisionRule collisionRule = AbstractTeam.CollisionRule.ALWAYS;
     private final Style field_24195;
 
-    public Team(Scoreboard arg, String string) {
-        this.scoreboard = arg;
-        this.name = string;
-        this.displayName = new LiteralText(string);
-        this.field_24195 = Style.EMPTY.withInsertion(string).setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText(string)));
+    public Team(Scoreboard scoreboard, String name) {
+        this.scoreboard = scoreboard;
+        this.name = name;
+        this.displayName = new LiteralText(name);
+        this.field_24195 = Style.EMPTY.withInsertion(name).withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText(name)));
     }
 
     @Override
@@ -119,8 +119,8 @@ extends AbstractTeam {
         return this.friendlyFire;
     }
 
-    public void setFriendlyFireAllowed(boolean bl) {
-        this.friendlyFire = bl;
+    public void setFriendlyFireAllowed(boolean friendlyFire) {
+        this.friendlyFire = friendlyFire;
         this.scoreboard.updateScoreboardTeam(this);
     }
 
@@ -129,8 +129,8 @@ extends AbstractTeam {
         return this.showFriendlyInvisibles;
     }
 
-    public void setShowFriendlyInvisibles(boolean bl) {
-        this.showFriendlyInvisibles = bl;
+    public void setShowFriendlyInvisibles(boolean showFriendlyInvisible) {
+        this.showFriendlyInvisibles = showFriendlyInvisible;
         this.scoreboard.updateScoreboardTeam(this);
     }
 
@@ -181,8 +181,8 @@ extends AbstractTeam {
         this.setShowFriendlyInvisibles((i & 2) > 0);
     }
 
-    public void setColor(Formatting arg) {
-        this.color = arg;
+    public void setColor(Formatting color) {
+        this.color = color;
         this.scoreboard.updateScoreboardTeam(this);
     }
 

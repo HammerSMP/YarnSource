@@ -42,16 +42,16 @@ public final class AffineTransformation {
         return lv2;
     });
 
-    public AffineTransformation(@Nullable Matrix4f arg) {
-        this.matrix = arg == null ? AffineTransformation.IDENTITY.matrix : arg;
+    public AffineTransformation(@Nullable Matrix4f matrix) {
+        this.matrix = matrix == null ? AffineTransformation.IDENTITY.matrix : matrix;
     }
 
-    public AffineTransformation(@Nullable Vector3f arg, @Nullable Quaternion arg2, @Nullable Vector3f arg3, @Nullable Quaternion arg4) {
-        this.matrix = AffineTransformation.setup(arg, arg2, arg3, arg4);
-        this.translation = arg != null ? arg : new Vector3f();
-        this.rotation2 = arg2 != null ? arg2 : Quaternion.IDENTITY.copy();
-        this.scale = arg3 != null ? arg3 : new Vector3f(1.0f, 1.0f, 1.0f);
-        this.rotation1 = arg4 != null ? arg4 : Quaternion.IDENTITY.copy();
+    public AffineTransformation(@Nullable Vector3f translation, @Nullable Quaternion rotation2, @Nullable Vector3f scale, @Nullable Quaternion rotation1) {
+        this.matrix = AffineTransformation.setup(translation, rotation2, scale, rotation1);
+        this.translation = translation != null ? translation : new Vector3f();
+        this.rotation2 = rotation2 != null ? rotation2 : Quaternion.IDENTITY.copy();
+        this.scale = scale != null ? scale : new Vector3f(1.0f, 1.0f, 1.0f);
+        this.rotation1 = rotation1 != null ? rotation1 : Quaternion.IDENTITY.copy();
         this.initialized = true;
     }
 
@@ -59,9 +59,9 @@ public final class AffineTransformation {
         return IDENTITY;
     }
 
-    public AffineTransformation multiply(AffineTransformation arg) {
+    public AffineTransformation multiply(AffineTransformation other) {
         Matrix4f lv = this.getMatrix();
-        lv.multiply(arg.getMatrix());
+        lv.multiply(other.getMatrix());
         return new AffineTransformation(lv);
     }
 
@@ -89,30 +89,30 @@ public final class AffineTransformation {
         }
     }
 
-    private static Matrix4f setup(@Nullable Vector3f arg, @Nullable Quaternion arg2, @Nullable Vector3f arg3, @Nullable Quaternion arg4) {
+    private static Matrix4f setup(@Nullable Vector3f translation, @Nullable Quaternion rotation2, @Nullable Vector3f scale, @Nullable Quaternion rotation1) {
         Matrix4f lv = new Matrix4f();
         lv.loadIdentity();
-        if (arg2 != null) {
-            lv.multiply(new Matrix4f(arg2));
+        if (rotation2 != null) {
+            lv.multiply(new Matrix4f(rotation2));
         }
-        if (arg3 != null) {
-            lv.multiply(Matrix4f.scale(arg3.getX(), arg3.getY(), arg3.getZ()));
+        if (scale != null) {
+            lv.multiply(Matrix4f.scale(scale.getX(), scale.getY(), scale.getZ()));
         }
-        if (arg4 != null) {
-            lv.multiply(new Matrix4f(arg4));
+        if (rotation1 != null) {
+            lv.multiply(new Matrix4f(rotation1));
         }
-        if (arg != null) {
-            lv.a03 = arg.getX();
-            lv.a13 = arg.getY();
-            lv.a23 = arg.getZ();
+        if (translation != null) {
+            lv.a03 = translation.getX();
+            lv.a13 = translation.getY();
+            lv.a23 = translation.getZ();
         }
         return lv;
     }
 
-    public static Pair<Matrix3f, Vector3f> getLinearTransformationAndTranslationFromAffine(Matrix4f arg) {
-        arg.multiply(1.0f / arg.a33);
-        Vector3f lv = new Vector3f(arg.a03, arg.a13, arg.a23);
-        Matrix3f lv2 = new Matrix3f(arg);
+    public static Pair<Matrix3f, Vector3f> getLinearTransformationAndTranslationFromAffine(Matrix4f affineTransform) {
+        affineTransform.multiply(1.0f / affineTransform.a33);
+        Vector3f lv = new Vector3f(affineTransform.a03, affineTransform.a13, affineTransform.a23);
+        Matrix3f lv2 = new Matrix3f(affineTransform);
         return Pair.of((Object)lv2, (Object)lv);
     }
 

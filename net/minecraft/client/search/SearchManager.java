@@ -27,18 +27,18 @@ implements SynchronousResourceReloadListener {
     private final Map<Key<?>, SearchableContainer<?>> instances = Maps.newHashMap();
 
     @Override
-    public void apply(ResourceManager arg) {
+    public void apply(ResourceManager manager) {
         for (SearchableContainer<?> lv : this.instances.values()) {
             lv.reload();
         }
     }
 
-    public <T> void put(Key<T> arg, SearchableContainer<T> arg2) {
-        this.instances.put(arg, arg2);
+    public <T> void put(Key<T> key, SearchableContainer<T> value) {
+        this.instances.put(key, value);
     }
 
-    public <T> SearchableContainer<T> get(Key<T> arg) {
-        return this.instances.get(arg);
+    public <T> SearchableContainer<T> get(Key<T> key) {
+        return this.instances.get(key);
     }
 
     @Environment(value=EnvType.CLIENT)

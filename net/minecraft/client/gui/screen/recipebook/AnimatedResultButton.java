@@ -62,16 +62,16 @@ extends AbstractButtonWidget {
         return this.results;
     }
 
-    public void setPos(int i, int j) {
-        this.x = i;
-        this.y = j;
+    public void setPos(int x, int y) {
+        this.x = x;
+        this.y = y;
     }
 
     @Override
-    public void renderButton(MatrixStack arg, int i, int j, float f) {
+    public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         boolean bl;
         if (!Screen.hasControlDown()) {
-            this.time += f;
+            this.time += delta;
         }
         MinecraftClient lv = MinecraftClient.getInstance();
         lv.getTextureManager().bindTexture(BG_TEX);
@@ -90,9 +90,9 @@ extends AbstractButtonWidget {
             RenderSystem.translatef(this.x + 8, this.y + 12, 0.0f);
             RenderSystem.scalef(g, g, 1.0f);
             RenderSystem.translatef(-(this.x + 8), -(this.y + 12), 0.0f);
-            this.bounce -= f;
+            this.bounce -= delta;
         }
-        this.drawTexture(arg, this.x, this.y, k, l, this.width, this.height);
+        this.drawTexture(matrices, this.x, this.y, k, l, this.width, this.height);
         List<Recipe<?>> list = this.getResults();
         this.currentResultIndex = MathHelper.floor(this.time / 30.0f) % list.size();
         ItemStack lv2 = list.get(this.currentResultIndex).getOutput();
@@ -124,9 +124,9 @@ extends AbstractButtonWidget {
         return list.get(this.currentResultIndex);
     }
 
-    public List<StringRenderable> getTooltip(Screen arg) {
+    public List<StringRenderable> getTooltip(Screen screen) {
         ItemStack lv = this.getResults().get(this.currentResultIndex).getOutput();
-        ArrayList list = Lists.newArrayList(arg.getTooltipFromItem(lv));
+        ArrayList list = Lists.newArrayList(screen.getTooltipFromItem(lv));
         if (this.results.getResults(this.recipeBook.isFilteringCraftable(this.craftingScreenHandler)).size() > 1) {
             list.add(new TranslatableText("gui.recipebook.moreRecipes"));
         }
@@ -139,8 +139,8 @@ extends AbstractButtonWidget {
     }
 
     @Override
-    protected boolean isValidClickButton(int i) {
-        return i == 0 || i == 1;
+    protected boolean isValidClickButton(int button) {
+        return button == 0 || button == 1;
     }
 }
 

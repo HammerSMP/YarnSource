@@ -30,8 +30,8 @@ extends DrawableHelper {
     private final MinecraftClient client;
     private final Map<UUID, ClientBossBar> bossBars = Maps.newLinkedHashMap();
 
-    public BossBarHud(MinecraftClient arg) {
-        this.client = arg;
+    public BossBarHud(MinecraftClient client) {
+        this.client = client;
     }
 
     public void render(MatrixStack arg) {
@@ -71,13 +71,13 @@ extends DrawableHelper {
         }
     }
 
-    public void handlePacket(BossBarS2CPacket arg) {
-        if (arg.getType() == BossBarS2CPacket.Type.ADD) {
-            this.bossBars.put(arg.getUuid(), new ClientBossBar(arg));
-        } else if (arg.getType() == BossBarS2CPacket.Type.REMOVE) {
-            this.bossBars.remove(arg.getUuid());
+    public void handlePacket(BossBarS2CPacket packet) {
+        if (packet.getType() == BossBarS2CPacket.Type.ADD) {
+            this.bossBars.put(packet.getUuid(), new ClientBossBar(packet));
+        } else if (packet.getType() == BossBarS2CPacket.Type.REMOVE) {
+            this.bossBars.remove(packet.getUuid());
         } else {
-            this.bossBars.get(arg.getUuid()).handlePacket(arg);
+            this.bossBars.get(packet.getUuid()).handlePacket(packet);
         }
     }
 

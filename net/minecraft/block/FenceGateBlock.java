@@ -48,108 +48,108 @@ extends HorizontalFacingBlock {
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
-        if (arg.get(IN_WALL).booleanValue()) {
-            return arg.get(FACING).getAxis() == Direction.Axis.X ? IN_WALL_X_AXIS_SHAPE : IN_WALL_Z_AXIS_SHAPE;
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        if (state.get(IN_WALL).booleanValue()) {
+            return state.get(FACING).getAxis() == Direction.Axis.X ? IN_WALL_X_AXIS_SHAPE : IN_WALL_Z_AXIS_SHAPE;
         }
-        return arg.get(FACING).getAxis() == Direction.Axis.X ? X_AXIS_SHAPE : Z_AXIS_SHAPE;
+        return state.get(FACING).getAxis() == Direction.Axis.X ? X_AXIS_SHAPE : Z_AXIS_SHAPE;
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
-        Direction.Axis lv = arg2.getAxis();
-        if (arg.get(FACING).rotateYClockwise().getAxis() == lv) {
-            boolean bl = this.isWall(arg3) || this.isWall(arg4.getBlockState(arg5.offset(arg2.getOpposite())));
-            return (BlockState)arg.with(IN_WALL, bl);
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
+        Direction.Axis lv = direction.getAxis();
+        if (state.get(FACING).rotateYClockwise().getAxis() == lv) {
+            boolean bl = this.isWall(newState) || this.isWall(world.getBlockState(pos.offset(direction.getOpposite())));
+            return (BlockState)state.with(IN_WALL, bl);
         }
-        return super.getStateForNeighborUpdate(arg, arg2, arg3, arg4, arg5, arg6);
+        return super.getStateForNeighborUpdate(state, direction, newState, world, pos, posFrom);
     }
 
     @Override
-    public VoxelShape getCollisionShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
-        if (arg.get(OPEN).booleanValue()) {
+    public VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        if (state.get(OPEN).booleanValue()) {
             return VoxelShapes.empty();
         }
-        return arg.get(FACING).getAxis() == Direction.Axis.Z ? Z_AXIS_COLLISION_SHAPE : X_AXIS_COLLISION_SHAPE;
+        return state.get(FACING).getAxis() == Direction.Axis.Z ? Z_AXIS_COLLISION_SHAPE : X_AXIS_COLLISION_SHAPE;
     }
 
     @Override
-    public VoxelShape getCullingShape(BlockState arg, BlockView arg2, BlockPos arg3) {
-        if (arg.get(IN_WALL).booleanValue()) {
-            return arg.get(FACING).getAxis() == Direction.Axis.X ? IN_WALL_X_AXIS_CULL_SHAPE : IN_WALL_Z_AXIS_CULL_SHAPE;
+    public VoxelShape getCullingShape(BlockState state, BlockView world, BlockPos pos) {
+        if (state.get(IN_WALL).booleanValue()) {
+            return state.get(FACING).getAxis() == Direction.Axis.X ? IN_WALL_X_AXIS_CULL_SHAPE : IN_WALL_Z_AXIS_CULL_SHAPE;
         }
-        return arg.get(FACING).getAxis() == Direction.Axis.X ? X_AXIS_CULL_SHAPE : Z_AXIS_CULL_SHAPE;
+        return state.get(FACING).getAxis() == Direction.Axis.X ? X_AXIS_CULL_SHAPE : Z_AXIS_CULL_SHAPE;
     }
 
     @Override
-    public boolean canPathfindThrough(BlockState arg, BlockView arg2, BlockPos arg3, NavigationType arg4) {
-        switch (arg4) {
+    public boolean canPathfindThrough(BlockState state, BlockView world, BlockPos pos, NavigationType type) {
+        switch (type) {
             case LAND: {
-                return arg.get(OPEN);
+                return state.get(OPEN);
             }
             case WATER: {
                 return false;
             }
             case AIR: {
-                return arg.get(OPEN);
+                return state.get(OPEN);
             }
         }
         return false;
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext arg) {
-        World lv = arg.getWorld();
-        BlockPos lv2 = arg.getBlockPos();
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        World lv = ctx.getWorld();
+        BlockPos lv2 = ctx.getBlockPos();
         boolean bl = lv.isReceivingRedstonePower(lv2);
-        Direction lv3 = arg.getPlayerFacing();
+        Direction lv3 = ctx.getPlayerFacing();
         Direction.Axis lv4 = lv3.getAxis();
         boolean bl2 = lv4 == Direction.Axis.Z && (this.isWall(lv.getBlockState(lv2.west())) || this.isWall(lv.getBlockState(lv2.east()))) || lv4 == Direction.Axis.X && (this.isWall(lv.getBlockState(lv2.north())) || this.isWall(lv.getBlockState(lv2.south())));
         return (BlockState)((BlockState)((BlockState)((BlockState)this.getDefaultState().with(FACING, lv3)).with(OPEN, bl)).with(POWERED, bl)).with(IN_WALL, bl2);
     }
 
-    private boolean isWall(BlockState arg) {
-        return arg.getBlock().isIn(BlockTags.WALLS);
+    private boolean isWall(BlockState state) {
+        return state.getBlock().isIn(BlockTags.WALLS);
     }
 
     @Override
-    public ActionResult onUse(BlockState arg, World arg2, BlockPos arg3, PlayerEntity arg4, Hand arg5, BlockHitResult arg6) {
-        if (arg.get(OPEN).booleanValue()) {
-            arg = (BlockState)arg.with(OPEN, false);
-            arg2.setBlockState(arg3, arg, 10);
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        if (state.get(OPEN).booleanValue()) {
+            state = (BlockState)state.with(OPEN, false);
+            world.setBlockState(pos, state, 10);
         } else {
-            Direction lv = arg4.getHorizontalFacing();
-            if (arg.get(FACING) == lv.getOpposite()) {
-                arg = (BlockState)arg.with(FACING, lv);
+            Direction lv = player.getHorizontalFacing();
+            if (state.get(FACING) == lv.getOpposite()) {
+                state = (BlockState)state.with(FACING, lv);
             }
-            arg = (BlockState)arg.with(OPEN, true);
-            arg2.setBlockState(arg3, arg, 10);
+            state = (BlockState)state.with(OPEN, true);
+            world.setBlockState(pos, state, 10);
         }
-        arg2.syncWorldEvent(arg4, arg.get(OPEN) != false ? 1008 : 1014, arg3, 0);
-        return ActionResult.success(arg2.isClient);
+        world.syncWorldEvent(player, state.get(OPEN) != false ? 1008 : 1014, pos, 0);
+        return ActionResult.success(world.isClient);
     }
 
     @Override
-    public void neighborUpdate(BlockState arg, World arg2, BlockPos arg3, Block arg4, BlockPos arg5, boolean bl) {
-        if (arg2.isClient) {
+    public void neighborUpdate(BlockState state, World world, BlockPos pos, Block block, BlockPos fromPos, boolean notify) {
+        if (world.isClient) {
             return;
         }
-        boolean bl2 = arg2.isReceivingRedstonePower(arg3);
-        if (arg.get(POWERED) != bl2) {
-            arg2.setBlockState(arg3, (BlockState)((BlockState)arg.with(POWERED, bl2)).with(OPEN, bl2), 2);
-            if (arg.get(OPEN) != bl2) {
-                arg2.syncWorldEvent(null, bl2 ? 1008 : 1014, arg3, 0);
+        boolean bl2 = world.isReceivingRedstonePower(pos);
+        if (state.get(POWERED) != bl2) {
+            world.setBlockState(pos, (BlockState)((BlockState)state.with(POWERED, bl2)).with(OPEN, bl2), 2);
+            if (state.get(OPEN) != bl2) {
+                world.syncWorldEvent(null, bl2 ? 1008 : 1014, pos, 0);
             }
         }
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(FACING, OPEN, POWERED, IN_WALL);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(FACING, OPEN, POWERED, IN_WALL);
     }
 
-    public static boolean canWallConnect(BlockState arg, Direction arg2) {
-        return arg.get(FACING).getAxis() == arg2.rotateYClockwise().getAxis();
+    public static boolean canWallConnect(BlockState state, Direction side) {
+        return state.get(FACING).getAxis() == side.rotateYClockwise().getAxis();
     }
 }
 

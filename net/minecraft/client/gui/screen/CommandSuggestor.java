@@ -3,6 +3,7 @@
  * 
  * Could not load the following classes:
  *  com.google.common.base.Strings
+ *  com.google.common.collect.ImmutableList
  *  com.google.common.collect.Lists
  *  com.mojang.brigadier.CommandDispatcher
  *  com.mojang.brigadier.Message
@@ -23,6 +24,7 @@
 package net.minecraft.client.gui.screen;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.Message;
@@ -44,6 +46,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -58,7 +61,11 @@ import net.minecraft.client.util.Rect2i;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.CommandSource;
+import net.minecraft.text.StringRenderable;
+import net.minecraft.text.Style;
+import net.minecraft.text.Text;
 import net.minecraft.text.Texts;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec2f;
@@ -66,6 +73,9 @@ import net.minecraft.util.math.Vec2f;
 @Environment(value=EnvType.CLIENT)
 public class CommandSuggestor {
     private static final Pattern BACKSLASH_S_PATTERN = Pattern.compile("(\\s+)");
+    private static final Style field_25885 = Style.EMPTY.withColor(Formatting.RED);
+    private static final Style field_25886 = Style.EMPTY.withColor(Formatting.GRAY);
+    private static final List<Style> field_25887 = (List)Stream.of(new Formatting[]{Formatting.AQUA, Formatting.YELLOW, Formatting.GREEN, Formatting.LIGHT_PURPLE, Formatting.GOLD}).map(Style.EMPTY::withColor).collect(ImmutableList.toImmutableList());
     private final MinecraftClient client;
     private final Screen owner;
     private final TextFieldWidget textField;
@@ -76,7 +86,7 @@ public class CommandSuggestor {
     private final int maxSuggestionSize;
     private final boolean chatScreenSized;
     private final int color;
-    private final List<String> messages = Lists.newArrayList();
+    private final List<StringRenderable> messages = Lists.newArrayList();
     private int x;
     private int width;
     private ParseResults<CommandSource> parse;
@@ -85,47 +95,47 @@ public class CommandSuggestor {
     private boolean windowActive;
     private boolean completingSuggestions;
 
-    public CommandSuggestor(MinecraftClient arg, Screen arg2, TextFieldWidget arg3, TextRenderer arg4, boolean bl, boolean bl2, int i, int j, boolean bl3, int k) {
-        this.client = arg;
-        this.owner = arg2;
-        this.textField = arg3;
-        this.textRenderer = arg4;
-        this.slashRequired = bl;
-        this.suggestingWhenEmpty = bl2;
-        this.inWindowIndexOffset = i;
-        this.maxSuggestionSize = j;
-        this.chatScreenSized = bl3;
-        this.color = k;
-        arg3.setRenderTextProvider((arg_0, arg_1) -> this.provideRenderText(arg_0, arg_1));
+    public CommandSuggestor(MinecraftClient client, Screen owner, TextFieldWidget textField, TextRenderer textRenderer, boolean slashRequired, boolean suggestingWhenEmpty, int inWindowIndexOffset, int maxSuggestionSize, boolean chatScreenSized, int color) {
+        this.client = client;
+        this.owner = owner;
+        this.textField = textField;
+        this.textRenderer = textRenderer;
+        this.slashRequired = slashRequired;
+        this.suggestingWhenEmpty = suggestingWhenEmpty;
+        this.inWindowIndexOffset = inWindowIndexOffset;
+        this.maxSuggestionSize = maxSuggestionSize;
+        this.chatScreenSized = chatScreenSized;
+        this.color = color;
+        textField.setRenderTextProvider((arg_0, arg_1) -> this.provideRenderText(arg_0, arg_1));
     }
 
-    public void setWindowActive(boolean bl) {
-        this.windowActive = bl;
-        if (!bl) {
+    public void setWindowActive(boolean windowActive) {
+        this.windowActive = windowActive;
+        if (!windowActive) {
             this.window = null;
         }
     }
 
-    public boolean keyPressed(int i, int j, int k) {
-        if (this.window != null && this.window.keyPressed(i, j, k)) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (this.window != null && this.window.keyPressed(keyCode, scanCode, modifiers)) {
             return true;
         }
-        if (this.owner.getFocused() == this.textField && i == 258) {
+        if (this.owner.getFocused() == this.textField && keyCode == 258) {
             this.showSuggestions(true);
             return true;
         }
         return false;
     }
 
-    public boolean mouseScrolled(double d) {
-        return this.window != null && this.window.mouseScrolled(MathHelper.clamp(d, -1.0, 1.0));
+    public boolean mouseScrolled(double amount) {
+        return this.window != null && this.window.mouseScrolled(MathHelper.clamp(amount, -1.0, 1.0));
     }
 
-    public boolean mouseClicked(double d, double e, int i) {
-        return this.window != null && this.window.mouseClicked((int)d, (int)e, i);
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        return this.window != null && this.window.mouseClicked((int)mouseX, (int)mouseY, button);
     }
 
-    public void showSuggestions(boolean bl) {
+    public void showSuggestions(boolean narrateFirstSuggestion) {
         Suggestions suggestions;
         if (this.pendingSuggestions != null && this.pendingSuggestions.isDone() && !(suggestions = this.pendingSuggestions.join()).isEmpty()) {
             int i = 0;
@@ -134,7 +144,7 @@ public class CommandSuggestor {
             }
             int j = MathHelper.clamp(this.textField.getCharacterX(suggestions.getRange().getStart()), 0, this.textField.getCharacterX(0) + this.textField.getInnerWidth() - i);
             int k = this.chatScreenSized ? this.owner.height - 12 : 72;
-            this.window = new SuggestionWindow(j, k, i, this.method_30104(suggestions), bl);
+            this.window = new SuggestionWindow(j, k, i, this.method_30104(suggestions), narrateFirstSuggestion);
         }
     }
 
@@ -197,16 +207,25 @@ public class CommandSuggestor {
         }
     }
 
-    private static int getLastPlayerNameStart(String string) {
-        if (Strings.isNullOrEmpty((String)string)) {
+    private static int getLastPlayerNameStart(String input) {
+        if (Strings.isNullOrEmpty((String)input)) {
             return 0;
         }
         int i = 0;
-        Matcher matcher = BACKSLASH_S_PATTERN.matcher(string);
+        Matcher matcher = BACKSLASH_S_PATTERN.matcher(input);
         while (matcher.find()) {
             i = matcher.end();
         }
         return i;
+    }
+
+    private static StringRenderable method_30505(CommandSyntaxException commandSyntaxException) {
+        Text lv = Texts.toText(commandSyntaxException.getRawMessage());
+        String string = commandSyntaxException.getContext();
+        if (string == null) {
+            return lv;
+        }
+        return new TranslatableText("command.context.parse_error", lv, commandSyntaxException.getCursor(), string);
     }
 
     public void show() {
@@ -219,13 +238,13 @@ public class CommandSuggestor {
                         ++i;
                         continue;
                     }
-                    this.messages.add(commandSyntaxException.getMessage());
+                    this.messages.add(CommandSuggestor.method_30505(commandSyntaxException));
                 }
                 if (i > 0) {
-                    this.messages.add(CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherUnknownCommand().create().getMessage());
+                    this.messages.add(CommandSuggestor.method_30505(CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherUnknownCommand().create()));
                 }
             } else if (this.parse.getReader().canRead()) {
-                this.messages.add(CommandManager.getException(this.parse).getMessage());
+                this.messages.add(CommandSuggestor.method_30505(CommandManager.getException(this.parse)));
             }
         }
         this.x = 0;
@@ -239,15 +258,16 @@ public class CommandSuggestor {
         }
     }
 
-    private void showUsages(Formatting arg) {
+    private void showUsages(Formatting formatting) {
         CommandContextBuilder commandContextBuilder = this.parse.getContext();
         SuggestionContext suggestionContext = commandContextBuilder.findSuggestionContext(this.textField.getCursor());
         Map map = this.client.player.networkHandler.getCommandDispatcher().getSmartUsage(suggestionContext.parent, (Object)this.client.player.networkHandler.getCommandSource());
         ArrayList list = Lists.newArrayList();
         int i = 0;
+        Style lv = Style.EMPTY.withColor(formatting);
         for (Map.Entry entry : map.entrySet()) {
             if (entry.getKey() instanceof LiteralCommandNode) continue;
-            list.add((Object)((Object)arg) + (String)entry.getValue());
+            list.add(StringRenderable.styled((String)entry.getValue(), lv));
             i = Math.max(i, this.textRenderer.getWidth((String)entry.getValue()));
         }
         if (!list.isEmpty()) {
@@ -257,52 +277,47 @@ public class CommandSuggestor {
         }
     }
 
-    private String provideRenderText(String string, int i) {
+    private StringRenderable provideRenderText(String original, int firstCharacterIndex) {
         if (this.parse != null) {
-            return CommandSuggestor.highlight(this.parse, string, i);
+            return CommandSuggestor.highlight(this.parse, original, firstCharacterIndex);
         }
-        return string;
+        return StringRenderable.plain(original);
     }
 
     @Nullable
-    private static String getSuggestionSuffix(String string, String string2) {
-        if (string2.startsWith(string)) {
-            return string2.substring(string.length());
+    private static String getSuggestionSuffix(String original, String suggestion) {
+        if (suggestion.startsWith(original)) {
+            return suggestion.substring(original.length());
         }
         return null;
     }
 
-    public static String highlight(ParseResults<CommandSource> parseResults, String string, int i) {
+    private static StringRenderable highlight(ParseResults<CommandSource> parse, String original, int firstCharacterIndex) {
         int n;
-        Formatting[] lvs = new Formatting[]{Formatting.AQUA, Formatting.YELLOW, Formatting.GREEN, Formatting.LIGHT_PURPLE, Formatting.GOLD};
-        String string2 = Formatting.GRAY.toString();
-        StringBuilder stringBuilder = new StringBuilder(string2);
+        ArrayList list = Lists.newArrayList();
         int j = 0;
         int k = -1;
-        CommandContextBuilder commandContextBuilder = parseResults.getContext().getLastChild();
+        CommandContextBuilder commandContextBuilder = parse.getContext().getLastChild();
         for (ParsedArgument parsedArgument : commandContextBuilder.getArguments().values()) {
             int l;
-            if (++k >= lvs.length) {
+            if (++k >= field_25887.size()) {
                 k = 0;
             }
-            if ((l = Math.max(parsedArgument.getRange().getStart() - i, 0)) >= string.length()) break;
-            int m = Math.min(parsedArgument.getRange().getEnd() - i, string.length());
+            if ((l = Math.max(parsedArgument.getRange().getStart() - firstCharacterIndex, 0)) >= original.length()) break;
+            int m = Math.min(parsedArgument.getRange().getEnd() - firstCharacterIndex, original.length());
             if (m <= 0) continue;
-            stringBuilder.append(string, j, l);
-            stringBuilder.append((Object)lvs[k]);
-            stringBuilder.append(string, l, m);
-            stringBuilder.append(string2);
+            list.add(StringRenderable.styled(original.substring(j, l), field_25886));
+            list.add(StringRenderable.styled(original.substring(l, m), field_25887.get(k)));
             j = m;
         }
-        if (parseResults.getReader().canRead() && (n = Math.max(parseResults.getReader().getCursor() - i, 0)) < string.length()) {
-            int o = Math.min(n + parseResults.getReader().getRemainingLength(), string.length());
-            stringBuilder.append(string, j, n);
-            stringBuilder.append((Object)Formatting.RED);
-            stringBuilder.append(string, n, o);
+        if (parse.getReader().canRead() && (n = Math.max(parse.getReader().getCursor() - firstCharacterIndex, 0)) < original.length()) {
+            int o = Math.min(n + parse.getReader().getRemainingLength(), original.length());
+            list.add(StringRenderable.styled(original.substring(j, n), field_25886));
+            list.add(StringRenderable.styled(original.substring(n, o), field_25885));
             j = o;
         }
-        stringBuilder.append(string, j, string.length());
-        return stringBuilder.toString();
+        list.add(StringRenderable.styled(original.substring(j), field_25886));
+        return StringRenderable.concat(list);
     }
 
     public void render(MatrixStack arg, int i, int j) {
@@ -310,10 +325,10 @@ public class CommandSuggestor {
             this.window.render(arg, i, j);
         } else {
             int k = 0;
-            for (String string : this.messages) {
+            for (StringRenderable lv : this.messages) {
                 int l = this.chatScreenSized ? this.owner.height - 14 - 13 - 12 * k : 72 + 12 * k;
                 DrawableHelper.fill(arg, this.x - 1, l, this.x + this.width + 1, l + 12, this.color);
-                this.textRenderer.drawWithShadow(arg, string, (float)this.x, (float)(l + 2), -1);
+                this.textRenderer.drawWithShadow(arg, lv, (float)this.x, (float)(l + 2), -1);
                 ++k;
             }
         }
@@ -337,12 +352,12 @@ public class CommandSuggestor {
         private boolean completed;
         private int lastNarrationIndex;
 
-        private SuggestionWindow(int i, int j, int k, List<Suggestion> list, boolean bl) {
-            int l = i - 1;
-            int m = CommandSuggestor.this.chatScreenSized ? j - 3 - Math.min(list.size(), CommandSuggestor.this.maxSuggestionSize) * 12 : j;
-            this.area = new Rect2i(l, m, k + 1, Math.min(list.size(), CommandSuggestor.this.maxSuggestionSize) * 12);
+        private SuggestionWindow(int x, int y, int width, List<Suggestion> list, boolean narrateFirstSuggestion) {
+            int l = x - 1;
+            int m = CommandSuggestor.this.chatScreenSized ? y - 3 - Math.min(list.size(), CommandSuggestor.this.maxSuggestionSize) * 12 : y;
+            this.area = new Rect2i(l, m, width + 1, Math.min(list.size(), CommandSuggestor.this.maxSuggestionSize) * 12);
             this.typedText = CommandSuggestor.this.textField.getText();
-            this.lastNarrationIndex = bl ? -1 : 0;
+            this.lastNarrationIndex = narrateFirstSuggestion ? -1 : 0;
             this.field_25709 = list;
             this.select(0);
         }
@@ -392,11 +407,11 @@ public class CommandSuggestor {
             }
         }
 
-        public boolean mouseClicked(int i, int j, int k) {
-            if (!this.area.contains(i, j)) {
+        public boolean mouseClicked(int x, int y, int button) {
+            if (!this.area.contains(x, y)) {
                 return false;
             }
-            int l = (j - this.area.getY()) / 12 + this.inWindowIndex;
+            int l = (y - this.area.getY()) / 12 + this.inWindowIndex;
             if (l >= 0 && l < this.field_25709.size()) {
                 this.select(l);
                 this.complete();
@@ -404,43 +419,43 @@ public class CommandSuggestor {
             return true;
         }
 
-        public boolean mouseScrolled(double d) {
+        public boolean mouseScrolled(double amount) {
             int j;
             int i = (int)(((CommandSuggestor)CommandSuggestor.this).client.mouse.getX() * (double)CommandSuggestor.this.client.getWindow().getScaledWidth() / (double)CommandSuggestor.this.client.getWindow().getWidth());
             if (this.area.contains(i, j = (int)(((CommandSuggestor)CommandSuggestor.this).client.mouse.getY() * (double)CommandSuggestor.this.client.getWindow().getScaledHeight() / (double)CommandSuggestor.this.client.getWindow().getHeight()))) {
-                this.inWindowIndex = MathHelper.clamp((int)((double)this.inWindowIndex - d), 0, Math.max(this.field_25709.size() - CommandSuggestor.this.maxSuggestionSize, 0));
+                this.inWindowIndex = MathHelper.clamp((int)((double)this.inWindowIndex - amount), 0, Math.max(this.field_25709.size() - CommandSuggestor.this.maxSuggestionSize, 0));
                 return true;
             }
             return false;
         }
 
-        public boolean keyPressed(int i, int j, int k) {
-            if (i == 265) {
+        public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+            if (keyCode == 265) {
                 this.scroll(-1);
                 this.completed = false;
                 return true;
             }
-            if (i == 264) {
+            if (keyCode == 264) {
                 this.scroll(1);
                 this.completed = false;
                 return true;
             }
-            if (i == 258) {
+            if (keyCode == 258) {
                 if (this.completed) {
                     this.scroll(Screen.hasShiftDown() ? -1 : 1);
                 }
                 this.complete();
                 return true;
             }
-            if (i == 256) {
+            if (keyCode == 256) {
                 this.discard();
                 return true;
             }
             return false;
         }
 
-        public void scroll(int i) {
-            this.select(this.selection + i);
+        public void scroll(int offset) {
+            this.select(this.selection + offset);
             int j = this.inWindowIndex;
             int k = this.inWindowIndex + CommandSuggestor.this.maxSuggestionSize - 1;
             if (this.selection < j) {
@@ -450,8 +465,8 @@ public class CommandSuggestor {
             }
         }
 
-        public void select(int i) {
-            this.selection = i;
+        public void select(int index) {
+            this.selection = index;
             if (this.selection < 0) {
                 this.selection += this.field_25709.size();
             }

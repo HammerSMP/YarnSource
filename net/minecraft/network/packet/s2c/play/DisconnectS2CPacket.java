@@ -22,18 +22,18 @@ implements Packet<ClientPlayPacketListener> {
     public DisconnectS2CPacket() {
     }
 
-    public DisconnectS2CPacket(Text arg) {
-        this.reason = arg;
+    public DisconnectS2CPacket(Text reason) {
+        this.reason = reason;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.reason = arg.readText();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.reason = buf.readText();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeText(this.reason);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeText(this.reason);
     }
 
     @Override

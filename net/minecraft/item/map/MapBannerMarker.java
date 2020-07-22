@@ -25,27 +25,27 @@ public class MapBannerMarker {
     @Nullable
     private final Text name;
 
-    public MapBannerMarker(BlockPos arg, DyeColor arg2, @Nullable Text arg3) {
-        this.pos = arg;
-        this.color = arg2;
-        this.name = arg3;
+    public MapBannerMarker(BlockPos pos, DyeColor dyeColor, @Nullable Text name) {
+        this.pos = pos;
+        this.color = dyeColor;
+        this.name = name;
     }
 
-    public static MapBannerMarker fromNbt(CompoundTag arg) {
-        BlockPos lv = NbtHelper.toBlockPos(arg.getCompound("Pos"));
-        DyeColor lv2 = DyeColor.byName(arg.getString("Color"), DyeColor.WHITE);
-        MutableText lv3 = arg.contains("Name") ? Text.Serializer.fromJson(arg.getString("Name")) : null;
+    public static MapBannerMarker fromNbt(CompoundTag tag) {
+        BlockPos lv = NbtHelper.toBlockPos(tag.getCompound("Pos"));
+        DyeColor lv2 = DyeColor.byName(tag.getString("Color"), DyeColor.WHITE);
+        MutableText lv3 = tag.contains("Name") ? Text.Serializer.fromJson(tag.getString("Name")) : null;
         return new MapBannerMarker(lv, lv2, lv3);
     }
 
     @Nullable
-    public static MapBannerMarker fromWorldBlock(BlockView arg, BlockPos arg2) {
-        BlockEntity lv = arg.getBlockEntity(arg2);
+    public static MapBannerMarker fromWorldBlock(BlockView blockView, BlockPos blockPos) {
+        BlockEntity lv = blockView.getBlockEntity(blockPos);
         if (lv instanceof BannerBlockEntity) {
             BannerBlockEntity lv2 = (BannerBlockEntity)lv;
-            DyeColor lv3 = lv2.getColorForState(() -> arg.getBlockState(arg2));
+            DyeColor lv3 = lv2.getColorForState(() -> blockView.getBlockState(blockPos));
             Text lv4 = lv2.hasCustomName() ? lv2.getCustomName() : null;
-            return new MapBannerMarker(arg2, lv3, lv4);
+            return new MapBannerMarker(blockPos, lv3, lv4);
         }
         return null;
     }
@@ -110,14 +110,14 @@ public class MapBannerMarker {
         return this.name;
     }
 
-    public boolean equals(Object object) {
-        if (this == object) {
+    public boolean equals(Object o) {
+        if (this == o) {
             return true;
         }
-        if (object == null || this.getClass() != object.getClass()) {
+        if (o == null || this.getClass() != o.getClass()) {
             return false;
         }
-        MapBannerMarker lv = (MapBannerMarker)object;
+        MapBannerMarker lv = (MapBannerMarker)o;
         return Objects.equals(this.pos, lv.pos) && this.color == lv.color && Objects.equals(this.name, lv.name);
     }
 

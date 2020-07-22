@@ -19,11 +19,11 @@ public abstract class FeatureSize {
     protected final OptionalInt minClippedHeight;
 
     protected static <S extends FeatureSize> RecordCodecBuilder<S, OptionalInt> createCodecBuilder() {
-        return Codec.INT.optionalFieldOf("min_clipped_height").xmap(optional -> optional.map(OptionalInt::of).orElse(OptionalInt.empty()), optionalInt -> optionalInt.isPresent() ? Optional.of(optionalInt.getAsInt()) : Optional.empty()).forGetter(arg -> arg.minClippedHeight);
+        return Codec.intRange((int)0, (int)80).optionalFieldOf("min_clipped_height").xmap(optional -> optional.map(OptionalInt::of).orElse(OptionalInt.empty()), optionalInt -> optionalInt.isPresent() ? Optional.of(optionalInt.getAsInt()) : Optional.empty()).forGetter(arg -> arg.minClippedHeight);
     }
 
-    public FeatureSize(OptionalInt optionalInt) {
-        this.minClippedHeight = optionalInt;
+    public FeatureSize(OptionalInt minClippedHeight) {
+        this.minClippedHeight = minClippedHeight;
     }
 
     protected abstract FeatureSizeType<?> getType();

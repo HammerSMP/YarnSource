@@ -23,24 +23,24 @@ implements Packet<ClientPlayPacketListener> {
     public HealthUpdateS2CPacket() {
     }
 
-    public HealthUpdateS2CPacket(float f, int i, float g) {
-        this.health = f;
-        this.food = i;
-        this.saturation = g;
+    public HealthUpdateS2CPacket(float health, int food, float saturation) {
+        this.health = health;
+        this.food = food;
+        this.saturation = saturation;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.health = arg.readFloat();
-        this.food = arg.readVarInt();
-        this.saturation = arg.readFloat();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.health = buf.readFloat();
+        this.food = buf.readVarInt();
+        this.saturation = buf.readFloat();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeFloat(this.health);
-        arg.writeVarInt(this.food);
-        arg.writeFloat(this.saturation);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeFloat(this.health);
+        buf.writeVarInt(this.food);
+        buf.writeFloat(this.saturation);
     }
 
     @Override

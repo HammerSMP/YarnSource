@@ -18,6 +18,7 @@ import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.registry.DynamicRegistryManager;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.biome.Biome;
@@ -32,7 +33,7 @@ public abstract class StructureStart<C extends FeatureConfig> {
     public static final StructureStart<?> DEFAULT = new StructureStart<MineshaftFeatureConfig>(StructureFeature.MINESHAFT, 0, 0, BlockBox.empty(), 0, 0L){
 
         @Override
-        public void init(ChunkGenerator arg, StructureManager arg2, int i, int j, Biome arg3, MineshaftFeatureConfig arg4) {
+        public void init(DynamicRegistryManager arg, ChunkGenerator arg2, StructureManager arg3, int i, int j, Biome arg4, MineshaftFeatureConfig arg5) {
         }
     };
     private final StructureFeature<C> feature;
@@ -43,17 +44,17 @@ public abstract class StructureStart<C extends FeatureConfig> {
     private int references;
     protected final ChunkRandom random;
 
-    public StructureStart(StructureFeature<C> arg, int i, int j, BlockBox arg2, int k, long l) {
-        this.feature = arg;
-        this.chunkX = i;
-        this.chunkZ = j;
-        this.references = k;
+    public StructureStart(StructureFeature<C> feature, int chunkX, int chunkZ, BlockBox box, int references, long seed) {
+        this.feature = feature;
+        this.chunkX = chunkX;
+        this.chunkZ = chunkZ;
+        this.references = references;
         this.random = new ChunkRandom();
-        this.random.setCarverSeed(l, i, j);
-        this.boundingBox = arg2;
+        this.random.setCarverSeed(seed, chunkX, chunkZ);
+        this.boundingBox = box;
     }
 
-    public abstract void init(ChunkGenerator var1, StructureManager var2, int var3, int var4, Biome var5, C var6);
+    public abstract void init(DynamicRegistryManager var1, ChunkGenerator var2, StructureManager var3, int var4, int var5, Biome var6, C var7);
 
     public BlockBox getBoundingBox() {
         return this.boundingBox;
@@ -95,15 +96,15 @@ public abstract class StructureStart<C extends FeatureConfig> {
     /*
      * WARNING - Removed try catching itself - possible behaviour change.
      */
-    public CompoundTag toTag(int i, int j) {
+    public CompoundTag toTag(int chunkX, int chunkZ) {
         CompoundTag lv = new CompoundTag();
         if (!this.hasChildren()) {
             lv.putString("id", "INVALID");
             return lv;
         }
         lv.putString("id", Registry.STRUCTURE_FEATURE.getId(this.getFeature()).toString());
-        lv.putInt("ChunkX", i);
-        lv.putInt("ChunkZ", j);
+        lv.putInt("ChunkX", chunkX);
+        lv.putInt("ChunkZ", chunkZ);
         lv.putInt("references", this.references);
         lv.put("BB", this.boundingBox.toNbt());
         ListTag lv2 = new ListTag();

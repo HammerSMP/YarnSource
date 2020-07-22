@@ -21,18 +21,18 @@ public class BossBarManager {
     private final Map<Identifier, CommandBossBar> commandBossBars = Maps.newHashMap();
 
     @Nullable
-    public CommandBossBar get(Identifier arg) {
-        return this.commandBossBars.get(arg);
+    public CommandBossBar get(Identifier id) {
+        return this.commandBossBars.get(id);
     }
 
-    public CommandBossBar add(Identifier arg, Text arg2) {
-        CommandBossBar lv = new CommandBossBar(arg, arg2);
-        this.commandBossBars.put(arg, lv);
+    public CommandBossBar add(Identifier id, Text displayName) {
+        CommandBossBar lv = new CommandBossBar(id, displayName);
+        this.commandBossBars.put(id, lv);
         return lv;
     }
 
-    public void remove(CommandBossBar arg) {
-        this.commandBossBars.remove(arg.getId());
+    public void remove(CommandBossBar bossBar) {
+        this.commandBossBars.remove(bossBar.getId());
     }
 
     public Collection<Identifier> getIds() {
@@ -51,22 +51,22 @@ public class BossBarManager {
         return lv;
     }
 
-    public void fromTag(CompoundTag arg) {
-        for (String string : arg.getKeys()) {
+    public void fromTag(CompoundTag tag) {
+        for (String string : tag.getKeys()) {
             Identifier lv = new Identifier(string);
-            this.commandBossBars.put(lv, CommandBossBar.fromTag(arg.getCompound(string), lv));
+            this.commandBossBars.put(lv, CommandBossBar.fromTag(tag.getCompound(string), lv));
         }
     }
 
-    public void onPlayerConnect(ServerPlayerEntity arg) {
+    public void onPlayerConnect(ServerPlayerEntity player) {
         for (CommandBossBar lv : this.commandBossBars.values()) {
-            lv.onPlayerConnect(arg);
+            lv.onPlayerConnect(player);
         }
     }
 
-    public void onPlayerDisconnect(ServerPlayerEntity arg) {
+    public void onPlayerDisconnect(ServerPlayerEntity player) {
         for (CommandBossBar lv : this.commandBossBars.values()) {
-            lv.onPlayerDisconnect(arg);
+            lv.onPlayerDisconnect(player);
         }
     }
 }

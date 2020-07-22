@@ -14,109 +14,109 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.class_5411;
-import net.minecraft.class_5421;
 import net.minecraft.recipe.Recipe;
+import net.minecraft.recipe.book.RecipeBookCategory;
+import net.minecraft.recipe.book.RecipeBookOptions;
 import net.minecraft.screen.AbstractRecipeScreenHandler;
 import net.minecraft.util.Identifier;
 
 public class RecipeBook {
     protected final Set<Identifier> recipes = Sets.newHashSet();
     protected final Set<Identifier> toBeDisplayed = Sets.newHashSet();
-    private final class_5411 field_25734 = new class_5411();
+    private final RecipeBookOptions options = new RecipeBookOptions();
 
-    public void copyFrom(RecipeBook arg) {
+    public void copyFrom(RecipeBook book) {
         this.recipes.clear();
         this.toBeDisplayed.clear();
-        this.field_25734.method_30179(arg.field_25734);
-        this.recipes.addAll(arg.recipes);
-        this.toBeDisplayed.addAll(arg.toBeDisplayed);
+        this.options.copyFrom(book.options);
+        this.recipes.addAll(book.recipes);
+        this.toBeDisplayed.addAll(book.toBeDisplayed);
     }
 
-    public void add(Recipe<?> arg) {
-        if (!arg.isIgnoredInRecipeBook()) {
-            this.add(arg.getId());
+    public void add(Recipe<?> recipe) {
+        if (!recipe.isIgnoredInRecipeBook()) {
+            this.add(recipe.getId());
         }
     }
 
-    protected void add(Identifier arg) {
-        this.recipes.add(arg);
+    protected void add(Identifier id) {
+        this.recipes.add(id);
     }
 
-    public boolean contains(@Nullable Recipe<?> arg) {
-        if (arg == null) {
+    public boolean contains(@Nullable Recipe<?> recipe) {
+        if (recipe == null) {
             return false;
         }
-        return this.recipes.contains(arg.getId());
+        return this.recipes.contains(recipe.getId());
     }
 
-    public boolean contains(Identifier arg) {
-        return this.recipes.contains(arg);
-    }
-
-    @Environment(value=EnvType.CLIENT)
-    public void remove(Recipe<?> arg) {
-        this.remove(arg.getId());
-    }
-
-    protected void remove(Identifier arg) {
-        this.recipes.remove(arg);
-        this.toBeDisplayed.remove(arg);
+    public boolean contains(Identifier id) {
+        return this.recipes.contains(id);
     }
 
     @Environment(value=EnvType.CLIENT)
-    public boolean shouldDisplay(Recipe<?> arg) {
-        return this.toBeDisplayed.contains(arg.getId());
+    public void remove(Recipe<?> recipe) {
+        this.remove(recipe.getId());
     }
 
-    public void onRecipeDisplayed(Recipe<?> arg) {
-        this.toBeDisplayed.remove(arg.getId());
-    }
-
-    public void display(Recipe<?> arg) {
-        this.display(arg.getId());
-    }
-
-    protected void display(Identifier arg) {
-        this.toBeDisplayed.add(arg);
+    protected void remove(Identifier id) {
+        this.recipes.remove(id);
+        this.toBeDisplayed.remove(id);
     }
 
     @Environment(value=EnvType.CLIENT)
-    public boolean isGuiOpen(class_5421 arg) {
-        return this.field_25734.method_30180(arg);
+    public boolean shouldDisplay(Recipe<?> recipe) {
+        return this.toBeDisplayed.contains(recipe.getId());
+    }
+
+    public void onRecipeDisplayed(Recipe<?> recipe) {
+        this.toBeDisplayed.remove(recipe.getId());
+    }
+
+    public void display(Recipe<?> recipe) {
+        this.display(recipe.getId());
+    }
+
+    protected void display(Identifier id) {
+        this.toBeDisplayed.add(id);
     }
 
     @Environment(value=EnvType.CLIENT)
-    public void setGuiOpen(class_5421 arg, boolean bl) {
-        this.field_25734.method_30181(arg, bl);
+    public boolean isGuiOpen(RecipeBookCategory category) {
+        return this.options.isGuiOpen(category);
     }
 
     @Environment(value=EnvType.CLIENT)
-    public boolean isFilteringCraftable(AbstractRecipeScreenHandler<?> arg) {
-        return this.method_30176(arg.method_30264());
+    public void setGuiOpen(RecipeBookCategory category, boolean open) {
+        this.options.setGuiOpen(category, open);
     }
 
     @Environment(value=EnvType.CLIENT)
-    public boolean method_30176(class_5421 arg) {
-        return this.field_25734.method_30187(arg);
+    public boolean isFilteringCraftable(AbstractRecipeScreenHandler<?> handler) {
+        return this.isFilteringCraftable(handler.getCategory());
     }
 
     @Environment(value=EnvType.CLIENT)
-    public void method_30177(class_5421 arg, boolean bl) {
-        this.field_25734.method_30188(arg, bl);
+    public boolean isFilteringCraftable(RecipeBookCategory category) {
+        return this.options.isFilteringCraftable(category);
     }
 
-    public void method_30174(class_5411 arg) {
-        this.field_25734.method_30179(arg);
+    @Environment(value=EnvType.CLIENT)
+    public void setFilteringCraftable(RecipeBookCategory category, boolean filteringCraftable) {
+        this.options.setFilteringCraftable(category, filteringCraftable);
     }
 
-    public class_5411 method_30173() {
-        return this.field_25734.method_30178();
+    public void setOptions(RecipeBookOptions options) {
+        this.options.copyFrom(options);
     }
 
-    public void method_30175(class_5421 arg, boolean bl, boolean bl2) {
-        this.field_25734.method_30181(arg, bl);
-        this.field_25734.method_30188(arg, bl2);
+    public RecipeBookOptions getOptions() {
+        return this.options.copy();
+    }
+
+    public void setCategoryOptions(RecipeBookCategory category, boolean guiOpen, boolean filteringCraftable) {
+        this.options.setGuiOpen(category, guiOpen);
+        this.options.setFilteringCraftable(category, filteringCraftable);
     }
 }
 

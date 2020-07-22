@@ -30,11 +30,11 @@ extends Screen {
     private final BooleanConsumer callback;
     private final Screen parent;
 
-    public DirectConnectScreen(Screen arg, BooleanConsumer booleanConsumer, ServerInfo arg2) {
+    public DirectConnectScreen(Screen parent, BooleanConsumer callback, ServerInfo server) {
         super(new TranslatableText("selectServer.direct"));
-        this.parent = arg;
-        this.serverEntry = arg2;
-        this.callback = booleanConsumer;
+        this.parent = parent;
+        this.serverEntry = server;
+        this.callback = callback;
     }
 
     @Override
@@ -43,12 +43,12 @@ extends Screen {
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (this.getFocused() == this.addressField && (i == 257 || i == 335)) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (this.getFocused() == this.addressField && (keyCode == 257 || keyCode == 335)) {
             this.saveAndClose();
             return true;
         }
-        return super.keyPressed(i, j, k);
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
@@ -60,16 +60,16 @@ extends Screen {
         this.addressField.setMaxLength(128);
         this.addressField.setSelected(true);
         this.addressField.setText(this.client.options.lastServer);
-        this.addressField.setChangedListener(string -> this.onAddressFieldChanged());
+        this.addressField.setChangedListener(text -> this.onAddressFieldChanged());
         this.children.add(this.addressField);
         this.setInitialFocus(this.addressField);
         this.onAddressFieldChanged();
     }
 
     @Override
-    public void resize(MinecraftClient arg, int i, int j) {
+    public void resize(MinecraftClient client, int width, int height) {
         String string = this.addressField.getText();
-        this.init(arg, i, j);
+        this.init(client, width, height);
         this.addressField.setText(string);
     }
 
@@ -96,12 +96,12 @@ extends Screen {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.renderBackground(arg);
-        this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 20, 0xFFFFFF);
-        this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("addServer.enterIp", new Object[0]), this.width / 2 - 100, 100, 0xA0A0A0);
-        this.addressField.render(arg, i, j, f);
-        super.render(arg, i, j, f);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.renderBackground(matrices);
+        this.drawCenteredText(matrices, this.textRenderer, this.title, this.width / 2, 20, 0xFFFFFF);
+        this.drawStringWithShadow(matrices, this.textRenderer, I18n.translate("addServer.enterIp", new Object[0]), this.width / 2 - 100, 100, 0xA0A0A0);
+        this.addressField.render(matrices, mouseX, mouseY, delta);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 }
 

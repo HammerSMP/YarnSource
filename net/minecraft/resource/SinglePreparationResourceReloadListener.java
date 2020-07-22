@@ -12,8 +12,8 @@ import net.minecraft.util.profiler.Profiler;
 public abstract class SinglePreparationResourceReloadListener<T>
 implements ResourceReloadListener {
     @Override
-    public final CompletableFuture<Void> reload(ResourceReloadListener.Synchronizer arg, ResourceManager arg2, Profiler arg3, Profiler arg4, Executor executor, Executor executor2) {
-        return ((CompletableFuture)CompletableFuture.supplyAsync(() -> this.prepare(arg2, arg3), executor).thenCompose(arg::whenPrepared)).thenAcceptAsync(object -> this.apply(object, arg2, arg4), executor2);
+    public final CompletableFuture<Void> reload(ResourceReloadListener.Synchronizer synchronizer, ResourceManager manager, Profiler prepareProfiler, Profiler applyProfiler, Executor prepareExecutor, Executor applyExecutor) {
+        return ((CompletableFuture)CompletableFuture.supplyAsync(() -> this.prepare(manager, prepareProfiler), prepareExecutor).thenCompose(synchronizer::whenPrepared)).thenAcceptAsync(object -> this.apply(object, manager, applyProfiler), applyExecutor);
     }
 
     protected abstract T prepare(ResourceManager var1, Profiler var2);

@@ -64,6 +64,7 @@ import net.minecraft.network.DecoderHandler;
 import net.minecraft.network.LegacyQueryHandler;
 import net.minecraft.network.NetworkSide;
 import net.minecraft.network.PacketEncoder;
+import net.minecraft.network.RateLimitedConnection;
 import net.minecraft.network.SizePrepender;
 import net.minecraft.network.SplitterHandler;
 import net.minecraft.network.packet.s2c.play.DisconnectS2CPacket;
@@ -86,15 +87,15 @@ public class ServerNetworkIo {
     private final List<ChannelFuture> channels = Collections.synchronizedList(Lists.newArrayList());
     private final List<ClientConnection> connections = Collections.synchronizedList(Lists.newArrayList());
 
-    public ServerNetworkIo(MinecraftServer minecraftServer) {
-        this.server = minecraftServer;
+    public ServerNetworkIo(MinecraftServer server) {
+        this.server = server;
         this.active = true;
     }
 
     /*
      * WARNING - Removed try catching itself - possible behaviour change.
      */
-    public void bind(@Nullable InetAddress inetAddress, int i) throws IOException {
+    public void bind(@Nullable InetAddress address, int port) throws IOException {
         List<ChannelFuture> list = this.channels;
         synchronized (list) {
             Lazy<NioEventLoopGroup> lv2;
@@ -118,12 +119,13 @@ public class ServerNetworkIo {
                         // empty catch block
                     }
                     channel.pipeline().addLast("timeout", (ChannelHandler)new ReadTimeoutHandler(30)).addLast("legacy_query", (ChannelHandler)new LegacyQueryHandler(ServerNetworkIo.this)).addLast("splitter", (ChannelHandler)new SplitterHandler()).addLast("decoder", (ChannelHandler)new DecoderHandler(NetworkSide.SERVERBOUND)).addLast("prepender", (ChannelHandler)new SizePrepender()).addLast("encoder", (ChannelHandler)new PacketEncoder(NetworkSide.CLIENTBOUND));
-                    ClientConnection lv = new ClientConnection(NetworkSide.SERVERBOUND);
+                    int i = ServerNetworkIo.this.server.getRateLimit();
+                    ClientConnection lv = i > 0 ? new RateLimitedConnection(i) : new ClientConnection(NetworkSide.SERVERBOUND);
                     ServerNetworkIo.this.connections.add(lv);
                     channel.pipeline().addLast("packet_handler", (ChannelHandler)lv);
                     lv.setPacketListener(new ServerHandshakeNetworkHandler(ServerNetworkIo.this.server, lv));
                 }
-            }).group((EventLoopGroup)lv2.get()).localAddress(inetAddress, i)).bind().syncUninterruptibly());
+            }).group((EventLoopGroup)lv2.get()).localAddress(address, port)).bind().syncUninterruptibly());
         }
     }
 

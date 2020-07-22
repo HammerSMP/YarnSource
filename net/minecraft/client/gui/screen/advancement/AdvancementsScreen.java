@@ -39,9 +39,9 @@ implements ClientAdvancementManager.Listener {
     private AdvancementTab selectedTab;
     private boolean movingTab;
 
-    public AdvancementsScreen(ClientAdvancementManager arg) {
+    public AdvancementsScreen(ClientAdvancementManager advancementHandler) {
         super(NarratorManager.EMPTY);
-        this.advancementHandler = arg;
+        this.advancementHandler = advancementHandler;
     }
 
     @Override
@@ -66,54 +66,54 @@ implements ClientAdvancementManager.Listener {
     }
 
     @Override
-    public boolean mouseClicked(double d, double e, int i) {
-        if (i == 0) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (button == 0) {
             int j = (this.width - 252) / 2;
             int k = (this.height - 140) / 2;
             for (AdvancementTab lv : this.tabs.values()) {
-                if (!lv.isClickOnTab(j, k, d, e)) continue;
+                if (!lv.isClickOnTab(j, k, mouseX, mouseY)) continue;
                 this.advancementHandler.selectTab(lv.getRoot(), true);
                 break;
             }
         }
-        return super.mouseClicked(d, e, i);
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (this.client.options.keyAdvancements.matchesKey(i, j)) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (this.client.options.keyAdvancements.matchesKey(keyCode, scanCode)) {
             this.client.openScreen(null);
             this.client.mouse.lockCursor();
             return true;
         }
-        return super.keyPressed(i, j, k);
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         int k = (this.width - 252) / 2;
         int l = (this.height - 140) / 2;
-        this.renderBackground(arg);
-        this.drawAdvancementTree(arg, i, j, k, l);
-        this.drawWidgets(arg, k, l);
-        this.drawWidgetTooltip(arg, i, j, k, l);
+        this.renderBackground(matrices);
+        this.drawAdvancementTree(matrices, mouseX, mouseY, k, l);
+        this.drawWidgets(matrices, k, l);
+        this.drawWidgetTooltip(matrices, mouseX, mouseY, k, l);
     }
 
     @Override
-    public boolean mouseDragged(double d, double e, int i, double f, double g) {
-        if (i != 0) {
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+        if (button != 0) {
             this.movingTab = false;
             return false;
         }
         if (!this.movingTab) {
             this.movingTab = true;
         } else if (this.selectedTab != null) {
-            this.selectedTab.move(f, g);
+            this.selectedTab.move(deltaX, deltaY);
         }
         return true;
     }
 
-    private void drawAdvancementTree(MatrixStack arg, int i, int j, int k, int l) {
+    private void drawAdvancementTree(MatrixStack arg, int mouseY, int j, int k, int l) {
         AdvancementTab lv = this.selectedTab;
         if (lv == null) {
             AdvancementsScreen.fill(arg, k + 9, l + 18, k + 9 + 234, l + 18 + 113, -16777216);
@@ -172,41 +172,41 @@ implements ClientAdvancementManager.Listener {
     }
 
     @Override
-    public void onRootAdded(Advancement arg) {
-        AdvancementTab lv = AdvancementTab.create(this.client, this, this.tabs.size(), arg);
+    public void onRootAdded(Advancement root) {
+        AdvancementTab lv = AdvancementTab.create(this.client, this, this.tabs.size(), root);
         if (lv == null) {
             return;
         }
-        this.tabs.put(arg, lv);
+        this.tabs.put(root, lv);
     }
 
     @Override
-    public void onRootRemoved(Advancement arg) {
+    public void onRootRemoved(Advancement root) {
     }
 
     @Override
-    public void onDependentAdded(Advancement arg) {
-        AdvancementTab lv = this.getTab(arg);
+    public void onDependentAdded(Advancement dependent) {
+        AdvancementTab lv = this.getTab(dependent);
         if (lv != null) {
-            lv.addAdvancement(arg);
+            lv.addAdvancement(dependent);
         }
     }
 
     @Override
-    public void onDependentRemoved(Advancement arg) {
+    public void onDependentRemoved(Advancement dependent) {
     }
 
     @Override
-    public void setProgress(Advancement arg, AdvancementProgress arg2) {
-        AdvancementWidget lv = this.getAdvancementWidget(arg);
+    public void setProgress(Advancement advancement, AdvancementProgress progress) {
+        AdvancementWidget lv = this.getAdvancementWidget(advancement);
         if (lv != null) {
-            lv.setProgress(arg2);
+            lv.setProgress(progress);
         }
     }
 
     @Override
-    public void selectTab(@Nullable Advancement arg) {
-        this.selectedTab = this.tabs.get(arg);
+    public void selectTab(@Nullable Advancement advancement) {
+        this.selectedTab = this.tabs.get(advancement);
     }
 
     @Override
@@ -216,17 +216,17 @@ implements ClientAdvancementManager.Listener {
     }
 
     @Nullable
-    public AdvancementWidget getAdvancementWidget(Advancement arg) {
-        AdvancementTab lv = this.getTab(arg);
-        return lv == null ? null : lv.getWidget(arg);
+    public AdvancementWidget getAdvancementWidget(Advancement advancement) {
+        AdvancementTab lv = this.getTab(advancement);
+        return lv == null ? null : lv.getWidget(advancement);
     }
 
     @Nullable
-    private AdvancementTab getTab(Advancement arg) {
-        while (arg.getParent() != null) {
-            arg = arg.getParent();
+    private AdvancementTab getTab(Advancement advancement) {
+        while (advancement.getParent() != null) {
+            advancement = advancement.getParent();
         }
-        return this.tabs.get(arg);
+        return this.tabs.get(advancement);
     }
 }
 

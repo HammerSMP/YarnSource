@@ -30,38 +30,38 @@ extends Block {
     }
 
     @Override
-    public void onSteppedOn(World arg, BlockPos arg2, Entity arg3) {
-        if (!arg3.isFireImmune() && arg3 instanceof LivingEntity && !EnchantmentHelper.hasFrostWalker((LivingEntity)arg3)) {
-            arg3.damage(DamageSource.HOT_FLOOR, 1.0f);
+    public void onSteppedOn(World world, BlockPos pos, Entity entity) {
+        if (!entity.isFireImmune() && entity instanceof LivingEntity && !EnchantmentHelper.hasFrostWalker((LivingEntity)entity)) {
+            entity.damage(DamageSource.HOT_FLOOR, 1.0f);
         }
-        super.onSteppedOn(arg, arg2, arg3);
+        super.onSteppedOn(world, pos, entity);
     }
 
     @Override
-    public void scheduledTick(BlockState arg, ServerWorld arg2, BlockPos arg3, Random random) {
-        BubbleColumnBlock.update(arg2, arg3.up(), true);
+    public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        BubbleColumnBlock.update(world, pos.up(), true);
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
-        if (arg2 == Direction.UP && arg3.isOf(Blocks.WATER)) {
-            arg4.getBlockTickScheduler().schedule(arg5, this, 20);
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
+        if (direction == Direction.UP && newState.isOf(Blocks.WATER)) {
+            world.getBlockTickScheduler().schedule(pos, this, 20);
         }
-        return super.getStateForNeighborUpdate(arg, arg2, arg3, arg4, arg5, arg6);
+        return super.getStateForNeighborUpdate(state, direction, newState, world, pos, posFrom);
     }
 
     @Override
-    public void randomTick(BlockState arg, ServerWorld arg2, BlockPos arg3, Random random) {
-        BlockPos lv = arg3.up();
-        if (arg2.getFluidState(arg3).isIn(FluidTags.WATER)) {
-            arg2.playSound(null, arg3, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.BLOCKS, 0.5f, 2.6f + (arg2.random.nextFloat() - arg2.random.nextFloat()) * 0.8f);
-            arg2.spawnParticles(ParticleTypes.LARGE_SMOKE, (double)lv.getX() + 0.5, (double)lv.getY() + 0.25, (double)lv.getZ() + 0.5, 8, 0.5, 0.25, 0.5, 0.0);
+    public void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        BlockPos lv = pos.up();
+        if (world.getFluidState(pos).isIn(FluidTags.WATER)) {
+            world.playSound(null, pos, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.BLOCKS, 0.5f, 2.6f + (world.random.nextFloat() - world.random.nextFloat()) * 0.8f);
+            world.spawnParticles(ParticleTypes.LARGE_SMOKE, (double)lv.getX() + 0.5, (double)lv.getY() + 0.25, (double)lv.getZ() + 0.5, 8, 0.5, 0.25, 0.5, 0.0);
         }
     }
 
     @Override
-    public void onBlockAdded(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
-        arg2.getBlockTickScheduler().schedule(arg3, this, 20);
+    public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
+        world.getBlockTickScheduler().schedule(pos, this, 20);
     }
 }
 

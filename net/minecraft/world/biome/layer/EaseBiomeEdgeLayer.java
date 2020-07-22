@@ -3,7 +3,7 @@
  */
 package net.minecraft.world.biome.layer;
 
-import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.BuiltinRegistries;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.biome.layer.BiomeLayers;
@@ -32,23 +32,23 @@ public enum EaseBiomeEdgeLayer implements CrossSamplingLayer
     private static final int SNOWY_TAIGA_ID;
 
     @Override
-    public int sample(LayerRandomnessSource arg, int i, int j, int k, int l, int m) {
+    public int sample(LayerRandomnessSource context, int n, int e, int s, int w, int center) {
         int[] is = new int[1];
-        if (this.method_15841(is, i, j, k, l, m, MOUNTAINS_ID, MOUNTAIN_EDGE_ID) || this.method_15840(is, i, j, k, l, m, WOODED_BADLANDS_PLATEAU_ID, BADLANDS_ID) || this.method_15840(is, i, j, k, l, m, BADLANDS_PLATEAU_ID, BADLANDS_ID) || this.method_15840(is, i, j, k, l, m, GIANT_TREE_TAIGA_ID, TAIGA_ID)) {
+        if (this.method_15841(is, n, e, s, w, center, MOUNTAINS_ID, MOUNTAIN_EDGE_ID) || this.method_15840(is, n, e, s, w, center, WOODED_BADLANDS_PLATEAU_ID, BADLANDS_ID) || this.method_15840(is, n, e, s, w, center, BADLANDS_PLATEAU_ID, BADLANDS_ID) || this.method_15840(is, n, e, s, w, center, GIANT_TREE_TAIGA_ID, TAIGA_ID)) {
             return is[0];
         }
-        if (m == DESERT_ID && (i == SNOWY_TUNDRA_ID || j == SNOWY_TUNDRA_ID || l == SNOWY_TUNDRA_ID || k == SNOWY_TUNDRA_ID)) {
+        if (center == DESERT_ID && (n == SNOWY_TUNDRA_ID || e == SNOWY_TUNDRA_ID || w == SNOWY_TUNDRA_ID || s == SNOWY_TUNDRA_ID)) {
             return WOODED_MOUNTAINS_ID;
         }
-        if (m == SWAMP_ID) {
-            if (i == DESERT_ID || j == DESERT_ID || l == DESERT_ID || k == DESERT_ID || i == SNOWY_TAIGA_ID || j == SNOWY_TAIGA_ID || l == SNOWY_TAIGA_ID || k == SNOWY_TAIGA_ID || i == SNOWY_TUNDRA_ID || j == SNOWY_TUNDRA_ID || l == SNOWY_TUNDRA_ID || k == SNOWY_TUNDRA_ID) {
+        if (center == SWAMP_ID) {
+            if (n == DESERT_ID || e == DESERT_ID || w == DESERT_ID || s == DESERT_ID || n == SNOWY_TAIGA_ID || e == SNOWY_TAIGA_ID || w == SNOWY_TAIGA_ID || s == SNOWY_TAIGA_ID || n == SNOWY_TUNDRA_ID || e == SNOWY_TUNDRA_ID || w == SNOWY_TUNDRA_ID || s == SNOWY_TUNDRA_ID) {
                 return PLAINS_ID;
             }
-            if (i == JUNGLE_ID || k == JUNGLE_ID || j == JUNGLE_ID || l == JUNGLE_ID || i == BAMBOO_JUNGLE_ID || k == BAMBOO_JUNGLE_ID || j == BAMBOO_JUNGLE_ID || l == BAMBOO_JUNGLE_ID) {
+            if (n == JUNGLE_ID || s == JUNGLE_ID || e == JUNGLE_ID || w == JUNGLE_ID || n == BAMBOO_JUNGLE_ID || s == BAMBOO_JUNGLE_ID || e == BAMBOO_JUNGLE_ID || w == BAMBOO_JUNGLE_ID) {
                 return JUNGLE_EDGE_ID;
             }
         }
-        return m;
+        return center;
     }
 
     private boolean method_15841(int[] is, int i, int j, int k, int l, int m, int n, int o) {
@@ -71,8 +71,8 @@ public enum EaseBiomeEdgeLayer implements CrossSamplingLayer
         if (BiomeLayers.areSimilar(i, j)) {
             return true;
         }
-        Biome lv = (Biome)Registry.BIOME.get(i);
-        Biome lv2 = (Biome)Registry.BIOME.get(j);
+        Biome lv = (Biome)BuiltinRegistries.BIOME.get(i);
+        Biome lv2 = (Biome)BuiltinRegistries.BIOME.get(j);
         if (lv != null && lv2 != null) {
             Biome.TemperatureGroup lv4;
             Biome.TemperatureGroup lv3 = lv.getTemperatureGroup();
@@ -82,22 +82,22 @@ public enum EaseBiomeEdgeLayer implements CrossSamplingLayer
     }
 
     static {
-        DESERT_ID = Registry.BIOME.getRawId(Biomes.DESERT);
-        MOUNTAINS_ID = Registry.BIOME.getRawId(Biomes.MOUNTAINS);
-        WOODED_MOUNTAINS_ID = Registry.BIOME.getRawId(Biomes.WOODED_MOUNTAINS);
-        SNOWY_TUNDRA_ID = Registry.BIOME.getRawId(Biomes.SNOWY_TUNDRA);
-        JUNGLE_ID = Registry.BIOME.getRawId(Biomes.JUNGLE);
-        BAMBOO_JUNGLE_ID = Registry.BIOME.getRawId(Biomes.BAMBOO_JUNGLE);
-        JUNGLE_EDGE_ID = Registry.BIOME.getRawId(Biomes.JUNGLE_EDGE);
-        BADLANDS_ID = Registry.BIOME.getRawId(Biomes.BADLANDS);
-        BADLANDS_PLATEAU_ID = Registry.BIOME.getRawId(Biomes.BADLANDS_PLATEAU);
-        WOODED_BADLANDS_PLATEAU_ID = Registry.BIOME.getRawId(Biomes.WOODED_BADLANDS_PLATEAU);
-        PLAINS_ID = Registry.BIOME.getRawId(Biomes.PLAINS);
-        GIANT_TREE_TAIGA_ID = Registry.BIOME.getRawId(Biomes.GIANT_TREE_TAIGA);
-        MOUNTAIN_EDGE_ID = Registry.BIOME.getRawId(Biomes.MOUNTAIN_EDGE);
-        SWAMP_ID = Registry.BIOME.getRawId(Biomes.SWAMP);
-        TAIGA_ID = Registry.BIOME.getRawId(Biomes.TAIGA);
-        SNOWY_TAIGA_ID = Registry.BIOME.getRawId(Biomes.SNOWY_TAIGA);
+        DESERT_ID = BuiltinRegistries.BIOME.getRawId(Biomes.DESERT);
+        MOUNTAINS_ID = BuiltinRegistries.BIOME.getRawId(Biomes.MOUNTAINS);
+        WOODED_MOUNTAINS_ID = BuiltinRegistries.BIOME.getRawId(Biomes.WOODED_MOUNTAINS);
+        SNOWY_TUNDRA_ID = BuiltinRegistries.BIOME.getRawId(Biomes.SNOWY_TUNDRA);
+        JUNGLE_ID = BuiltinRegistries.BIOME.getRawId(Biomes.JUNGLE);
+        BAMBOO_JUNGLE_ID = BuiltinRegistries.BIOME.getRawId(Biomes.BAMBOO_JUNGLE);
+        JUNGLE_EDGE_ID = BuiltinRegistries.BIOME.getRawId(Biomes.JUNGLE_EDGE);
+        BADLANDS_ID = BuiltinRegistries.BIOME.getRawId(Biomes.BADLANDS);
+        BADLANDS_PLATEAU_ID = BuiltinRegistries.BIOME.getRawId(Biomes.BADLANDS_PLATEAU);
+        WOODED_BADLANDS_PLATEAU_ID = BuiltinRegistries.BIOME.getRawId(Biomes.WOODED_BADLANDS_PLATEAU);
+        PLAINS_ID = BuiltinRegistries.BIOME.getRawId(Biomes.PLAINS);
+        GIANT_TREE_TAIGA_ID = BuiltinRegistries.BIOME.getRawId(Biomes.GIANT_TREE_TAIGA);
+        MOUNTAIN_EDGE_ID = BuiltinRegistries.BIOME.getRawId(Biomes.MOUNTAIN_EDGE);
+        SWAMP_ID = BuiltinRegistries.BIOME.getRawId(Biomes.SWAMP);
+        TAIGA_ID = BuiltinRegistries.BIOME.getRawId(Biomes.TAIGA);
+        SNOWY_TAIGA_ID = BuiltinRegistries.BIOME.getRawId(Biomes.SNOWY_TAIGA);
     }
 }
 

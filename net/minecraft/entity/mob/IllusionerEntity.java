@@ -92,9 +92,9 @@ implements RangedAttackMob {
     }
 
     @Override
-    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(class_5425 arg, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable CompoundTag entityTag) {
         this.equipStack(EquipmentSlot.MAINHAND, new ItemStack(Items.BOW));
-        return super.initialize(arg, arg2, arg3, arg4, arg5);
+        return super.initialize(arg, difficulty, spawnReason, entityData, entityTag);
     }
 
     @Override
@@ -158,12 +158,12 @@ implements RangedAttackMob {
     }
 
     @Override
-    public boolean isTeammate(Entity arg) {
-        if (super.isTeammate(arg)) {
+    public boolean isTeammate(Entity other) {
+        if (super.isTeammate(other)) {
             return true;
         }
-        if (arg instanceof LivingEntity && ((LivingEntity)arg).getGroup() == EntityGroup.ILLAGER) {
-            return this.getScoreboardTeam() == null && arg.getScoreboardTeam() == null;
+        if (other instanceof LivingEntity && ((LivingEntity)other).getGroup() == EntityGroup.ILLAGER) {
+            return this.getScoreboardTeam() == null && other.getScoreboardTeam() == null;
         }
         return false;
     }
@@ -179,7 +179,7 @@ implements RangedAttackMob {
     }
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource arg) {
+    protected SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.ENTITY_ILLUSIONER_HURT;
     }
 
@@ -189,16 +189,16 @@ implements RangedAttackMob {
     }
 
     @Override
-    public void addBonusForWave(int i, boolean bl) {
+    public void addBonusForWave(int wave, boolean unused) {
     }
 
     @Override
-    public void attack(LivingEntity arg, float f) {
+    public void attack(LivingEntity target, float pullProgress) {
         ItemStack lv = this.getArrowType(this.getStackInHand(ProjectileUtil.getHandPossiblyHolding(this, Items.BOW)));
-        PersistentProjectileEntity lv2 = ProjectileUtil.createArrowProjectile(this, lv, f);
-        double d = arg.getX() - this.getX();
-        double e = arg.getBodyY(0.3333333333333333) - lv2.getY();
-        double g = arg.getZ() - this.getZ();
+        PersistentProjectileEntity lv2 = ProjectileUtil.createArrowProjectile(this, lv, pullProgress);
+        double d = target.getX() - this.getX();
+        double e = target.getBodyY(0.3333333333333333) - lv2.getY();
+        double g = target.getZ() - this.getZ();
         double h = MathHelper.sqrt(d * d + g * g);
         lv2.setVelocity(d, e + h * (double)0.2f, g, 1.6f, 14 - this.world.getDifficulty().getId() * 4);
         this.playSound(SoundEvents.ENTITY_SKELETON_SHOOT, 1.0f, 1.0f / (this.getRandom().nextFloat() * 0.4f + 0.8f));

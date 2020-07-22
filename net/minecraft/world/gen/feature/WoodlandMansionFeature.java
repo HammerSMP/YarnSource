@@ -21,6 +21,7 @@ import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.registry.DynamicRegistryManager;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.biome.Biome;
@@ -38,7 +39,7 @@ extends StructureFeature<DefaultFeatureConfig> {
     }
 
     @Override
-    protected boolean method_27219() {
+    protected boolean isUniformDistribution() {
         return false;
     }
 
@@ -64,7 +65,7 @@ extends StructureFeature<DefaultFeatureConfig> {
         }
 
         @Override
-        public void init(ChunkGenerator arg, StructureManager arg2, int i, int j, Biome arg3, DefaultFeatureConfig arg4) {
+        public void init(DynamicRegistryManager arg, ChunkGenerator arg2, StructureManager arg3, int i, int j, Biome arg4, DefaultFeatureConfig arg5) {
             BlockRotation lv = BlockRotation.random(this.random);
             int k = 5;
             int l = 5;
@@ -78,17 +79,17 @@ extends StructureFeature<DefaultFeatureConfig> {
             }
             int m = (i << 4) + 7;
             int n = (j << 4) + 7;
-            int o = arg.getHeightInGround(m, n, Heightmap.Type.WORLD_SURFACE_WG);
-            int p = arg.getHeightInGround(m, n + l, Heightmap.Type.WORLD_SURFACE_WG);
-            int q = arg.getHeightInGround(m + k, n, Heightmap.Type.WORLD_SURFACE_WG);
-            int r = arg.getHeightInGround(m + k, n + l, Heightmap.Type.WORLD_SURFACE_WG);
+            int o = arg2.getHeightInGround(m, n, Heightmap.Type.WORLD_SURFACE_WG);
+            int p = arg2.getHeightInGround(m, n + l, Heightmap.Type.WORLD_SURFACE_WG);
+            int q = arg2.getHeightInGround(m + k, n, Heightmap.Type.WORLD_SURFACE_WG);
+            int r = arg2.getHeightInGround(m + k, n + l, Heightmap.Type.WORLD_SURFACE_WG);
             int s = Math.min(Math.min(o, p), Math.min(q, r));
             if (s < 60) {
                 return;
             }
             BlockPos lv2 = new BlockPos(i * 16 + 8, s + 1, j * 16 + 8);
             LinkedList list = Lists.newLinkedList();
-            WoodlandMansionGenerator.addPieces(arg2, lv2, lv, list, this.random);
+            WoodlandMansionGenerator.addPieces(arg3, lv2, lv, list, this.random);
             this.children.addAll(list);
             this.setBoundingBoxFromChildren();
         }

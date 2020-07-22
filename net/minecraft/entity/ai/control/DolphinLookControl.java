@@ -11,9 +11,9 @@ public class DolphinLookControl
 extends LookControl {
     private final int maxYawDifference;
 
-    public DolphinLookControl(MobEntity arg, int i) {
-        super(arg);
-        this.maxYawDifference = i;
+    public DolphinLookControl(MobEntity entity, int maxYawDifference) {
+        super(entity);
+        this.maxYawDifference = maxYawDifference;
     }
 
     @Override

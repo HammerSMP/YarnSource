@@ -12,7 +12,7 @@ import net.minecraft.util.registry.RegistryKey;
 
 public abstract class MutableRegistry<T>
 extends Registry<T> {
-    public MutableRegistry(RegistryKey<Registry<T>> arg, Lifecycle lifecycle) {
+    public MutableRegistry(RegistryKey<? extends Registry<T>> arg, Lifecycle lifecycle) {
         super(arg, lifecycle);
     }
 

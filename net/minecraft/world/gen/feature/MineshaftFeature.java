@@ -17,6 +17,7 @@ import net.minecraft.structure.StructureStart;
 import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.registry.DynamicRegistryManager;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.source.BiomeSource;
 import net.minecraft.world.gen.ChunkRandom;
@@ -49,20 +50,20 @@ extends StructureFeature<MineshaftFeatureConfig> {
         }
 
         @Override
-        public void init(ChunkGenerator arg, StructureManager arg2, int i, int j, Biome arg3, MineshaftFeatureConfig arg4) {
-            MineshaftGenerator.MineshaftRoom lv = new MineshaftGenerator.MineshaftRoom(0, this.random, (i << 4) + 2, (j << 4) + 2, arg4.type);
+        public void init(DynamicRegistryManager arg, ChunkGenerator arg2, StructureManager arg3, int i, int j, Biome arg4, MineshaftFeatureConfig arg5) {
+            MineshaftGenerator.MineshaftRoom lv = new MineshaftGenerator.MineshaftRoom(0, this.random, (i << 4) + 2, (j << 4) + 2, arg5.type);
             this.children.add(lv);
             lv.placeJigsaw(lv, this.children, this.random);
             this.setBoundingBoxFromChildren();
-            if (arg4.type == Type.MESA) {
+            if (arg5.type == Type.MESA) {
                 int k = -5;
-                int l = arg.getSeaLevel() - this.boundingBox.maxY + this.boundingBox.getBlockCountY() / 2 - -5;
+                int l = arg2.getSeaLevel() - this.boundingBox.maxY + this.boundingBox.getBlockCountY() / 2 - -5;
                 this.boundingBox.offset(0, l, 0);
                 for (StructurePiece lv2 : this.children) {
                     lv2.translate(0, l, 0);
                 }
             } else {
-                this.method_14978(arg.getSeaLevel(), this.random, 10);
+                this.method_14978(arg2.getSeaLevel(), this.random, 10);
             }
         }
     }
@@ -84,15 +85,15 @@ extends StructureFeature<MineshaftFeatureConfig> {
             return this.name;
         }
 
-        private static Type byName(String string) {
-            return nameMap.get(string);
+        private static Type byName(String nam) {
+            return nameMap.get(nam);
         }
 
-        public static Type byIndex(int i) {
-            if (i < 0 || i >= Type.values().length) {
+        public static Type byIndex(int index) {
+            if (index < 0 || index >= Type.values().length) {
                 return NORMAL;
             }
-            return Type.values()[i];
+            return Type.values()[index];
         }
 
         @Override
@@ -101,7 +102,7 @@ extends StructureFeature<MineshaftFeatureConfig> {
         }
 
         static {
-            field_24839 = StringIdentifiable.method_28140(Type::values, Type::byName);
+            field_24839 = StringIdentifiable.createCodec(Type::values, Type::byName);
             nameMap = Arrays.stream(Type.values()).collect(Collectors.toMap(Type::getName, arg -> arg));
         }
     }

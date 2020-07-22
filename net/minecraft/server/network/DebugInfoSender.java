@@ -36,68 +36,68 @@ import org.apache.logging.log4j.Logger;
 public class DebugInfoSender {
     private static final Logger LOGGER = LogManager.getLogger();
 
-    public static void addGameTestMarker(ServerWorld arg, BlockPos arg2, String string, int i, int j) {
+    public static void addGameTestMarker(ServerWorld world, BlockPos pos, String message, int color, int duration) {
         PacketByteBuf lv = new PacketByteBuf(Unpooled.buffer());
-        lv.writeBlockPos(arg2);
-        lv.writeInt(i);
-        lv.writeString(string);
-        lv.writeInt(j);
-        DebugInfoSender.sendToAll(arg, lv, CustomPayloadS2CPacket.DEBUG_GAME_TEST_ADD_MARKER);
+        lv.writeBlockPos(pos);
+        lv.writeInt(color);
+        lv.writeString(message);
+        lv.writeInt(duration);
+        DebugInfoSender.sendToAll(world, lv, CustomPayloadS2CPacket.DEBUG_GAME_TEST_ADD_MARKER);
     }
 
-    public static void clearGameTestMarkers(ServerWorld arg) {
+    public static void clearGameTestMarkers(ServerWorld world) {
         PacketByteBuf lv = new PacketByteBuf(Unpooled.buffer());
-        DebugInfoSender.sendToAll(arg, lv, CustomPayloadS2CPacket.DEBUG_GAME_TEST_CLEAR);
+        DebugInfoSender.sendToAll(world, lv, CustomPayloadS2CPacket.DEBUG_GAME_TEST_CLEAR);
     }
 
-    public static void sendChunkWatchingChange(ServerWorld arg, ChunkPos arg2) {
+    public static void sendChunkWatchingChange(ServerWorld world, ChunkPos pos) {
     }
 
-    public static void sendPoiAddition(ServerWorld arg, BlockPos arg2) {
-        DebugInfoSender.method_24819(arg, arg2);
+    public static void sendPoiAddition(ServerWorld world, BlockPos pos) {
+        DebugInfoSender.method_24819(world, pos);
     }
 
-    public static void sendPoiRemoval(ServerWorld arg, BlockPos arg2) {
-        DebugInfoSender.method_24819(arg, arg2);
+    public static void sendPoiRemoval(ServerWorld world, BlockPos pos) {
+        DebugInfoSender.method_24819(world, pos);
     }
 
-    public static void sendPointOfInterest(ServerWorld arg, BlockPos arg2) {
-        DebugInfoSender.method_24819(arg, arg2);
+    public static void sendPointOfInterest(ServerWorld world, BlockPos pos) {
+        DebugInfoSender.method_24819(world, pos);
     }
 
     private static void method_24819(ServerWorld arg, BlockPos arg2) {
     }
 
-    public static void sendPathfindingData(World arg, MobEntity arg2, @Nullable Path arg3, float f) {
+    public static void sendPathfindingData(World world, MobEntity mob, @Nullable Path path, float nodeReachProximity) {
     }
 
-    public static void sendNeighborUpdate(World arg, BlockPos arg2) {
+    public static void sendNeighborUpdate(World world, BlockPos pos) {
     }
 
-    public static void sendStructureStart(ServerWorldAccess arg, StructureStart<?> arg2) {
+    public static void sendStructureStart(ServerWorldAccess arg, StructureStart<?> structureStart) {
     }
 
-    public static void sendGoalSelector(World arg, MobEntity arg2, GoalSelector arg3) {
-        if (!(arg instanceof ServerWorld)) {
+    public static void sendGoalSelector(World world, MobEntity mob, GoalSelector goalSelector) {
+        if (!(world instanceof ServerWorld)) {
             return;
         }
     }
 
-    public static void sendRaids(ServerWorld arg, Collection<Raid> collection) {
+    public static void sendRaids(ServerWorld server, Collection<Raid> raids) {
     }
 
-    public static void sendBrainDebugData(LivingEntity arg) {
+    public static void sendBrainDebugData(LivingEntity living) {
     }
 
-    public static void sendBeeDebugData(BeeEntity arg) {
+    public static void sendBeeDebugData(BeeEntity bee) {
     }
 
-    public static void sendBeehiveDebugData(BeehiveBlockEntity arg) {
+    public static void sendBeehiveDebugData(BeehiveBlockEntity beehive) {
     }
 
-    private static void sendToAll(ServerWorld arg, PacketByteBuf arg2, Identifier arg3) {
-        CustomPayloadS2CPacket lv = new CustomPayloadS2CPacket(arg3, arg2);
-        for (PlayerEntity playerEntity : arg.getWorld().getPlayers()) {
+    private static void sendToAll(ServerWorld world, PacketByteBuf buf, Identifier channel) {
+        CustomPayloadS2CPacket lv = new CustomPayloadS2CPacket(channel, buf);
+        for (PlayerEntity playerEntity : world.getWorld().getPlayers()) {
             ((ServerPlayerEntity)playerEntity).networkHandler.sendPacket(lv);
         }
     }

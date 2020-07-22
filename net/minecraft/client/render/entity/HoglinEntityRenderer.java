@@ -36,8 +36,8 @@ extends MobEntityRenderer<HoglinEntity, HoglinEntityModel<HoglinEntity>> {
     }
 
     @Override
-    protected /* synthetic */ boolean isShaking(LivingEntity arg) {
-        return this.isShaking((HoglinEntity)arg);
+    protected /* synthetic */ boolean isShaking(LivingEntity entity) {
+        return this.isShaking((HoglinEntity)entity);
     }
 }
 

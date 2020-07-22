@@ -23,16 +23,16 @@ extends BlockItem {
     }
 
     @Override
-    public ActionResult useOnBlock(ItemUsageContext arg) {
+    public ActionResult useOnBlock(ItemUsageContext context) {
         return ActionResult.PASS;
     }
 
     @Override
-    public TypedActionResult<ItemStack> use(World arg, PlayerEntity arg2, Hand arg3) {
-        BlockHitResult lv = LilyPadItem.rayTrace(arg, arg2, RayTraceContext.FluidHandling.SOURCE_ONLY);
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+        BlockHitResult lv = LilyPadItem.rayTrace(world, user, RayTraceContext.FluidHandling.SOURCE_ONLY);
         BlockHitResult lv2 = lv.method_29328(lv.getBlockPos().up());
-        ActionResult lv3 = super.useOnBlock(new ItemUsageContext(arg2, arg3, lv2));
-        return new TypedActionResult<ItemStack>(lv3, arg2.getStackInHand(arg3));
+        ActionResult lv3 = super.useOnBlock(new ItemUsageContext(user, hand, lv2));
+        return new TypedActionResult<ItemStack>(lv3, user.getStackInHand(hand));
     }
 }
 

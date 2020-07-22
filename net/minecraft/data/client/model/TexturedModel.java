@@ -42,9 +42,9 @@ public class TexturedModel {
     private final Texture texture;
     private final Model model;
 
-    private TexturedModel(Texture arg, Model arg2) {
-        this.texture = arg;
-        this.model = arg2;
+    private TexturedModel(Texture texture, Model model) {
+        this.texture = texture;
+        this.model = model;
     }
 
     public Model getModel() {
@@ -55,41 +55,41 @@ public class TexturedModel {
         return this.texture;
     }
 
-    public TexturedModel texture(Consumer<Texture> consumer) {
-        consumer.accept(this.texture);
+    public TexturedModel texture(Consumer<Texture> textureConsumer) {
+        textureConsumer.accept(this.texture);
         return this;
     }
 
-    public Identifier upload(Block arg, BiConsumer<Identifier, Supplier<JsonElement>> biConsumer) {
-        return this.model.upload(arg, this.texture, biConsumer);
+    public Identifier upload(Block block, BiConsumer<Identifier, Supplier<JsonElement>> writer) {
+        return this.model.upload(block, this.texture, writer);
     }
 
-    public Identifier upload(Block arg, String string, BiConsumer<Identifier, Supplier<JsonElement>> biConsumer) {
-        return this.model.upload(arg, string, this.texture, biConsumer);
+    public Identifier upload(Block block, String suffix, BiConsumer<Identifier, Supplier<JsonElement>> writer) {
+        return this.model.upload(block, suffix, this.texture, writer);
     }
 
-    private static Factory makeFactory(Function<Block, Texture> function, Model arg) {
-        return arg2 -> new TexturedModel((Texture)function.apply(arg2), arg);
+    private static Factory makeFactory(Function<Block, Texture> textureGetter, Model model) {
+        return arg2 -> new TexturedModel((Texture)textureGetter.apply(arg2), model);
     }
 
-    public static TexturedModel getCubeAll(Identifier arg) {
-        return new TexturedModel(Texture.all(arg), Models.CUBE_ALL);
+    public static TexturedModel getCubeAll(Identifier id) {
+        return new TexturedModel(Texture.all(id), Models.CUBE_ALL);
     }
 
     @FunctionalInterface
     public static interface Factory {
         public TexturedModel get(Block var1);
 
-        default public Identifier upload(Block arg, BiConsumer<Identifier, Supplier<JsonElement>> biConsumer) {
-            return this.get(arg).upload(arg, biConsumer);
+        default public Identifier upload(Block block, BiConsumer<Identifier, Supplier<JsonElement>> writer) {
+            return this.get(block).upload(block, writer);
         }
 
-        default public Identifier upload(Block arg, String string, BiConsumer<Identifier, Supplier<JsonElement>> biConsumer) {
-            return this.get(arg).upload(arg, string, biConsumer);
+        default public Identifier upload(Block block, String suffix, BiConsumer<Identifier, Supplier<JsonElement>> writer) {
+            return this.get(block).upload(block, suffix, writer);
         }
 
-        default public Factory withTexture(Consumer<Texture> consumer) {
-            return arg -> this.get(arg).texture(consumer);
+        default public Factory withTexture(Consumer<Texture> textureConsumer) {
+            return arg -> this.get(arg).texture(textureConsumer);
         }
     }
 }

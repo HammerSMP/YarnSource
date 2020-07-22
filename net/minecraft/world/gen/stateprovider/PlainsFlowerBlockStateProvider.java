@@ -29,8 +29,8 @@ extends BlockStateProvider {
     }
 
     @Override
-    public BlockState getBlockState(Random random, BlockPos arg) {
-        double d = Biome.FOLIAGE_NOISE.sample((double)arg.getX() / 200.0, (double)arg.getZ() / 200.0, false);
+    public BlockState getBlockState(Random random, BlockPos pos) {
+        double d = Biome.FOLIAGE_NOISE.sample((double)pos.getX() / 200.0, (double)pos.getZ() / 200.0, false);
         if (d < -0.8) {
             return Util.getRandom(TULIPS, random);
         }

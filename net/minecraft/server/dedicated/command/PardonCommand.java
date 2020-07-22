@@ -20,7 +20,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import java.util.Collection;
-import net.minecraft.command.arguments.GameProfileArgumentType;
+import net.minecraft.command.argument.GameProfileArgumentType;
 import net.minecraft.server.BannedPlayerList;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.CommandSource;
@@ -31,18 +31,18 @@ import net.minecraft.text.TranslatableText;
 public class PardonCommand {
     private static final SimpleCommandExceptionType ALREADY_UNBANNED_EXCEPTION = new SimpleCommandExceptionType((Message)new TranslatableText("commands.pardon.failed"));
 
-    public static void register(CommandDispatcher<ServerCommandSource> commandDispatcher) {
-        commandDispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)CommandManager.literal("pardon").requires(arg -> arg.hasPermissionLevel(3))).then(CommandManager.argument("targets", GameProfileArgumentType.gameProfile()).suggests((commandContext, suggestionsBuilder) -> CommandSource.suggestMatching(((ServerCommandSource)commandContext.getSource()).getMinecraftServer().getPlayerManager().getUserBanList().getNames(), suggestionsBuilder)).executes(commandContext -> PardonCommand.pardon((ServerCommandSource)commandContext.getSource(), GameProfileArgumentType.getProfileArgument((CommandContext<ServerCommandSource>)commandContext, "targets")))));
+    public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
+        dispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)CommandManager.literal("pardon").requires(arg -> arg.hasPermissionLevel(3))).then(CommandManager.argument("targets", GameProfileArgumentType.gameProfile()).suggests((commandContext, suggestionsBuilder) -> CommandSource.suggestMatching(((ServerCommandSource)commandContext.getSource()).getMinecraftServer().getPlayerManager().getUserBanList().getNames(), suggestionsBuilder)).executes(commandContext -> PardonCommand.pardon((ServerCommandSource)commandContext.getSource(), GameProfileArgumentType.getProfileArgument((CommandContext<ServerCommandSource>)commandContext, "targets")))));
     }
 
-    private static int pardon(ServerCommandSource arg, Collection<GameProfile> collection) throws CommandSyntaxException {
-        BannedPlayerList lv = arg.getMinecraftServer().getPlayerManager().getUserBanList();
+    private static int pardon(ServerCommandSource source, Collection<GameProfile> targets) throws CommandSyntaxException {
+        BannedPlayerList lv = source.getMinecraftServer().getPlayerManager().getUserBanList();
         int i = 0;
-        for (GameProfile gameProfile : collection) {
+        for (GameProfile gameProfile : targets) {
             if (!lv.contains(gameProfile)) continue;
             lv.remove(gameProfile);
             ++i;
-            arg.sendFeedback(new TranslatableText("commands.pardon.success", Texts.toText(gameProfile)), true);
+            source.sendFeedback(new TranslatableText("commands.pardon.success", Texts.toText(gameProfile)), true);
         }
         if (i == 0) {
             throw ALREADY_UNBANNED_EXCEPTION.create();

@@ -45,14 +45,14 @@ implements Comparable<AdvancementProgress> {
     private final Map<String, CriterionProgress> criteriaProgresses = Maps.newHashMap();
     private String[][] requirements = new String[0][];
 
-    public void init(Map<String, AdvancementCriterion> map, String[][] strings) {
-        Set<String> set = map.keySet();
+    public void init(Map<String, AdvancementCriterion> criteria, String[][] requirements) {
+        Set<String> set = criteria.keySet();
         this.criteriaProgresses.entrySet().removeIf(entry -> !set.contains(entry.getKey()));
         for (String string : set) {
             if (this.criteriaProgresses.containsKey(string)) continue;
             this.criteriaProgresses.put(string, new CriterionProgress());
         }
-        this.requirements = strings;
+        this.requirements = requirements;
     }
 
     public boolean isDone() {
@@ -81,8 +81,8 @@ implements Comparable<AdvancementProgress> {
         return false;
     }
 
-    public boolean obtain(String string) {
-        CriterionProgress lv = this.criteriaProgresses.get(string);
+    public boolean obtain(String name) {
+        CriterionProgress lv = this.criteriaProgresses.get(name);
         if (lv != null && !lv.isObtained()) {
             lv.obtain();
             return true;
@@ -90,8 +90,8 @@ implements Comparable<AdvancementProgress> {
         return false;
     }
 
-    public boolean reset(String string) {
-        CriterionProgress lv = this.criteriaProgresses.get(string);
+    public boolean reset(String name) {
+        CriterionProgress lv = this.criteriaProgresses.get(name);
         if (lv != null && lv.isObtained()) {
             lv.reset();
             return true;
@@ -103,26 +103,26 @@ implements Comparable<AdvancementProgress> {
         return "AdvancementProgress{criteria=" + this.criteriaProgresses + ", requirements=" + Arrays.deepToString((Object[])this.requirements) + '}';
     }
 
-    public void toPacket(PacketByteBuf arg) {
-        arg.writeVarInt(this.criteriaProgresses.size());
+    public void toPacket(PacketByteBuf buf) {
+        buf.writeVarInt(this.criteriaProgresses.size());
         for (Map.Entry<String, CriterionProgress> entry : this.criteriaProgresses.entrySet()) {
-            arg.writeString(entry.getKey());
-            entry.getValue().toPacket(arg);
+            buf.writeString(entry.getKey());
+            entry.getValue().toPacket(buf);
         }
     }
 
-    public static AdvancementProgress fromPacket(PacketByteBuf arg) {
+    public static AdvancementProgress fromPacket(PacketByteBuf buf) {
         AdvancementProgress lv = new AdvancementProgress();
-        int i = arg.readVarInt();
+        int i = buf.readVarInt();
         for (int j = 0; j < i; ++j) {
-            lv.criteriaProgresses.put(arg.readString(32767), CriterionProgress.fromPacket(arg));
+            lv.criteriaProgresses.put(buf.readString(32767), CriterionProgress.fromPacket(buf));
         }
         return lv;
     }
 
     @Nullable
-    public CriterionProgress getCriterionProgress(String string) {
-        return this.criteriaProgresses.get(string);
+    public CriterionProgress getCriterionProgress(String name) {
+        return this.criteriaProgresses.get(name);
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -244,12 +244,12 @@ implements Comparable<AdvancementProgress> {
             return lv;
         }
 
-        public /* synthetic */ Object deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
-            return this.deserialize(jsonElement, type, jsonDeserializationContext);
+        public /* synthetic */ Object deserialize(JsonElement functionJson, Type unused, JsonDeserializationContext context) throws JsonParseException {
+            return this.deserialize(functionJson, unused, context);
         }
 
-        public /* synthetic */ JsonElement serialize(Object object, Type type, JsonSerializationContext jsonSerializationContext) {
-            return this.serialize((AdvancementProgress)object, type, jsonSerializationContext);
+        public /* synthetic */ JsonElement serialize(Object entry, Type unused, JsonSerializationContext context) {
+            return this.serialize((AdvancementProgress)entry, unused, context);
         }
     }
 }

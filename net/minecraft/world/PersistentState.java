@@ -8,7 +8,6 @@
 package net.minecraft.world;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import net.minecraft.SharedConstants;
 import net.minecraft.nbt.CompoundTag;
@@ -21,8 +20,8 @@ public abstract class PersistentState {
     private final String key;
     private boolean dirty;
 
-    public PersistentState(String string) {
-        this.key = string;
+    public PersistentState(String key) {
+        this.key = key;
     }
 
     public abstract void fromTag(CompoundTag var1);
@@ -33,8 +32,8 @@ public abstract class PersistentState {
         this.setDirty(true);
     }
 
-    public void setDirty(boolean bl) {
-        this.dirty = bl;
+    public void setDirty(boolean dirty) {
+        this.dirty = dirty;
     }
 
     public boolean isDirty() {
@@ -52,8 +51,8 @@ public abstract class PersistentState {
         CompoundTag lv = new CompoundTag();
         lv.put("data", this.toTag(new CompoundTag()));
         lv.putInt("DataVersion", SharedConstants.getGameVersion().getWorldVersion());
-        try (FileOutputStream fileOutputStream = new FileOutputStream(file);){
-            NbtIo.writeCompressed(lv, fileOutputStream);
+        try {
+            NbtIo.method_30614(lv, file);
         }
         catch (IOException iOException) {
             LOGGER.error("Could not save data {}", (Object)this, (Object)iOException);

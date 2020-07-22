@@ -29,20 +29,20 @@ extends ToggleButtonWidget {
     private final RecipeBookGroup category;
     private float bounce;
 
-    public RecipeGroupButtonWidget(RecipeBookGroup arg) {
+    public RecipeGroupButtonWidget(RecipeBookGroup category) {
         super(0, 0, 35, 27, false);
-        this.category = arg;
+        this.category = category;
         this.setTextureUV(153, 2, 35, 0, RecipeBookWidget.TEXTURE);
     }
 
-    public void checkForNewRecipes(MinecraftClient arg) {
-        ClientRecipeBook lv = arg.player.getRecipeBook();
+    public void checkForNewRecipes(MinecraftClient client) {
+        ClientRecipeBook lv = client.player.getRecipeBook();
         List<RecipeResultCollection> list = lv.getResultsForGroup(this.category);
-        if (!(arg.player.currentScreenHandler instanceof AbstractRecipeScreenHandler)) {
+        if (!(client.player.currentScreenHandler instanceof AbstractRecipeScreenHandler)) {
             return;
         }
         for (RecipeResultCollection lv2 : list) {
-            for (Recipe<?> lv3 : lv2.getResults(lv.isFilteringCraftable((AbstractRecipeScreenHandler)arg.player.currentScreenHandler))) {
+            for (Recipe<?> lv3 : lv2.getResults(lv.isFilteringCraftable((AbstractRecipeScreenHandler)client.player.currentScreenHandler))) {
                 if (!lv.shouldDisplay(lv3)) continue;
                 this.bounce = 15.0f;
                 return;
@@ -51,7 +51,7 @@ extends ToggleButtonWidget {
     }
 
     @Override
-    public void renderButton(MatrixStack arg, int i, int j, float f) {
+    public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         if (this.bounce > 0.0f) {
             float g = 1.0f + 0.1f * (float)Math.sin(this.bounce / 15.0f * (float)Math.PI);
             RenderSystem.pushMatrix();
@@ -75,24 +75,24 @@ extends ToggleButtonWidget {
             m -= 2;
         }
         RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
-        this.drawTexture(arg, m, this.y, k, l, this.width, this.height);
+        this.drawTexture(matrices, m, this.y, k, l, this.width, this.height);
         RenderSystem.enableDepthTest();
         this.renderIcons(lv.getItemRenderer());
         if (this.bounce > 0.0f) {
             RenderSystem.popMatrix();
-            this.bounce -= f;
+            this.bounce -= delta;
         }
     }
 
-    private void renderIcons(ItemRenderer arg) {
+    private void renderIcons(ItemRenderer itemRenderer) {
         int i;
         List<ItemStack> list = this.category.getIcons();
         int n = i = this.toggled ? -2 : 0;
         if (list.size() == 1) {
-            arg.renderInGui(list.get(0), this.x + 9 + i, this.y + 5);
+            itemRenderer.renderInGui(list.get(0), this.x + 9 + i, this.y + 5);
         } else if (list.size() == 2) {
-            arg.renderInGui(list.get(0), this.x + 3 + i, this.y + 5);
-            arg.renderInGui(list.get(1), this.x + 14 + i, this.y + 5);
+            itemRenderer.renderInGui(list.get(0), this.x + 3 + i, this.y + 5);
+            itemRenderer.renderInGui(list.get(1), this.x + 14 + i, this.y + 5);
         }
     }
 
@@ -100,8 +100,8 @@ extends ToggleButtonWidget {
         return this.category;
     }
 
-    public boolean hasKnownRecipes(ClientRecipeBook arg) {
-        List<RecipeResultCollection> list = arg.getResultsForGroup(this.category);
+    public boolean hasKnownRecipes(ClientRecipeBook recipeBook) {
+        List<RecipeResultCollection> list = recipeBook.getResultsForGroup(this.category);
         this.visible = false;
         if (list != null) {
             for (RecipeResultCollection lv : list) {

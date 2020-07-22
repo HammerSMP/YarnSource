@@ -16,12 +16,12 @@ public class ScheduleBuilder {
     private final Schedule schedule;
     private final List<ActivityEntry> activities = Lists.newArrayList();
 
-    public ScheduleBuilder(Schedule arg) {
-        this.schedule = arg;
+    public ScheduleBuilder(Schedule schedule) {
+        this.schedule = schedule;
     }
 
-    public ScheduleBuilder withActivity(int i, Activity arg) {
-        this.activities.add(new ActivityEntry(i, arg));
+    public ScheduleBuilder withActivity(int startTime, Activity activity) {
+        this.activities.add(new ActivityEntry(startTime, activity));
         return this;
     }
 
@@ -39,9 +39,9 @@ public class ScheduleBuilder {
         private final int startTime;
         private final Activity activity;
 
-        public ActivityEntry(int i, Activity arg) {
-            this.startTime = i;
-            this.activity = arg;
+        public ActivityEntry(int startTime, Activity activity) {
+            this.startTime = startTime;
+            this.activity = activity;
         }
 
         public int getStartTime() {

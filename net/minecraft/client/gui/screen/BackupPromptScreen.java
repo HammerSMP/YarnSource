@@ -34,12 +34,12 @@ extends Screen {
     private final List<StringRenderable> wrappedText = Lists.newArrayList();
     private CheckboxWidget eraseCacheCheckbox;
 
-    public BackupPromptScreen(@Nullable Screen arg, Callback arg2, Text arg3, Text arg4, boolean bl) {
-        super(arg3);
-        this.parent = arg;
-        this.callback = arg2;
-        this.subtitle = arg4;
-        this.showEraseCacheCheckbox = bl;
+    public BackupPromptScreen(@Nullable Screen parent, Callback callback, Text title, Text subtitle, boolean showEraseCacheCheckBox) {
+        super(title);
+        this.parent = parent;
+        this.callback = callback;
+        this.subtitle = subtitle;
+        this.showEraseCacheCheckbox = showEraseCacheCheckBox;
     }
 
     @Override
@@ -59,16 +59,16 @@ extends Screen {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.renderBackground(arg);
-        this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 50, 0xFFFFFF);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.renderBackground(matrices);
+        this.drawCenteredText(matrices, this.textRenderer, this.title, this.width / 2, 50, 0xFFFFFF);
         int k = 70;
         for (StringRenderable lv : this.wrappedText) {
-            this.drawCenteredText(arg, this.textRenderer, lv, this.width / 2, k, 0xFFFFFF);
+            this.drawCenteredText(matrices, this.textRenderer, lv, this.width / 2, k, 0xFFFFFF);
             this.textRenderer.getClass();
             k += 9;
         }
-        super.render(arg, i, j, f);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 
     @Override
@@ -77,12 +77,12 @@ extends Screen {
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (i == 256) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (keyCode == 256) {
             this.client.openScreen(this.parent);
             return true;
         }
-        return super.keyPressed(i, j, k);
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Environment(value=EnvType.CLIENT)

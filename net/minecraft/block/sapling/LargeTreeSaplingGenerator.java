@@ -56,9 +56,9 @@ extends SaplingGenerator {
         return false;
     }
 
-    public static boolean canGenerateLargeTree(BlockState arg, BlockView arg2, BlockPos arg3, int i, int j) {
-        Block lv = arg.getBlock();
-        return lv == arg2.getBlockState(arg3.add(i, 0, j)).getBlock() && lv == arg2.getBlockState(arg3.add(i + 1, 0, j)).getBlock() && lv == arg2.getBlockState(arg3.add(i, 0, j + 1)).getBlock() && lv == arg2.getBlockState(arg3.add(i + 1, 0, j + 1)).getBlock();
+    public static boolean canGenerateLargeTree(BlockState state, BlockView world, BlockPos pos, int x, int z) {
+        Block lv = state.getBlock();
+        return lv == world.getBlockState(pos.add(x, 0, z)).getBlock() && lv == world.getBlockState(pos.add(x + 1, 0, z)).getBlock() && lv == world.getBlockState(pos.add(x, 0, z + 1)).getBlock() && lv == world.getBlockState(pos.add(x + 1, 0, z + 1)).getBlock();
     }
 }
 

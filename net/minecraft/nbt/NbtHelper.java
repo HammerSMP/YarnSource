@@ -50,19 +50,19 @@ public final class NbtHelper {
     private static final Logger LOGGER = LogManager.getLogger();
 
     @Nullable
-    public static GameProfile toGameProfile(CompoundTag arg) {
+    public static GameProfile toGameProfile(CompoundTag tag) {
         String string = null;
         UUID uUID = null;
-        if (arg.contains("Name", 8)) {
-            string = arg.getString("Name");
+        if (tag.contains("Name", 8)) {
+            string = tag.getString("Name");
         }
-        if (arg.containsUuid("Id")) {
-            uUID = arg.getUuid("Id");
+        if (tag.containsUuid("Id")) {
+            uUID = tag.getUuid("Id");
         }
         try {
             GameProfile gameProfile = new GameProfile(uUID, string);
-            if (arg.contains("Properties", 10)) {
-                CompoundTag lv = arg.getCompound("Properties");
+            if (tag.contains("Properties", 10)) {
+                CompoundTag lv = tag.getCompound("Properties");
                 for (String string2 : lv.getKeys()) {
                     ListTag lv2 = lv.getList(string2, 10);
                     for (int i = 0; i < lv2.size(); ++i) {
@@ -83,18 +83,18 @@ public final class NbtHelper {
         }
     }
 
-    public static CompoundTag fromGameProfile(CompoundTag arg, GameProfile gameProfile) {
-        if (!ChatUtil.isEmpty(gameProfile.getName())) {
-            arg.putString("Name", gameProfile.getName());
+    public static CompoundTag fromGameProfile(CompoundTag tag, GameProfile profile) {
+        if (!ChatUtil.isEmpty(profile.getName())) {
+            tag.putString("Name", profile.getName());
         }
-        if (gameProfile.getId() != null) {
-            arg.putUuid("Id", gameProfile.getId());
+        if (profile.getId() != null) {
+            tag.putUuid("Id", profile.getId());
         }
-        if (!gameProfile.getProperties().isEmpty()) {
+        if (!profile.getProperties().isEmpty()) {
             CompoundTag lv = new CompoundTag();
-            for (String string : gameProfile.getProperties().keySet()) {
+            for (String string : profile.getProperties().keySet()) {
                 ListTag lv2 = new ListTag();
-                for (com.mojang.authlib.properties.Property property : gameProfile.getProperties().get((Object)string)) {
+                for (com.mojang.authlib.properties.Property property : profile.getProperties().get((Object)string)) {
                     CompoundTag lv3 = new CompoundTag();
                     lv3.putString("Value", property.getValue());
                     if (property.hasSignature()) {
@@ -104,38 +104,38 @@ public final class NbtHelper {
                 }
                 lv.put(string, lv2);
             }
-            arg.put("Properties", lv);
+            tag.put("Properties", lv);
         }
-        return arg;
+        return tag;
     }
 
     @VisibleForTesting
-    public static boolean matches(@Nullable Tag arg, @Nullable Tag arg2, boolean bl) {
-        if (arg == arg2) {
+    public static boolean matches(@Nullable Tag standard, @Nullable Tag subject, boolean equalValue) {
+        if (standard == subject) {
             return true;
         }
-        if (arg == null) {
+        if (standard == null) {
             return true;
         }
-        if (arg2 == null) {
+        if (subject == null) {
             return false;
         }
-        if (!arg.getClass().equals(arg2.getClass())) {
+        if (!standard.getClass().equals(subject.getClass())) {
             return false;
         }
-        if (arg instanceof CompoundTag) {
-            CompoundTag lv = (CompoundTag)arg;
-            CompoundTag lv2 = (CompoundTag)arg2;
+        if (standard instanceof CompoundTag) {
+            CompoundTag lv = (CompoundTag)standard;
+            CompoundTag lv2 = (CompoundTag)subject;
             for (String string : lv.getKeys()) {
                 Tag lv3 = lv.get(string);
-                if (NbtHelper.matches(lv3, lv2.get(string), bl)) continue;
+                if (NbtHelper.matches(lv3, lv2.get(string), equalValue)) continue;
                 return false;
             }
             return true;
         }
-        if (arg instanceof ListTag && bl) {
-            ListTag lv4 = (ListTag)arg;
-            ListTag lv5 = (ListTag)arg2;
+        if (standard instanceof ListTag && equalValue) {
+            ListTag lv4 = (ListTag)standard;
+            ListTag lv5 = (ListTag)subject;
             if (lv4.isEmpty()) {
                 return lv5.isEmpty();
             }
@@ -143,7 +143,7 @@ public final class NbtHelper {
                 Tag lv6 = lv4.get(i);
                 boolean bl2 = false;
                 for (int j = 0; j < lv5.size(); ++j) {
-                    if (!NbtHelper.matches(lv6, lv5.get(j), bl)) continue;
+                    if (!NbtHelper.matches(lv6, lv5.get(j), equalValue)) continue;
                     bl2 = true;
                     break;
                 }
@@ -152,67 +152,67 @@ public final class NbtHelper {
             }
             return true;
         }
-        return arg.equals(arg2);
+        return standard.equals(subject);
     }
 
-    public static IntArrayTag fromUuid(UUID uUID) {
-        return new IntArrayTag(DynamicSerializableUuid.toIntArray(uUID));
+    public static IntArrayTag fromUuid(UUID uuid) {
+        return new IntArrayTag(DynamicSerializableUuid.toIntArray(uuid));
     }
 
-    public static UUID toUuid(Tag arg) {
-        if (arg.getReader() != IntArrayTag.READER) {
-            throw new IllegalArgumentException("Expected UUID-Tag to be of type " + IntArrayTag.READER.getCrashReportName() + ", but found " + arg.getReader().getCrashReportName() + ".");
+    public static UUID toUuid(Tag tag) {
+        if (tag.getReader() != IntArrayTag.READER) {
+            throw new IllegalArgumentException("Expected UUID-Tag to be of type " + IntArrayTag.READER.getCrashReportName() + ", but found " + tag.getReader().getCrashReportName() + ".");
         }
-        int[] is = ((IntArrayTag)arg).getIntArray();
+        int[] is = ((IntArrayTag)tag).getIntArray();
         if (is.length != 4) {
             throw new IllegalArgumentException("Expected UUID-Array to be of length 4, but found " + is.length + ".");
         }
         return DynamicSerializableUuid.toUuid(is);
     }
 
-    public static BlockPos toBlockPos(CompoundTag arg) {
-        return new BlockPos(arg.getInt("X"), arg.getInt("Y"), arg.getInt("Z"));
+    public static BlockPos toBlockPos(CompoundTag tag) {
+        return new BlockPos(tag.getInt("X"), tag.getInt("Y"), tag.getInt("Z"));
     }
 
-    public static CompoundTag fromBlockPos(BlockPos arg) {
+    public static CompoundTag fromBlockPos(BlockPos pos) {
         CompoundTag lv = new CompoundTag();
-        lv.putInt("X", arg.getX());
-        lv.putInt("Y", arg.getY());
-        lv.putInt("Z", arg.getZ());
+        lv.putInt("X", pos.getX());
+        lv.putInt("Y", pos.getY());
+        lv.putInt("Z", pos.getZ());
         return lv;
     }
 
-    public static BlockState toBlockState(CompoundTag arg) {
-        if (!arg.contains("Name", 8)) {
+    public static BlockState toBlockState(CompoundTag tag) {
+        if (!tag.contains("Name", 8)) {
             return Blocks.AIR.getDefaultState();
         }
-        Block lv = Registry.BLOCK.get(new Identifier(arg.getString("Name")));
+        Block lv = Registry.BLOCK.get(new Identifier(tag.getString("Name")));
         BlockState lv2 = lv.getDefaultState();
-        if (arg.contains("Properties", 10)) {
-            CompoundTag lv3 = arg.getCompound("Properties");
+        if (tag.contains("Properties", 10)) {
+            CompoundTag lv3 = tag.getCompound("Properties");
             StateManager<Block, BlockState> lv4 = lv.getStateManager();
             for (String string : lv3.getKeys()) {
                 Property<?> lv5 = lv4.getProperty(string);
                 if (lv5 == null) continue;
-                lv2 = NbtHelper.withProperty(lv2, lv5, string, lv3, arg);
+                lv2 = NbtHelper.withProperty(lv2, lv5, string, lv3, tag);
             }
         }
         return lv2;
     }
 
-    private static <S extends State<?, S>, T extends Comparable<T>> S withProperty(S arg, Property<T> arg2, String string, CompoundTag arg3, CompoundTag arg4) {
-        Optional<T> optional = arg2.parse(arg3.getString(string));
+    private static <S extends State<?, S>, T extends Comparable<T>> S withProperty(S state, Property<T> property, String key, CompoundTag propertiesTag, CompoundTag mainTag) {
+        Optional<T> optional = property.parse(propertiesTag.getString(key));
         if (optional.isPresent()) {
-            return (S)((State)arg.with(arg2, (Comparable)((Comparable)optional.get())));
+            return (S)((State)state.with(property, (Comparable)((Comparable)optional.get())));
         }
-        LOGGER.warn("Unable to read property: {} with value: {} for blockstate: {}", (Object)string, (Object)arg3.getString(string), (Object)arg4.toString());
-        return arg;
+        LOGGER.warn("Unable to read property: {} with value: {} for blockstate: {}", (Object)key, (Object)propertiesTag.getString(key), (Object)mainTag.toString());
+        return state;
     }
 
-    public static CompoundTag fromBlockState(BlockState arg) {
+    public static CompoundTag fromBlockState(BlockState state) {
         CompoundTag lv = new CompoundTag();
-        lv.putString("Name", Registry.BLOCK.getId(arg.getBlock()).toString());
-        ImmutableMap<Property<?>, Comparable<?>> immutableMap = arg.getEntries();
+        lv.putString("Name", Registry.BLOCK.getId(state.getBlock()).toString());
+        ImmutableMap<Property<?>, Comparable<?>> immutableMap = state.getEntries();
         if (!immutableMap.isEmpty()) {
             CompoundTag lv2 = new CompoundTag();
             for (Map.Entry entry : immutableMap.entrySet()) {
@@ -224,16 +224,16 @@ public final class NbtHelper {
         return lv;
     }
 
-    private static <T extends Comparable<T>> String nameValue(Property<T> arg, Comparable<?> comparable) {
-        return arg.name(comparable);
+    private static <T extends Comparable<T>> String nameValue(Property<T> property, Comparable<?> value) {
+        return property.name(value);
     }
 
-    public static CompoundTag update(DataFixer dataFixer, DataFixTypes arg, CompoundTag arg2, int i) {
-        return NbtHelper.update(dataFixer, arg, arg2, i, SharedConstants.getGameVersion().getWorldVersion());
+    public static CompoundTag update(DataFixer fixer, DataFixTypes fixTypes, CompoundTag tag, int oldVersion) {
+        return NbtHelper.update(fixer, fixTypes, tag, oldVersion, SharedConstants.getGameVersion().getWorldVersion());
     }
 
-    public static CompoundTag update(DataFixer dataFixer, DataFixTypes arg, CompoundTag arg2, int i, int j) {
-        return (CompoundTag)dataFixer.update(arg.getTypeReference(), new Dynamic((DynamicOps)NbtOps.INSTANCE, (Object)arg2), i, j).getValue();
+    public static CompoundTag update(DataFixer fixer, DataFixTypes fixTypes, CompoundTag tag, int oldVersion, int targetVersion) {
+        return (CompoundTag)fixer.update(fixTypes.getTypeReference(), new Dynamic((DynamicOps)NbtOps.INSTANCE, (Object)tag), oldVersion, targetVersion).getValue();
     }
 }
 

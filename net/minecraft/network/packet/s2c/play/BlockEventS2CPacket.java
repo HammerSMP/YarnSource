@@ -27,27 +27,27 @@ implements Packet<ClientPlayPacketListener> {
     public BlockEventS2CPacket() {
     }
 
-    public BlockEventS2CPacket(BlockPos arg, Block arg2, int i, int j) {
-        this.pos = arg;
-        this.block = arg2;
-        this.type = i;
-        this.data = j;
+    public BlockEventS2CPacket(BlockPos pos, Block block, int type, int data) {
+        this.pos = pos;
+        this.block = block;
+        this.type = type;
+        this.data = data;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.pos = arg.readBlockPos();
-        this.type = arg.readUnsignedByte();
-        this.data = arg.readUnsignedByte();
-        this.block = Registry.BLOCK.get(arg.readVarInt());
+    public void read(PacketByteBuf buf) throws IOException {
+        this.pos = buf.readBlockPos();
+        this.type = buf.readUnsignedByte();
+        this.data = buf.readUnsignedByte();
+        this.block = Registry.BLOCK.get(buf.readVarInt());
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeBlockPos(this.pos);
-        arg.writeByte(this.type);
-        arg.writeByte(this.data);
-        arg.writeVarInt(Registry.BLOCK.getRawId(this.block));
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeBlockPos(this.pos);
+        buf.writeByte(this.type);
+        buf.writeByte(this.data);
+        buf.writeVarInt(Registry.BLOCK.getRawId(this.block));
     }
 
     @Override

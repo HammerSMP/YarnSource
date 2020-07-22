@@ -26,37 +26,37 @@ extends AbstractPressurePlateBlock {
     public static final BooleanProperty POWERED = Properties.POWERED;
     private final ActivationRule type;
 
-    protected PressurePlateBlock(ActivationRule arg, AbstractBlock.Settings arg2) {
-        super(arg2);
+    protected PressurePlateBlock(ActivationRule type, AbstractBlock.Settings settings) {
+        super(settings);
         this.setDefaultState((BlockState)((BlockState)this.stateManager.getDefaultState()).with(POWERED, false));
-        this.type = arg;
+        this.type = type;
     }
 
     @Override
-    protected int getRedstoneOutput(BlockState arg) {
-        return arg.get(POWERED) != false ? 15 : 0;
+    protected int getRedstoneOutput(BlockState state) {
+        return state.get(POWERED) != false ? 15 : 0;
     }
 
     @Override
-    protected BlockState setRedstoneOutput(BlockState arg, int i) {
-        return (BlockState)arg.with(POWERED, i > 0);
+    protected BlockState setRedstoneOutput(BlockState state, int rsOut) {
+        return (BlockState)state.with(POWERED, rsOut > 0);
     }
 
     @Override
-    protected void playPressSound(WorldAccess arg, BlockPos arg2) {
+    protected void playPressSound(WorldAccess world, BlockPos pos) {
         if (this.material == Material.WOOD || this.material == Material.NETHER_WOOD) {
-            arg.playSound(null, arg2, SoundEvents.BLOCK_WOODEN_PRESSURE_PLATE_CLICK_ON, SoundCategory.BLOCKS, 0.3f, 0.8f);
+            world.playSound(null, pos, SoundEvents.BLOCK_WOODEN_PRESSURE_PLATE_CLICK_ON, SoundCategory.BLOCKS, 0.3f, 0.8f);
         } else {
-            arg.playSound(null, arg2, SoundEvents.BLOCK_STONE_PRESSURE_PLATE_CLICK_ON, SoundCategory.BLOCKS, 0.3f, 0.6f);
+            world.playSound(null, pos, SoundEvents.BLOCK_STONE_PRESSURE_PLATE_CLICK_ON, SoundCategory.BLOCKS, 0.3f, 0.6f);
         }
     }
 
     @Override
-    protected void playDepressSound(WorldAccess arg, BlockPos arg2) {
+    protected void playDepressSound(WorldAccess world, BlockPos pos) {
         if (this.material == Material.WOOD || this.material == Material.NETHER_WOOD) {
-            arg.playSound(null, arg2, SoundEvents.BLOCK_WOODEN_PRESSURE_PLATE_CLICK_OFF, SoundCategory.BLOCKS, 0.3f, 0.7f);
+            world.playSound(null, pos, SoundEvents.BLOCK_WOODEN_PRESSURE_PLATE_CLICK_OFF, SoundCategory.BLOCKS, 0.3f, 0.7f);
         } else {
-            arg.playSound(null, arg2, SoundEvents.BLOCK_STONE_PRESSURE_PLATE_CLICK_OFF, SoundCategory.BLOCKS, 0.3f, 0.5f);
+            world.playSound(null, pos, SoundEvents.BLOCK_STONE_PRESSURE_PLATE_CLICK_OFF, SoundCategory.BLOCKS, 0.3f, 0.5f);
         }
     }
 
@@ -64,16 +64,16 @@ extends AbstractPressurePlateBlock {
      * WARNING - void declaration
      */
     @Override
-    protected int getRedstoneOutput(World arg, BlockPos arg2) {
+    protected int getRedstoneOutput(World world, BlockPos pos) {
         void list3;
-        Box lv = BOX.offset(arg2);
+        Box lv = BOX.offset(pos);
         switch (this.type) {
             case EVERYTHING: {
-                List<Entity> list = arg.getEntities(null, lv);
+                List<Entity> list = world.getOtherEntities(null, lv);
                 break;
             }
             case MOBS: {
-                List<LivingEntity> list2 = arg.getNonSpectatingEntities(LivingEntity.class, lv);
+                List<LivingEntity> list2 = world.getNonSpectatingEntities(LivingEntity.class, lv);
                 break;
             }
             default: {
@@ -90,8 +90,8 @@ extends AbstractPressurePlateBlock {
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(POWERED);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(POWERED);
     }
 
     public static enum ActivationRule {

@@ -24,37 +24,37 @@ extends CoralParentBlock {
     private final Block deadCoralBlock;
     protected static final VoxelShape SHAPE = Block.createCuboidShape(2.0, 0.0, 2.0, 14.0, 15.0, 14.0);
 
-    protected CoralBlock(Block arg, AbstractBlock.Settings arg2) {
-        super(arg2);
-        this.deadCoralBlock = arg;
+    protected CoralBlock(Block deadCoralBlock, AbstractBlock.Settings settings) {
+        super(settings);
+        this.deadCoralBlock = deadCoralBlock;
     }
 
     @Override
-    public void onBlockAdded(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
-        this.checkLivingConditions(arg, arg2, arg3);
+    public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
+        this.checkLivingConditions(state, world, pos);
     }
 
     @Override
-    public void scheduledTick(BlockState arg, ServerWorld arg2, BlockPos arg3, Random random) {
-        if (!CoralBlock.isInWater(arg, arg2, arg3)) {
-            arg2.setBlockState(arg3, (BlockState)this.deadCoralBlock.getDefaultState().with(WATERLOGGED, false), 2);
+    public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        if (!CoralBlock.isInWater(state, world, pos)) {
+            world.setBlockState(pos, (BlockState)this.deadCoralBlock.getDefaultState().with(WATERLOGGED, false), 2);
         }
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
-        if (arg2 == Direction.DOWN && !arg.canPlaceAt(arg4, arg5)) {
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
+        if (direction == Direction.DOWN && !state.canPlaceAt(world, pos)) {
             return Blocks.AIR.getDefaultState();
         }
-        this.checkLivingConditions(arg, arg4, arg5);
-        if (arg.get(WATERLOGGED).booleanValue()) {
-            arg4.getFluidTickScheduler().schedule(arg5, Fluids.WATER, Fluids.WATER.getTickRate(arg4));
+        this.checkLivingConditions(state, world, pos);
+        if (state.get(WATERLOGGED).booleanValue()) {
+            world.getFluidTickScheduler().schedule(pos, Fluids.WATER, Fluids.WATER.getTickRate(world));
         }
-        return super.getStateForNeighborUpdate(arg, arg2, arg3, arg4, arg5, arg6);
+        return super.getStateForNeighborUpdate(state, direction, newState, world, pos, posFrom);
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
         return SHAPE;
     }
 }

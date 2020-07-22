@@ -47,15 +47,15 @@ public class RecipeBookResults {
         }
     }
 
-    public void initialize(MinecraftClient arg, int i, int j) {
+    public void initialize(MinecraftClient arg, int parentLeft, int parentTop) {
         this.client = arg;
         this.recipeBook = arg.player.getRecipeBook();
         for (int k = 0; k < this.resultButtons.size(); ++k) {
-            this.resultButtons.get(k).setPos(i + 11 + 25 * (k % 5), j + 31 + 25 * (k / 5));
+            this.resultButtons.get(k).setPos(parentLeft + 11 + 25 * (k % 5), parentTop + 31 + 25 * (k / 5));
         }
-        this.nextPageButton = new ToggleButtonWidget(i + 93, j + 137, 12, 17, false);
+        this.nextPageButton = new ToggleButtonWidget(parentLeft + 93, parentTop + 137, 12, 17, false);
         this.nextPageButton.setTextureUV(1, 208, 13, 18, RecipeBookWidget.TEXTURE);
-        this.prevPageButton = new ToggleButtonWidget(i + 38, j + 137, 12, 17, true);
+        this.prevPageButton = new ToggleButtonWidget(parentLeft + 38, parentTop + 137, 12, 17, true);
         this.prevPageButton.setTextureUV(1, 208, 13, 18, RecipeBookWidget.TEXTURE);
     }
 
@@ -64,10 +64,10 @@ public class RecipeBookResults {
         this.recipeDisplayListeners.add(arg);
     }
 
-    public void setResults(List<RecipeResultCollection> list, boolean bl) {
+    public void setResults(List<RecipeResultCollection> list, boolean resetCurrentPage) {
         this.resultCollections = list;
         this.pageCount = (int)Math.ceil((double)list.size() / 20.0);
-        if (this.pageCount <= this.currentPage || bl) {
+        if (this.pageCount <= this.currentPage || resetCurrentPage) {
             this.currentPage = 0;
         }
         this.refreshResultButtons();
@@ -130,11 +130,11 @@ public class RecipeBookResults {
         this.alternatesWidget.setVisible(false);
     }
 
-    public boolean mouseClicked(double d, double e, int i, int j, int k, int l, int m) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button, int areaLeft, int areaTop, int areaWidth, int areaHeight) {
         this.lastClickedRecipe = null;
         this.resultCollection = null;
         if (this.alternatesWidget.isVisible()) {
-            if (this.alternatesWidget.mouseClicked(d, e, i)) {
+            if (this.alternatesWidget.mouseClicked(mouseX, mouseY, button)) {
                 this.lastClickedRecipe = this.alternatesWidget.getLastClickedRecipe();
                 this.resultCollection = this.alternatesWidget.getResults();
             } else {
@@ -142,23 +142,23 @@ public class RecipeBookResults {
             }
             return true;
         }
-        if (this.nextPageButton.mouseClicked(d, e, i)) {
+        if (this.nextPageButton.mouseClicked(mouseX, mouseY, button)) {
             ++this.currentPage;
             this.refreshResultButtons();
             return true;
         }
-        if (this.prevPageButton.mouseClicked(d, e, i)) {
+        if (this.prevPageButton.mouseClicked(mouseX, mouseY, button)) {
             --this.currentPage;
             this.refreshResultButtons();
             return true;
         }
         for (AnimatedResultButton lv : this.resultButtons) {
-            if (!lv.mouseClicked(d, e, i)) continue;
-            if (i == 0) {
+            if (!lv.mouseClicked(mouseX, mouseY, button)) continue;
+            if (button == 0) {
                 this.lastClickedRecipe = lv.currentRecipe();
                 this.resultCollection = lv.getResultCollection();
-            } else if (i == 1 && !this.alternatesWidget.isVisible() && !lv.hasResults()) {
-                this.alternatesWidget.showAlternativesForResult(this.client, lv.getResultCollection(), lv.x, lv.y, j + l / 2, k + 13 + m / 2, lv.getWidth());
+            } else if (button == 1 && !this.alternatesWidget.isVisible() && !lv.hasResults()) {
+                this.alternatesWidget.showAlternativesForResult(this.client, lv.getResultCollection(), lv.x, lv.y, areaLeft + areaWidth / 2, areaTop + 13 + areaHeight / 2, lv.getWidth());
             }
             return true;
         }

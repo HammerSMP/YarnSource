@@ -74,18 +74,18 @@ implements SearchableContainer<T> {
         });
     }
 
-    protected int compare(T object, T object2) {
-        return Integer.compare(this.entryIds.getInt(object), this.entryIds.getInt(object2));
+    protected int compare(T object1, T object2) {
+        return Integer.compare(this.entryIds.getInt(object1), this.entryIds.getInt(object2));
     }
 
     @Override
-    public List<T> findAll(String string) {
-        int i = string.indexOf(58);
+    public List<T> findAll(String text) {
+        int i = text.indexOf(58);
         if (i == -1) {
-            return this.byPath.findAll(string);
+            return this.byPath.findAll(text);
         }
-        List<T> list = this.byNamespace.findAll(string.substring(0, i).trim());
-        String string2 = string.substring(i + 1).trim();
+        List<T> list = this.byNamespace.findAll(text.substring(0, i).trim());
+        String string2 = text.substring(i + 1).trim();
         List<T> list2 = this.byPath.findAll(string2);
         return Lists.newArrayList(new Iterator<T>(list.iterator(), list2.iterator(), (arg_0, arg_1) -> this.compare(arg_0, arg_1)));
     }

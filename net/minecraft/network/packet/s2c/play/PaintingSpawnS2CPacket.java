@@ -31,30 +31,30 @@ implements Packet<ClientPlayPacketListener> {
     public PaintingSpawnS2CPacket() {
     }
 
-    public PaintingSpawnS2CPacket(PaintingEntity arg) {
-        this.id = arg.getEntityId();
-        this.uuid = arg.getUuid();
-        this.pos = arg.getDecorationBlockPos();
-        this.facing = arg.getHorizontalFacing();
-        this.motiveId = Registry.PAINTING_MOTIVE.getRawId(arg.motive);
+    public PaintingSpawnS2CPacket(PaintingEntity entity) {
+        this.id = entity.getEntityId();
+        this.uuid = entity.getUuid();
+        this.pos = entity.getDecorationBlockPos();
+        this.facing = entity.getHorizontalFacing();
+        this.motiveId = Registry.PAINTING_MOTIVE.getRawId(entity.motive);
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.id = arg.readVarInt();
-        this.uuid = arg.readUuid();
-        this.motiveId = arg.readVarInt();
-        this.pos = arg.readBlockPos();
-        this.facing = Direction.fromHorizontal(arg.readUnsignedByte());
+    public void read(PacketByteBuf buf) throws IOException {
+        this.id = buf.readVarInt();
+        this.uuid = buf.readUuid();
+        this.motiveId = buf.readVarInt();
+        this.pos = buf.readBlockPos();
+        this.facing = Direction.fromHorizontal(buf.readUnsignedByte());
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeVarInt(this.id);
-        arg.writeUuid(this.uuid);
-        arg.writeVarInt(this.motiveId);
-        arg.writeBlockPos(this.pos);
-        arg.writeByte(this.facing.getHorizontal());
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeVarInt(this.id);
+        buf.writeUuid(this.uuid);
+        buf.writeVarInt(this.motiveId);
+        buf.writeBlockPos(this.pos);
+        buf.writeByte(this.facing.getHorizontal());
     }
 
     @Override

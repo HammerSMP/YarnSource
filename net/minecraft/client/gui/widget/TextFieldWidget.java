@@ -30,6 +30,7 @@ import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.MutableText;
+import net.minecraft.text.StringRenderable;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Util;
@@ -56,26 +57,26 @@ Element {
     private String suggestion;
     private Consumer<String> changedListener;
     private Predicate<String> textPredicate = Objects::nonNull;
-    private BiFunction<String, Integer, String> renderTextProvider = (string, integer) -> string;
+    private BiFunction<String, Integer, StringRenderable> renderTextProvider = (string, integer) -> StringRenderable.plain(string);
 
-    public TextFieldWidget(TextRenderer arg, int i, int j, int k, int l, Text arg2) {
-        this(arg, i, j, k, l, null, arg2);
+    public TextFieldWidget(TextRenderer textRenderer, int x, int y, int width, int height, Text arg2) {
+        this(textRenderer, x, y, width, height, null, arg2);
     }
 
-    public TextFieldWidget(TextRenderer arg, int i, int j, int k, int l, @Nullable TextFieldWidget arg2, Text arg3) {
-        super(i, j, k, l, arg3);
-        this.textRenderer = arg;
-        if (arg2 != null) {
-            this.setText(arg2.getText());
+    public TextFieldWidget(TextRenderer textRenderer, int x, int y, int width, int height, @Nullable TextFieldWidget copyFrom, Text arg3) {
+        super(x, y, width, height, arg3);
+        this.textRenderer = textRenderer;
+        if (copyFrom != null) {
+            this.setText(copyFrom.getText());
         }
     }
 
-    public void setChangedListener(Consumer<String> consumer) {
-        this.changedListener = consumer;
+    public void setChangedListener(Consumer<String> changedListener) {
+        this.changedListener = changedListener;
     }
 
-    public void setRenderTextProvider(BiFunction<String, Integer, String> biFunction) {
-        this.renderTextProvider = biFunction;
+    public void setRenderTextProvider(BiFunction<String, Integer, StringRenderable> renderTextProvider) {
+        this.renderTextProvider = renderTextProvider;
     }
 
     public void tick() {
@@ -88,14 +89,14 @@ Element {
         return new TranslatableText("gui.narrate.editBox", lv, this.text);
     }
 
-    public void setText(String string) {
-        if (!this.textPredicate.test(string)) {
+    public void setText(String text) {
+        if (!this.textPredicate.test(text)) {
             return;
         }
-        this.text = string.length() > this.maxLength ? string.substring(0, this.maxLength) : string;
+        this.text = text.length() > this.maxLength ? text.substring(0, this.maxLength) : text;
         this.setCursorToEnd();
         this.setSelectionEnd(this.selectionStart);
-        this.onChanged(string);
+        this.onChanged(text);
     }
 
     public String getText() {
@@ -108,8 +109,8 @@ Element {
         return this.text.substring(i, j);
     }
 
-    public void setTextPredicate(Predicate<String> predicate) {
-        this.textPredicate = predicate;
+    public void setTextPredicate(Predicate<String> textPredicate) {
+        this.textPredicate = textPredicate;
     }
 
     public void write(String string) {
@@ -132,22 +133,22 @@ Element {
         this.onChanged(this.text);
     }
 
-    private void onChanged(String string) {
+    private void onChanged(String newText) {
         if (this.changedListener != null) {
-            this.changedListener.accept(string);
+            this.changedListener.accept(newText);
         }
         this.nextNarration = Util.getMeasuringTimeMs() + 500L;
     }
 
-    private void erase(int i) {
+    private void erase(int offset) {
         if (Screen.hasControlDown()) {
-            this.eraseWords(i);
+            this.eraseWords(offset);
         } else {
-            this.eraseCharacters(i);
+            this.eraseCharacters(offset);
         }
     }
 
-    public void eraseWords(int i) {
+    public void eraseWords(int wordOffset) {
         if (this.text.isEmpty()) {
             return;
         }
@@ -155,10 +156,10 @@ Element {
             this.write("");
             return;
         }
-        this.eraseCharacters(this.getWordSkipPosition(i) - this.selectionStart);
+        this.eraseCharacters(this.getWordSkipPosition(wordOffset) - this.selectionStart);
     }
 
-    public void eraseCharacters(int i) {
+    public void eraseCharacters(int characterOffset) {
         int l;
         if (this.text.isEmpty()) {
             return;
@@ -167,7 +168,7 @@ Element {
             this.write("");
             return;
         }
-        int j = this.method_27537(i);
+        int j = this.method_27537(characterOffset);
         int k = Math.min(j, this.selectionStart);
         if (k == (l = Math.max(j, this.selectionStart))) {
             return;
@@ -180,21 +181,21 @@ Element {
         this.setCursor(k);
     }
 
-    public int getWordSkipPosition(int i) {
-        return this.getWordSkipPosition(i, this.getCursor());
+    public int getWordSkipPosition(int wordOffset) {
+        return this.getWordSkipPosition(wordOffset, this.getCursor());
     }
 
-    private int getWordSkipPosition(int i, int j) {
-        return this.getWordSkipPosition(i, j, true);
+    private int getWordSkipPosition(int wordOffset, int cursorPosition) {
+        return this.getWordSkipPosition(wordOffset, cursorPosition, true);
     }
 
-    private int getWordSkipPosition(int i, int j, boolean bl) {
-        int k = j;
-        boolean bl2 = i < 0;
-        int l = Math.abs(i);
+    private int getWordSkipPosition(int wordOffset, int cursorPosition, boolean skipOverSpaces) {
+        int k = cursorPosition;
+        boolean bl2 = wordOffset < 0;
+        int l = Math.abs(wordOffset);
         for (int m = 0; m < l; ++m) {
             if (bl2) {
-                while (bl && k > 0 && this.text.charAt(k - 1) == ' ') {
+                while (skipOverSpaces && k > 0 && this.text.charAt(k - 1) == ' ') {
                     --k;
                 }
                 while (k > 0 && this.text.charAt(k - 1) != ' ') {
@@ -207,31 +208,31 @@ Element {
                 k = n;
                 continue;
             }
-            while (bl && k < n && this.text.charAt(k) == ' ') {
+            while (skipOverSpaces && k < n && this.text.charAt(k) == ' ') {
                 ++k;
             }
         }
         return k;
     }
 
-    public void moveCursor(int i) {
-        this.setCursor(this.method_27537(i));
+    public void moveCursor(int offset) {
+        this.setCursor(this.method_27537(offset));
     }
 
     private int method_27537(int i) {
         return Util.moveCursor(this.text, this.selectionStart, i);
     }
 
-    public void setCursor(int i) {
-        this.setSelectionStart(i);
+    public void setCursor(int cursor) {
+        this.setSelectionStart(cursor);
         if (!this.selecting) {
             this.setSelectionEnd(this.selectionStart);
         }
         this.onChanged(this.text);
     }
 
-    public void setSelectionStart(int i) {
-        this.selectionStart = MathHelper.clamp(i, 0, this.text.length());
+    public void setSelectionStart(int cursor) {
+        this.selectionStart = MathHelper.clamp(cursor, 0, this.text.length());
     }
 
     public void setCursorToStart() {
@@ -243,34 +244,34 @@ Element {
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (!this.isActive()) {
             return false;
         }
         this.selecting = Screen.hasShiftDown();
-        if (Screen.isSelectAll(i)) {
+        if (Screen.isSelectAll(keyCode)) {
             this.setCursorToEnd();
             this.setSelectionEnd(0);
             return true;
         }
-        if (Screen.isCopy(i)) {
+        if (Screen.isCopy(keyCode)) {
             MinecraftClient.getInstance().keyboard.setClipboard(this.getSelectedText());
             return true;
         }
-        if (Screen.isPaste(i)) {
+        if (Screen.isPaste(keyCode)) {
             if (this.editable) {
                 this.write(MinecraftClient.getInstance().keyboard.getClipboard());
             }
             return true;
         }
-        if (Screen.isCut(i)) {
+        if (Screen.isCut(keyCode)) {
             MinecraftClient.getInstance().keyboard.setClipboard(this.getSelectedText());
             if (this.editable) {
                 this.write("");
             }
             return true;
         }
-        switch (i) {
+        switch (keyCode) {
             case 263: {
                 if (Screen.hasControlDown()) {
                     this.setCursor(this.getWordSkipPosition(-1));
@@ -320,13 +321,13 @@ Element {
     }
 
     @Override
-    public boolean charTyped(char c, int i) {
+    public boolean charTyped(char chr, int keyCode) {
         if (!this.isActive()) {
             return false;
         }
-        if (SharedConstants.isValidChar(c)) {
+        if (SharedConstants.isValidChar(chr)) {
             if (this.editable) {
-                this.write(Character.toString(c));
+                this.write(Character.toString(chr));
             }
             return true;
         }
@@ -334,17 +335,17 @@ Element {
     }
 
     @Override
-    public boolean mouseClicked(double d, double e, int i) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
         boolean bl;
         if (!this.isVisible()) {
             return false;
         }
-        boolean bl2 = bl = d >= (double)this.x && d < (double)(this.x + this.width) && e >= (double)this.y && e < (double)(this.y + this.height);
+        boolean bl2 = bl = mouseX >= (double)this.x && mouseX < (double)(this.x + this.width) && mouseY >= (double)this.y && mouseY < (double)(this.y + this.height);
         if (this.focusUnlocked) {
             this.setSelected(bl);
         }
-        if (this.isFocused() && bl && i == 0) {
-            int j = MathHelper.floor(d) - this.x;
+        if (this.isFocused() && bl && button == 0) {
+            int j = MathHelper.floor(mouseX) - this.x;
             if (this.focused) {
                 j -= 4;
             }
@@ -355,19 +356,19 @@ Element {
         return false;
     }
 
-    public void setSelected(boolean bl) {
-        super.setFocused(bl);
+    public void setSelected(boolean selected) {
+        super.setFocused(selected);
     }
 
     @Override
-    public void renderButton(MatrixStack arg, int i, int j, float f) {
+    public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         if (!this.isVisible()) {
             return;
         }
         if (this.hasBorder()) {
             int k = this.isFocused() ? -1 : -6250336;
-            TextFieldWidget.fill(arg, this.x - 1, this.y - 1, this.x + this.width + 1, this.y + this.height + 1, k);
-            TextFieldWidget.fill(arg, this.x, this.y, this.x + this.width, this.y + this.height, -16777216);
+            TextFieldWidget.fill(matrices, this.x - 1, this.y - 1, this.x + this.width + 1, this.y + this.height + 1, k);
+            TextFieldWidget.fill(matrices, this.x, this.y, this.x + this.width, this.y + this.height, -16777216);
         }
         int l = this.editable ? this.editableColor : this.uneditableColor;
         int m = this.selectionStart - this.firstCharacterIndex;
@@ -383,7 +384,7 @@ Element {
         }
         if (!string.isEmpty()) {
             String string2 = bl ? string.substring(0, m) : string;
-            q = this.textRenderer.drawWithShadow(arg, this.renderTextProvider.apply(string2, this.firstCharacterIndex), (float)q, (float)p, l);
+            q = this.textRenderer.drawWithShadow(matrices, this.renderTextProvider.apply(string2, this.firstCharacterIndex), (float)q, (float)p, l);
         }
         boolean bl3 = this.selectionStart < this.text.length() || this.text.length() >= this.getMaxLength();
         int r = q;
@@ -394,17 +395,17 @@ Element {
             --q;
         }
         if (!string.isEmpty() && bl && m < string.length()) {
-            this.textRenderer.drawWithShadow(arg, this.renderTextProvider.apply(string.substring(m), this.selectionStart), (float)q, (float)p, l);
+            this.textRenderer.drawWithShadow(matrices, this.renderTextProvider.apply(string.substring(m), this.selectionStart), (float)q, (float)p, l);
         }
         if (!bl3 && this.suggestion != null) {
-            this.textRenderer.drawWithShadow(arg, this.suggestion, (float)(r - 1), (float)p, -8355712);
+            this.textRenderer.drawWithShadow(matrices, this.suggestion, (float)(r - 1), (float)p, -8355712);
         }
         if (bl2) {
             if (bl3) {
                 this.textRenderer.getClass();
-                DrawableHelper.fill(arg, r, p - 1, r + 1, p + 1 + 9, -3092272);
+                DrawableHelper.fill(matrices, r, p - 1, r + 1, p + 1 + 9, -3092272);
             } else {
-                this.textRenderer.drawWithShadow(arg, "_", (float)r, (float)p, l);
+                this.textRenderer.drawWithShadow(matrices, "_", (float)r, (float)p, l);
             }
         }
         if (n != m) {
@@ -414,22 +415,22 @@ Element {
         }
     }
 
-    private void drawSelectionHighlight(int i, int j, int k, int l) {
-        if (i < k) {
-            int m = i;
-            i = k;
-            k = m;
+    private void drawSelectionHighlight(int x1, int y1, int x2, int y2) {
+        if (x1 < x2) {
+            int m = x1;
+            x1 = x2;
+            x2 = m;
         }
-        if (j < l) {
-            int n = j;
-            j = l;
-            l = n;
+        if (y1 < y2) {
+            int n = y1;
+            y1 = y2;
+            y2 = n;
         }
-        if (k > this.x + this.width) {
-            k = this.x + this.width;
+        if (x2 > this.x + this.width) {
+            x2 = this.x + this.width;
         }
-        if (i > this.x + this.width) {
-            i = this.x + this.width;
+        if (x1 > this.x + this.width) {
+            x1 = this.x + this.width;
         }
         Tessellator lv = Tessellator.getInstance();
         BufferBuilder lv2 = lv.getBuffer();
@@ -438,19 +439,19 @@ Element {
         RenderSystem.enableColorLogicOp();
         RenderSystem.logicOp(GlStateManager.LogicOp.OR_REVERSE);
         lv2.begin(7, VertexFormats.POSITION);
-        lv2.vertex(i, l, 0.0).next();
-        lv2.vertex(k, l, 0.0).next();
-        lv2.vertex(k, j, 0.0).next();
-        lv2.vertex(i, j, 0.0).next();
+        lv2.vertex(x1, y2, 0.0).next();
+        lv2.vertex(x2, y2, 0.0).next();
+        lv2.vertex(x2, y1, 0.0).next();
+        lv2.vertex(x1, y1, 0.0).next();
         lv.draw();
         RenderSystem.disableColorLogicOp();
         RenderSystem.enableTexture();
     }
 
-    public void setMaxLength(int i) {
-        this.maxLength = i;
-        if (this.text.length() > i) {
-            this.text = this.text.substring(0, i);
+    public void setMaxLength(int maxLength) {
+        this.maxLength = maxLength;
+        if (this.text.length() > maxLength) {
+            this.text = this.text.substring(0, maxLength);
             this.onChanged(this.text);
         }
     }
@@ -467,29 +468,29 @@ Element {
         return this.focused;
     }
 
-    public void setHasBorder(boolean bl) {
-        this.focused = bl;
+    public void setHasBorder(boolean hasBorder) {
+        this.focused = hasBorder;
     }
 
-    public void setEditableColor(int i) {
-        this.editableColor = i;
+    public void setEditableColor(int color) {
+        this.editableColor = color;
     }
 
-    public void setUneditableColor(int i) {
-        this.uneditableColor = i;
+    public void setUneditableColor(int color) {
+        this.uneditableColor = color;
     }
 
     @Override
-    public boolean changeFocus(boolean bl) {
+    public boolean changeFocus(boolean lookForwards) {
         if (!this.visible || !this.editable) {
             return false;
         }
-        return super.changeFocus(bl);
+        return super.changeFocus(lookForwards);
     }
 
     @Override
-    public boolean isMouseOver(double d, double e) {
-        return this.visible && d >= (double)this.x && d < (double)(this.x + this.width) && e >= (double)this.y && e < (double)(this.y + this.height);
+    public boolean isMouseOver(double mouseX, double mouseY) {
+        return this.visible && mouseX >= (double)this.x && mouseX < (double)(this.x + this.width) && mouseY >= (double)this.y && mouseY < (double)(this.y + this.height);
     }
 
     @Override
@@ -503,8 +504,8 @@ Element {
         return this.editable;
     }
 
-    public void setEditable(boolean bl) {
-        this.editable = bl;
+    public void setEditable(boolean editable) {
+        this.editable = editable;
     }
 
     public int getInnerWidth() {
@@ -533,31 +534,31 @@ Element {
         }
     }
 
-    public void setFocusUnlocked(boolean bl) {
-        this.focusUnlocked = bl;
+    public void setFocusUnlocked(boolean focusUnlocked) {
+        this.focusUnlocked = focusUnlocked;
     }
 
     public boolean isVisible() {
         return this.visible;
     }
 
-    public void setVisible(boolean bl) {
-        this.visible = bl;
+    public void setVisible(boolean visible) {
+        this.visible = visible;
     }
 
-    public void setSuggestion(@Nullable String string) {
-        this.suggestion = string;
+    public void setSuggestion(@Nullable String suggestion) {
+        this.suggestion = suggestion;
     }
 
-    public int getCharacterX(int i) {
-        if (i > this.text.length()) {
+    public int getCharacterX(int index) {
+        if (index > this.text.length()) {
             return this.x;
         }
-        return this.x + this.textRenderer.getWidth(this.text.substring(0, i));
+        return this.x + this.textRenderer.getWidth(this.text.substring(0, index));
     }
 
-    public void setX(int i) {
-        this.x = i;
+    public void setX(int x) {
+        this.x = x;
     }
 }
 

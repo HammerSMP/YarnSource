@@ -27,21 +27,21 @@ implements Packet<ClientPlayPacketListener> {
     public RemoveEntityStatusEffectS2CPacket() {
     }
 
-    public RemoveEntityStatusEffectS2CPacket(int i, StatusEffect arg) {
-        this.entityId = i;
-        this.effectType = arg;
+    public RemoveEntityStatusEffectS2CPacket(int entityId, StatusEffect effectType) {
+        this.entityId = entityId;
+        this.effectType = effectType;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.entityId = arg.readVarInt();
-        this.effectType = StatusEffect.byRawId(arg.readUnsignedByte());
+    public void read(PacketByteBuf buf) throws IOException {
+        this.entityId = buf.readVarInt();
+        this.effectType = StatusEffect.byRawId(buf.readUnsignedByte());
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeVarInt(this.entityId);
-        arg.writeByte(StatusEffect.getRawId(this.effectType));
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeVarInt(this.entityId);
+        buf.writeByte(StatusEffect.getRawId(this.effectType));
     }
 
     @Override
@@ -51,8 +51,8 @@ implements Packet<ClientPlayPacketListener> {
 
     @Nullable
     @Environment(value=EnvType.CLIENT)
-    public Entity getEntity(World arg) {
-        return arg.getEntityById(this.entityId);
+    public Entity getEntity(World world) {
+        return world.getEntityById(this.entityId);
     }
 
     @Nullable

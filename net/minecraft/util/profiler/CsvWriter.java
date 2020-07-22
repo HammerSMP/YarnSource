@@ -21,36 +21,36 @@ public class CsvWriter {
     private final Writer writer;
     private final int column;
 
-    private CsvWriter(Writer writer, List<String> list) throws IOException {
+    private CsvWriter(Writer writer, List<String> headers) throws IOException {
         this.writer = writer;
-        this.column = list.size();
-        this.printRow(list.stream());
+        this.column = headers.size();
+        this.printRow(headers.stream());
     }
 
     public static Header makeHeader() {
         return new Header();
     }
 
-    public void printRow(Object ... objects) throws IOException {
-        if (objects.length != this.column) {
-            throw new IllegalArgumentException("Invalid number of columns, expected " + this.column + ", but got " + objects.length);
+    public void printRow(Object ... columns) throws IOException {
+        if (columns.length != this.column) {
+            throw new IllegalArgumentException("Invalid number of columns, expected " + this.column + ", but got " + columns.length);
         }
-        this.printRow(Stream.of(objects));
+        this.printRow(Stream.of(columns));
     }
 
-    private void printRow(Stream<?> stream) throws IOException {
-        this.writer.write(stream.map(CsvWriter::print).collect(Collectors.joining(",")) + "\r\n");
+    private void printRow(Stream<?> columns) throws IOException {
+        this.writer.write(columns.map(CsvWriter::print).collect(Collectors.joining(",")) + "\r\n");
     }
 
-    private static String print(@Nullable Object object) {
-        return StringEscapeUtils.escapeCsv((String)(object != null ? object.toString() : "[null]"));
+    private static String print(@Nullable Object o) {
+        return StringEscapeUtils.escapeCsv((String)(o != null ? o.toString() : "[null]"));
     }
 
     public static class Header {
         private final List<String> columns = Lists.newArrayList();
 
-        public Header addColumn(String string) {
-            this.columns.add(string);
+        public Header addColumn(String name) {
+            this.columns.add(name);
             return this;
         }
 

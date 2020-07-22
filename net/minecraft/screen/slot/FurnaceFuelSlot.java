@@ -13,23 +13,23 @@ public class FurnaceFuelSlot
 extends Slot {
     private final AbstractFurnaceScreenHandler handler;
 
-    public FurnaceFuelSlot(AbstractFurnaceScreenHandler arg, Inventory arg2, int i, int j, int k) {
-        super(arg2, i, j, k);
-        this.handler = arg;
+    public FurnaceFuelSlot(AbstractFurnaceScreenHandler handler, Inventory inventory, int index, int x, int y) {
+        super(inventory, index, x, y);
+        this.handler = handler;
     }
 
     @Override
-    public boolean canInsert(ItemStack arg) {
-        return this.handler.isFuel(arg) || FurnaceFuelSlot.isBucket(arg);
+    public boolean canInsert(ItemStack stack) {
+        return this.handler.isFuel(stack) || FurnaceFuelSlot.isBucket(stack);
     }
 
     @Override
-    public int getMaxStackAmount(ItemStack arg) {
-        return FurnaceFuelSlot.isBucket(arg) ? 1 : super.getMaxStackAmount(arg);
+    public int getMaxStackAmount(ItemStack stack) {
+        return FurnaceFuelSlot.isBucket(stack) ? 1 : super.getMaxStackAmount(stack);
     }
 
-    public static boolean isBucket(ItemStack arg) {
-        return arg.getItem() == Items.BUCKET;
+    public static boolean isBucket(ItemStack stack) {
+        return stack.getItem() == Items.BUCKET;
     }
 }
 

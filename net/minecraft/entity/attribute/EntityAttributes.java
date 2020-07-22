@@ -22,8 +22,8 @@ public class EntityAttributes {
     public static final EntityAttribute ZOMBIE_SPAWN_REINFORCEMENTS = EntityAttributes.register("zombie.spawn_reinforcements", new ClampedEntityAttribute("attribute.name.zombie.spawn_reinforcements", 0.0, 0.0, 1.0));
     public static final EntityAttribute HORSE_JUMP_STRENGTH = EntityAttributes.register("horse.jump_strength", new ClampedEntityAttribute("attribute.name.horse.jump_strength", 0.7, 0.0, 2.0).setTracked(true));
 
-    private static EntityAttribute register(String string, EntityAttribute arg) {
-        return Registry.register(Registry.ATTRIBUTE, string, arg);
+    private static EntityAttribute register(String id, EntityAttribute attribute) {
+        return Registry.register(Registry.ATTRIBUTE, id, attribute);
     }
 }
 

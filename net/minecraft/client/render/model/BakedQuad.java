@@ -20,12 +20,12 @@ public class BakedQuad {
     protected final Sprite sprite;
     private final boolean shade;
 
-    public BakedQuad(int[] is, int i, Direction arg, Sprite arg2, boolean bl) {
-        this.vertexData = is;
-        this.colorIndex = i;
-        this.face = arg;
-        this.sprite = arg2;
-        this.shade = bl;
+    public BakedQuad(int[] vertexData, int colorIndex, Direction face, Sprite sprite, boolean shade) {
+        this.vertexData = vertexData;
+        this.colorIndex = colorIndex;
+        this.face = face;
+        this.sprite = sprite;
+        this.shade = shade;
     }
 
     public int[] getVertexData() {

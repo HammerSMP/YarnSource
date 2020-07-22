@@ -35,8 +35,8 @@ extends Task<MobEntity> {
     private float speed;
     private int pathUpdateCountdownTicks;
 
-    public WanderAroundTask(int i) {
-        super((Map<MemoryModuleType<?>, MemoryModuleState>)ImmutableMap.of(MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE, (Object)((Object)MemoryModuleState.REGISTERED), MemoryModuleType.PATH, (Object)((Object)MemoryModuleState.VALUE_ABSENT), MemoryModuleType.WALK_TARGET, (Object)((Object)MemoryModuleState.VALUE_PRESENT)), i);
+    public WanderAroundTask(int runTime) {
+        super((Map<MemoryModuleType<?>, MemoryModuleState>)ImmutableMap.of(MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE, (Object)((Object)MemoryModuleState.REGISTERED), MemoryModuleType.PATH, (Object)((Object)MemoryModuleState.VALUE_ABSENT), MemoryModuleType.WALK_TARGET, (Object)((Object)MemoryModuleState.VALUE_PRESENT)), runTime);
     }
 
     @Override
@@ -102,7 +102,7 @@ extends Task<MobEntity> {
         }
     }
 
-    private boolean hasFinishedPath(MobEntity arg, WalkTarget arg2, long l) {
+    private boolean hasFinishedPath(MobEntity arg, WalkTarget arg2, long time) {
         BlockPos lv = arg2.getLookTarget().getBlockPos();
         this.path = arg.getNavigation().findPathTo(lv, 0);
         this.speed = arg2.getSpeed();
@@ -115,7 +115,7 @@ extends Task<MobEntity> {
             if (bl) {
                 lv2.forget(MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE);
             } else if (!lv2.hasMemoryModule(MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE)) {
-                lv2.remember(MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE, l);
+                lv2.remember(MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE, time);
             }
             if (this.path != null) {
                 return true;
@@ -129,23 +129,23 @@ extends Task<MobEntity> {
         return false;
     }
 
-    private boolean hasReached(MobEntity arg, WalkTarget arg2) {
-        return arg2.getLookTarget().getBlockPos().getManhattanDistance(arg.getBlockPos()) <= arg2.getCompletionRange();
+    private boolean hasReached(MobEntity entity, WalkTarget walkTarget) {
+        return walkTarget.getLookTarget().getBlockPos().getManhattanDistance(entity.getBlockPos()) <= walkTarget.getCompletionRange();
     }
 
     @Override
-    protected /* synthetic */ boolean shouldKeepRunning(ServerWorld arg, LivingEntity arg2, long l) {
-        return this.shouldKeepRunning(arg, (MobEntity)arg2, l);
+    protected /* synthetic */ boolean shouldKeepRunning(ServerWorld world, LivingEntity entity, long time) {
+        return this.shouldKeepRunning(world, (MobEntity)entity, time);
     }
 
     @Override
-    protected /* synthetic */ void finishRunning(ServerWorld arg, LivingEntity arg2, long l) {
-        this.finishRunning(arg, (MobEntity)arg2, l);
+    protected /* synthetic */ void finishRunning(ServerWorld world, LivingEntity entity, long time) {
+        this.finishRunning(world, (MobEntity)entity, time);
     }
 
     @Override
-    protected /* synthetic */ void run(ServerWorld arg, LivingEntity arg2, long l) {
-        this.run(arg, (MobEntity)arg2, l);
+    protected /* synthetic */ void run(ServerWorld world, LivingEntity entity, long time) {
+        this.run(world, (MobEntity)entity, time);
     }
 }
 

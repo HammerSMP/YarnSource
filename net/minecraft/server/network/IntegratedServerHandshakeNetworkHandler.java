@@ -22,19 +22,19 @@ implements ServerHandshakePacketListener {
     private final MinecraftServer server;
     private final ClientConnection connection;
 
-    public IntegratedServerHandshakeNetworkHandler(MinecraftServer minecraftServer, ClientConnection arg) {
-        this.server = minecraftServer;
-        this.connection = arg;
+    public IntegratedServerHandshakeNetworkHandler(MinecraftServer server, ClientConnection connection) {
+        this.server = server;
+        this.connection = connection;
     }
 
     @Override
-    public void onHandshake(HandshakeC2SPacket arg) {
-        this.connection.setState(arg.getIntendedState());
+    public void onHandshake(HandshakeC2SPacket packet) {
+        this.connection.setState(packet.getIntendedState());
         this.connection.setPacketListener(new ServerLoginNetworkHandler(this.server, this.connection));
     }
 
     @Override
-    public void onDisconnected(Text arg) {
+    public void onDisconnected(Text reason) {
     }
 
     @Override

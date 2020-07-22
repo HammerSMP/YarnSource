@@ -18,8 +18,8 @@ import net.minecraft.datafixer.schema.Schema100;
 
 public class Schema703
 extends Schema {
-    public Schema703(int i, Schema schema) {
-        super(i, schema);
+    public Schema703(int versionKey, Schema parent) {
+        super(versionKey, parent);
     }
 
     public Map<String, Supplier<TypeTemplate>> registerEntities(Schema schema) {

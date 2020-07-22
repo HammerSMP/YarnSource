@@ -33,37 +33,37 @@ extends AbstractSignBlock {
     }
 
     @Override
-    public boolean canPlaceAt(BlockState arg, WorldView arg2, BlockPos arg3) {
-        return arg2.getBlockState(arg3.down()).getMaterial().isSolid();
+    public boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
+        return world.getBlockState(pos.down()).getMaterial().isSolid();
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext arg) {
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
         FluidState lv;
-        return (BlockState)((BlockState)this.getDefaultState().with(ROTATION, MathHelper.floor((double)((180.0f + arg.getPlayerYaw()) * 16.0f / 360.0f) + 0.5) & 0xF)).with(WATERLOGGED, (lv = arg.getWorld().getFluidState(arg.getBlockPos())).getFluid() == Fluids.WATER);
+        return (BlockState)((BlockState)this.getDefaultState().with(ROTATION, MathHelper.floor((double)((180.0f + ctx.getPlayerYaw()) * 16.0f / 360.0f) + 0.5) & 0xF)).with(WATERLOGGED, (lv = ctx.getWorld().getFluidState(ctx.getBlockPos())).getFluid() == Fluids.WATER);
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
-        if (arg2 == Direction.DOWN && !this.canPlaceAt(arg, arg4, arg5)) {
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
+        if (direction == Direction.DOWN && !this.canPlaceAt(state, world, pos)) {
             return Blocks.AIR.getDefaultState();
         }
-        return super.getStateForNeighborUpdate(arg, arg2, arg3, arg4, arg5, arg6);
+        return super.getStateForNeighborUpdate(state, direction, newState, world, pos, posFrom);
     }
 
     @Override
-    public BlockState rotate(BlockState arg, BlockRotation arg2) {
-        return (BlockState)arg.with(ROTATION, arg2.rotate(arg.get(ROTATION), 16));
+    public BlockState rotate(BlockState state, BlockRotation rotation) {
+        return (BlockState)state.with(ROTATION, rotation.rotate(state.get(ROTATION), 16));
     }
 
     @Override
-    public BlockState mirror(BlockState arg, BlockMirror arg2) {
-        return (BlockState)arg.with(ROTATION, arg2.mirror(arg.get(ROTATION), 16));
+    public BlockState mirror(BlockState state, BlockMirror mirror) {
+        return (BlockState)state.with(ROTATION, mirror.mirror(state.get(ROTATION), 16));
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(ROTATION, WATERLOGGED);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(ROTATION, WATERLOGGED);
     }
 }
 

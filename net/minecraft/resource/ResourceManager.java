@@ -54,28 +54,28 @@ public interface ResourceManager {
         }
 
         @Override
-        public Resource getResource(Identifier arg) throws IOException {
-            throw new FileNotFoundException(arg.toString());
+        public Resource getResource(Identifier id) throws IOException {
+            throw new FileNotFoundException(id.toString());
         }
 
         @Override
         @Environment(value=EnvType.CLIENT)
-        public boolean containsResource(Identifier arg) {
+        public boolean containsResource(Identifier id) {
             return false;
         }
 
         @Override
-        public List<Resource> getAllResources(Identifier arg) {
+        public List<Resource> getAllResources(Identifier id) {
             return ImmutableList.of();
         }
 
         @Override
-        public Collection<Identifier> findResources(Identifier arg, Predicate<String> predicate) {
+        public Collection<Identifier> findResources(Identifier resourceType, Predicate<String> predicate) {
             return ImmutableSet.of();
         }
 
         @Override
-        public Collection<Identifier> findResources(String string, Predicate<String> predicate) {
+        public Collection<Identifier> findResources(String resourceType, Predicate<String> pathPredicate) {
             return ImmutableSet.of();
         }
 

@@ -47,40 +47,40 @@ extends ResourceTexture {
     private CompletableFuture<?> loader;
     private boolean loaded;
 
-    public PlayerSkinTexture(@Nullable File file, String string, Identifier arg, boolean bl, @Nullable Runnable runnable) {
-        super(arg);
-        this.cacheFile = file;
-        this.url = string;
-        this.convertLegacy = bl;
-        this.loadedCallback = runnable;
+    public PlayerSkinTexture(@Nullable File cacheFile, String url, Identifier fallbackSkin, boolean convertLegacy, @Nullable Runnable callback) {
+        super(fallbackSkin);
+        this.cacheFile = cacheFile;
+        this.url = url;
+        this.convertLegacy = convertLegacy;
+        this.loadedCallback = callback;
     }
 
-    private void onTextureLoaded(NativeImage arg) {
+    private void onTextureLoaded(NativeImage image) {
         if (this.loadedCallback != null) {
             this.loadedCallback.run();
         }
         MinecraftClient.getInstance().execute(() -> {
             this.loaded = true;
             if (!RenderSystem.isOnRenderThread()) {
-                RenderSystem.recordRenderCall(() -> this.uploadTexture(arg));
+                RenderSystem.recordRenderCall(() -> this.uploadTexture(image));
             } else {
-                this.uploadTexture(arg);
+                this.uploadTexture(image);
             }
         });
     }
 
-    private void uploadTexture(NativeImage arg) {
-        TextureUtil.allocate(this.getGlId(), arg.getWidth(), arg.getHeight());
-        arg.upload(0, 0, 0, true);
+    private void uploadTexture(NativeImage image) {
+        TextureUtil.allocate(this.getGlId(), image.getWidth(), image.getHeight());
+        image.upload(0, 0, 0, true);
     }
 
     @Override
-    public void load(ResourceManager arg) throws IOException {
+    public void load(ResourceManager manager) throws IOException {
         NativeImage lv2;
         MinecraftClient.getInstance().execute(() -> {
             if (!this.loaded) {
                 try {
-                    super.load(arg);
+                    super.load(manager);
                 }
                 catch (IOException iOException) {
                     LOGGER.warn("Failed to load texture: {}", (Object)this.location, (Object)iOException);
@@ -139,10 +139,10 @@ extends ResourceTexture {
     }
 
     @Nullable
-    private NativeImage loadTexture(InputStream inputStream) {
+    private NativeImage loadTexture(InputStream stream) {
         NativeImage lv = null;
         try {
-            lv = NativeImage.read(inputStream);
+            lv = NativeImage.read(stream);
             if (this.convertLegacy) {
                 lv = PlayerSkinTexture.remapTexture(lv);
             }
@@ -153,56 +153,56 @@ extends ResourceTexture {
         return lv;
     }
 
-    private static NativeImage remapTexture(NativeImage arg) {
+    private static NativeImage remapTexture(NativeImage image) {
         boolean bl;
-        boolean bl2 = bl = arg.getHeight() == 32;
+        boolean bl2 = bl = image.getHeight() == 32;
         if (bl) {
             NativeImage lv = new NativeImage(64, 64, true);
-            lv.copyFrom(arg);
-            arg.close();
-            arg = lv;
-            arg.fillRect(0, 32, 64, 32, 0);
-            arg.copyRect(4, 16, 16, 32, 4, 4, true, false);
-            arg.copyRect(8, 16, 16, 32, 4, 4, true, false);
-            arg.copyRect(0, 20, 24, 32, 4, 12, true, false);
-            arg.copyRect(4, 20, 16, 32, 4, 12, true, false);
-            arg.copyRect(8, 20, 8, 32, 4, 12, true, false);
-            arg.copyRect(12, 20, 16, 32, 4, 12, true, false);
-            arg.copyRect(44, 16, -8, 32, 4, 4, true, false);
-            arg.copyRect(48, 16, -8, 32, 4, 4, true, false);
-            arg.copyRect(40, 20, 0, 32, 4, 12, true, false);
-            arg.copyRect(44, 20, -8, 32, 4, 12, true, false);
-            arg.copyRect(48, 20, -16, 32, 4, 12, true, false);
-            arg.copyRect(52, 20, -8, 32, 4, 12, true, false);
+            lv.copyFrom(image);
+            image.close();
+            image = lv;
+            image.fillRect(0, 32, 64, 32, 0);
+            image.copyRect(4, 16, 16, 32, 4, 4, true, false);
+            image.copyRect(8, 16, 16, 32, 4, 4, true, false);
+            image.copyRect(0, 20, 24, 32, 4, 12, true, false);
+            image.copyRect(4, 20, 16, 32, 4, 12, true, false);
+            image.copyRect(8, 20, 8, 32, 4, 12, true, false);
+            image.copyRect(12, 20, 16, 32, 4, 12, true, false);
+            image.copyRect(44, 16, -8, 32, 4, 4, true, false);
+            image.copyRect(48, 16, -8, 32, 4, 4, true, false);
+            image.copyRect(40, 20, 0, 32, 4, 12, true, false);
+            image.copyRect(44, 20, -8, 32, 4, 12, true, false);
+            image.copyRect(48, 20, -16, 32, 4, 12, true, false);
+            image.copyRect(52, 20, -8, 32, 4, 12, true, false);
         }
-        PlayerSkinTexture.stripAlpha(arg, 0, 0, 32, 16);
+        PlayerSkinTexture.stripAlpha(image, 0, 0, 32, 16);
         if (bl) {
-            PlayerSkinTexture.stripColor(arg, 32, 0, 64, 32);
+            PlayerSkinTexture.stripColor(image, 32, 0, 64, 32);
         }
-        PlayerSkinTexture.stripAlpha(arg, 0, 16, 64, 32);
-        PlayerSkinTexture.stripAlpha(arg, 16, 48, 48, 64);
-        return arg;
+        PlayerSkinTexture.stripAlpha(image, 0, 16, 64, 32);
+        PlayerSkinTexture.stripAlpha(image, 16, 48, 48, 64);
+        return image;
     }
 
-    private static void stripColor(NativeImage arg, int i, int j, int k, int l) {
-        for (int m = i; m < k; ++m) {
-            for (int n = j; n < l; ++n) {
-                int o = arg.getPixelColor(m, n);
+    private static void stripColor(NativeImage image, int x, int y, int width, int height) {
+        for (int m = x; m < width; ++m) {
+            for (int n = y; n < height; ++n) {
+                int o = image.getPixelColor(m, n);
                 if ((o >> 24 & 0xFF) >= 128) continue;
                 return;
             }
         }
-        for (int p = i; p < k; ++p) {
-            for (int q = j; q < l; ++q) {
-                arg.setPixelColor(p, q, arg.getPixelColor(p, q) & 0xFFFFFF);
+        for (int p = x; p < width; ++p) {
+            for (int q = y; q < height; ++q) {
+                image.setPixelColor(p, q, image.getPixelColor(p, q) & 0xFFFFFF);
             }
         }
     }
 
-    private static void stripAlpha(NativeImage arg, int i, int j, int k, int l) {
-        for (int m = i; m < k; ++m) {
-            for (int n = j; n < l; ++n) {
-                arg.setPixelColor(m, n, arg.getPixelColor(m, n) | 0xFF000000);
+    private static void stripAlpha(NativeImage image, int x, int y, int width, int height) {
+        for (int m = x; m < width; ++m) {
+            for (int n = y; n < height; ++n) {
+                image.setPixelColor(m, n, image.getPixelColor(m, n) | 0xFF000000);
             }
         }
     }

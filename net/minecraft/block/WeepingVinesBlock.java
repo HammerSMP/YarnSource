@@ -32,8 +32,8 @@ extends AbstractPlantStemBlock {
     }
 
     @Override
-    protected boolean chooseStemState(BlockState arg) {
-        return VineLogic.isValidForWeepingStem(arg);
+    protected boolean chooseStemState(BlockState state) {
+        return VineLogic.isValidForWeepingStem(state);
     }
 }
 

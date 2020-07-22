@@ -14,6 +14,7 @@ import net.minecraft.structure.StructurePiece;
 import net.minecraft.structure.StructureStart;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.registry.DynamicRegistryManager;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.source.BiomeSource;
 import net.minecraft.world.gen.ChunkRandom;
@@ -34,7 +35,7 @@ extends StructureFeature<DefaultFeatureConfig> {
 
     @Override
     protected boolean shouldStartAt(ChunkGenerator arg, BiomeSource arg2, long l, ChunkRandom arg3, int i, int j, Biome arg4, ChunkPos arg5, DefaultFeatureConfig arg6) {
-        return arg.method_28507(new ChunkPos(i, j));
+        return arg.isStrongholdStartingChunk(new ChunkPos(i, j));
     }
 
     public static class Start
@@ -47,7 +48,7 @@ extends StructureFeature<DefaultFeatureConfig> {
         }
 
         @Override
-        public void init(ChunkGenerator arg, StructureManager arg2, int i, int j, Biome arg3, DefaultFeatureConfig arg4) {
+        public void init(DynamicRegistryManager arg, ChunkGenerator arg2, StructureManager arg3, int i, int j, Biome arg4, DefaultFeatureConfig arg5) {
             StrongholdGenerator.Start lv;
             int k = 0;
             do {
@@ -65,7 +66,7 @@ extends StructureFeature<DefaultFeatureConfig> {
                     lv2.placeJigsaw(lv, this.children, this.random);
                 }
                 this.setBoundingBoxFromChildren();
-                this.method_14978(arg.getSeaLevel(), this.random, 10);
+                this.method_14978(arg2.getSeaLevel(), this.random, 10);
             } while (this.children.isEmpty() || lv.field_15283 == null);
         }
     }

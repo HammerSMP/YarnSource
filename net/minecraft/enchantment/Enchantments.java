@@ -79,8 +79,8 @@ public class Enchantments {
     public static final Enchantment MENDING = Enchantments.register("mending", new MendingEnchantment(Enchantment.Rarity.RARE, EquipmentSlot.values()));
     public static final Enchantment VANISHING_CURSE = Enchantments.register("vanishing_curse", new VanishingCurseEnchantment(Enchantment.Rarity.VERY_RARE, EquipmentSlot.values()));
 
-    private static Enchantment register(String string, Enchantment arg) {
-        return Registry.register(Registry.ENCHANTMENT, string, arg);
+    private static Enchantment register(String name, Enchantment enchantment) {
+        return Registry.register(Registry.ENCHANTMENT, name, enchantment);
     }
 }
 

@@ -24,8 +24,8 @@ extends IdentifierNormalizingSchema {
         super(i, schema);
     }
 
-    private static void targetRecipeUsedField(Schema schema, Map<String, Supplier<TypeTemplate>> map, String string) {
-        schema.register(map, string, () -> DSL.optionalFields((String)"Items", (TypeTemplate)DSL.list((TypeTemplate)TypeReferences.ITEM_STACK.in(schema)), (String)"RecipesUsed", (TypeTemplate)DSL.compoundList((TypeTemplate)TypeReferences.RECIPE.in(schema), (TypeTemplate)DSL.constType((Type)DSL.intType()))));
+    private static void targetRecipeUsedField(Schema schema, Map<String, Supplier<TypeTemplate>> map, String name) {
+        schema.register(map, name, () -> DSL.optionalFields((String)"Items", (TypeTemplate)DSL.list((TypeTemplate)TypeReferences.ITEM_STACK.in(schema)), (String)"RecipesUsed", (TypeTemplate)DSL.compoundList((TypeTemplate)TypeReferences.RECIPE.in(schema), (TypeTemplate)DSL.constType((Type)DSL.intType()))));
     }
 
     public Map<String, Supplier<TypeTemplate>> registerBlockEntities(Schema schema) {

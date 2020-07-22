@@ -46,9 +46,9 @@ public class TestRunner {
     private int currentBatchIndex = 0;
     private BlockPos.Mutable reusablePos;
 
-    public TestRunner(Collection<GameTestBatch> collection, BlockPos arg, BlockRotation arg2, ServerWorld arg32, TestManager arg4, int i) {
-        this.reusablePos = arg.mutableCopy();
-        this.pos = arg;
+    public TestRunner(Collection<GameTestBatch> collection, BlockPos pos, BlockRotation arg2, ServerWorld arg32, TestManager arg4, int i) {
+        this.reusablePos = pos.mutableCopy();
+        this.pos = pos;
         this.world = arg32;
         this.testManager = arg4;
         this.sizeZ = i;
@@ -72,10 +72,10 @@ public class TestRunner {
         this.runBatch(0);
     }
 
-    private void runBatch(int i) {
-        this.currentBatchIndex = i;
+    private void runBatch(int index) {
+        this.currentBatchIndex = index;
         this.currentBatchTests = new TestSet();
-        if (i >= this.batches.size()) {
+        if (index >= this.batches.size()) {
             return;
         }
         Pair<GameTestBatch, Collection<GameTest>> pair = this.batches.get(this.currentBatchIndex);
@@ -90,12 +90,12 @@ public class TestRunner {
             this.currentBatchTests.addListener(new TestListener(){
 
                 @Override
-                public void onStarted(GameTest arg) {
+                public void onStarted(GameTest test) {
                 }
 
                 @Override
-                public void onFailed(GameTest arg) {
-                    TestRunner.this.onTestCompleted(arg);
+                public void onFailed(GameTest test) {
+                    TestRunner.this.onTestCompleted(test);
                 }
             });
             BlockPos lv = this.field_25300.get(arg);
@@ -103,7 +103,7 @@ public class TestRunner {
         });
     }
 
-    private void onTestCompleted(GameTest arg) {
+    private void onTestCompleted(GameTest test) {
         if (this.currentBatchTests.isDone()) {
             this.runBatch(this.currentBatchIndex + 1);
         }

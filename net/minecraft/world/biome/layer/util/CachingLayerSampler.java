@@ -17,25 +17,25 @@ implements LayerSampler {
     private final Long2IntLinkedOpenHashMap cache;
     private final int cacheCapacity;
 
-    public CachingLayerSampler(Long2IntLinkedOpenHashMap long2IntLinkedOpenHashMap, int i, LayerOperator arg) {
-        this.cache = long2IntLinkedOpenHashMap;
-        this.cacheCapacity = i;
-        this.operator = arg;
+    public CachingLayerSampler(Long2IntLinkedOpenHashMap cache, int cacheCapacity, LayerOperator operator) {
+        this.cache = cache;
+        this.cacheCapacity = cacheCapacity;
+        this.operator = operator;
     }
 
     /*
      * WARNING - Removed try catching itself - possible behaviour change.
      */
     @Override
-    public int sample(int i, int j) {
-        long l = ChunkPos.toLong(i, j);
+    public int sample(int x, int z) {
+        long l = ChunkPos.toLong(x, z);
         Long2IntLinkedOpenHashMap long2IntLinkedOpenHashMap = this.cache;
         synchronized (long2IntLinkedOpenHashMap) {
             int k = this.cache.get(l);
             if (k != Integer.MIN_VALUE) {
                 return k;
             }
-            int m = this.operator.apply(i, j);
+            int m = this.operator.apply(x, z);
             this.cache.put(l, m);
             if (this.cache.size() > this.cacheCapacity) {
                 for (int n = 0; n < this.cacheCapacity / 16; ++n) {

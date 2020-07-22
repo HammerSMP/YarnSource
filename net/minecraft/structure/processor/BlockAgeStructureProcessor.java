@@ -29,13 +29,13 @@ extends StructureProcessor {
     public static final Codec<BlockAgeStructureProcessor> CODEC = Codec.FLOAT.fieldOf("mossiness").xmap(BlockAgeStructureProcessor::new, arg -> Float.valueOf(arg.mossiness)).codec();
     private final float mossiness;
 
-    public BlockAgeStructureProcessor(float f) {
-        this.mossiness = f;
+    public BlockAgeStructureProcessor(float mossiness) {
+        this.mossiness = mossiness;
     }
 
     @Override
     @Nullable
-    public Structure.StructureBlockInfo process(WorldView arg, BlockPos arg2, BlockPos arg3, Structure.StructureBlockInfo arg4, Structure.StructureBlockInfo arg5, StructurePlacementData arg6) {
+    public Structure.StructureBlockInfo process(WorldView arg, BlockPos pos, BlockPos arg3, Structure.StructureBlockInfo arg4, Structure.StructureBlockInfo arg5, StructurePlacementData arg6) {
         Random random = arg6.getRandom(arg5.pos);
         BlockState lv = arg5.state;
         BlockPos lv2 = arg5.pos;
@@ -68,9 +68,9 @@ extends StructureProcessor {
     }
 
     @Nullable
-    private BlockState processStairs(Random random, BlockState arg) {
-        Direction lv = arg.get(StairsBlock.FACING);
-        BlockHalf lv2 = arg.get(StairsBlock.HALF);
+    private BlockState processStairs(Random random, BlockState state) {
+        Direction lv = state.get(StairsBlock.FACING);
+        BlockHalf lv2 = state.get(StairsBlock.HALF);
         if (random.nextFloat() >= 0.5f) {
             return null;
         }
@@ -103,19 +103,19 @@ extends StructureProcessor {
         return null;
     }
 
-    private static BlockState randomStairProperties(Random random, Block arg) {
-        return (BlockState)((BlockState)arg.getDefaultState().with(StairsBlock.FACING, Direction.Type.HORIZONTAL.random(random))).with(StairsBlock.HALF, BlockHalf.values()[random.nextInt(BlockHalf.values().length)]);
+    private static BlockState randomStairProperties(Random random, Block stairs) {
+        return (BlockState)((BlockState)stairs.getDefaultState().with(StairsBlock.FACING, Direction.Type.HORIZONTAL.random(random))).with(StairsBlock.HALF, BlockHalf.values()[random.nextInt(BlockHalf.values().length)]);
     }
 
-    private BlockState process(Random random, BlockState[] args, BlockState[] args2) {
+    private BlockState process(Random random, BlockState[] regularStates, BlockState[] mossyStates) {
         if (random.nextFloat() < this.mossiness) {
-            return BlockAgeStructureProcessor.randomState(random, args2);
+            return BlockAgeStructureProcessor.randomState(random, mossyStates);
         }
-        return BlockAgeStructureProcessor.randomState(random, args);
+        return BlockAgeStructureProcessor.randomState(random, regularStates);
     }
 
-    private static BlockState randomState(Random random, BlockState[] args) {
-        return args[random.nextInt(args.length)];
+    private static BlockState randomState(Random random, BlockState[] states) {
+        return states[random.nextInt(states.length)];
     }
 
     @Override

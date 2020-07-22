@@ -52,12 +52,12 @@ implements FlyingItemEntity {
         super((EntityType<? extends ThrownItemEntity>)arg, arg2);
     }
 
-    public PotionEntity(World arg, LivingEntity arg2) {
-        super((EntityType<? extends ThrownItemEntity>)EntityType.POTION, arg2, arg);
+    public PotionEntity(World world, LivingEntity owner) {
+        super((EntityType<? extends ThrownItemEntity>)EntityType.POTION, owner, world);
     }
 
-    public PotionEntity(World arg, double d, double e, double f) {
-        super((EntityType<? extends ThrownItemEntity>)EntityType.POTION, d, e, f, arg);
+    public PotionEntity(World world, double x, double y, double z) {
+        super((EntityType<? extends ThrownItemEntity>)EntityType.POTION, x, y, z, world);
     }
 
     @Override
@@ -71,8 +71,8 @@ implements FlyingItemEntity {
     }
 
     @Override
-    protected void onBlockHit(BlockHitResult arg) {
-        super.onBlockHit(arg);
+    protected void onBlockHit(BlockHitResult blockHitResult) {
+        super.onBlockHit(blockHitResult);
         if (this.world.isClient) {
             return;
         }
@@ -80,8 +80,8 @@ implements FlyingItemEntity {
         Potion lv2 = PotionUtil.getPotion(lv);
         List<StatusEffectInstance> list = PotionUtil.getPotionEffects(lv);
         boolean bl = lv2 == Potions.WATER && list.isEmpty();
-        Direction lv3 = arg.getSide();
-        BlockPos lv4 = arg.getBlockPos();
+        Direction lv3 = blockHitResult.getSide();
+        BlockPos lv4 = blockHitResult.getBlockPos();
         BlockPos lv5 = lv4.offset(lv3);
         if (bl) {
             this.extinguishFire(lv5, lv3);
@@ -93,9 +93,9 @@ implements FlyingItemEntity {
     }
 
     @Override
-    protected void onCollision(HitResult arg) {
+    protected void onCollision(HitResult hitResult) {
         boolean bl;
-        super.onCollision(arg);
+        super.onCollision(hitResult);
         if (this.world.isClient) {
             return;
         }
@@ -109,7 +109,7 @@ implements FlyingItemEntity {
             if (this.isLingering()) {
                 this.applyLingeringPotion(lv, lv2);
             } else {
-                this.applySplashPotion(list, arg.getType() == HitResult.Type.ENTITY ? ((EntityHitResult)arg).getEntity() : null);
+                this.applySplashPotion(list, hitResult.getType() == HitResult.Type.ENTITY ? ((EntityHitResult)hitResult).getEntity() : null);
             }
         }
         int i = lv2.hasInstantEffect() ? 2007 : 2002;
@@ -119,7 +119,7 @@ implements FlyingItemEntity {
 
     private void damageEntitiesHurtByWater() {
         Box lv = this.getBoundingBox().expand(4.0, 2.0, 4.0);
-        List<LivingEntity> list = this.world.getEntities(LivingEntity.class, lv, WATER_HURTS);
+        List<LivingEntity> list = this.world.getEntitiesByClass(LivingEntity.class, lv, WATER_HURTS);
         if (!list.isEmpty()) {
             for (LivingEntity lv2 : list) {
                 double d = this.squaredDistanceTo(lv2);
@@ -129,7 +129,7 @@ implements FlyingItemEntity {
         }
     }
 
-    private void applySplashPotion(List<StatusEffectInstance> list, @Nullable Entity arg) {
+    private void applySplashPotion(List<StatusEffectInstance> statusEffects, @Nullable Entity entity) {
         Box lv = this.getBoundingBox().expand(4.0, 2.0, 4.0);
         List<LivingEntity> list2 = this.world.getNonSpectatingEntities(LivingEntity.class, lv);
         if (!list2.isEmpty()) {
@@ -137,10 +137,10 @@ implements FlyingItemEntity {
                 double d;
                 if (!lv2.isAffectedBySplashPotions() || !((d = this.squaredDistanceTo(lv2)) < 16.0)) continue;
                 double e = 1.0 - Math.sqrt(d) / 4.0;
-                if (lv2 == arg) {
+                if (lv2 == entity) {
                     e = 1.0;
                 }
-                for (StatusEffectInstance lv3 : list) {
+                for (StatusEffectInstance lv3 : statusEffects) {
                     StatusEffect lv4 = lv3.getEffectType();
                     if (lv4.isInstant()) {
                         lv4.applyInstantEffect(this, this.getOwner(), lv2, lv3.getAmplifier(), e);
@@ -154,7 +154,7 @@ implements FlyingItemEntity {
         }
     }
 
-    private void applyLingeringPotion(ItemStack arg, Potion arg2) {
+    private void applyLingeringPotion(ItemStack stack, Potion potion) {
         AreaEffectCloudEntity lv = new AreaEffectCloudEntity(this.world, this.getX(), this.getY(), this.getZ());
         Entity lv2 = this.getOwner();
         if (lv2 instanceof LivingEntity) {
@@ -164,11 +164,11 @@ implements FlyingItemEntity {
         lv.setRadiusOnUse(-0.5f);
         lv.setWaitTime(10);
         lv.setRadiusGrowth(-lv.getRadius() / (float)lv.getDuration());
-        lv.setPotion(arg2);
-        for (StatusEffectInstance lv3 : PotionUtil.getCustomPotionEffects(arg)) {
+        lv.setPotion(potion);
+        for (StatusEffectInstance lv3 : PotionUtil.getCustomPotionEffects(stack)) {
             lv.addEffect(new StatusEffectInstance(lv3));
         }
-        CompoundTag lv4 = arg.getTag();
+        CompoundTag lv4 = stack.getTag();
         if (lv4 != null && lv4.contains("CustomPotionColor", 99)) {
             lv.setColor(lv4.getInt("CustomPotionColor"));
         }
@@ -179,14 +179,14 @@ implements FlyingItemEntity {
         return this.getStack().getItem() == Items.LINGERING_POTION;
     }
 
-    private void extinguishFire(BlockPos arg, Direction arg2) {
-        BlockState lv = this.world.getBlockState(arg);
+    private void extinguishFire(BlockPos pos, Direction direction) {
+        BlockState lv = this.world.getBlockState(pos);
         if (lv.isIn(BlockTags.FIRE)) {
-            this.world.removeBlock(arg, false);
+            this.world.removeBlock(pos, false);
         } else if (CampfireBlock.isLitCampfire(lv)) {
-            this.world.syncWorldEvent(null, 1009, arg, 0);
-            CampfireBlock.extinguish(this.world, arg, lv);
-            this.world.setBlockState(arg, (BlockState)lv.with(CampfireBlock.LIT, false));
+            this.world.syncWorldEvent(null, 1009, pos, 0);
+            CampfireBlock.extinguish(this.world, pos, lv);
+            this.world.setBlockState(pos, (BlockState)lv.with(CampfireBlock.LIT, false));
         }
     }
 }

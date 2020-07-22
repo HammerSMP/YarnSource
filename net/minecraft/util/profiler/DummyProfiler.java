@@ -30,11 +30,11 @@ implements ReadableProfiler {
     }
 
     @Override
-    public void push(String string) {
+    public void push(String location) {
     }
 
     @Override
-    public void push(Supplier<String> supplier) {
+    public void push(Supplier<String> locationGetter) {
     }
 
     @Override
@@ -42,20 +42,20 @@ implements ReadableProfiler {
     }
 
     @Override
-    public void swap(String string) {
+    public void swap(String location) {
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void swap(Supplier<String> supplier) {
+    public void swap(Supplier<String> locationGetter) {
     }
 
     @Override
-    public void visit(String string) {
+    public void visit(String marker) {
     }
 
     @Override
-    public void visit(Supplier<String> supplier) {
+    public void visit(Supplier<String> markerGetter) {
     }
 
     @Override

@@ -39,6 +39,7 @@ public class BufferBuilderStorage {
         BufferBuilderStorage.assignBufferBuilder((Object2ObjectLinkedOpenHashMap<RenderLayer, BufferBuilder>)object2ObjectLinkedOpenHashMap, RenderLayer.getArmorEntityGlint());
         BufferBuilderStorage.assignBufferBuilder((Object2ObjectLinkedOpenHashMap<RenderLayer, BufferBuilder>)object2ObjectLinkedOpenHashMap, RenderLayer.getGlint());
         BufferBuilderStorage.assignBufferBuilder((Object2ObjectLinkedOpenHashMap<RenderLayer, BufferBuilder>)object2ObjectLinkedOpenHashMap, RenderLayer.getGlintDirect());
+        BufferBuilderStorage.assignBufferBuilder((Object2ObjectLinkedOpenHashMap<RenderLayer, BufferBuilder>)object2ObjectLinkedOpenHashMap, RenderLayer.method_30676());
         BufferBuilderStorage.assignBufferBuilder((Object2ObjectLinkedOpenHashMap<RenderLayer, BufferBuilder>)object2ObjectLinkedOpenHashMap, RenderLayer.getEntityGlint());
         BufferBuilderStorage.assignBufferBuilder((Object2ObjectLinkedOpenHashMap<RenderLayer, BufferBuilder>)object2ObjectLinkedOpenHashMap, RenderLayer.getEntityGlintDirect());
         BufferBuilderStorage.assignBufferBuilder((Object2ObjectLinkedOpenHashMap<RenderLayer, BufferBuilder>)object2ObjectLinkedOpenHashMap, RenderLayer.getWaterMask());
@@ -48,8 +49,8 @@ public class BufferBuilderStorage {
     private final VertexConsumerProvider.Immediate effectVertexConsumers = VertexConsumerProvider.immediate(new BufferBuilder(256));
     private final OutlineVertexConsumerProvider outlineVertexConsumers = new OutlineVertexConsumerProvider(this.entityVertexConsumers);
 
-    private static void assignBufferBuilder(Object2ObjectLinkedOpenHashMap<RenderLayer, BufferBuilder> object2ObjectLinkedOpenHashMap, RenderLayer arg) {
-        object2ObjectLinkedOpenHashMap.put((Object)arg, (Object)new BufferBuilder(arg.getExpectedBufferSize()));
+    private static void assignBufferBuilder(Object2ObjectLinkedOpenHashMap<RenderLayer, BufferBuilder> builderStorage, RenderLayer layer) {
+        builderStorage.put((Object)layer, (Object)new BufferBuilder(layer.getExpectedBufferSize()));
     }
 
     public BlockBufferBuilderStorage getBlockBufferBuilders() {

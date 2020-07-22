@@ -20,20 +20,20 @@ extends Item {
         super(arg);
     }
 
-    public static void addEffectToStew(ItemStack arg, StatusEffect arg2, int i) {
-        CompoundTag lv = arg.getOrCreateTag();
+    public static void addEffectToStew(ItemStack stew, StatusEffect effect, int duration) {
+        CompoundTag lv = stew.getOrCreateTag();
         ListTag lv2 = lv.getList("Effects", 9);
         CompoundTag lv3 = new CompoundTag();
-        lv3.putByte("EffectId", (byte)StatusEffect.getRawId(arg2));
-        lv3.putInt("EffectDuration", i);
+        lv3.putByte("EffectId", (byte)StatusEffect.getRawId(effect));
+        lv3.putInt("EffectDuration", duration);
         lv2.add(lv3);
         lv.put("Effects", lv2);
     }
 
     @Override
-    public ItemStack finishUsing(ItemStack arg, World arg2, LivingEntity arg3) {
-        ItemStack lv = super.finishUsing(arg, arg2, arg3);
-        CompoundTag lv2 = arg.getTag();
+    public ItemStack finishUsing(ItemStack stack, World world, LivingEntity user) {
+        ItemStack lv = super.finishUsing(stack, world, user);
+        CompoundTag lv2 = stack.getTag();
         if (lv2 != null && lv2.contains("Effects", 9)) {
             ListTag lv3 = lv2.getList("Effects", 10);
             for (int i = 0; i < lv3.size(); ++i) {
@@ -44,10 +44,10 @@ extends Item {
                     j = lv4.getInt("EffectDuration");
                 }
                 if ((lv5 = StatusEffect.byRawId(lv4.getByte("EffectId"))) == null) continue;
-                arg3.addStatusEffect(new StatusEffectInstance(lv5, j));
+                user.addStatusEffect(new StatusEffectInstance(lv5, j));
             }
         }
-        if (arg3 instanceof PlayerEntity && ((PlayerEntity)arg3).abilities.creativeMode) {
+        if (user instanceof PlayerEntity && ((PlayerEntity)user).abilities.creativeMode) {
             return lv;
         }
         return new ItemStack(Items.BOWL);

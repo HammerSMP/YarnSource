@@ -70,8 +70,8 @@ extends SpriteBillboardParticle {
     implements ParticleFactory<DefaultParticleType> {
         private final SpriteProvider spriteProvider;
 
-        public Factory(SpriteProvider arg) {
-            this.spriteProvider = arg;
+        public Factory(SpriteProvider spriteProvider) {
+            this.spriteProvider = spriteProvider;
         }
 
         @Override

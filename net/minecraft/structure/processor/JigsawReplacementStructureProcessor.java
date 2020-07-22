@@ -15,7 +15,7 @@ import com.mojang.serialization.Codec;
 import javax.annotation.Nullable;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.command.arguments.BlockArgumentParser;
+import net.minecraft.command.argument.BlockArgumentParser;
 import net.minecraft.structure.Structure;
 import net.minecraft.structure.StructurePlacementData;
 import net.minecraft.structure.processor.StructureProcessor;
@@ -33,7 +33,7 @@ extends StructureProcessor {
 
     @Override
     @Nullable
-    public Structure.StructureBlockInfo process(WorldView arg, BlockPos arg2, BlockPos arg3, Structure.StructureBlockInfo arg4, Structure.StructureBlockInfo arg5, StructurePlacementData arg6) {
+    public Structure.StructureBlockInfo process(WorldView arg, BlockPos pos, BlockPos arg3, Structure.StructureBlockInfo arg4, Structure.StructureBlockInfo arg5, StructurePlacementData arg6) {
         BlockState lv = arg5.state;
         if (!lv.isOf(Blocks.JIGSAW)) {
             return arg5;

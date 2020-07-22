@@ -13,34 +13,34 @@ import net.minecraft.util.math.BlockPos;
 public class GravityField {
     private final List<Point> points = Lists.newArrayList();
 
-    public void addPoint(BlockPos arg, double d) {
-        if (d != 0.0) {
-            this.points.add(new Point(arg, d));
+    public void addPoint(BlockPos pos, double mass) {
+        if (mass != 0.0) {
+            this.points.add(new Point(pos, mass));
         }
     }
 
-    public double calculate(BlockPos arg, double d) {
-        if (d == 0.0) {
+    public double calculate(BlockPos pos, double mass) {
+        if (mass == 0.0) {
             return 0.0;
         }
         double e = 0.0;
         for (Point lv : this.points) {
-            e += lv.getGravityFactor(arg);
+            e += lv.getGravityFactor(pos);
         }
-        return e * d;
+        return e * mass;
     }
 
     static class Point {
         private final BlockPos pos;
         private final double mass;
 
-        public Point(BlockPos arg, double d) {
-            this.pos = arg;
-            this.mass = d;
+        public Point(BlockPos pos, double mass) {
+            this.pos = pos;
+            this.mass = mass;
         }
 
-        public double getGravityFactor(BlockPos arg) {
-            double d = this.pos.getSquaredDistance(arg);
+        public double getGravityFactor(BlockPos pos) {
+            double d = this.pos.getSquaredDistance(pos);
             if (d == 0.0) {
                 return Double.POSITIVE_INFINITY;
             }

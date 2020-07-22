@@ -155,8 +155,8 @@ implements Waterloggable {
         this.setDefaultState((BlockState)((BlockState)((BlockState)((BlockState)this.stateManager.getDefaultState()).with(FACING, Direction.NORTH)).with(CHEST_TYPE, ChestType.SINGLE)).with(WATERLOGGED, false));
     }
 
-    public static DoubleBlockProperties.Type getDoubleBlockType(BlockState arg) {
-        ChestType lv = arg.get(CHEST_TYPE);
+    public static DoubleBlockProperties.Type getDoubleBlockType(BlockState state) {
+        ChestType lv = state.get(CHEST_TYPE);
         if (lv == ChestType.SINGLE) {
             return DoubleBlockProperties.Type.SINGLE;
         }
@@ -167,32 +167,32 @@ implements Waterloggable {
     }
 
     @Override
-    public BlockRenderType getRenderType(BlockState arg) {
+    public BlockRenderType getRenderType(BlockState state) {
         return BlockRenderType.ENTITYBLOCK_ANIMATED;
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
-        if (arg.get(WATERLOGGED).booleanValue()) {
-            arg4.getFluidTickScheduler().schedule(arg5, Fluids.WATER, Fluids.WATER.getTickRate(arg4));
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
+        if (state.get(WATERLOGGED).booleanValue()) {
+            world.getFluidTickScheduler().schedule(pos, Fluids.WATER, Fluids.WATER.getTickRate(world));
         }
-        if (arg3.isOf(this) && arg2.getAxis().isHorizontal()) {
-            ChestType lv = arg3.get(CHEST_TYPE);
-            if (arg.get(CHEST_TYPE) == ChestType.SINGLE && lv != ChestType.SINGLE && arg.get(FACING) == arg3.get(FACING) && ChestBlock.getFacing(arg3) == arg2.getOpposite()) {
-                return (BlockState)arg.with(CHEST_TYPE, lv.getOpposite());
+        if (newState.isOf(this) && direction.getAxis().isHorizontal()) {
+            ChestType lv = newState.get(CHEST_TYPE);
+            if (state.get(CHEST_TYPE) == ChestType.SINGLE && lv != ChestType.SINGLE && state.get(FACING) == newState.get(FACING) && ChestBlock.getFacing(newState) == direction.getOpposite()) {
+                return (BlockState)state.with(CHEST_TYPE, lv.getOpposite());
             }
-        } else if (ChestBlock.getFacing(arg) == arg2) {
-            return (BlockState)arg.with(CHEST_TYPE, ChestType.SINGLE);
+        } else if (ChestBlock.getFacing(state) == direction) {
+            return (BlockState)state.with(CHEST_TYPE, ChestType.SINGLE);
         }
-        return super.getStateForNeighborUpdate(arg, arg2, arg3, arg4, arg5, arg6);
+        return super.getStateForNeighborUpdate(state, direction, newState, world, pos, posFrom);
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
-        if (arg.get(CHEST_TYPE) == ChestType.SINGLE) {
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        if (state.get(CHEST_TYPE) == ChestType.SINGLE) {
             return SINGLE_SHAPE;
         }
-        switch (ChestBlock.getFacing(arg)) {
+        switch (ChestBlock.getFacing(state)) {
             default: {
                 return DOUBLE_NORTH_SHAPE;
             }
@@ -207,27 +207,27 @@ implements Waterloggable {
         return DOUBLE_EAST_SHAPE;
     }
 
-    public static Direction getFacing(BlockState arg) {
-        Direction lv = arg.get(FACING);
-        return arg.get(CHEST_TYPE) == ChestType.LEFT ? lv.rotateYClockwise() : lv.rotateYCounterclockwise();
+    public static Direction getFacing(BlockState state) {
+        Direction lv = state.get(FACING);
+        return state.get(CHEST_TYPE) == ChestType.LEFT ? lv.rotateYClockwise() : lv.rotateYCounterclockwise();
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext arg) {
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
         Direction lv5;
         ChestType lv = ChestType.SINGLE;
-        Direction lv2 = arg.getPlayerFacing().getOpposite();
-        FluidState lv3 = arg.getWorld().getFluidState(arg.getBlockPos());
-        boolean bl = arg.shouldCancelInteraction();
-        Direction lv4 = arg.getSide();
-        if (lv4.getAxis().isHorizontal() && bl && (lv5 = this.getNeighborChestDirection(arg, lv4.getOpposite())) != null && lv5.getAxis() != lv4.getAxis()) {
+        Direction lv2 = ctx.getPlayerFacing().getOpposite();
+        FluidState lv3 = ctx.getWorld().getFluidState(ctx.getBlockPos());
+        boolean bl = ctx.shouldCancelInteraction();
+        Direction lv4 = ctx.getSide();
+        if (lv4.getAxis().isHorizontal() && bl && (lv5 = this.getNeighborChestDirection(ctx, lv4.getOpposite())) != null && lv5.getAxis() != lv4.getAxis()) {
             lv2 = lv5;
             ChestType chestType = lv = lv2.rotateYCounterclockwise() == lv4.getOpposite() ? ChestType.RIGHT : ChestType.LEFT;
         }
         if (lv == ChestType.SINGLE && !bl) {
-            if (lv2 == this.getNeighborChestDirection(arg, lv2.rotateYClockwise())) {
+            if (lv2 == this.getNeighborChestDirection(ctx, lv2.rotateYClockwise())) {
                 lv = ChestType.LEFT;
-            } else if (lv2 == this.getNeighborChestDirection(arg, lv2.rotateYCounterclockwise())) {
+            } else if (lv2 == this.getNeighborChestDirection(ctx, lv2.rotateYCounterclockwise())) {
                 lv = ChestType.RIGHT;
             }
         }
@@ -235,50 +235,50 @@ implements Waterloggable {
     }
 
     @Override
-    public FluidState getFluidState(BlockState arg) {
-        if (arg.get(WATERLOGGED).booleanValue()) {
+    public FluidState getFluidState(BlockState state) {
+        if (state.get(WATERLOGGED).booleanValue()) {
             return Fluids.WATER.getStill(false);
         }
-        return super.getFluidState(arg);
+        return super.getFluidState(state);
     }
 
     @Nullable
-    private Direction getNeighborChestDirection(ItemPlacementContext arg, Direction arg2) {
-        BlockState lv = arg.getWorld().getBlockState(arg.getBlockPos().offset(arg2));
+    private Direction getNeighborChestDirection(ItemPlacementContext ctx, Direction dir) {
+        BlockState lv = ctx.getWorld().getBlockState(ctx.getBlockPos().offset(dir));
         return lv.isOf(this) && lv.get(CHEST_TYPE) == ChestType.SINGLE ? lv.get(FACING) : null;
     }
 
     @Override
-    public void onPlaced(World arg, BlockPos arg2, BlockState arg3, LivingEntity arg4, ItemStack arg5) {
+    public void onPlaced(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack) {
         BlockEntity lv;
-        if (arg5.hasCustomName() && (lv = arg.getBlockEntity(arg2)) instanceof ChestBlockEntity) {
-            ((ChestBlockEntity)lv).setCustomName(arg5.getName());
+        if (itemStack.hasCustomName() && (lv = world.getBlockEntity(pos)) instanceof ChestBlockEntity) {
+            ((ChestBlockEntity)lv).setCustomName(itemStack.getName());
         }
     }
 
     @Override
-    public void onStateReplaced(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
-        if (arg.isOf(arg4.getBlock())) {
+    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
+        if (state.isOf(newState.getBlock())) {
             return;
         }
-        BlockEntity lv = arg2.getBlockEntity(arg3);
+        BlockEntity lv = world.getBlockEntity(pos);
         if (lv instanceof Inventory) {
-            ItemScatterer.spawn(arg2, arg3, (Inventory)((Object)lv));
-            arg2.updateComparators(arg3, this);
+            ItemScatterer.spawn(world, pos, (Inventory)((Object)lv));
+            world.updateComparators(pos, this);
         }
-        super.onStateReplaced(arg, arg2, arg3, arg4, bl);
+        super.onStateReplaced(state, world, pos, newState, moved);
     }
 
     @Override
-    public ActionResult onUse(BlockState arg, World arg2, BlockPos arg3, PlayerEntity arg4, Hand arg5, BlockHitResult arg6) {
-        if (arg2.isClient) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        if (world.isClient) {
             return ActionResult.SUCCESS;
         }
-        NamedScreenHandlerFactory lv = this.createScreenHandlerFactory(arg, arg2, arg3);
+        NamedScreenHandlerFactory lv = this.createScreenHandlerFactory(state, world, pos);
         if (lv != null) {
-            arg4.openHandledScreen(lv);
-            arg4.incrementStat(this.getOpenStat());
-            PiglinBrain.onGuardedBlockBroken(arg4, true);
+            player.openHandledScreen(lv);
+            player.incrementStat(this.getOpenStat());
+            PiglinBrain.onGuardedBlockBroken(player, true);
         }
         return ActionResult.CONSUME;
     }
@@ -288,25 +288,25 @@ implements Waterloggable {
     }
 
     @Nullable
-    public static Inventory getInventory(ChestBlock arg, BlockState arg2, World arg3, BlockPos arg4, boolean bl) {
-        return arg.getBlockEntitySource(arg2, arg3, arg4, bl).apply(INVENTORY_RETRIEVER).orElse(null);
+    public static Inventory getInventory(ChestBlock block, BlockState state, World world, BlockPos pos, boolean ignoreBlocked) {
+        return block.getBlockEntitySource(state, world, pos, ignoreBlocked).apply(INVENTORY_RETRIEVER).orElse(null);
     }
 
     @Override
-    public DoubleBlockProperties.PropertySource<? extends ChestBlockEntity> getBlockEntitySource(BlockState arg3, World arg22, BlockPos arg32, boolean bl) {
+    public DoubleBlockProperties.PropertySource<? extends ChestBlockEntity> getBlockEntitySource(BlockState state, World world, BlockPos pos, boolean ignoreBlocked) {
         BiPredicate<WorldAccess, BlockPos> biPredicate2;
-        if (bl) {
+        if (ignoreBlocked) {
             BiPredicate<WorldAccess, BlockPos> biPredicate = (arg, arg2) -> false;
         } else {
             biPredicate2 = ChestBlock::isChestBlocked;
         }
-        return DoubleBlockProperties.toPropertySource((BlockEntityType)this.entityTypeRetriever.get(), ChestBlock::getDoubleBlockType, ChestBlock::getFacing, FACING, arg3, arg22, arg32, biPredicate2);
+        return DoubleBlockProperties.toPropertySource((BlockEntityType)this.entityTypeRetriever.get(), ChestBlock::getDoubleBlockType, ChestBlock::getFacing, FACING, state, world, pos, biPredicate2);
     }
 
     @Override
     @Nullable
-    public NamedScreenHandlerFactory createScreenHandlerFactory(BlockState arg, World arg2, BlockPos arg3) {
-        return this.getBlockEntitySource(arg, arg2, arg3, false).apply(NAME_RETRIEVER).orElse(null);
+    public NamedScreenHandlerFactory createScreenHandlerFactory(BlockState state, World world, BlockPos pos) {
+        return this.getBlockEntitySource(state, world, pos, false).apply(NAME_RETRIEVER).orElse(null);
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -336,21 +336,21 @@ implements Waterloggable {
     }
 
     @Override
-    public BlockEntity createBlockEntity(BlockView arg) {
+    public BlockEntity createBlockEntity(BlockView world) {
         return new ChestBlockEntity();
     }
 
-    public static boolean isChestBlocked(WorldAccess arg, BlockPos arg2) {
-        return ChestBlock.hasBlockOnTop(arg, arg2) || ChestBlock.hasOcelotOnTop(arg, arg2);
+    public static boolean isChestBlocked(WorldAccess world, BlockPos pos) {
+        return ChestBlock.hasBlockOnTop(world, pos) || ChestBlock.hasOcelotOnTop(world, pos);
     }
 
-    private static boolean hasBlockOnTop(BlockView arg, BlockPos arg2) {
-        BlockPos lv = arg2.up();
-        return arg.getBlockState(lv).isSolidBlock(arg, lv);
+    private static boolean hasBlockOnTop(BlockView world, BlockPos pos) {
+        BlockPos lv = pos.up();
+        return world.getBlockState(lv).isSolidBlock(world, lv);
     }
 
-    private static boolean hasOcelotOnTop(WorldAccess arg, BlockPos arg2) {
-        List<CatEntity> list = arg.getNonSpectatingEntities(CatEntity.class, new Box(arg2.getX(), arg2.getY() + 1, arg2.getZ(), arg2.getX() + 1, arg2.getY() + 2, arg2.getZ() + 1));
+    private static boolean hasOcelotOnTop(WorldAccess world, BlockPos pos) {
+        List<CatEntity> list = world.getNonSpectatingEntities(CatEntity.class, new Box(pos.getX(), pos.getY() + 1, pos.getZ(), pos.getX() + 1, pos.getY() + 2, pos.getZ() + 1));
         if (!list.isEmpty()) {
             for (CatEntity lv : list) {
                 if (!lv.isInSittingPose()) continue;
@@ -361,32 +361,32 @@ implements Waterloggable {
     }
 
     @Override
-    public boolean hasComparatorOutput(BlockState arg) {
+    public boolean hasComparatorOutput(BlockState state) {
         return true;
     }
 
     @Override
-    public int getComparatorOutput(BlockState arg, World arg2, BlockPos arg3) {
-        return ScreenHandler.calculateComparatorOutput(ChestBlock.getInventory(this, arg, arg2, arg3, false));
+    public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
+        return ScreenHandler.calculateComparatorOutput(ChestBlock.getInventory(this, state, world, pos, false));
     }
 
     @Override
-    public BlockState rotate(BlockState arg, BlockRotation arg2) {
-        return (BlockState)arg.with(FACING, arg2.rotate(arg.get(FACING)));
+    public BlockState rotate(BlockState state, BlockRotation rotation) {
+        return (BlockState)state.with(FACING, rotation.rotate(state.get(FACING)));
     }
 
     @Override
-    public BlockState mirror(BlockState arg, BlockMirror arg2) {
-        return arg.rotate(arg2.getRotation(arg.get(FACING)));
+    public BlockState mirror(BlockState state, BlockMirror mirror) {
+        return state.rotate(mirror.getRotation(state.get(FACING)));
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(FACING, CHEST_TYPE, WATERLOGGED);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(FACING, CHEST_TYPE, WATERLOGGED);
     }
 
     @Override
-    public boolean canPathfindThrough(BlockState arg, BlockView arg2, BlockPos arg3, NavigationType arg4) {
+    public boolean canPathfindThrough(BlockState state, BlockView world, BlockPos pos, NavigationType type) {
         return false;
     }
 }

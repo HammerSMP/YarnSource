@@ -67,8 +67,8 @@ extends AnimalEntity {
     }
 
     @Override
-    protected float getActiveEyeHeight(EntityPose arg, EntityDimensions arg2) {
-        return this.isBaby() ? arg2.height * 0.85f : arg2.height * 0.92f;
+    protected float getActiveEyeHeight(EntityPose pose, EntityDimensions dimensions) {
+        return this.isBaby() ? dimensions.height * 0.85f : dimensions.height * 0.92f;
     }
 
     public static DefaultAttributeContainer.Builder createChickenAttributes() {
@@ -99,7 +99,7 @@ extends AnimalEntity {
     }
 
     @Override
-    public boolean handleFallDamage(float f, float g) {
+    public boolean handleFallDamage(float fallDistance, float damageMultiplier) {
         return false;
     }
 
@@ -109,7 +109,7 @@ extends AnimalEntity {
     }
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource arg) {
+    protected SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.ENTITY_CHICKEN_HURT;
     }
 
@@ -119,7 +119,7 @@ extends AnimalEntity {
     }
 
     @Override
-    protected void playStepSound(BlockPos arg, BlockState arg2) {
+    protected void playStepSound(BlockPos pos, BlockState state) {
         this.playSound(SoundEvents.ENTITY_CHICKEN_STEP, 0.15f, 1.0f);
     }
 
@@ -129,49 +129,49 @@ extends AnimalEntity {
     }
 
     @Override
-    public boolean isBreedingItem(ItemStack arg) {
-        return BREEDING_INGREDIENT.test(arg);
+    public boolean isBreedingItem(ItemStack stack) {
+        return BREEDING_INGREDIENT.test(stack);
     }
 
     @Override
-    protected int getCurrentExperience(PlayerEntity arg) {
+    protected int getCurrentExperience(PlayerEntity player) {
         if (this.hasJockey()) {
             return 10;
         }
-        return super.getCurrentExperience(arg);
+        return super.getCurrentExperience(player);
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        this.jockey = arg.getBoolean("IsChickenJockey");
-        if (arg.contains("EggLayTime")) {
-            this.eggLayTime = arg.getInt("EggLayTime");
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        this.jockey = tag.getBoolean("IsChickenJockey");
+        if (tag.contains("EggLayTime")) {
+            this.eggLayTime = tag.getInt("EggLayTime");
         }
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
-        arg.putBoolean("IsChickenJockey", this.jockey);
-        arg.putInt("EggLayTime", this.eggLayTime);
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
+        tag.putBoolean("IsChickenJockey", this.jockey);
+        tag.putInt("EggLayTime", this.eggLayTime);
     }
 
     @Override
-    public boolean canImmediatelyDespawn(double d) {
+    public boolean canImmediatelyDespawn(double distanceSquared) {
         return this.hasJockey();
     }
 
     @Override
-    public void updatePassengerPosition(Entity arg) {
-        super.updatePassengerPosition(arg);
+    public void updatePassengerPosition(Entity passenger) {
+        super.updatePassengerPosition(passenger);
         float f = MathHelper.sin(this.bodyYaw * ((float)Math.PI / 180));
         float g = MathHelper.cos(this.bodyYaw * ((float)Math.PI / 180));
         float h = 0.1f;
         float i = 0.0f;
-        arg.updatePosition(this.getX() + (double)(0.1f * f), this.getBodyY(0.5) + arg.getHeightOffset() + 0.0, this.getZ() - (double)(0.1f * g));
-        if (arg instanceof LivingEntity) {
-            ((LivingEntity)arg).bodyYaw = this.bodyYaw;
+        passenger.updatePosition(this.getX() + (double)(0.1f * f), this.getBodyY(0.5) + passenger.getHeightOffset() + 0.0, this.getZ() - (double)(0.1f * g));
+        if (passenger instanceof LivingEntity) {
+            ((LivingEntity)passenger).bodyYaw = this.bodyYaw;
         }
     }
 
@@ -179,8 +179,8 @@ extends AnimalEntity {
         return this.jockey;
     }
 
-    public void setHasJockey(boolean bl) {
-        this.jockey = bl;
+    public void setHasJockey(boolean hasJockey) {
+        this.jockey = hasJockey;
     }
 
     @Override

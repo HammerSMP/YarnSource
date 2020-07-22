@@ -21,8 +21,8 @@ public class SmokerScreen
 extends AbstractFurnaceScreen<SmokerScreenHandler> {
     private static final Identifier TEXTURE = new Identifier("textures/gui/container/smoker.png");
 
-    public SmokerScreen(SmokerScreenHandler arg, PlayerInventory arg2, Text arg3) {
-        super(arg, new SmokerRecipeBookScreen(), arg2, arg3, TEXTURE);
+    public SmokerScreen(SmokerScreenHandler container, PlayerInventory inventory, Text title) {
+        super(container, new SmokerRecipeBookScreen(), inventory, title, TEXTURE);
     }
 }
 

@@ -25,16 +25,16 @@ import net.minecraft.util.registry.SimpleRegistry;
 public final class RegistryCodec<E>
 implements Codec<SimpleRegistry<E>> {
     private final Codec<SimpleRegistry<E>> delegate;
-    private final RegistryKey<Registry<E>> registryRef;
+    private final RegistryKey<? extends Registry<E>> registryRef;
     private final MapCodec<E> elementCodec;
 
-    public static <E> RegistryCodec<E> of(RegistryKey<Registry<E>> arg, Lifecycle lifecycle, MapCodec<E> mapCodec) {
-        return new RegistryCodec<E>(arg, lifecycle, mapCodec);
+    public static <E> RegistryCodec<E> of(RegistryKey<? extends Registry<E>> registryRef, Lifecycle lifecycle, MapCodec<E> mapCodec) {
+        return new RegistryCodec<E>(registryRef, lifecycle, mapCodec);
     }
 
-    private RegistryCodec(RegistryKey<Registry<E>> arg, Lifecycle lifecycle, MapCodec<E> mapCodec) {
-        this.delegate = SimpleRegistry.createEmptyCodec(arg, lifecycle, mapCodec);
-        this.registryRef = arg;
+    private RegistryCodec(RegistryKey<? extends Registry<E>> registryRef, Lifecycle lifecycle, MapCodec<E> mapCodec) {
+        this.delegate = SimpleRegistry.createEmptyCodec(registryRef, lifecycle, mapCodec);
+        this.registryRef = registryRef;
         this.elementCodec = mapCodec;
     }
 
@@ -42,20 +42,20 @@ implements Codec<SimpleRegistry<E>> {
         return this.delegate.encode(arg, dynamicOps, object);
     }
 
-    public <T> DataResult<Pair<SimpleRegistry<E>, T>> decode(DynamicOps<T> dynamicOps, T object) {
-        DataResult dataResult = this.delegate.decode(dynamicOps, object);
-        if (dynamicOps instanceof RegistryOps) {
-            return dataResult.flatMap(pair -> ((RegistryOps)dynamicOps).loadToRegistry((SimpleRegistry)pair.getFirst(), this.registryRef, this.elementCodec).map(arg -> Pair.of((Object)arg, (Object)pair.getSecond())));
+    public <T> DataResult<Pair<SimpleRegistry<E>, T>> decode(DynamicOps<T> ops, T input) {
+        DataResult dataResult = this.delegate.decode(ops, input);
+        if (ops instanceof RegistryOps) {
+            return dataResult.flatMap(pair -> ((RegistryOps)ops).loadToRegistry((SimpleRegistry)pair.getFirst(), this.registryRef, this.elementCodec).map(arg -> Pair.of((Object)arg, (Object)pair.getSecond())));
         }
         return dataResult;
     }
 
     public String toString() {
-        return "RegistryDapaPackCodec[" + this.delegate + " " + this.registryRef + " " + this.elementCodec + "]";
+        return "RegistryDataPackCodec[" + this.delegate + " " + this.registryRef + " " + this.elementCodec + "]";
     }
 
-    public /* synthetic */ DataResult encode(Object object, DynamicOps dynamicOps, Object object2) {
-        return this.encode((SimpleRegistry)object, dynamicOps, object2);
+    public /* synthetic */ DataResult encode(Object input, DynamicOps ops, Object prefix) {
+        return this.encode((SimpleRegistry)input, ops, prefix);
     }
 }
 

@@ -15,8 +15,8 @@ implements FeatureConfig {
     public static final Codec<SingleStateFeatureConfig> CODEC = BlockState.CODEC.fieldOf("state").xmap(SingleStateFeatureConfig::new, arg -> arg.state).codec();
     public final BlockState state;
 
-    public SingleStateFeatureConfig(BlockState arg) {
-        this.state = arg;
+    public SingleStateFeatureConfig(BlockState state) {
+        this.state = state;
     }
 }
 

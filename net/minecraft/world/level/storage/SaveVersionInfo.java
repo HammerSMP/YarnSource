@@ -22,12 +22,12 @@ public class SaveVersionInfo {
     private final int versionId;
     private final boolean stable;
 
-    public SaveVersionInfo(int i, long l, String string, int j, boolean bl) {
-        this.levelFormatVersion = i;
-        this.lastPlayed = l;
-        this.versionName = string;
-        this.versionId = j;
-        this.stable = bl;
+    public SaveVersionInfo(int levelFormatVersion, long lastPlayed, String versionName, int versionId, boolean stable) {
+        this.levelFormatVersion = levelFormatVersion;
+        this.lastPlayed = lastPlayed;
+        this.versionName = versionName;
+        this.versionId = versionId;
+        this.stable = stable;
     }
 
     public static SaveVersionInfo fromDynamic(Dynamic<?> dynamic) {

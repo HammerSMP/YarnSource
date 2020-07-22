@@ -15,8 +15,8 @@ import net.minecraft.util.Unit;
 public interface ReloadableResourceManager
 extends ResourceManager,
 AutoCloseable {
-    default public CompletableFuture<Unit> beginReload(Executor executor, Executor executor2, List<ResourcePack> list, CompletableFuture<Unit> completableFuture) {
-        return this.beginMonitoredReload(executor, executor2, completableFuture, list).whenComplete();
+    default public CompletableFuture<Unit> beginReload(Executor prepareExecutor, Executor applyExecutor, List<ResourcePack> packs, CompletableFuture<Unit> initialStage) {
+        return this.beginMonitoredReload(prepareExecutor, applyExecutor, initialStage, packs).whenComplete();
     }
 
     public ResourceReloadMonitor beginMonitoredReload(Executor var1, Executor var2, CompletableFuture<Unit> var3, List<ResourcePack> var4);

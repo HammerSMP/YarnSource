@@ -19,8 +19,8 @@ import net.minecraft.particle.DefaultParticleType;
 @Environment(value=EnvType.CLIENT)
 public class AshParticle
 extends AscendingParticle {
-    protected AshParticle(ClientWorld arg, double d, double e, double f, double g, double h, double i, float j, SpriteProvider arg2) {
-        super(arg, d, e, f, 0.1f, -0.1f, 0.1f, g, h, i, j, arg2, 0.5f, 20, -0.004, false);
+    protected AshParticle(ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ, float scaleMultiplier, SpriteProvider spriteProvider) {
+        super(world, x, y, z, 0.1f, -0.1f, 0.1f, velocityX, velocityY, velocityZ, scaleMultiplier, spriteProvider, 0.5f, 20, -0.004, false);
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -28,8 +28,8 @@ extends AscendingParticle {
     implements ParticleFactory<DefaultParticleType> {
         private final SpriteProvider spriteProvider;
 
-        public Factory(SpriteProvider arg) {
-            this.spriteProvider = arg;
+        public Factory(SpriteProvider spriteProvider) {
+            this.spriteProvider = spriteProvider;
         }
 
         @Override

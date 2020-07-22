@@ -16,10 +16,10 @@ public class SaddledComponent {
     public int field_23216;
     public int currentBoostTime;
 
-    public SaddledComponent(DataTracker arg, TrackedData<Integer> arg2, TrackedData<Boolean> arg3) {
-        this.dataTracker = arg;
-        this.boostTime = arg2;
-        this.saddled = arg3;
+    public SaddledComponent(DataTracker dataTracker, TrackedData<Integer> boostTime, TrackedData<Boolean> saddled) {
+        this.dataTracker = dataTracker;
+        this.boostTime = boostTime;
+        this.saddled = saddled;
     }
 
     public void boost() {
@@ -39,16 +39,16 @@ public class SaddledComponent {
         return true;
     }
 
-    public void toTag(CompoundTag arg) {
-        arg.putBoolean("Saddle", this.isSaddled());
+    public void toTag(CompoundTag tag) {
+        tag.putBoolean("Saddle", this.isSaddled());
     }
 
-    public void fromTag(CompoundTag arg) {
-        this.setSaddled(arg.getBoolean("Saddle"));
+    public void fromTag(CompoundTag tag) {
+        this.setSaddled(tag.getBoolean("Saddle"));
     }
 
-    public void setSaddled(boolean bl) {
-        this.dataTracker.set(this.saddled, bl);
+    public void setSaddled(boolean saddled) {
+        this.dataTracker.set(this.saddled, saddled);
     }
 
     public boolean isSaddled() {

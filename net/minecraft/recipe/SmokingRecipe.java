@@ -19,8 +19,8 @@ import net.minecraft.util.Identifier;
 
 public class SmokingRecipe
 extends AbstractCookingRecipe {
-    public SmokingRecipe(Identifier arg, String string, Ingredient arg2, ItemStack arg3, float f, int i) {
-        super(RecipeType.SMOKING, arg, string, arg2, arg3, f, i);
+    public SmokingRecipe(Identifier id, String group, Ingredient input, ItemStack output, float experience, int cookTime) {
+        super(RecipeType.SMOKING, id, group, input, output, experience, cookTime);
     }
 
     @Override

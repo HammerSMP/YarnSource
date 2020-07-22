@@ -13,8 +13,8 @@ public enum Rarity {
 
     public final Formatting formatting;
 
-    private Rarity(Formatting arg) {
-        this.formatting = arg;
+    private Rarity(Formatting formatting) {
+        this.formatting = formatting;
     }
 }
 

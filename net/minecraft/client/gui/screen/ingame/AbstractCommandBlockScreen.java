@@ -81,9 +81,9 @@ extends Screen {
     }
 
     @Override
-    public void resize(MinecraftClient arg, int i, int j) {
+    public void resize(MinecraftClient client, int width, int height) {
         String string = this.consoleCommandTextField.getText();
-        this.init(arg, i, j);
+        this.init(client, width, height);
         this.consoleCommandTextField.setText(string);
         this.commandSuggestor.refresh();
     }
@@ -120,19 +120,19 @@ extends Screen {
         this.client.openScreen(null);
     }
 
-    private void onCommandChanged(String string) {
+    private void onCommandChanged(String text) {
         this.commandSuggestor.refresh();
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (this.commandSuggestor.keyPressed(i, j, k)) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (this.commandSuggestor.keyPressed(keyCode, scanCode, modifiers)) {
             return true;
         }
-        if (super.keyPressed(i, j, k)) {
+        if (super.keyPressed(keyCode, scanCode, modifiers)) {
             return true;
         }
-        if (i == 257 || i == 335) {
+        if (keyCode == 257 || keyCode == 335) {
             this.commitAndClose();
             return true;
         }
@@ -140,35 +140,35 @@ extends Screen {
     }
 
     @Override
-    public boolean mouseScrolled(double d, double e, double f) {
-        if (this.commandSuggestor.mouseScrolled(f)) {
+    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+        if (this.commandSuggestor.mouseScrolled(amount)) {
             return true;
         }
-        return super.mouseScrolled(d, e, f);
+        return super.mouseScrolled(mouseX, mouseY, amount);
     }
 
     @Override
-    public boolean mouseClicked(double d, double e, int i) {
-        if (this.commandSuggestor.mouseClicked(d, e, i)) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (this.commandSuggestor.mouseClicked(mouseX, mouseY, button)) {
             return true;
         }
-        return super.mouseClicked(d, e, i);
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.renderBackground(arg);
-        this.drawCenteredString(arg, this.textRenderer, I18n.translate("advMode.setCommand", new Object[0]), this.width / 2, 20, 0xFFFFFF);
-        this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("advMode.command", new Object[0]), this.width / 2 - 150, 40, 0xA0A0A0);
-        this.consoleCommandTextField.render(arg, i, j, f);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.renderBackground(matrices);
+        this.drawCenteredString(matrices, this.textRenderer, I18n.translate("advMode.setCommand", new Object[0]), this.width / 2, 20, 0xFFFFFF);
+        this.drawStringWithShadow(matrices, this.textRenderer, I18n.translate("advMode.command", new Object[0]), this.width / 2 - 150, 40, 0xA0A0A0);
+        this.consoleCommandTextField.render(matrices, mouseX, mouseY, delta);
         int k = 75;
         if (!this.previousOutputTextField.getText().isEmpty()) {
             this.textRenderer.getClass();
-            this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("advMode.previousOutput", new Object[0]), this.width / 2 - 150, (k += 5 * 9 + 1 + this.getTrackOutputButtonHeight() - 135) + 4, 0xA0A0A0);
-            this.previousOutputTextField.render(arg, i, j, f);
+            this.drawStringWithShadow(matrices, this.textRenderer, I18n.translate("advMode.previousOutput", new Object[0]), this.width / 2 - 150, (k += 5 * 9 + 1 + this.getTrackOutputButtonHeight() - 135) + 4, 0xA0A0A0);
+            this.previousOutputTextField.render(matrices, mouseX, mouseY, delta);
         }
-        super.render(arg, i, j, f);
-        this.commandSuggestor.render(arg, i, j);
+        super.render(matrices, mouseX, mouseY, delta);
+        this.commandSuggestor.render(matrices, mouseX, mouseY);
     }
 }
 

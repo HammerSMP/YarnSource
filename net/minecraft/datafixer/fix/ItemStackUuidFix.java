@@ -23,8 +23,8 @@ import net.minecraft.datafixer.schema.IdentifierNormalizingSchema;
 
 public class ItemStackUuidFix
 extends AbstractUuidFix {
-    public ItemStackUuidFix(Schema schema) {
-        super(schema, TypeReferences.ITEM_STACK);
+    public ItemStackUuidFix(Schema outputSchema) {
+        super(outputSchema, TypeReferences.ITEM_STACK);
     }
 
     public TypeRewriteRule makeRule() {

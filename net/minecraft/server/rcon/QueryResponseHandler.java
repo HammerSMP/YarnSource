@@ -47,15 +47,15 @@ extends RconBase {
     private long lastResponseTime;
     private final DedicatedServer field_23964;
 
-    public QueryResponseHandler(DedicatedServer arg) {
+    public QueryResponseHandler(DedicatedServer server) {
         super("Query Listener");
-        this.field_23964 = arg;
-        this.queryPort = arg.getProperties().queryPort;
-        this.hostname = arg.getHostname();
-        this.port = arg.getPort();
-        this.motd = arg.getMotd();
-        this.maxPlayerCount = arg.getMaxPlayerCount();
-        this.levelName = arg.getLevelName();
+        this.field_23964 = server;
+        this.queryPort = server.getProperties().queryPort;
+        this.hostname = server.getHostname();
+        this.port = server.getPort();
+        this.motd = server.getMotd();
+        this.maxPlayerCount = server.getMaxPlayerCount();
+        this.levelName = server.getLevelName();
         this.lastResponseTime = 0L;
         this.ip = "0.0.0.0";
         if (this.hostname.isEmpty() || this.ip.equals(this.hostname)) {
@@ -74,14 +74,14 @@ extends RconBase {
         this.queries = Maps.newHashMap();
     }
 
-    private void reply(byte[] bs, DatagramPacket datagramPacket) throws IOException {
-        this.socket.send(new DatagramPacket(bs, bs.length, datagramPacket.getSocketAddress()));
+    private void reply(byte[] buf, DatagramPacket datagramPacket) throws IOException {
+        this.socket.send(new DatagramPacket(buf, buf.length, datagramPacket.getSocketAddress()));
     }
 
-    private boolean handle(DatagramPacket datagramPacket) throws IOException {
-        byte[] bs = datagramPacket.getData();
-        int i = datagramPacket.getLength();
-        SocketAddress socketAddress = datagramPacket.getSocketAddress();
+    private boolean handle(DatagramPacket packet) throws IOException {
+        byte[] bs = packet.getData();
+        int i = packet.getLength();
+        SocketAddress socketAddress = packet.getSocketAddress();
         field_23963.debug("Packet len {} [{}]", (Object)i, (Object)socketAddress);
         if (3 > i || -2 != bs[0] || -3 != bs[1]) {
             field_23963.debug("Invalid packet [{}]", (Object)socketAddress);
@@ -90,23 +90,23 @@ extends RconBase {
         field_23963.debug("Packet '{}' [{}]", (Object)BufferHelper.toHex(bs[2]), (Object)socketAddress);
         switch (bs[2]) {
             case 9: {
-                this.createQuery(datagramPacket);
+                this.createQuery(packet);
                 field_23963.debug("Challenge [{}]", (Object)socketAddress);
                 return true;
             }
             case 0: {
-                if (!this.isValidQuery(datagramPacket).booleanValue()) {
+                if (!this.isValidQuery(packet).booleanValue()) {
                     field_23963.debug("Invalid challenge [{}]", (Object)socketAddress);
                     return false;
                 }
                 if (15 == i) {
-                    this.reply(this.createRulesReply(datagramPacket), datagramPacket);
+                    this.reply(this.createRulesReply(packet), packet);
                     field_23963.debug("Rules [{}]", (Object)socketAddress);
                     break;
                 }
                 DataStreamHelper lv = new DataStreamHelper(1460);
                 lv.write(0);
-                lv.write(this.getMessageBytes(datagramPacket.getSocketAddress()));
+                lv.write(this.getMessageBytes(packet.getSocketAddress()));
                 lv.writeBytes(this.motd);
                 lv.writeBytes("SMP");
                 lv.writeBytes(this.levelName);
@@ -114,19 +114,19 @@ extends RconBase {
                 lv.writeBytes(Integer.toString(this.maxPlayerCount));
                 lv.writeShort((short)this.port);
                 lv.writeBytes(this.ip);
-                this.reply(lv.bytes(), datagramPacket);
+                this.reply(lv.bytes(), packet);
                 field_23963.debug("Status [{}]", (Object)socketAddress);
             }
         }
         return true;
     }
 
-    private byte[] createRulesReply(DatagramPacket datagramPacket) throws IOException {
+    private byte[] createRulesReply(DatagramPacket packet) throws IOException {
         String[] strings;
         long l = Util.getMeasuringTimeMs();
         if (l < this.lastResponseTime + 5000L) {
             byte[] bs = this.data.bytes();
-            byte[] cs = this.getMessageBytes(datagramPacket.getSocketAddress());
+            byte[] cs = this.getMessageBytes(packet.getSocketAddress());
             bs[1] = cs[0];
             bs[2] = cs[1];
             bs[3] = cs[2];
@@ -136,7 +136,7 @@ extends RconBase {
         this.lastResponseTime = l;
         this.data.reset();
         this.data.write(0);
-        this.data.write(this.getMessageBytes(datagramPacket.getSocketAddress()));
+        this.data.write(this.getMessageBytes(packet.getSocketAddress()));
         this.data.writeBytes("splitnum");
         this.data.write(128);
         this.data.write(0);
@@ -244,11 +244,11 @@ extends RconBase {
         }
     }
 
-    private void handleIoException(Exception exception) {
+    private void handleIoException(Exception e) {
         if (!this.running) {
             return;
         }
-        field_23963.warn("Unexpected exception", (Throwable)exception);
+        field_23963.warn("Unexpected exception", (Throwable)e);
         if (!this.initialize()) {
             field_23963.error("Failed to recover from exception, shutting down!");
             this.running = false;
@@ -286,8 +286,8 @@ extends RconBase {
             this.replyBuf = String.format("\t%s%d\u0000", this.message, this.id).getBytes(StandardCharsets.UTF_8);
         }
 
-        public Boolean startedBefore(long l) {
-            return this.startTime < l;
+        public Boolean startedBefore(long lastQueryTime) {
+            return this.startTime < lastQueryTime;
         }
 
         public int getId() {

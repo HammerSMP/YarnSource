@@ -24,7 +24,7 @@ implements ProfileResult {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public List<ProfilerTiming> getTimings(String string) {
+    public List<ProfilerTiming> getTimings(String parentPath) {
         return Collections.emptyList();
     }
 

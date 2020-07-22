@@ -16,12 +16,12 @@ import net.minecraft.text.Text;
 
 public class BannedIpEntry
 extends BanEntry<String> {
-    public BannedIpEntry(String string) {
-        this(string, (Date)null, (String)null, (Date)null, (String)null);
+    public BannedIpEntry(String ip) {
+        this(ip, (Date)null, (String)null, (Date)null, (String)null);
     }
 
-    public BannedIpEntry(String string, @Nullable Date date, @Nullable String string2, @Nullable Date date2, @Nullable String string3) {
-        super(string, date, string2, date2, string3);
+    public BannedIpEntry(String ip, @Nullable Date created, @Nullable String source, @Nullable Date expiry, @Nullable String reason) {
+        super(ip, created, source, expiry, reason);
     }
 
     @Override
@@ -29,21 +29,21 @@ extends BanEntry<String> {
         return new LiteralText((String)this.getKey());
     }
 
-    public BannedIpEntry(JsonObject jsonObject) {
-        super(BannedIpEntry.getIp(jsonObject), jsonObject);
+    public BannedIpEntry(JsonObject json) {
+        super(BannedIpEntry.getIp(json), json);
     }
 
-    private static String getIp(JsonObject jsonObject) {
-        return jsonObject.has("ip") ? jsonObject.get("ip").getAsString() : null;
+    private static String getIp(JsonObject json) {
+        return json.has("ip") ? json.get("ip").getAsString() : null;
     }
 
     @Override
-    protected void fromJson(JsonObject jsonObject) {
+    protected void fromJson(JsonObject json) {
         if (this.getKey() == null) {
             return;
         }
-        jsonObject.addProperty("ip", (String)this.getKey());
-        super.fromJson(jsonObject);
+        json.addProperty("ip", (String)this.getKey());
+        super.fromJson(json);
     }
 }
 

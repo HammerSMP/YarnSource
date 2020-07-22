@@ -43,16 +43,16 @@ extends Schema {
     };
     private static final Type<String> IDENTIFIER_TYPE = new Const.PrimitiveType(CODEC);
 
-    public IdentifierNormalizingSchema(int i, Schema schema) {
-        super(i, schema);
+    public IdentifierNormalizingSchema(int versionKey, Schema parent) {
+        super(versionKey, parent);
     }
 
-    public static String normalize(String string) {
-        Identifier lv = Identifier.tryParse(string);
+    public static String normalize(String id) {
+        Identifier lv = Identifier.tryParse(id);
         if (lv != null) {
             return lv.toString();
         }
-        return string;
+        return id;
     }
 
     public static Type<String> getIdentifierType() {

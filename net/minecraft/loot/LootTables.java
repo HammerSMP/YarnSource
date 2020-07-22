@@ -92,15 +92,15 @@ public class LootTables {
     public static final Identifier HERO_OF_THE_VILLAGE_WEAPONSMITH_GIFT_GAMEPLAY = LootTables.register("gameplay/hero_of_the_village/weaponsmith_gift");
     public static final Identifier PIGLIN_BARTERING_GAMEPLAY = LootTables.register("gameplay/piglin_bartering");
 
-    private static Identifier register(String string) {
-        return LootTables.registerLootTable(new Identifier(string));
+    private static Identifier register(String id) {
+        return LootTables.registerLootTable(new Identifier(id));
     }
 
-    private static Identifier registerLootTable(Identifier arg) {
-        if (LOOT_TABLES.add(arg)) {
-            return arg;
+    private static Identifier registerLootTable(Identifier id) {
+        if (LOOT_TABLES.add(id)) {
+            return id;
         }
-        throw new IllegalArgumentException(arg + " is already a registered built-in loot table");
+        throw new IllegalArgumentException(id + " is already a registered built-in loot table");
     }
 
     public static Set<Identifier> getAll() {

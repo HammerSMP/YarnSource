@@ -19,8 +19,8 @@ import net.minecraft.particle.DefaultParticleType;
 @Environment(value=EnvType.CLIENT)
 public class LargeFireSmokeParticle
 extends FireSmokeParticle {
-    protected LargeFireSmokeParticle(ClientWorld arg, double d, double e, double f, double g, double h, double i, SpriteProvider arg2) {
-        super(arg, d, e, f, g, h, i, 2.5f, arg2);
+    protected LargeFireSmokeParticle(ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ, SpriteProvider spriteProvider) {
+        super(world, x, y, z, velocityX, velocityY, velocityZ, 2.5f, spriteProvider);
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -28,8 +28,8 @@ extends FireSmokeParticle {
     implements ParticleFactory<DefaultParticleType> {
         private final SpriteProvider spriteProvider;
 
-        public Factory(SpriteProvider arg) {
-            this.spriteProvider = arg;
+        public Factory(SpriteProvider spriteProvider) {
+            this.spriteProvider = spriteProvider;
         }
 
         @Override

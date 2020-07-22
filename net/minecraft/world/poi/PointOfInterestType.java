@@ -65,24 +65,24 @@ public class PointOfInterestType {
     private final Predicate<PointOfInterestType> completionCondition;
     private final int searchDistance;
 
-    private static Set<BlockState> getAllStatesOf(Block arg) {
-        return ImmutableSet.copyOf(arg.getStateManager().getStates());
+    private static Set<BlockState> getAllStatesOf(Block block) {
+        return ImmutableSet.copyOf(block.getStateManager().getStates());
     }
 
-    private PointOfInterestType(String string, Set<BlockState> set, int i, Predicate<PointOfInterestType> predicate, int j) {
-        this.id = string;
-        this.blockStates = ImmutableSet.copyOf(set);
-        this.ticketCount = i;
-        this.completionCondition = predicate;
-        this.searchDistance = j;
+    private PointOfInterestType(String id, Set<BlockState> blockStates, int ticketCount, Predicate<PointOfInterestType> completionCondition, int searchDistance) {
+        this.id = id;
+        this.blockStates = ImmutableSet.copyOf(blockStates);
+        this.ticketCount = ticketCount;
+        this.completionCondition = completionCondition;
+        this.searchDistance = searchDistance;
     }
 
-    private PointOfInterestType(String string, Set<BlockState> set, int i, int j) {
-        this.id = string;
-        this.blockStates = ImmutableSet.copyOf(set);
-        this.ticketCount = i;
+    private PointOfInterestType(String id, Set<BlockState> blockStates, int ticketCount, int searchDistance) {
+        this.id = id;
+        this.blockStates = ImmutableSet.copyOf(blockStates);
+        this.ticketCount = ticketCount;
         this.completionCondition = arg -> arg == this;
-        this.searchDistance = j;
+        this.searchDistance = searchDistance;
     }
 
     public int getTicketCount() {
@@ -101,12 +101,12 @@ public class PointOfInterestType {
         return this.id;
     }
 
-    private static PointOfInterestType register(String string, Set<BlockState> set, int i, int j) {
-        return PointOfInterestType.setup(Registry.register(Registry.POINT_OF_INTEREST_TYPE, new Identifier(string), new PointOfInterestType(string, set, i, j)));
+    private static PointOfInterestType register(String id, Set<BlockState> workStationStates, int ticketCount, int searchDistance) {
+        return PointOfInterestType.setup(Registry.register(Registry.POINT_OF_INTEREST_TYPE, new Identifier(id), new PointOfInterestType(id, workStationStates, ticketCount, searchDistance)));
     }
 
-    private static PointOfInterestType register(String string, Set<BlockState> set, int i, Predicate<PointOfInterestType> predicate, int j) {
-        return PointOfInterestType.setup(Registry.register(Registry.POINT_OF_INTEREST_TYPE, new Identifier(string), new PointOfInterestType(string, set, i, predicate, j)));
+    private static PointOfInterestType register(String id, Set<BlockState> workStationStates, int ticketCount, Predicate<PointOfInterestType> completionCondition, int searchDistance) {
+        return PointOfInterestType.setup(Registry.register(Registry.POINT_OF_INTEREST_TYPE, new Identifier(id), new PointOfInterestType(id, workStationStates, ticketCount, completionCondition, searchDistance)));
     }
 
     private static PointOfInterestType setup(PointOfInterestType arg) {
@@ -119,8 +119,8 @@ public class PointOfInterestType {
         return arg;
     }
 
-    public static Optional<PointOfInterestType> from(BlockState arg) {
-        return Optional.ofNullable(BLOCK_STATE_TO_POINT_OF_INTEREST_TYPE.get(arg));
+    public static Optional<PointOfInterestType> from(BlockState state) {
+        return Optional.ofNullable(BLOCK_STATE_TO_POINT_OF_INTEREST_TYPE.get(state));
     }
 }
 

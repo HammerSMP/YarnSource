@@ -64,8 +64,8 @@ extends BlockWithEntity {
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
-        switch (arg.get(FACING)) {
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        switch (state.get(FACING)) {
             case DOWN: {
                 return DOWN_SHAPE;
             }
@@ -86,8 +86,8 @@ extends BlockWithEntity {
     }
 
     @Override
-    public VoxelShape getRayTraceShape(BlockState arg, BlockView arg2, BlockPos arg3) {
-        switch (arg.get(FACING)) {
+    public VoxelShape getRayTraceShape(BlockState state, BlockView world, BlockPos pos) {
+        switch (state.get(FACING)) {
             case DOWN: {
                 return DOWN_RAY_TRACE_SHAPE;
             }
@@ -108,111 +108,111 @@ extends BlockWithEntity {
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext arg) {
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
         Direction lv;
-        return (BlockState)((BlockState)this.getDefaultState().with(FACING, (lv = arg.getSide().getOpposite()).getAxis() == Direction.Axis.Y ? Direction.DOWN : lv)).with(ENABLED, true);
+        return (BlockState)((BlockState)this.getDefaultState().with(FACING, (lv = ctx.getSide().getOpposite()).getAxis() == Direction.Axis.Y ? Direction.DOWN : lv)).with(ENABLED, true);
     }
 
     @Override
-    public BlockEntity createBlockEntity(BlockView arg) {
+    public BlockEntity createBlockEntity(BlockView world) {
         return new HopperBlockEntity();
     }
 
     @Override
-    public void onPlaced(World arg, BlockPos arg2, BlockState arg3, LivingEntity arg4, ItemStack arg5) {
+    public void onPlaced(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack) {
         BlockEntity lv;
-        if (arg5.hasCustomName() && (lv = arg.getBlockEntity(arg2)) instanceof HopperBlockEntity) {
-            ((HopperBlockEntity)lv).setCustomName(arg5.getName());
+        if (itemStack.hasCustomName() && (lv = world.getBlockEntity(pos)) instanceof HopperBlockEntity) {
+            ((HopperBlockEntity)lv).setCustomName(itemStack.getName());
         }
     }
 
     @Override
-    public void onBlockAdded(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
-        if (arg4.isOf(arg.getBlock())) {
+    public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
+        if (oldState.isOf(state.getBlock())) {
             return;
         }
-        this.updateEnabled(arg2, arg3, arg);
+        this.updateEnabled(world, pos, state);
     }
 
     @Override
-    public ActionResult onUse(BlockState arg, World arg2, BlockPos arg3, PlayerEntity arg4, Hand arg5, BlockHitResult arg6) {
-        if (arg2.isClient) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        if (world.isClient) {
             return ActionResult.SUCCESS;
         }
-        BlockEntity lv = arg2.getBlockEntity(arg3);
+        BlockEntity lv = world.getBlockEntity(pos);
         if (lv instanceof HopperBlockEntity) {
-            arg4.openHandledScreen((HopperBlockEntity)lv);
-            arg4.incrementStat(Stats.INSPECT_HOPPER);
+            player.openHandledScreen((HopperBlockEntity)lv);
+            player.incrementStat(Stats.INSPECT_HOPPER);
         }
         return ActionResult.CONSUME;
     }
 
     @Override
-    public void neighborUpdate(BlockState arg, World arg2, BlockPos arg3, Block arg4, BlockPos arg5, boolean bl) {
-        this.updateEnabled(arg2, arg3, arg);
+    public void neighborUpdate(BlockState state, World world, BlockPos pos, Block block, BlockPos fromPos, boolean notify) {
+        this.updateEnabled(world, pos, state);
     }
 
-    private void updateEnabled(World arg, BlockPos arg2, BlockState arg3) {
+    private void updateEnabled(World world, BlockPos pos, BlockState state) {
         boolean bl;
-        boolean bl2 = bl = !arg.isReceivingRedstonePower(arg2);
-        if (bl != arg3.get(ENABLED)) {
-            arg.setBlockState(arg2, (BlockState)arg3.with(ENABLED, bl), 4);
+        boolean bl2 = bl = !world.isReceivingRedstonePower(pos);
+        if (bl != state.get(ENABLED)) {
+            world.setBlockState(pos, (BlockState)state.with(ENABLED, bl), 4);
         }
     }
 
     @Override
-    public void onStateReplaced(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
-        if (arg.isOf(arg4.getBlock())) {
+    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
+        if (state.isOf(newState.getBlock())) {
             return;
         }
-        BlockEntity lv = arg2.getBlockEntity(arg3);
+        BlockEntity lv = world.getBlockEntity(pos);
         if (lv instanceof HopperBlockEntity) {
-            ItemScatterer.spawn(arg2, arg3, (Inventory)((HopperBlockEntity)lv));
-            arg2.updateComparators(arg3, this);
+            ItemScatterer.spawn(world, pos, (Inventory)((HopperBlockEntity)lv));
+            world.updateComparators(pos, this);
         }
-        super.onStateReplaced(arg, arg2, arg3, arg4, bl);
+        super.onStateReplaced(state, world, pos, newState, moved);
     }
 
     @Override
-    public BlockRenderType getRenderType(BlockState arg) {
+    public BlockRenderType getRenderType(BlockState state) {
         return BlockRenderType.MODEL;
     }
 
     @Override
-    public boolean hasComparatorOutput(BlockState arg) {
+    public boolean hasComparatorOutput(BlockState state) {
         return true;
     }
 
     @Override
-    public int getComparatorOutput(BlockState arg, World arg2, BlockPos arg3) {
-        return ScreenHandler.calculateComparatorOutput(arg2.getBlockEntity(arg3));
+    public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
+        return ScreenHandler.calculateComparatorOutput(world.getBlockEntity(pos));
     }
 
     @Override
-    public BlockState rotate(BlockState arg, BlockRotation arg2) {
-        return (BlockState)arg.with(FACING, arg2.rotate(arg.get(FACING)));
+    public BlockState rotate(BlockState state, BlockRotation rotation) {
+        return (BlockState)state.with(FACING, rotation.rotate(state.get(FACING)));
     }
 
     @Override
-    public BlockState mirror(BlockState arg, BlockMirror arg2) {
-        return arg.rotate(arg2.getRotation(arg.get(FACING)));
+    public BlockState mirror(BlockState state, BlockMirror mirror) {
+        return state.rotate(mirror.getRotation(state.get(FACING)));
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(FACING, ENABLED);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(FACING, ENABLED);
     }
 
     @Override
-    public void onEntityCollision(BlockState arg, World arg2, BlockPos arg3, Entity arg4) {
-        BlockEntity lv = arg2.getBlockEntity(arg3);
+    public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
+        BlockEntity lv = world.getBlockEntity(pos);
         if (lv instanceof HopperBlockEntity) {
-            ((HopperBlockEntity)lv).onEntityCollided(arg4);
+            ((HopperBlockEntity)lv).onEntityCollided(entity);
         }
     }
 
     @Override
-    public boolean canPathfindThrough(BlockState arg, BlockView arg2, BlockPos arg3, NavigationType arg4) {
+    public boolean canPathfindThrough(BlockState state, BlockView world, BlockPos pos, NavigationType type) {
         return false;
     }
 }

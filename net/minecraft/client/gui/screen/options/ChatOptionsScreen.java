@@ -26,8 +26,8 @@ extends GameOptionsScreen {
     private static final Option[] OPTIONS = new Option[]{Option.VISIBILITY, Option.CHAT_COLOR, Option.CHAT_LINKS, Option.CHAT_LINKS_PROMPT, Option.CHAT_OPACITY, Option.TEXT_BACKGROUND_OPACITY, Option.CHAT_SCALE, Option.CHAT_LINE_SPACING, Option.CHAT_WIDTH, Option.CHAT_HEIGHT_FOCUSED, Option.SATURATION, Option.NARRATOR, Option.AUTO_SUGGESTIONS, Option.REDUCED_DEBUG_INFO};
     private AbstractButtonWidget narratorOptionButton;
 
-    public ChatOptionsScreen(Screen arg, GameOptions arg2) {
-        super(arg, arg2, new TranslatableText("options.chat.title"));
+    public ChatOptionsScreen(Screen parent, GameOptions options) {
+        super(parent, options, new TranslatableText("options.chat.title"));
     }
 
     @Override
@@ -47,10 +47,10 @@ extends GameOptionsScreen {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.renderBackground(arg);
-        this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 20, 0xFFFFFF);
-        super.render(arg, i, j, f);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.renderBackground(matrices);
+        this.drawCenteredText(matrices, this.textRenderer, this.title, this.width / 2, 20, 0xFFFFFF);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 
     public void setNarratorMessage() {

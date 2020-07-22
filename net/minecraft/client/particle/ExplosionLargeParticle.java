@@ -22,20 +22,20 @@ public class ExplosionLargeParticle
 extends SpriteBillboardParticle {
     private final SpriteProvider spriteProvider;
 
-    private ExplosionLargeParticle(ClientWorld arg, double d, double e, double f, double g, SpriteProvider arg2) {
-        super(arg, d, e, f, 0.0, 0.0, 0.0);
+    private ExplosionLargeParticle(ClientWorld world, double x, double y, double z, double g, SpriteProvider spriteProvider) {
+        super(world, x, y, z, 0.0, 0.0, 0.0);
         float h;
         this.maxAge = 6 + this.random.nextInt(4);
         this.colorRed = h = this.random.nextFloat() * 0.6f + 0.4f;
         this.colorGreen = h;
         this.colorBlue = h;
         this.scale = 2.0f * (1.0f - (float)g * 0.5f);
-        this.spriteProvider = arg2;
-        this.setSpriteForAge(arg2);
+        this.spriteProvider = spriteProvider;
+        this.setSpriteForAge(spriteProvider);
     }
 
     @Override
-    public int getColorMultiplier(float f) {
+    public int getColorMultiplier(float tint) {
         return 0xF000F0;
     }
 
@@ -61,8 +61,8 @@ extends SpriteBillboardParticle {
     implements ParticleFactory<DefaultParticleType> {
         private final SpriteProvider spriteProvider;
 
-        public Factory(SpriteProvider arg) {
-            this.spriteProvider = arg;
+        public Factory(SpriteProvider spriteProvider) {
+            this.spriteProvider = spriteProvider;
         }
 
         @Override

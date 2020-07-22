@@ -66,9 +66,9 @@ extends Screen {
     private ButtonWidget buttonShowBoundingBox;
     private final DecimalFormat decimalFormat = new DecimalFormat("0.0###");
 
-    public StructureBlockScreen(StructureBlockBlockEntity arg) {
+    public StructureBlockScreen(StructureBlockBlockEntity structureBlock) {
         super(new TranslatableText(Blocks.STRUCTURE_BLOCK.getTranslationKey()));
-        this.structureBlock = arg;
+        this.structureBlock = structureBlock;
         this.decimalFormat.setDecimalFormatSymbols(DecimalFormatSymbols.getInstance(Locale.ROOT));
     }
 
@@ -176,11 +176,11 @@ extends Screen {
         this.inputName = new TextFieldWidget(this.textRenderer, this.width / 2 - 152, 40, 300, 20, (Text)new TranslatableText("structure_block.structure_name")){
 
             @Override
-            public boolean charTyped(char c, int i) {
-                if (!StructureBlockScreen.this.isValidCharacterForName(this.getText(), c, this.getCursor())) {
+            public boolean charTyped(char chr, int keyCode) {
+                if (!StructureBlockScreen.this.isValidCharacterForName(this.getText(), chr, this.getCursor())) {
                     return false;
                 }
-                return super.charTyped(c, i);
+                return super.charTyped(chr, keyCode);
             }
         };
         this.inputName.setMaxLength(64);
@@ -240,7 +240,7 @@ extends Screen {
     }
 
     @Override
-    public void resize(MinecraftClient arg, int i, int j) {
+    public void resize(MinecraftClient client, int width, int height) {
         String string = this.inputName.getText();
         String string2 = this.inputPosX.getText();
         String string3 = this.inputPosY.getText();
@@ -251,7 +251,7 @@ extends Screen {
         String string8 = this.inputIntegrity.getText();
         String string9 = this.inputSeed.getText();
         String string10 = this.inputMetadata.getText();
-        this.init(arg, i, j);
+        this.init(client, width, height);
         this.inputName.setText(string);
         this.inputPosX.setText(string2);
         this.inputPosY.setText(string3);
@@ -430,11 +430,11 @@ extends Screen {
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (super.keyPressed(i, j, k)) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (super.keyPressed(keyCode, scanCode, modifiers)) {
             return true;
         }
-        if (i == 257 || i == 335) {
+        if (keyCode == 257 || keyCode == 335) {
             this.done();
             return true;
         }
@@ -442,50 +442,50 @@ extends Screen {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.renderBackground(arg);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.renderBackground(matrices);
         StructureBlockMode lv = this.structureBlock.getMode();
-        this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 10, 0xFFFFFF);
+        this.drawCenteredText(matrices, this.textRenderer, this.title, this.width / 2, 10, 0xFFFFFF);
         if (lv != StructureBlockMode.DATA) {
-            this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("structure_block.structure_name", new Object[0]), this.width / 2 - 153, 30, 0xA0A0A0);
-            this.inputName.render(arg, i, j, f);
+            this.drawStringWithShadow(matrices, this.textRenderer, I18n.translate("structure_block.structure_name", new Object[0]), this.width / 2 - 153, 30, 0xA0A0A0);
+            this.inputName.render(matrices, mouseX, mouseY, delta);
         }
         if (lv == StructureBlockMode.LOAD || lv == StructureBlockMode.SAVE) {
-            this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("structure_block.position", new Object[0]), this.width / 2 - 153, 70, 0xA0A0A0);
-            this.inputPosX.render(arg, i, j, f);
-            this.inputPosY.render(arg, i, j, f);
-            this.inputPosZ.render(arg, i, j, f);
+            this.drawStringWithShadow(matrices, this.textRenderer, I18n.translate("structure_block.position", new Object[0]), this.width / 2 - 153, 70, 0xA0A0A0);
+            this.inputPosX.render(matrices, mouseX, mouseY, delta);
+            this.inputPosY.render(matrices, mouseX, mouseY, delta);
+            this.inputPosZ.render(matrices, mouseX, mouseY, delta);
             String string = I18n.translate("structure_block.include_entities", new Object[0]);
             int k = this.textRenderer.getWidth(string);
-            this.drawStringWithShadow(arg, this.textRenderer, string, this.width / 2 + 154 - k, 150, 0xA0A0A0);
+            this.drawStringWithShadow(matrices, this.textRenderer, string, this.width / 2 + 154 - k, 150, 0xA0A0A0);
         }
         if (lv == StructureBlockMode.SAVE) {
-            this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("structure_block.size", new Object[0]), this.width / 2 - 153, 110, 0xA0A0A0);
-            this.inputSizeX.render(arg, i, j, f);
-            this.inputSizeY.render(arg, i, j, f);
-            this.inputSizeZ.render(arg, i, j, f);
+            this.drawStringWithShadow(matrices, this.textRenderer, I18n.translate("structure_block.size", new Object[0]), this.width / 2 - 153, 110, 0xA0A0A0);
+            this.inputSizeX.render(matrices, mouseX, mouseY, delta);
+            this.inputSizeY.render(matrices, mouseX, mouseY, delta);
+            this.inputSizeZ.render(matrices, mouseX, mouseY, delta);
             String string2 = I18n.translate("structure_block.detect_size", new Object[0]);
             int l = this.textRenderer.getWidth(string2);
-            this.drawStringWithShadow(arg, this.textRenderer, string2, this.width / 2 + 154 - l, 110, 0xA0A0A0);
+            this.drawStringWithShadow(matrices, this.textRenderer, string2, this.width / 2 + 154 - l, 110, 0xA0A0A0);
             String string3 = I18n.translate("structure_block.show_air", new Object[0]);
             int m = this.textRenderer.getWidth(string3);
-            this.drawStringWithShadow(arg, this.textRenderer, string3, this.width / 2 + 154 - m, 70, 0xA0A0A0);
+            this.drawStringWithShadow(matrices, this.textRenderer, string3, this.width / 2 + 154 - m, 70, 0xA0A0A0);
         }
         if (lv == StructureBlockMode.LOAD) {
-            this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("structure_block.integrity", new Object[0]), this.width / 2 - 153, 110, 0xA0A0A0);
-            this.inputIntegrity.render(arg, i, j, f);
-            this.inputSeed.render(arg, i, j, f);
+            this.drawStringWithShadow(matrices, this.textRenderer, I18n.translate("structure_block.integrity", new Object[0]), this.width / 2 - 153, 110, 0xA0A0A0);
+            this.inputIntegrity.render(matrices, mouseX, mouseY, delta);
+            this.inputSeed.render(matrices, mouseX, mouseY, delta);
             String string4 = I18n.translate("structure_block.show_boundingbox", new Object[0]);
             int n = this.textRenderer.getWidth(string4);
-            this.drawStringWithShadow(arg, this.textRenderer, string4, this.width / 2 + 154 - n, 70, 0xA0A0A0);
+            this.drawStringWithShadow(matrices, this.textRenderer, string4, this.width / 2 + 154 - n, 70, 0xA0A0A0);
         }
         if (lv == StructureBlockMode.DATA) {
-            this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("structure_block.custom_data", new Object[0]), this.width / 2 - 153, 110, 0xA0A0A0);
-            this.inputMetadata.render(arg, i, j, f);
+            this.drawStringWithShadow(matrices, this.textRenderer, I18n.translate("structure_block.custom_data", new Object[0]), this.width / 2 - 153, 110, 0xA0A0A0);
+            this.inputMetadata.render(matrices, mouseX, mouseY, delta);
         }
         String string5 = "structure_block.mode_info." + lv.asString();
-        this.drawStringWithShadow(arg, this.textRenderer, I18n.translate(string5, new Object[0]), this.width / 2 - 153, 174, 0xA0A0A0);
-        super.render(arg, i, j, f);
+        this.drawStringWithShadow(matrices, this.textRenderer, I18n.translate(string5, new Object[0]), this.width / 2 - 153, 174, 0xA0A0A0);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 
     @Override

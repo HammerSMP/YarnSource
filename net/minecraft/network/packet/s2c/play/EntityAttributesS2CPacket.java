@@ -33,43 +33,43 @@ implements Packet<ClientPlayPacketListener> {
     public EntityAttributesS2CPacket() {
     }
 
-    public EntityAttributesS2CPacket(int i, Collection<EntityAttributeInstance> collection) {
-        this.entityId = i;
-        for (EntityAttributeInstance lv : collection) {
+    public EntityAttributesS2CPacket(int entityId, Collection<EntityAttributeInstance> attributes) {
+        this.entityId = entityId;
+        for (EntityAttributeInstance lv : attributes) {
             this.entries.add(new Entry(lv.getAttribute(), lv.getBaseValue(), lv.getModifiers()));
         }
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.entityId = arg.readVarInt();
-        int i = arg.readInt();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.entityId = buf.readVarInt();
+        int i = buf.readInt();
         for (int j = 0; j < i; ++j) {
-            Identifier lv = arg.readIdentifier();
+            Identifier lv = buf.readIdentifier();
             EntityAttribute lv2 = Registry.ATTRIBUTE.get(lv);
-            double d = arg.readDouble();
+            double d = buf.readDouble();
             ArrayList list = Lists.newArrayList();
-            int k = arg.readVarInt();
+            int k = buf.readVarInt();
             for (int l = 0; l < k; ++l) {
-                UUID uUID = arg.readUuid();
-                list.add(new EntityAttributeModifier(uUID, "Unknown synced attribute modifier", arg.readDouble(), EntityAttributeModifier.Operation.fromId(arg.readByte())));
+                UUID uUID = buf.readUuid();
+                list.add(new EntityAttributeModifier(uUID, "Unknown synced attribute modifier", buf.readDouble(), EntityAttributeModifier.Operation.fromId(buf.readByte())));
             }
             this.entries.add(new Entry(lv2, d, list));
         }
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeVarInt(this.entityId);
-        arg.writeInt(this.entries.size());
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeVarInt(this.entityId);
+        buf.writeInt(this.entries.size());
         for (Entry lv : this.entries) {
-            arg.writeIdentifier(Registry.ATTRIBUTE.getId(lv.getId()));
-            arg.writeDouble(lv.getBaseValue());
-            arg.writeVarInt(lv.getModifiers().size());
+            buf.writeIdentifier(Registry.ATTRIBUTE.getId(lv.getId()));
+            buf.writeDouble(lv.getBaseValue());
+            buf.writeVarInt(lv.getModifiers().size());
             for (EntityAttributeModifier lv2 : lv.getModifiers()) {
-                arg.writeUuid(lv2.getId());
-                arg.writeDouble(lv2.getValue());
-                arg.writeByte(lv2.getOperation().getId());
+                buf.writeUuid(lv2.getId());
+                buf.writeDouble(lv2.getValue());
+                buf.writeByte(lv2.getOperation().getId());
             }
         }
     }

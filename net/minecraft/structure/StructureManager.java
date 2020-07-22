@@ -52,18 +52,18 @@ public class StructureManager {
         this.generatedPath = arg2.getDirectory(WorldSavePath.GENERATED).normalize();
     }
 
-    public Structure getStructureOrBlank(Identifier arg) {
-        Structure lv = this.getStructure(arg);
+    public Structure getStructureOrBlank(Identifier id) {
+        Structure lv = this.getStructure(id);
         if (lv == null) {
             lv = new Structure();
-            this.structures.put(arg, lv);
+            this.structures.put(id, lv);
         }
         return lv;
     }
 
     @Nullable
-    public Structure getStructure(Identifier arg2) {
-        return this.structures.computeIfAbsent(arg2, arg -> {
+    public Structure getStructure(Identifier identifier) {
+        return this.structures.computeIfAbsent(identifier, arg -> {
             Structure lv = this.loadStructureFromFile((Identifier)arg);
             return lv != null ? lv : this.loadStructureFromResource((Identifier)arg);
         });
@@ -80,8 +80,8 @@ public class StructureManager {
      * Enabled aggressive exception aggregation
      */
     @Nullable
-    private Structure loadStructureFromResource(Identifier arg) {
-        Identifier lv = new Identifier(arg.getNamespace(), "structures/" + arg.getPath() + ".nbt");
+    private Structure loadStructureFromResource(Identifier id) {
+        Identifier lv = new Identifier(id.getNamespace(), "structures/" + id.getPath() + ".nbt");
         try (Resource lv2 = this.field_25189.getResource(lv);){
             Structure structure = this.readStructure(lv2.getInputStream());
             return structure;
@@ -90,7 +90,7 @@ public class StructureManager {
             return null;
         }
         catch (Throwable throwable6) {
-            LOGGER.error("Couldn't load structure {}: {}", (Object)arg, (Object)throwable6.toString());
+            LOGGER.error("Couldn't load structure {}: {}", (Object)id, (Object)throwable6.toString());
             return null;
         }
     }
@@ -101,11 +101,11 @@ public class StructureManager {
      * Enabled aggressive exception aggregation
      */
     @Nullable
-    private Structure loadStructureFromFile(Identifier arg) {
+    private Structure loadStructureFromFile(Identifier id) {
         if (!this.generatedPath.toFile().isDirectory()) {
             return null;
         }
-        Path path = this.getAndCheckStructurePath(arg, ".nbt");
+        Path path = this.getAndCheckStructurePath(id, ".nbt");
         try (FileInputStream inputStream = new FileInputStream(path.toFile());){
             Structure structure = this.readStructure(inputStream);
             return structure;
@@ -119,26 +119,26 @@ public class StructureManager {
         }
     }
 
-    private Structure readStructure(InputStream inputStream) throws IOException {
-        CompoundTag lv = NbtIo.readCompressed(inputStream);
+    private Structure readStructure(InputStream structureInputStream) throws IOException {
+        CompoundTag lv = NbtIo.readCompressed(structureInputStream);
         return this.createStructure(lv);
     }
 
-    public Structure createStructure(CompoundTag arg) {
-        if (!arg.contains("DataVersion", 99)) {
-            arg.putInt("DataVersion", 500);
+    public Structure createStructure(CompoundTag tag) {
+        if (!tag.contains("DataVersion", 99)) {
+            tag.putInt("DataVersion", 500);
         }
         Structure lv = new Structure();
-        lv.fromTag(NbtHelper.update(this.dataFixer, DataFixTypes.STRUCTURE, arg, arg.getInt("DataVersion")));
+        lv.fromTag(NbtHelper.update(this.dataFixer, DataFixTypes.STRUCTURE, tag, tag.getInt("DataVersion")));
         return lv;
     }
 
-    public boolean saveStructure(Identifier arg) {
-        Structure lv = this.structures.get(arg);
+    public boolean saveStructure(Identifier id) {
+        Structure lv = this.structures.get(id);
         if (lv == null) {
             return false;
         }
-        Path path = this.getAndCheckStructurePath(arg, ".nbt");
+        Path path = this.getAndCheckStructurePath(id, ".nbt");
         Path path2 = path.getParent();
         if (path2 == null) {
             return false;
@@ -160,30 +160,30 @@ public class StructureManager {
         return true;
     }
 
-    public Path getStructurePath(Identifier arg, String string) {
+    public Path getStructurePath(Identifier id, String extension) {
         try {
-            Path path = this.generatedPath.resolve(arg.getNamespace());
+            Path path = this.generatedPath.resolve(id.getNamespace());
             Path path2 = path.resolve("structures");
-            return FileNameUtil.getResourcePath(path2, arg.getPath(), string);
+            return FileNameUtil.getResourcePath(path2, id.getPath(), extension);
         }
         catch (InvalidPathException invalidPathException) {
-            throw new InvalidIdentifierException("Invalid resource path: " + arg, invalidPathException);
+            throw new InvalidIdentifierException("Invalid resource path: " + id, invalidPathException);
         }
     }
 
-    private Path getAndCheckStructurePath(Identifier arg, String string) {
-        if (arg.getPath().contains("//")) {
-            throw new InvalidIdentifierException("Invalid resource path: " + arg);
+    private Path getAndCheckStructurePath(Identifier id, String extension) {
+        if (id.getPath().contains("//")) {
+            throw new InvalidIdentifierException("Invalid resource path: " + id);
         }
-        Path path = this.getStructurePath(arg, string);
+        Path path = this.getStructurePath(id, extension);
         if (!(path.startsWith(this.generatedPath) && FileNameUtil.isNormal(path) && FileNameUtil.isAllowedName(path))) {
             throw new InvalidIdentifierException("Invalid resource path: " + path);
         }
         return path;
     }
 
-    public void unloadStructure(Identifier arg) {
-        this.structures.remove(arg);
+    public void unloadStructure(Identifier id) {
+        this.structures.remove(id);
     }
 }
 

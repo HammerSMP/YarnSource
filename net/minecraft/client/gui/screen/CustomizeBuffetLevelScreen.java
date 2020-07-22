@@ -22,7 +22,10 @@ import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.NarratorManager;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.TranslatableText;
+import net.minecraft.util.registry.DynamicRegistryManager;
+import net.minecraft.util.registry.MutableRegistry;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.biome.Biome;
 
 @Environment(value=EnvType.CLIENT)
@@ -30,15 +33,17 @@ public class CustomizeBuffetLevelScreen
 extends Screen {
     private final Screen field_24562;
     private final Consumer<Biome> field_24563;
+    private final MutableRegistry<Biome> field_25888;
     private BuffetBiomesListWidget biomeSelectionList;
     private Biome field_25040;
     private ButtonWidget confirmButton;
 
-    public CustomizeBuffetLevelScreen(Screen arg, Consumer<Biome> consumer, Biome arg2) {
+    public CustomizeBuffetLevelScreen(Screen arg, DynamicRegistryManager arg2, Consumer<Biome> consumer, Biome arg3) {
         super(new TranslatableText("createWorld.customize.buffet.title"));
         this.field_24562 = arg;
         this.field_24563 = consumer;
-        this.field_25040 = arg2;
+        this.field_25040 = arg3;
+        this.field_25888 = arg2.get(Registry.BIOME_KEY);
     }
 
     @Override
@@ -64,12 +69,12 @@ extends Screen {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         this.renderBackgroundTexture(0);
-        this.biomeSelectionList.render(arg, i, j, f);
-        this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 8, 0xFFFFFF);
-        this.drawCenteredString(arg, this.textRenderer, I18n.translate("createWorld.customize.buffet.biome", new Object[0]), this.width / 2, 28, 0xA0A0A0);
-        super.render(arg, i, j, f);
+        this.biomeSelectionList.render(matrices, mouseX, mouseY, delta);
+        this.drawCenteredText(matrices, this.textRenderer, this.title, this.width / 2, 8, 0xFFFFFF);
+        this.drawCenteredString(matrices, this.textRenderer, I18n.translate("createWorld.customize.buffet.biome", new Object[0]), this.width / 2, 28, 0xA0A0A0);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -77,7 +82,7 @@ extends Screen {
     extends AlwaysSelectedEntryListWidget<BuffetBiomeItem> {
         private BuffetBiomesListWidget() {
             super(CustomizeBuffetLevelScreen.this.client, CustomizeBuffetLevelScreen.this.width, CustomizeBuffetLevelScreen.this.height, 40, CustomizeBuffetLevelScreen.this.height - 37, 16);
-            Registry.BIOME.stream().sorted(Comparator.comparing(arg -> arg.getName().getString())).forEach(arg -> this.addEntry(new BuffetBiomeItem((Biome)arg)));
+            CustomizeBuffetLevelScreen.this.field_25888.getEntries().stream().sorted(Comparator.comparing(entry -> ((RegistryKey)entry.getKey()).getValue().toString())).forEach(entry -> this.addEntry(new BuffetBiomeItem((Biome)entry.getValue())));
         }
 
         @Override
@@ -90,7 +95,7 @@ extends Screen {
             super.setSelected(arg);
             if (arg != null) {
                 CustomizeBuffetLevelScreen.this.field_25040 = arg.field_24564;
-                NarratorManager.INSTANCE.narrate(new TranslatableText("narrator.select", arg.field_24564.getName().getString()).getString());
+                NarratorManager.INSTANCE.narrate(new TranslatableText("narrator.select", CustomizeBuffetLevelScreen.this.field_25888.getId(arg.field_24564)).getString());
             }
             CustomizeBuffetLevelScreen.this.refreshConfirmButton();
         }
@@ -105,13 +110,13 @@ extends Screen {
             }
 
             @Override
-            public void render(MatrixStack arg, int i, int j, int k, int l, int m, int n, int o, boolean bl, float f) {
-                BuffetBiomesListWidget.this.drawStringWithShadow(arg, CustomizeBuffetLevelScreen.this.textRenderer, this.field_24564.getName().getString(), k + 5, j + 2, 0xFFFFFF);
+            public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+                BuffetBiomesListWidget.this.drawStringWithShadow(matrices, CustomizeBuffetLevelScreen.this.textRenderer, CustomizeBuffetLevelScreen.this.field_25888.getId(this.field_24564).toString(), x + 5, y + 2, 0xFFFFFF);
             }
 
             @Override
-            public boolean mouseClicked(double d, double e, int i) {
-                if (i == 0) {
+            public boolean mouseClicked(double mouseX, double mouseY, int button) {
+                if (button == 0) {
                     BuffetBiomesListWidget.this.setSelected(this);
                     return true;
                 }

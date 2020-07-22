@@ -30,36 +30,37 @@ implements IndexedIterable<T> {
         this(512);
     }
 
-    public IdList(int i) {
-        this.list = Lists.newArrayListWithExpectedSize((int)i);
-        this.idMap = new IdentityHashMap(i);
+    public IdList(int initialSize) {
+        this.list = Lists.newArrayListWithExpectedSize((int)initialSize);
+        this.idMap = new IdentityHashMap(initialSize);
     }
 
-    public void set(T object, int i) {
-        this.idMap.put(object, i);
-        while (this.list.size() <= i) {
+    public void set(T value, int id) {
+        this.idMap.put(value, id);
+        while (this.list.size() <= id) {
             this.list.add(null);
         }
-        this.list.set(i, object);
-        if (this.nextId <= i) {
-            this.nextId = i + 1;
+        this.list.set(id, value);
+        if (this.nextId <= id) {
+            this.nextId = id + 1;
         }
     }
 
-    public void add(T object) {
-        this.set(object, this.nextId);
+    public void add(T value) {
+        this.set(value, this.nextId);
     }
 
-    public int getId(T object) {
+    @Override
+    public int getRawId(T object) {
         Integer integer = this.idMap.get(object);
         return integer == null ? -1 : integer;
     }
 
     @Override
     @Nullable
-    public final T get(int i) {
-        if (i >= 0 && i < this.list.size()) {
-            return this.list.get(i);
+    public final T get(int index) {
+        if (index >= 0 && index < this.list.size()) {
+            return this.list.get(index);
         }
         return null;
     }

@@ -20,30 +20,30 @@ implements Packet<ServerPlayPacketListener> {
     public VehicleMoveC2SPacket() {
     }
 
-    public VehicleMoveC2SPacket(Entity arg) {
-        this.x = arg.getX();
-        this.y = arg.getY();
-        this.z = arg.getZ();
-        this.yaw = arg.yaw;
-        this.pitch = arg.pitch;
+    public VehicleMoveC2SPacket(Entity entity) {
+        this.x = entity.getX();
+        this.y = entity.getY();
+        this.z = entity.getZ();
+        this.yaw = entity.yaw;
+        this.pitch = entity.pitch;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.x = arg.readDouble();
-        this.y = arg.readDouble();
-        this.z = arg.readDouble();
-        this.yaw = arg.readFloat();
-        this.pitch = arg.readFloat();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.x = buf.readDouble();
+        this.y = buf.readDouble();
+        this.z = buf.readDouble();
+        this.yaw = buf.readFloat();
+        this.pitch = buf.readFloat();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeDouble(this.x);
-        arg.writeDouble(this.y);
-        arg.writeDouble(this.z);
-        arg.writeFloat(this.yaw);
-        arg.writeFloat(this.pitch);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeDouble(this.x);
+        buf.writeDouble(this.y);
+        buf.writeDouble(this.z);
+        buf.writeFloat(this.yaw);
+        buf.writeFloat(this.pitch);
     }
 
     @Override

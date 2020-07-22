@@ -19,8 +19,8 @@ public final class PlayerChunkWatchingManager {
         return this.watchingPlayers.keySet().stream();
     }
 
-    public void add(long l, ServerPlayerEntity arg, boolean bl) {
-        this.watchingPlayers.put((Object)arg, bl);
+    public void add(long l, ServerPlayerEntity arg, boolean watchDisabled) {
+        this.watchingPlayers.put((Object)arg, watchDisabled);
     }
 
     public void remove(long l, ServerPlayerEntity arg) {
@@ -43,7 +43,7 @@ public final class PlayerChunkWatchingManager {
         return this.watchingPlayers.getBoolean((Object)arg);
     }
 
-    public void movePlayer(long l, long m, ServerPlayerEntity arg) {
+    public void movePlayer(long prevPos, long currentPos, ServerPlayerEntity arg) {
     }
 }
 

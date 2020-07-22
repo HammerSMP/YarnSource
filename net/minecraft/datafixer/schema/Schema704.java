@@ -114,8 +114,8 @@ extends Schema {
         }
     };
 
-    public Schema704(int i, Schema schema) {
-        super(i, schema);
+    public Schema704(int versionKey, Schema parent) {
+        super(versionKey, parent);
     }
 
     protected static void method_5296(Schema schema, Map<String, Supplier<TypeTemplate>> map, String string) {
@@ -157,9 +157,9 @@ extends Schema {
         return map;
     }
 
-    public void registerTypes(Schema schema, Map<String, Supplier<TypeTemplate>> map, Map<String, Supplier<TypeTemplate>> map2) {
-        super.registerTypes(schema, map, map2);
-        schema.registerType(false, TypeReferences.BLOCK_ENTITY, () -> DSL.taggedChoiceLazy((String)"id", IdentifierNormalizingSchema.getIdentifierType(), (Map)map2));
+    public void registerTypes(Schema schema, Map<String, Supplier<TypeTemplate>> entityTypes, Map<String, Supplier<TypeTemplate>> blockEntityTypes) {
+        super.registerTypes(schema, entityTypes, blockEntityTypes);
+        schema.registerType(false, TypeReferences.BLOCK_ENTITY, () -> DSL.taggedChoiceLazy((String)"id", IdentifierNormalizingSchema.getIdentifierType(), (Map)blockEntityTypes));
         schema.registerType(true, TypeReferences.ITEM_STACK, () -> DSL.hook((TypeTemplate)DSL.optionalFields((String)"id", (TypeTemplate)TypeReferences.ITEM_NAME.in(schema), (String)"tag", (TypeTemplate)DSL.optionalFields((String)"EntityTag", (TypeTemplate)TypeReferences.ENTITY_TREE.in(schema), (String)"BlockEntityTag", (TypeTemplate)TypeReferences.BLOCK_ENTITY.in(schema), (String)"CanDestroy", (TypeTemplate)DSL.list((TypeTemplate)TypeReferences.BLOCK_NAME.in(schema)), (String)"CanPlaceOn", (TypeTemplate)DSL.list((TypeTemplate)TypeReferences.BLOCK_NAME.in(schema)))), (Hook.HookFunction)field_5745, (Hook.HookFunction)Hook.HookFunction.IDENTITY));
     }
 }

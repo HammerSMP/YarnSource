@@ -19,22 +19,22 @@ extends VoxelShape {
     private final Direction.Axis axis;
     private static final DoubleList POINTS = new FractionalDoubleList(1);
 
-    public SlicedVoxelShape(VoxelShape arg, Direction.Axis arg2, int i) {
-        super(SlicedVoxelShape.createVoxelSet(arg.voxels, arg2, i));
-        this.shape = arg;
-        this.axis = arg2;
+    public SlicedVoxelShape(VoxelShape shape, Direction.Axis axis, int sliceWidth) {
+        super(SlicedVoxelShape.createVoxelSet(shape.voxels, axis, sliceWidth));
+        this.shape = shape;
+        this.axis = axis;
     }
 
-    private static VoxelSet createVoxelSet(VoxelSet arg, Direction.Axis arg2, int i) {
-        return new CroppedVoxelSet(arg, arg2.choose(i, 0, 0), arg2.choose(0, i, 0), arg2.choose(0, 0, i), arg2.choose(i + 1, arg.xSize, arg.xSize), arg2.choose(arg.ySize, i + 1, arg.ySize), arg2.choose(arg.zSize, arg.zSize, i + 1));
+    private static VoxelSet createVoxelSet(VoxelSet voxelSet, Direction.Axis arg2, int sliceWidth) {
+        return new CroppedVoxelSet(voxelSet, arg2.choose(sliceWidth, 0, 0), arg2.choose(0, sliceWidth, 0), arg2.choose(0, 0, sliceWidth), arg2.choose(sliceWidth + 1, voxelSet.xSize, voxelSet.xSize), arg2.choose(voxelSet.ySize, sliceWidth + 1, voxelSet.ySize), arg2.choose(voxelSet.zSize, voxelSet.zSize, sliceWidth + 1));
     }
 
     @Override
-    protected DoubleList getPointPositions(Direction.Axis arg) {
-        if (arg == this.axis) {
+    protected DoubleList getPointPositions(Direction.Axis axis) {
+        if (axis == this.axis) {
             return POINTS;
         }
-        return this.shape.getPointPositions(arg);
+        return this.shape.getPointPositions(axis);
     }
 }
 

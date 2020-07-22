@@ -22,30 +22,30 @@ public class TestSet {
     public TestSet() {
     }
 
-    public TestSet(Collection<GameTest> collection) {
-        this.tests.addAll(collection);
+    public TestSet(Collection<GameTest> tests) {
+        this.tests.addAll(tests);
     }
 
-    public void add(GameTest arg) {
-        this.tests.add(arg);
-        this.field_25303.forEach(arg::addListener);
+    public void add(GameTest test) {
+        this.tests.add(test);
+        this.field_25303.forEach(test::addListener);
     }
 
-    public void addListener(TestListener arg) {
-        this.field_25303.add(arg);
-        this.tests.forEach(arg2 -> arg2.addListener(arg));
+    public void addListener(TestListener listener) {
+        this.field_25303.add(listener);
+        this.tests.forEach(arg2 -> arg2.addListener(listener));
     }
 
     public void method_29407(final Consumer<GameTest> consumer) {
         this.addListener(new TestListener(){
 
             @Override
-            public void onStarted(GameTest arg) {
+            public void onStarted(GameTest test) {
             }
 
             @Override
-            public void onFailed(GameTest arg) {
-                consumer.accept(arg);
+            public void onFailed(GameTest test) {
+                consumer.accept(test);
             }
         });
     }

@@ -15,9 +15,9 @@ NorthWestCoordinateTransformer {
     public int sample(LayerRandomnessSource var1, int var2);
 
     @Override
-    default public int sample(LayerSampleContext<?> arg, LayerSampler arg2, int i, int j) {
-        int k = arg2.sample(this.transformX(i + 1), this.transformZ(j + 1));
-        return this.sample(arg, k);
+    default public int sample(LayerSampleContext<?> context, LayerSampler parent, int x, int z) {
+        int k = parent.sample(this.transformX(x + 1), this.transformZ(z + 1));
+        return this.sample(context, k);
     }
 }
 

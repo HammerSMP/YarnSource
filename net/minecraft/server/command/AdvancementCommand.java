@@ -25,8 +25,8 @@ import java.util.List;
 import net.minecraft.advancement.Advancement;
 import net.minecraft.advancement.AdvancementProgress;
 import net.minecraft.command.CommandException;
-import net.minecraft.command.arguments.EntityArgumentType;
-import net.minecraft.command.arguments.IdentifierArgumentType;
+import net.minecraft.command.argument.EntityArgumentType;
+import net.minecraft.command.argument.IdentifierArgumentType;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.CommandSource;
 import net.minecraft.server.command.ServerCommandSource;
@@ -39,82 +39,82 @@ public class AdvancementCommand {
         return CommandSource.suggestIdentifiers(collection.stream().map(Advancement::getId), suggestionsBuilder);
     };
 
-    public static void register(CommandDispatcher<ServerCommandSource> commandDispatcher) {
-        commandDispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)CommandManager.literal("advancement").requires(arg -> arg.hasPermissionLevel(2))).then(CommandManager.literal("grant").then(((RequiredArgumentBuilder)((RequiredArgumentBuilder)((RequiredArgumentBuilder)((RequiredArgumentBuilder)CommandManager.argument("targets", EntityArgumentType.players()).then(CommandManager.literal("only").then(((RequiredArgumentBuilder)CommandManager.argument("advancement", IdentifierArgumentType.identifier()).suggests(SUGGESTION_PROVIDER).executes(commandContext -> AdvancementCommand.executeAdvancement((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getPlayers((CommandContext<ServerCommandSource>)commandContext, "targets"), Operation.GRANT, AdvancementCommand.select(IdentifierArgumentType.getAdvancementArgument((CommandContext<ServerCommandSource>)commandContext, "advancement"), Selection.ONLY)))).then(CommandManager.argument("criterion", StringArgumentType.greedyString()).suggests((commandContext, suggestionsBuilder) -> CommandSource.suggestMatching(IdentifierArgumentType.getAdvancementArgument((CommandContext<ServerCommandSource>)commandContext, "advancement").getCriteria().keySet(), suggestionsBuilder)).executes(commandContext -> AdvancementCommand.executeCriterion((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getPlayers((CommandContext<ServerCommandSource>)commandContext, "targets"), Operation.GRANT, IdentifierArgumentType.getAdvancementArgument((CommandContext<ServerCommandSource>)commandContext, "advancement"), StringArgumentType.getString((CommandContext)commandContext, (String)"criterion"))))))).then(CommandManager.literal("from").then(CommandManager.argument("advancement", IdentifierArgumentType.identifier()).suggests(SUGGESTION_PROVIDER).executes(commandContext -> AdvancementCommand.executeAdvancement((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getPlayers((CommandContext<ServerCommandSource>)commandContext, "targets"), Operation.GRANT, AdvancementCommand.select(IdentifierArgumentType.getAdvancementArgument((CommandContext<ServerCommandSource>)commandContext, "advancement"), Selection.FROM)))))).then(CommandManager.literal("until").then(CommandManager.argument("advancement", IdentifierArgumentType.identifier()).suggests(SUGGESTION_PROVIDER).executes(commandContext -> AdvancementCommand.executeAdvancement((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getPlayers((CommandContext<ServerCommandSource>)commandContext, "targets"), Operation.GRANT, AdvancementCommand.select(IdentifierArgumentType.getAdvancementArgument((CommandContext<ServerCommandSource>)commandContext, "advancement"), Selection.UNTIL)))))).then(CommandManager.literal("through").then(CommandManager.argument("advancement", IdentifierArgumentType.identifier()).suggests(SUGGESTION_PROVIDER).executes(commandContext -> AdvancementCommand.executeAdvancement((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getPlayers((CommandContext<ServerCommandSource>)commandContext, "targets"), Operation.GRANT, AdvancementCommand.select(IdentifierArgumentType.getAdvancementArgument((CommandContext<ServerCommandSource>)commandContext, "advancement"), Selection.THROUGH)))))).then(CommandManager.literal("everything").executes(commandContext -> AdvancementCommand.executeAdvancement((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getPlayers((CommandContext<ServerCommandSource>)commandContext, "targets"), Operation.GRANT, ((ServerCommandSource)commandContext.getSource()).getMinecraftServer().getAdvancementLoader().getAdvancements())))))).then(CommandManager.literal("revoke").then(((RequiredArgumentBuilder)((RequiredArgumentBuilder)((RequiredArgumentBuilder)((RequiredArgumentBuilder)CommandManager.argument("targets", EntityArgumentType.players()).then(CommandManager.literal("only").then(((RequiredArgumentBuilder)CommandManager.argument("advancement", IdentifierArgumentType.identifier()).suggests(SUGGESTION_PROVIDER).executes(commandContext -> AdvancementCommand.executeAdvancement((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getPlayers((CommandContext<ServerCommandSource>)commandContext, "targets"), Operation.REVOKE, AdvancementCommand.select(IdentifierArgumentType.getAdvancementArgument((CommandContext<ServerCommandSource>)commandContext, "advancement"), Selection.ONLY)))).then(CommandManager.argument("criterion", StringArgumentType.greedyString()).suggests((commandContext, suggestionsBuilder) -> CommandSource.suggestMatching(IdentifierArgumentType.getAdvancementArgument((CommandContext<ServerCommandSource>)commandContext, "advancement").getCriteria().keySet(), suggestionsBuilder)).executes(commandContext -> AdvancementCommand.executeCriterion((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getPlayers((CommandContext<ServerCommandSource>)commandContext, "targets"), Operation.REVOKE, IdentifierArgumentType.getAdvancementArgument((CommandContext<ServerCommandSource>)commandContext, "advancement"), StringArgumentType.getString((CommandContext)commandContext, (String)"criterion"))))))).then(CommandManager.literal("from").then(CommandManager.argument("advancement", IdentifierArgumentType.identifier()).suggests(SUGGESTION_PROVIDER).executes(commandContext -> AdvancementCommand.executeAdvancement((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getPlayers((CommandContext<ServerCommandSource>)commandContext, "targets"), Operation.REVOKE, AdvancementCommand.select(IdentifierArgumentType.getAdvancementArgument((CommandContext<ServerCommandSource>)commandContext, "advancement"), Selection.FROM)))))).then(CommandManager.literal("until").then(CommandManager.argument("advancement", IdentifierArgumentType.identifier()).suggests(SUGGESTION_PROVIDER).executes(commandContext -> AdvancementCommand.executeAdvancement((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getPlayers((CommandContext<ServerCommandSource>)commandContext, "targets"), Operation.REVOKE, AdvancementCommand.select(IdentifierArgumentType.getAdvancementArgument((CommandContext<ServerCommandSource>)commandContext, "advancement"), Selection.UNTIL)))))).then(CommandManager.literal("through").then(CommandManager.argument("advancement", IdentifierArgumentType.identifier()).suggests(SUGGESTION_PROVIDER).executes(commandContext -> AdvancementCommand.executeAdvancement((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getPlayers((CommandContext<ServerCommandSource>)commandContext, "targets"), Operation.REVOKE, AdvancementCommand.select(IdentifierArgumentType.getAdvancementArgument((CommandContext<ServerCommandSource>)commandContext, "advancement"), Selection.THROUGH)))))).then(CommandManager.literal("everything").executes(commandContext -> AdvancementCommand.executeAdvancement((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getPlayers((CommandContext<ServerCommandSource>)commandContext, "targets"), Operation.REVOKE, ((ServerCommandSource)commandContext.getSource()).getMinecraftServer().getAdvancementLoader().getAdvancements()))))));
+    public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
+        dispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)CommandManager.literal("advancement").requires(arg -> arg.hasPermissionLevel(2))).then(CommandManager.literal("grant").then(((RequiredArgumentBuilder)((RequiredArgumentBuilder)((RequiredArgumentBuilder)((RequiredArgumentBuilder)CommandManager.argument("targets", EntityArgumentType.players()).then(CommandManager.literal("only").then(((RequiredArgumentBuilder)CommandManager.argument("advancement", IdentifierArgumentType.identifier()).suggests(SUGGESTION_PROVIDER).executes(commandContext -> AdvancementCommand.executeAdvancement((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getPlayers((CommandContext<ServerCommandSource>)commandContext, "targets"), Operation.GRANT, AdvancementCommand.select(IdentifierArgumentType.getAdvancementArgument((CommandContext<ServerCommandSource>)commandContext, "advancement"), Selection.ONLY)))).then(CommandManager.argument("criterion", StringArgumentType.greedyString()).suggests((commandContext, suggestionsBuilder) -> CommandSource.suggestMatching(IdentifierArgumentType.getAdvancementArgument((CommandContext<ServerCommandSource>)commandContext, "advancement").getCriteria().keySet(), suggestionsBuilder)).executes(commandContext -> AdvancementCommand.executeCriterion((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getPlayers((CommandContext<ServerCommandSource>)commandContext, "targets"), Operation.GRANT, IdentifierArgumentType.getAdvancementArgument((CommandContext<ServerCommandSource>)commandContext, "advancement"), StringArgumentType.getString((CommandContext)commandContext, (String)"criterion"))))))).then(CommandManager.literal("from").then(CommandManager.argument("advancement", IdentifierArgumentType.identifier()).suggests(SUGGESTION_PROVIDER).executes(commandContext -> AdvancementCommand.executeAdvancement((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getPlayers((CommandContext<ServerCommandSource>)commandContext, "targets"), Operation.GRANT, AdvancementCommand.select(IdentifierArgumentType.getAdvancementArgument((CommandContext<ServerCommandSource>)commandContext, "advancement"), Selection.FROM)))))).then(CommandManager.literal("until").then(CommandManager.argument("advancement", IdentifierArgumentType.identifier()).suggests(SUGGESTION_PROVIDER).executes(commandContext -> AdvancementCommand.executeAdvancement((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getPlayers((CommandContext<ServerCommandSource>)commandContext, "targets"), Operation.GRANT, AdvancementCommand.select(IdentifierArgumentType.getAdvancementArgument((CommandContext<ServerCommandSource>)commandContext, "advancement"), Selection.UNTIL)))))).then(CommandManager.literal("through").then(CommandManager.argument("advancement", IdentifierArgumentType.identifier()).suggests(SUGGESTION_PROVIDER).executes(commandContext -> AdvancementCommand.executeAdvancement((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getPlayers((CommandContext<ServerCommandSource>)commandContext, "targets"), Operation.GRANT, AdvancementCommand.select(IdentifierArgumentType.getAdvancementArgument((CommandContext<ServerCommandSource>)commandContext, "advancement"), Selection.THROUGH)))))).then(CommandManager.literal("everything").executes(commandContext -> AdvancementCommand.executeAdvancement((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getPlayers((CommandContext<ServerCommandSource>)commandContext, "targets"), Operation.GRANT, ((ServerCommandSource)commandContext.getSource()).getMinecraftServer().getAdvancementLoader().getAdvancements())))))).then(CommandManager.literal("revoke").then(((RequiredArgumentBuilder)((RequiredArgumentBuilder)((RequiredArgumentBuilder)((RequiredArgumentBuilder)CommandManager.argument("targets", EntityArgumentType.players()).then(CommandManager.literal("only").then(((RequiredArgumentBuilder)CommandManager.argument("advancement", IdentifierArgumentType.identifier()).suggests(SUGGESTION_PROVIDER).executes(commandContext -> AdvancementCommand.executeAdvancement((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getPlayers((CommandContext<ServerCommandSource>)commandContext, "targets"), Operation.REVOKE, AdvancementCommand.select(IdentifierArgumentType.getAdvancementArgument((CommandContext<ServerCommandSource>)commandContext, "advancement"), Selection.ONLY)))).then(CommandManager.argument("criterion", StringArgumentType.greedyString()).suggests((commandContext, suggestionsBuilder) -> CommandSource.suggestMatching(IdentifierArgumentType.getAdvancementArgument((CommandContext<ServerCommandSource>)commandContext, "advancement").getCriteria().keySet(), suggestionsBuilder)).executes(commandContext -> AdvancementCommand.executeCriterion((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getPlayers((CommandContext<ServerCommandSource>)commandContext, "targets"), Operation.REVOKE, IdentifierArgumentType.getAdvancementArgument((CommandContext<ServerCommandSource>)commandContext, "advancement"), StringArgumentType.getString((CommandContext)commandContext, (String)"criterion"))))))).then(CommandManager.literal("from").then(CommandManager.argument("advancement", IdentifierArgumentType.identifier()).suggests(SUGGESTION_PROVIDER).executes(commandContext -> AdvancementCommand.executeAdvancement((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getPlayers((CommandContext<ServerCommandSource>)commandContext, "targets"), Operation.REVOKE, AdvancementCommand.select(IdentifierArgumentType.getAdvancementArgument((CommandContext<ServerCommandSource>)commandContext, "advancement"), Selection.FROM)))))).then(CommandManager.literal("until").then(CommandManager.argument("advancement", IdentifierArgumentType.identifier()).suggests(SUGGESTION_PROVIDER).executes(commandContext -> AdvancementCommand.executeAdvancement((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getPlayers((CommandContext<ServerCommandSource>)commandContext, "targets"), Operation.REVOKE, AdvancementCommand.select(IdentifierArgumentType.getAdvancementArgument((CommandContext<ServerCommandSource>)commandContext, "advancement"), Selection.UNTIL)))))).then(CommandManager.literal("through").then(CommandManager.argument("advancement", IdentifierArgumentType.identifier()).suggests(SUGGESTION_PROVIDER).executes(commandContext -> AdvancementCommand.executeAdvancement((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getPlayers((CommandContext<ServerCommandSource>)commandContext, "targets"), Operation.REVOKE, AdvancementCommand.select(IdentifierArgumentType.getAdvancementArgument((CommandContext<ServerCommandSource>)commandContext, "advancement"), Selection.THROUGH)))))).then(CommandManager.literal("everything").executes(commandContext -> AdvancementCommand.executeAdvancement((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getPlayers((CommandContext<ServerCommandSource>)commandContext, "targets"), Operation.REVOKE, ((ServerCommandSource)commandContext.getSource()).getMinecraftServer().getAdvancementLoader().getAdvancements()))))));
     }
 
-    private static int executeAdvancement(ServerCommandSource arg, Collection<ServerPlayerEntity> collection, Operation arg2, Collection<Advancement> collection2) {
+    private static int executeAdvancement(ServerCommandSource source, Collection<ServerPlayerEntity> targets, Operation operation, Collection<Advancement> selection) {
         int i = 0;
-        for (ServerPlayerEntity lv : collection) {
-            i += arg2.processAll(lv, collection2);
+        for (ServerPlayerEntity lv : targets) {
+            i += operation.processAll(lv, selection);
         }
         if (i == 0) {
-            if (collection2.size() == 1) {
-                if (collection.size() == 1) {
-                    throw new CommandException(new TranslatableText(arg2.getCommandPrefix() + ".one.to.one.failure", collection2.iterator().next().toHoverableText(), collection.iterator().next().getDisplayName()));
+            if (selection.size() == 1) {
+                if (targets.size() == 1) {
+                    throw new CommandException(new TranslatableText(operation.getCommandPrefix() + ".one.to.one.failure", selection.iterator().next().toHoverableText(), targets.iterator().next().getDisplayName()));
                 }
-                throw new CommandException(new TranslatableText(arg2.getCommandPrefix() + ".one.to.many.failure", collection2.iterator().next().toHoverableText(), collection.size()));
+                throw new CommandException(new TranslatableText(operation.getCommandPrefix() + ".one.to.many.failure", selection.iterator().next().toHoverableText(), targets.size()));
             }
-            if (collection.size() == 1) {
-                throw new CommandException(new TranslatableText(arg2.getCommandPrefix() + ".many.to.one.failure", collection2.size(), collection.iterator().next().getDisplayName()));
+            if (targets.size() == 1) {
+                throw new CommandException(new TranslatableText(operation.getCommandPrefix() + ".many.to.one.failure", selection.size(), targets.iterator().next().getDisplayName()));
             }
-            throw new CommandException(new TranslatableText(arg2.getCommandPrefix() + ".many.to.many.failure", collection2.size(), collection.size()));
+            throw new CommandException(new TranslatableText(operation.getCommandPrefix() + ".many.to.many.failure", selection.size(), targets.size()));
         }
-        if (collection2.size() == 1) {
-            if (collection.size() == 1) {
-                arg.sendFeedback(new TranslatableText(arg2.getCommandPrefix() + ".one.to.one.success", collection2.iterator().next().toHoverableText(), collection.iterator().next().getDisplayName()), true);
+        if (selection.size() == 1) {
+            if (targets.size() == 1) {
+                source.sendFeedback(new TranslatableText(operation.getCommandPrefix() + ".one.to.one.success", selection.iterator().next().toHoverableText(), targets.iterator().next().getDisplayName()), true);
             } else {
-                arg.sendFeedback(new TranslatableText(arg2.getCommandPrefix() + ".one.to.many.success", collection2.iterator().next().toHoverableText(), collection.size()), true);
+                source.sendFeedback(new TranslatableText(operation.getCommandPrefix() + ".one.to.many.success", selection.iterator().next().toHoverableText(), targets.size()), true);
             }
-        } else if (collection.size() == 1) {
-            arg.sendFeedback(new TranslatableText(arg2.getCommandPrefix() + ".many.to.one.success", collection2.size(), collection.iterator().next().getDisplayName()), true);
+        } else if (targets.size() == 1) {
+            source.sendFeedback(new TranslatableText(operation.getCommandPrefix() + ".many.to.one.success", selection.size(), targets.iterator().next().getDisplayName()), true);
         } else {
-            arg.sendFeedback(new TranslatableText(arg2.getCommandPrefix() + ".many.to.many.success", collection2.size(), collection.size()), true);
+            source.sendFeedback(new TranslatableText(operation.getCommandPrefix() + ".many.to.many.success", selection.size(), targets.size()), true);
         }
         return i;
     }
 
-    private static int executeCriterion(ServerCommandSource arg, Collection<ServerPlayerEntity> collection, Operation arg2, Advancement arg3, String string) {
+    private static int executeCriterion(ServerCommandSource source, Collection<ServerPlayerEntity> targets, Operation operation, Advancement advancement, String criterion) {
         int i = 0;
-        if (!arg3.getCriteria().containsKey(string)) {
-            throw new CommandException(new TranslatableText("commands.advancement.criterionNotFound", arg3.toHoverableText(), string));
+        if (!advancement.getCriteria().containsKey(criterion)) {
+            throw new CommandException(new TranslatableText("commands.advancement.criterionNotFound", advancement.toHoverableText(), criterion));
         }
-        for (ServerPlayerEntity lv : collection) {
-            if (!arg2.processEachCriterion(lv, arg3, string)) continue;
+        for (ServerPlayerEntity lv : targets) {
+            if (!operation.processEachCriterion(lv, advancement, criterion)) continue;
             ++i;
         }
         if (i == 0) {
-            if (collection.size() == 1) {
-                throw new CommandException(new TranslatableText(arg2.getCommandPrefix() + ".criterion.to.one.failure", string, arg3.toHoverableText(), collection.iterator().next().getDisplayName()));
+            if (targets.size() == 1) {
+                throw new CommandException(new TranslatableText(operation.getCommandPrefix() + ".criterion.to.one.failure", criterion, advancement.toHoverableText(), targets.iterator().next().getDisplayName()));
             }
-            throw new CommandException(new TranslatableText(arg2.getCommandPrefix() + ".criterion.to.many.failure", string, arg3.toHoverableText(), collection.size()));
+            throw new CommandException(new TranslatableText(operation.getCommandPrefix() + ".criterion.to.many.failure", criterion, advancement.toHoverableText(), targets.size()));
         }
-        if (collection.size() == 1) {
-            arg.sendFeedback(new TranslatableText(arg2.getCommandPrefix() + ".criterion.to.one.success", string, arg3.toHoverableText(), collection.iterator().next().getDisplayName()), true);
+        if (targets.size() == 1) {
+            source.sendFeedback(new TranslatableText(operation.getCommandPrefix() + ".criterion.to.one.success", criterion, advancement.toHoverableText(), targets.iterator().next().getDisplayName()), true);
         } else {
-            arg.sendFeedback(new TranslatableText(arg2.getCommandPrefix() + ".criterion.to.many.success", string, arg3.toHoverableText(), collection.size()), true);
+            source.sendFeedback(new TranslatableText(operation.getCommandPrefix() + ".criterion.to.many.success", criterion, advancement.toHoverableText(), targets.size()), true);
         }
         return i;
     }
 
-    private static List<Advancement> select(Advancement arg, Selection arg2) {
+    private static List<Advancement> select(Advancement advancement, Selection selection) {
         ArrayList list = Lists.newArrayList();
-        if (arg2.before) {
-            for (Advancement lv = arg.getParent(); lv != null; lv = lv.getParent()) {
+        if (selection.before) {
+            for (Advancement lv = advancement.getParent(); lv != null; lv = lv.getParent()) {
                 list.add(lv);
             }
         }
-        list.add(arg);
-        if (arg2.after) {
-            AdvancementCommand.addChildrenRecursivelyToList(arg, list);
+        list.add(advancement);
+        if (selection.after) {
+            AdvancementCommand.addChildrenRecursivelyToList(advancement, list);
         }
         return list;
     }
 
-    private static void addChildrenRecursivelyToList(Advancement arg, List<Advancement> list) {
-        for (Advancement lv : arg.getChildren()) {
-            list.add(lv);
-            AdvancementCommand.addChildrenRecursivelyToList(lv, list);
+    private static void addChildrenRecursivelyToList(Advancement parent, List<Advancement> childList) {
+        for (Advancement lv : parent.getChildren()) {
+            childList.add(lv);
+            AdvancementCommand.addChildrenRecursivelyToList(lv, childList);
         }
     }
 
@@ -128,9 +128,9 @@ public class AdvancementCommand {
         private final boolean before;
         private final boolean after;
 
-        private Selection(boolean bl, boolean bl2) {
-            this.before = bl;
-            this.after = bl2;
+        private Selection(boolean before, boolean after) {
+            this.before = before;
+            this.after = after;
         }
     }
 
@@ -138,53 +138,53 @@ public class AdvancementCommand {
         GRANT("grant"){
 
             @Override
-            protected boolean processEach(ServerPlayerEntity arg, Advancement arg2) {
-                AdvancementProgress lv = arg.getAdvancementTracker().getProgress(arg2);
+            protected boolean processEach(ServerPlayerEntity player, Advancement advancement) {
+                AdvancementProgress lv = player.getAdvancementTracker().getProgress(advancement);
                 if (lv.isDone()) {
                     return false;
                 }
                 for (String string : lv.getUnobtainedCriteria()) {
-                    arg.getAdvancementTracker().grantCriterion(arg2, string);
+                    player.getAdvancementTracker().grantCriterion(advancement, string);
                 }
                 return true;
             }
 
             @Override
-            protected boolean processEachCriterion(ServerPlayerEntity arg, Advancement arg2, String string) {
-                return arg.getAdvancementTracker().grantCriterion(arg2, string);
+            protected boolean processEachCriterion(ServerPlayerEntity player, Advancement advancement, String criterion) {
+                return player.getAdvancementTracker().grantCriterion(advancement, criterion);
             }
         }
         ,
         REVOKE("revoke"){
 
             @Override
-            protected boolean processEach(ServerPlayerEntity arg, Advancement arg2) {
-                AdvancementProgress lv = arg.getAdvancementTracker().getProgress(arg2);
+            protected boolean processEach(ServerPlayerEntity player, Advancement advancement) {
+                AdvancementProgress lv = player.getAdvancementTracker().getProgress(advancement);
                 if (!lv.isAnyObtained()) {
                     return false;
                 }
                 for (String string : lv.getObtainedCriteria()) {
-                    arg.getAdvancementTracker().revokeCriterion(arg2, string);
+                    player.getAdvancementTracker().revokeCriterion(advancement, string);
                 }
                 return true;
             }
 
             @Override
-            protected boolean processEachCriterion(ServerPlayerEntity arg, Advancement arg2, String string) {
-                return arg.getAdvancementTracker().revokeCriterion(arg2, string);
+            protected boolean processEachCriterion(ServerPlayerEntity player, Advancement advancement, String criterion) {
+                return player.getAdvancementTracker().revokeCriterion(advancement, criterion);
             }
         };
 
         private final String commandPrefix;
 
-        private Operation(String string2) {
-            this.commandPrefix = "commands.advancement." + string2;
+        private Operation(String name) {
+            this.commandPrefix = "commands.advancement." + name;
         }
 
-        public int processAll(ServerPlayerEntity arg, Iterable<Advancement> iterable) {
+        public int processAll(ServerPlayerEntity player, Iterable<Advancement> advancements) {
             int i = 0;
-            for (Advancement lv : iterable) {
-                if (!this.processEach(arg, lv)) continue;
+            for (Advancement lv : advancements) {
+                if (!this.processEach(player, lv)) continue;
                 ++i;
             }
             return i;

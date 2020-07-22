@@ -24,21 +24,21 @@ public class BuriedTreasureGenerator {
 
     public static class Piece
     extends StructurePiece {
-        public Piece(BlockPos arg) {
+        public Piece(BlockPos pos) {
             super(StructurePieceType.BURIED_TREASURE, 0);
-            this.boundingBox = new BlockBox(arg.getX(), arg.getY(), arg.getZ(), arg.getX(), arg.getY(), arg.getZ());
+            this.boundingBox = new BlockBox(pos.getX(), pos.getY(), pos.getZ(), pos.getX(), pos.getY(), pos.getZ());
         }
 
-        public Piece(StructureManager arg, CompoundTag arg2) {
-            super(StructurePieceType.BURIED_TREASURE, arg2);
-        }
-
-        @Override
-        protected void toNbt(CompoundTag arg) {
+        public Piece(StructureManager manager, CompoundTag tag) {
+            super(StructurePieceType.BURIED_TREASURE, tag);
         }
 
         @Override
-        public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockBox arg4, ChunkPos arg5, BlockPos arg6) {
+        protected void toNbt(CompoundTag tag) {
+        }
+
+        @Override
+        public boolean generate(ServerWorldAccess arg, StructureAccessor structureAccessor, ChunkGenerator chunkGenerator, Random random, BlockBox boundingBox, ChunkPos arg5, BlockPos arg6) {
             int i = arg.getTopY(Heightmap.Type.OCEAN_FLOOR_WG, this.boundingBox.minX, this.boundingBox.minZ);
             BlockPos.Mutable lv = new BlockPos.Mutable(this.boundingBox.minX, i, this.boundingBox.minZ);
             while (lv.getY() > 0) {
@@ -59,15 +59,15 @@ public class BuriedTreasureGenerator {
                         arg.setBlockState(lv6, lv4, 3);
                     }
                     this.boundingBox = new BlockBox(lv.getX(), lv.getY(), lv.getZ(), lv.getX(), lv.getY(), lv.getZ());
-                    return this.addChest(arg, arg4, random, lv, LootTables.BURIED_TREASURE_CHEST, null);
+                    return this.addChest(arg, boundingBox, random, lv, LootTables.BURIED_TREASURE_CHEST, null);
                 }
                 lv.move(0, -1, 0);
             }
             return false;
         }
 
-        private boolean isLiquid(BlockState arg) {
-            return arg == Blocks.WATER.getDefaultState() || arg == Blocks.LAVA.getDefaultState();
+        private boolean isLiquid(BlockState state) {
+            return state == Blocks.WATER.getDefaultState() || state == Blocks.LAVA.getDefaultState();
         }
     }
 }

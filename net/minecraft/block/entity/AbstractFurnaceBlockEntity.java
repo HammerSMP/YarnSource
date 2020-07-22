@@ -69,8 +69,8 @@ Tickable {
     protected final PropertyDelegate propertyDelegate = new PropertyDelegate(){
 
         @Override
-        public int get(int i) {
-            switch (i) {
+        public int get(int index) {
+            switch (index) {
                 case 0: {
                     return AbstractFurnaceBlockEntity.this.burnTime;
                 }
@@ -88,22 +88,22 @@ Tickable {
         }
 
         @Override
-        public void set(int i, int j) {
-            switch (i) {
+        public void set(int index, int value) {
+            switch (index) {
                 case 0: {
-                    AbstractFurnaceBlockEntity.this.burnTime = j;
+                    AbstractFurnaceBlockEntity.this.burnTime = value;
                     break;
                 }
                 case 1: {
-                    AbstractFurnaceBlockEntity.this.fuelTime = j;
+                    AbstractFurnaceBlockEntity.this.fuelTime = value;
                     break;
                 }
                 case 2: {
-                    AbstractFurnaceBlockEntity.this.cookTime = j;
+                    AbstractFurnaceBlockEntity.this.cookTime = value;
                     break;
                 }
                 case 3: {
-                    AbstractFurnaceBlockEntity.this.cookTimeTotal = j;
+                    AbstractFurnaceBlockEntity.this.cookTimeTotal = value;
                     break;
                 }
             }
@@ -117,9 +117,9 @@ Tickable {
     private final Object2IntOpenHashMap<Identifier> recipesUsed = new Object2IntOpenHashMap();
     protected final RecipeType<? extends AbstractCookingRecipe> recipeType;
 
-    protected AbstractFurnaceBlockEntity(BlockEntityType<?> arg, RecipeType<? extends AbstractCookingRecipe> arg2) {
-        super(arg);
-        this.recipeType = arg2;
+    protected AbstractFurnaceBlockEntity(BlockEntityType<?> blockEntityType, RecipeType<? extends AbstractCookingRecipe> recipeType) {
+        super(blockEntityType);
+        this.recipeType = recipeType;
     }
 
     public static Map<Item, Integer> createFuelTimeMap() {
@@ -187,26 +187,26 @@ Tickable {
         return map;
     }
 
-    private static boolean isFlammableWood(Item arg) {
-        return ItemTags.NON_FLAMMABLE_WOOD.contains(arg);
+    private static boolean isFlammableWood(Item item) {
+        return ItemTags.NON_FLAMMABLE_WOOD.contains(item);
     }
 
-    private static void addFuel(Map<Item, Integer> map, Tag<Item> arg, int i) {
-        for (Item lv : arg.values()) {
+    private static void addFuel(Map<Item, Integer> fuelTimes, Tag<Item> tag, int fuelTime) {
+        for (Item lv : tag.values()) {
             if (AbstractFurnaceBlockEntity.isFlammableWood(lv)) continue;
-            map.put(lv, i);
+            fuelTimes.put(lv, fuelTime);
         }
     }
 
-    private static void addFuel(Map<Item, Integer> map, ItemConvertible arg, int i) {
-        Item lv = arg.asItem();
+    private static void addFuel(Map<Item, Integer> map, ItemConvertible item, int fuelTime) {
+        Item lv = item.asItem();
         if (AbstractFurnaceBlockEntity.isFlammableWood(lv)) {
             if (SharedConstants.isDevelopment) {
                 throw Util.throwOrPause(new IllegalStateException("A developer tried to explicitly make fire resistant item " + lv.getName(null).getString() + " a furnace fuel. That will not work!"));
             }
             return;
         }
-        map.put(lv, i);
+        map.put(lv, fuelTime);
     }
 
     private boolean isBurning() {
@@ -214,31 +214,31 @@ Tickable {
     }
 
     @Override
-    public void fromTag(BlockState arg, CompoundTag arg2) {
-        super.fromTag(arg, arg2);
+    public void fromTag(BlockState state, CompoundTag tag) {
+        super.fromTag(state, tag);
         this.inventory = DefaultedList.ofSize(this.size(), ItemStack.EMPTY);
-        Inventories.fromTag(arg2, this.inventory);
-        this.burnTime = arg2.getShort("BurnTime");
-        this.cookTime = arg2.getShort("CookTime");
-        this.cookTimeTotal = arg2.getShort("CookTimeTotal");
+        Inventories.fromTag(tag, this.inventory);
+        this.burnTime = tag.getShort("BurnTime");
+        this.cookTime = tag.getShort("CookTime");
+        this.cookTimeTotal = tag.getShort("CookTimeTotal");
         this.fuelTime = this.getFuelTime(this.inventory.get(1));
-        CompoundTag lv = arg2.getCompound("RecipesUsed");
+        CompoundTag lv = tag.getCompound("RecipesUsed");
         for (String string : lv.getKeys()) {
             this.recipesUsed.put((Object)new Identifier(string), lv.getInt(string));
         }
     }
 
     @Override
-    public CompoundTag toTag(CompoundTag arg) {
-        super.toTag(arg);
-        arg.putShort("BurnTime", (short)this.burnTime);
-        arg.putShort("CookTime", (short)this.cookTime);
-        arg.putShort("CookTimeTotal", (short)this.cookTimeTotal);
-        Inventories.toTag(arg, this.inventory);
+    public CompoundTag toTag(CompoundTag tag) {
+        super.toTag(tag);
+        tag.putShort("BurnTime", (short)this.burnTime);
+        tag.putShort("CookTime", (short)this.cookTime);
+        tag.putShort("CookTimeTotal", (short)this.cookTimeTotal);
+        Inventories.toTag(tag, this.inventory);
         CompoundTag lv = new CompoundTag();
         this.recipesUsed.forEach((arg2, integer) -> lv.putInt(arg2.toString(), (int)integer));
-        arg.put("RecipesUsed", lv);
-        return arg;
+        tag.put("RecipesUsed", lv);
+        return tag;
     }
 
     @Override
@@ -290,11 +290,11 @@ Tickable {
         }
     }
 
-    protected boolean canAcceptRecipeOutput(@Nullable Recipe<?> arg) {
-        if (this.inventory.get(0).isEmpty() || arg == null) {
+    protected boolean canAcceptRecipeOutput(@Nullable Recipe<?> recipe) {
+        if (this.inventory.get(0).isEmpty() || recipe == null) {
             return false;
         }
-        ItemStack lv = arg.getOutput();
+        ItemStack lv = recipe.getOutput();
         if (lv.isEmpty()) {
             return false;
         }
@@ -311,12 +311,12 @@ Tickable {
         return lv2.getCount() < lv.getMaxCount();
     }
 
-    private void craftRecipe(@Nullable Recipe<?> arg) {
-        if (arg == null || !this.canAcceptRecipeOutput(arg)) {
+    private void craftRecipe(@Nullable Recipe<?> recipe) {
+        if (recipe == null || !this.canAcceptRecipeOutput(recipe)) {
             return;
         }
         ItemStack lv = this.inventory.get(0);
-        ItemStack lv2 = arg.getOutput();
+        ItemStack lv2 = recipe.getOutput();
         ItemStack lv3 = this.inventory.get(2);
         if (lv3.isEmpty()) {
             this.inventory.set(2, lv2.copy());
@@ -324,7 +324,7 @@ Tickable {
             lv3.increment(1);
         }
         if (!this.world.isClient) {
-            this.setLastRecipe(arg);
+            this.setLastRecipe(recipe);
         }
         if (lv.getItem() == Blocks.WET_SPONGE.asItem() && !this.inventory.get(1).isEmpty() && this.inventory.get(1).getItem() == Items.BUCKET) {
             this.inventory.set(1, new ItemStack(Items.WATER_BUCKET));
@@ -332,11 +332,11 @@ Tickable {
         lv.decrement(1);
     }
 
-    protected int getFuelTime(ItemStack arg) {
-        if (arg.isEmpty()) {
+    protected int getFuelTime(ItemStack fuel) {
+        if (fuel.isEmpty()) {
             return 0;
         }
-        Item lv = arg.getItem();
+        Item lv = fuel.getItem();
         return AbstractFurnaceBlockEntity.createFuelTimeMap().getOrDefault(lv, 0);
     }
 
@@ -344,30 +344,30 @@ Tickable {
         return this.world.getRecipeManager().getFirstMatch(this.recipeType, this, this.world).map(AbstractCookingRecipe::getCookTime).orElse(200);
     }
 
-    public static boolean canUseAsFuel(ItemStack arg) {
-        return AbstractFurnaceBlockEntity.createFuelTimeMap().containsKey(arg.getItem());
+    public static boolean canUseAsFuel(ItemStack stack) {
+        return AbstractFurnaceBlockEntity.createFuelTimeMap().containsKey(stack.getItem());
     }
 
     @Override
-    public int[] getAvailableSlots(Direction arg) {
-        if (arg == Direction.DOWN) {
+    public int[] getAvailableSlots(Direction side) {
+        if (side == Direction.DOWN) {
             return BOTTOM_SLOTS;
         }
-        if (arg == Direction.UP) {
+        if (side == Direction.UP) {
             return TOP_SLOTS;
         }
         return SIDE_SLOTS;
     }
 
     @Override
-    public boolean canInsert(int i, ItemStack arg, @Nullable Direction arg2) {
-        return this.isValid(i, arg);
+    public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
+        return this.isValid(slot, stack);
     }
 
     @Override
-    public boolean canExtract(int i, ItemStack arg, Direction arg2) {
+    public boolean canExtract(int slot, ItemStack stack, Direction dir) {
         Item lv;
-        return arg2 != Direction.DOWN || i != 1 || (lv = arg.getItem()) == Items.WATER_BUCKET || lv == Items.BUCKET;
+        return dir != Direction.DOWN || slot != 1 || (lv = stack.getItem()) == Items.WATER_BUCKET || lv == Items.BUCKET;
     }
 
     @Override
@@ -385,29 +385,29 @@ Tickable {
     }
 
     @Override
-    public ItemStack getStack(int i) {
-        return this.inventory.get(i);
+    public ItemStack getStack(int slot) {
+        return this.inventory.get(slot);
     }
 
     @Override
-    public ItemStack removeStack(int i, int j) {
-        return Inventories.splitStack(this.inventory, i, j);
+    public ItemStack removeStack(int slot, int amount) {
+        return Inventories.splitStack(this.inventory, slot, amount);
     }
 
     @Override
-    public ItemStack removeStack(int i) {
-        return Inventories.removeStack(this.inventory, i);
+    public ItemStack removeStack(int slot) {
+        return Inventories.removeStack(this.inventory, slot);
     }
 
     @Override
-    public void setStack(int i, ItemStack arg) {
-        ItemStack lv = this.inventory.get(i);
-        boolean bl = !arg.isEmpty() && arg.isItemEqualIgnoreDamage(lv) && ItemStack.areTagsEqual(arg, lv);
-        this.inventory.set(i, arg);
-        if (arg.getCount() > this.getMaxCountPerStack()) {
-            arg.setCount(this.getMaxCountPerStack());
+    public void setStack(int slot, ItemStack stack) {
+        ItemStack lv = this.inventory.get(slot);
+        boolean bl = !stack.isEmpty() && stack.isItemEqualIgnoreDamage(lv) && ItemStack.areTagsEqual(stack, lv);
+        this.inventory.set(slot, stack);
+        if (stack.getCount() > this.getMaxCountPerStack()) {
+            stack.setCount(this.getMaxCountPerStack());
         }
-        if (i == 0 && !bl) {
+        if (slot == 0 && !bl) {
             this.cookTimeTotal = this.getCookTime();
             this.cookTime = 0;
             this.markDirty();
@@ -415,21 +415,21 @@ Tickable {
     }
 
     @Override
-    public boolean canPlayerUse(PlayerEntity arg) {
+    public boolean canPlayerUse(PlayerEntity player) {
         if (this.world.getBlockEntity(this.pos) != this) {
             return false;
         }
-        return arg.squaredDistanceTo((double)this.pos.getX() + 0.5, (double)this.pos.getY() + 0.5, (double)this.pos.getZ() + 0.5) <= 64.0;
+        return player.squaredDistanceTo((double)this.pos.getX() + 0.5, (double)this.pos.getY() + 0.5, (double)this.pos.getZ() + 0.5) <= 64.0;
     }
 
     @Override
-    public boolean isValid(int i, ItemStack arg) {
-        if (i == 2) {
+    public boolean isValid(int slot, ItemStack stack) {
+        if (slot == 2) {
             return false;
         }
-        if (i == 1) {
+        if (slot == 1) {
             ItemStack lv = this.inventory.get(1);
-            return AbstractFurnaceBlockEntity.canUseAsFuel(arg) || arg.getItem() == Items.BUCKET && lv.getItem() != Items.BUCKET;
+            return AbstractFurnaceBlockEntity.canUseAsFuel(stack) || stack.getItem() == Items.BUCKET && lv.getItem() != Items.BUCKET;
         }
         return true;
     }
@@ -440,9 +440,9 @@ Tickable {
     }
 
     @Override
-    public void setLastRecipe(@Nullable Recipe<?> arg) {
-        if (arg != null) {
-            Identifier lv = arg.getId();
+    public void setLastRecipe(@Nullable Recipe<?> recipe) {
+        if (recipe != null) {
+            Identifier lv = recipe.getId();
             this.recipesUsed.addTo((Object)lv, 1);
         }
     }
@@ -454,12 +454,12 @@ Tickable {
     }
 
     @Override
-    public void unlockLastRecipe(PlayerEntity arg) {
+    public void unlockLastRecipe(PlayerEntity player) {
     }
 
-    public void dropExperience(PlayerEntity arg) {
-        List<Recipe<?>> list = this.method_27354(arg.world, arg.getPos());
-        arg.unlockRecipes(list);
+    public void dropExperience(PlayerEntity player) {
+        List<Recipe<?>> list = this.method_27354(player.world, player.getPos());
+        player.unlockRecipes(list);
         this.recipesUsed.clear();
     }
 
@@ -488,9 +488,9 @@ Tickable {
     }
 
     @Override
-    public void provideRecipeInputs(RecipeFinder arg) {
+    public void provideRecipeInputs(RecipeFinder finder) {
         for (ItemStack lv : this.inventory) {
-            arg.addItem(lv);
+            finder.addItem(lv);
         }
     }
 }

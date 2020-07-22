@@ -40,18 +40,18 @@ extends FacingBlock {
     }
 
     @Override
-    public BlockState rotate(BlockState arg, BlockRotation arg2) {
-        return (BlockState)arg.with(FACING, arg2.rotate(arg.get(FACING)));
+    public BlockState rotate(BlockState state, BlockRotation rotation) {
+        return (BlockState)state.with(FACING, rotation.rotate(state.get(FACING)));
     }
 
     @Override
-    public BlockState mirror(BlockState arg, BlockMirror arg2) {
-        return (BlockState)arg.with(FACING, arg2.apply(arg.get(FACING)));
+    public BlockState mirror(BlockState state, BlockMirror mirror) {
+        return (BlockState)state.with(FACING, mirror.apply(state.get(FACING)));
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
-        switch (arg.get(FACING).getAxis()) {
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        switch (state.get(FACING).getAxis()) {
             default: {
                 return X_SHAPE;
             }
@@ -64,9 +64,9 @@ extends FacingBlock {
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext arg) {
-        Direction lv = arg.getSide();
-        BlockState lv2 = arg.getWorld().getBlockState(arg.getBlockPos().offset(lv.getOpposite()));
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        Direction lv = ctx.getSide();
+        BlockState lv2 = ctx.getWorld().getBlockState(ctx.getBlockPos().offset(lv.getOpposite()));
         if (lv2.isOf(this) && lv2.get(FACING) == lv) {
             return (BlockState)this.getDefaultState().with(FACING, lv.getOpposite());
         }
@@ -75,29 +75,29 @@ extends FacingBlock {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void randomDisplayTick(BlockState arg, World arg2, BlockPos arg3, Random random) {
-        Direction lv = arg.get(FACING);
-        double d = (double)arg3.getX() + 0.55 - (double)(random.nextFloat() * 0.1f);
-        double e = (double)arg3.getY() + 0.55 - (double)(random.nextFloat() * 0.1f);
-        double f = (double)arg3.getZ() + 0.55 - (double)(random.nextFloat() * 0.1f);
+    public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
+        Direction lv = state.get(FACING);
+        double d = (double)pos.getX() + 0.55 - (double)(random.nextFloat() * 0.1f);
+        double e = (double)pos.getY() + 0.55 - (double)(random.nextFloat() * 0.1f);
+        double f = (double)pos.getZ() + 0.55 - (double)(random.nextFloat() * 0.1f);
         double g = 0.4f - (random.nextFloat() + random.nextFloat()) * 0.4f;
         if (random.nextInt(5) == 0) {
-            arg2.addParticle(ParticleTypes.END_ROD, d + (double)lv.getOffsetX() * g, e + (double)lv.getOffsetY() * g, f + (double)lv.getOffsetZ() * g, random.nextGaussian() * 0.005, random.nextGaussian() * 0.005, random.nextGaussian() * 0.005);
+            world.addParticle(ParticleTypes.END_ROD, d + (double)lv.getOffsetX() * g, e + (double)lv.getOffsetY() * g, f + (double)lv.getOffsetZ() * g, random.nextGaussian() * 0.005, random.nextGaussian() * 0.005, random.nextGaussian() * 0.005);
         }
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(FACING);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(FACING);
     }
 
     @Override
-    public PistonBehavior getPistonBehavior(BlockState arg) {
+    public PistonBehavior getPistonBehavior(BlockState state) {
         return PistonBehavior.NORMAL;
     }
 
     @Override
-    public boolean canPathfindThrough(BlockState arg, BlockView arg2, BlockPos arg3, NavigationType arg4) {
+    public boolean canPathfindThrough(BlockState state, BlockView world, BlockPos pos, NavigationType type) {
         return false;
     }
 }

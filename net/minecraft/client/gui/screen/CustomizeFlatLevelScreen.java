@@ -20,6 +20,7 @@ import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.PresetsScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ScreenTexts;
+import net.minecraft.client.gui.screen.world.CreateWorldScreen;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.resource.language.I18n;
@@ -36,7 +37,7 @@ import net.minecraft.world.gen.chunk.FlatChunkGeneratorLayer;
 @Environment(value=EnvType.CLIENT)
 public class CustomizeFlatLevelScreen
 extends Screen {
-    private final Screen parent;
+    protected final CreateWorldScreen parent;
     private final Consumer<FlatChunkGeneratorConfig> field_24565;
     private FlatChunkGeneratorConfig config;
     private Text tileText;
@@ -44,7 +45,7 @@ extends Screen {
     private SuperflatLayersListWidget layers;
     private ButtonWidget widgetButtonRemoveLayer;
 
-    public CustomizeFlatLevelScreen(Screen arg, Consumer<FlatChunkGeneratorConfig> consumer, FlatChunkGeneratorConfig arg2) {
+    public CustomizeFlatLevelScreen(CreateWorldScreen arg, Consumer<FlatChunkGeneratorConfig> consumer, FlatChunkGeneratorConfig arg2) {
         super(new TranslatableText("createWorld.customize.flat.title"));
         this.parent = arg;
         this.field_24565 = consumer;
@@ -110,14 +111,14 @@ extends Screen {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.renderBackground(arg);
-        this.layers.render(arg, i, j, f);
-        this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 8, 0xFFFFFF);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.renderBackground(matrices);
+        this.layers.render(matrices, mouseX, mouseY, delta);
+        this.drawCenteredText(matrices, this.textRenderer, this.title, this.width / 2, 8, 0xFFFFFF);
         int k = this.width / 2 - 92 - 16;
-        this.drawTextWithShadow(arg, this.textRenderer, this.tileText, k, 32, 0xFFFFFF);
-        this.drawTextWithShadow(arg, this.textRenderer, this.heightText, k + 2 + 213 - this.textRenderer.getWidth(this.heightText), 32, 0xFFFFFF);
-        super.render(arg, i, j, f);
+        this.drawTextWithShadow(matrices, this.textRenderer, this.tileText, k, 32, 0xFFFFFF);
+        this.drawTextWithShadow(matrices, this.textRenderer, this.heightText, k + 2 + 213 - this.textRenderer.getWidth(this.heightText), 32, 0xFFFFFF);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -170,9 +171,9 @@ extends Screen {
             }
 
             @Override
-            public void render(MatrixStack arg, int i, int j, int k, int l, int m, int n, int o, boolean bl, float f) {
+            public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
                 String string3;
-                FlatChunkGeneratorLayer lv = CustomizeFlatLevelScreen.this.config.getLayers().get(CustomizeFlatLevelScreen.this.config.getLayers().size() - i - 1);
+                FlatChunkGeneratorLayer lv = CustomizeFlatLevelScreen.this.config.getLayers().get(CustomizeFlatLevelScreen.this.config.getLayers().size() - index - 1);
                 BlockState lv2 = lv.getBlockState();
                 Item lv3 = lv2.getBlock().asItem();
                 if (lv3 == Items.AIR) {
@@ -183,21 +184,21 @@ extends Screen {
                     }
                 }
                 ItemStack lv4 = new ItemStack(lv3);
-                this.method_19375(arg, k, j, lv4);
-                CustomizeFlatLevelScreen.this.textRenderer.draw(arg, lv3.getName(lv4), (float)(k + 18 + 5), (float)(j + 3), 0xFFFFFF);
-                if (i == 0) {
+                this.method_19375(matrices, x, y, lv4);
+                CustomizeFlatLevelScreen.this.textRenderer.draw(matrices, lv3.getName(lv4), (float)(x + 18 + 5), (float)(y + 3), 0xFFFFFF);
+                if (index == 0) {
                     String string = I18n.translate("createWorld.customize.flat.layer.top", lv.getThickness());
-                } else if (i == CustomizeFlatLevelScreen.this.config.getLayers().size() - 1) {
+                } else if (index == CustomizeFlatLevelScreen.this.config.getLayers().size() - 1) {
                     String string2 = I18n.translate("createWorld.customize.flat.layer.bottom", lv.getThickness());
                 } else {
                     string3 = I18n.translate("createWorld.customize.flat.layer", lv.getThickness());
                 }
-                CustomizeFlatLevelScreen.this.textRenderer.draw(arg, string3, (float)(k + 2 + 213 - CustomizeFlatLevelScreen.this.textRenderer.getWidth(string3)), (float)(j + 3), 0xFFFFFF);
+                CustomizeFlatLevelScreen.this.textRenderer.draw(matrices, string3, (float)(x + 2 + 213 - CustomizeFlatLevelScreen.this.textRenderer.getWidth(string3)), (float)(y + 3), 0xFFFFFF);
             }
 
             @Override
-            public boolean mouseClicked(double d, double e, int i) {
-                if (i == 0) {
+            public boolean mouseClicked(double mouseX, double mouseY, int button) {
+                if (button == 0) {
                     SuperflatLayersListWidget.this.setSelected(this);
                     return true;
                 }

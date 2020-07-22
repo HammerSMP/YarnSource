@@ -28,9 +28,9 @@ extends RconBase {
     private final String password;
     private final DedicatedServer server;
 
-    RconClient(DedicatedServer arg, String string, Socket socket) {
+    RconClient(DedicatedServer server, String password, Socket socket) {
         super("RCON Client " + socket.getInetAddress());
-        this.server = arg;
+        this.server = server;
         this.socket = socket;
         try {
             this.socket.setSoTimeout(0);
@@ -38,7 +38,7 @@ extends RconBase {
         catch (Exception exception) {
             this.running = false;
         }
-        this.password = string;
+        this.password = password;
     }
 
     /*
@@ -108,13 +108,13 @@ extends RconBase {
         }
     }
 
-    private void respond(int i, int j, String string) throws IOException {
+    private void respond(int sessionToken, int responseType, String message) throws IOException {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(1248);
         DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
-        byte[] bs = string.getBytes("UTF-8");
+        byte[] bs = message.getBytes("UTF-8");
         dataOutputStream.writeInt(Integer.reverseBytes(bs.length + 10));
-        dataOutputStream.writeInt(Integer.reverseBytes(i));
-        dataOutputStream.writeInt(Integer.reverseBytes(j));
+        dataOutputStream.writeInt(Integer.reverseBytes(sessionToken));
+        dataOutputStream.writeInt(Integer.reverseBytes(responseType));
         dataOutputStream.write(bs);
         dataOutputStream.write(0);
         dataOutputStream.write(0);
@@ -125,13 +125,13 @@ extends RconBase {
         this.respond(-1, 2, "");
     }
 
-    private void respond(int i, String string) throws IOException {
+    private void respond(int sessionToken, String message) throws IOException {
         int k;
-        int j = string.length();
+        int j = message.length();
         do {
             k = 4096 <= j ? 4096 : j;
-            this.respond(i, 0, string.substring(0, k));
-        } while (0 != (j = (string = string.substring(k)).length()));
+            this.respond(sessionToken, 0, message.substring(0, k));
+        } while (0 != (j = (message = message.substring(k)).length()));
     }
 
     @Override

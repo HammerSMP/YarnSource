@@ -23,15 +23,15 @@ extends AbstractPressurePlateBlock {
     public static final IntProperty POWER = Properties.POWER;
     private final int weight;
 
-    protected WeightedPressurePlateBlock(int i, AbstractBlock.Settings arg) {
-        super(arg);
+    protected WeightedPressurePlateBlock(int weight, AbstractBlock.Settings settings) {
+        super(settings);
         this.setDefaultState((BlockState)((BlockState)this.stateManager.getDefaultState()).with(POWER, 0));
-        this.weight = i;
+        this.weight = weight;
     }
 
     @Override
-    protected int getRedstoneOutput(World arg, BlockPos arg2) {
-        int i = Math.min(arg.getNonSpectatingEntities(Entity.class, BOX.offset(arg2)).size(), this.weight);
+    protected int getRedstoneOutput(World world, BlockPos pos) {
+        int i = Math.min(world.getNonSpectatingEntities(Entity.class, BOX.offset(pos)).size(), this.weight);
         if (i > 0) {
             float f = (float)Math.min(this.weight, i) / (float)this.weight;
             return MathHelper.ceil(f * 15.0f);
@@ -40,23 +40,23 @@ extends AbstractPressurePlateBlock {
     }
 
     @Override
-    protected void playPressSound(WorldAccess arg, BlockPos arg2) {
-        arg.playSound(null, arg2, SoundEvents.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON, SoundCategory.BLOCKS, 0.3f, 0.90000004f);
+    protected void playPressSound(WorldAccess world, BlockPos pos) {
+        world.playSound(null, pos, SoundEvents.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON, SoundCategory.BLOCKS, 0.3f, 0.90000004f);
     }
 
     @Override
-    protected void playDepressSound(WorldAccess arg, BlockPos arg2) {
-        arg.playSound(null, arg2, SoundEvents.BLOCK_METAL_PRESSURE_PLATE_CLICK_OFF, SoundCategory.BLOCKS, 0.3f, 0.75f);
+    protected void playDepressSound(WorldAccess world, BlockPos pos) {
+        world.playSound(null, pos, SoundEvents.BLOCK_METAL_PRESSURE_PLATE_CLICK_OFF, SoundCategory.BLOCKS, 0.3f, 0.75f);
     }
 
     @Override
-    protected int getRedstoneOutput(BlockState arg) {
-        return arg.get(POWER);
+    protected int getRedstoneOutput(BlockState state) {
+        return state.get(POWER);
     }
 
     @Override
-    protected BlockState setRedstoneOutput(BlockState arg, int i) {
-        return (BlockState)arg.with(POWER, i);
+    protected BlockState setRedstoneOutput(BlockState state, int rsOut) {
+        return (BlockState)state.with(POWER, rsOut);
     }
 
     @Override
@@ -65,8 +65,8 @@ extends AbstractPressurePlateBlock {
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(POWER);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(POWER);
     }
 }
 

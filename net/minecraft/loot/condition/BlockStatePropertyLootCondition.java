@@ -35,9 +35,9 @@ implements LootCondition {
     private final Block block;
     private final StatePredicate properties;
 
-    private BlockStatePropertyLootCondition(Block arg, StatePredicate arg2) {
-        this.block = arg;
-        this.properties = arg2;
+    private BlockStatePropertyLootCondition(Block block, StatePredicate properties) {
+        this.block = block;
+        this.properties = properties;
     }
 
     @Override
@@ -56,13 +56,13 @@ implements LootCondition {
         return lv != null && this.block == lv.getBlock() && this.properties.test(lv);
     }
 
-    public static Builder builder(Block arg) {
-        return new Builder(arg);
+    public static Builder builder(Block block) {
+        return new Builder(block);
     }
 
     @Override
-    public /* synthetic */ boolean test(Object object) {
-        return this.test((LootContext)object);
+    public /* synthetic */ boolean test(Object context) {
+        return this.test((LootContext)context);
     }
 
     public static class Serializer
@@ -76,7 +76,7 @@ implements LootCondition {
         @Override
         public BlockStatePropertyLootCondition fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext) {
             Identifier lv = new Identifier(JsonHelper.getString(jsonObject, "block"));
-            Block lv2 = (Block)Registry.BLOCK.getOrEmpty(lv).orElseThrow(() -> new IllegalArgumentException("Can't find block " + lv));
+            Block lv2 = Registry.BLOCK.getOrEmpty(lv).orElseThrow(() -> new IllegalArgumentException("Can't find block " + lv));
             StatePredicate lv3 = StatePredicate.fromJson(jsonObject.get("properties"));
             lv3.check(lv2.getStateManager(), string -> {
                 throw new JsonSyntaxException("Block " + lv2 + " has no property " + string);
@@ -85,8 +85,8 @@ implements LootCondition {
         }
 
         @Override
-        public /* synthetic */ Object fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext) {
-            return this.fromJson(jsonObject, jsonDeserializationContext);
+        public /* synthetic */ Object fromJson(JsonObject json, JsonDeserializationContext context) {
+            return this.fromJson(json, context);
         }
     }
 
@@ -95,8 +95,8 @@ implements LootCondition {
         private final Block block;
         private StatePredicate propertyValues = StatePredicate.ANY;
 
-        public Builder(Block arg) {
-            this.block = arg;
+        public Builder(Block block) {
+            this.block = block;
         }
 
         public Builder properties(StatePredicate.Builder arg) {

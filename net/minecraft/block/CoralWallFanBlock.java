@@ -20,33 +20,33 @@ public class CoralWallFanBlock
 extends DeadCoralWallFanBlock {
     private final Block deadCoralBlock;
 
-    protected CoralWallFanBlock(Block arg, AbstractBlock.Settings arg2) {
-        super(arg2);
-        this.deadCoralBlock = arg;
+    protected CoralWallFanBlock(Block deadCoralBlock, AbstractBlock.Settings settings) {
+        super(settings);
+        this.deadCoralBlock = deadCoralBlock;
     }
 
     @Override
-    public void onBlockAdded(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
-        this.checkLivingConditions(arg, arg2, arg3);
+    public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
+        this.checkLivingConditions(state, world, pos);
     }
 
     @Override
-    public void scheduledTick(BlockState arg, ServerWorld arg2, BlockPos arg3, Random random) {
-        if (!CoralWallFanBlock.isInWater(arg, arg2, arg3)) {
-            arg2.setBlockState(arg3, (BlockState)((BlockState)this.deadCoralBlock.getDefaultState().with(WATERLOGGED, false)).with(FACING, arg.get(FACING)), 2);
+    public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        if (!CoralWallFanBlock.isInWater(state, world, pos)) {
+            world.setBlockState(pos, (BlockState)((BlockState)this.deadCoralBlock.getDefaultState().with(WATERLOGGED, false)).with(FACING, state.get(FACING)), 2);
         }
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
-        if (arg2.getOpposite() == arg.get(FACING) && !arg.canPlaceAt(arg4, arg5)) {
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
+        if (direction.getOpposite() == state.get(FACING) && !state.canPlaceAt(world, pos)) {
             return Blocks.AIR.getDefaultState();
         }
-        if (arg.get(WATERLOGGED).booleanValue()) {
-            arg4.getFluidTickScheduler().schedule(arg5, Fluids.WATER, Fluids.WATER.getTickRate(arg4));
+        if (state.get(WATERLOGGED).booleanValue()) {
+            world.getFluidTickScheduler().schedule(pos, Fluids.WATER, Fluids.WATER.getTickRate(world));
         }
-        this.checkLivingConditions(arg, arg4, arg5);
-        return super.getStateForNeighborUpdate(arg, arg2, arg3, arg4, arg5, arg6);
+        this.checkLivingConditions(state, world, pos);
+        return super.getStateForNeighborUpdate(state, direction, newState, world, pos, posFrom);
     }
 }
 

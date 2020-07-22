@@ -50,18 +50,18 @@ extends AbstractDonkeyEntity {
     }
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource arg) {
-        super.getHurtSound(arg);
+    protected SoundEvent getHurtSound(DamageSource source) {
+        super.getHurtSound(source);
         return SoundEvents.ENTITY_DONKEY_HURT;
     }
 
     @Override
-    public boolean canBreedWith(AnimalEntity arg) {
-        if (arg == this) {
+    public boolean canBreedWith(AnimalEntity other) {
+        if (other == this) {
             return false;
         }
-        if (arg instanceof DonkeyEntity || arg instanceof HorseEntity) {
-            return this.canBreed() && ((HorseBaseEntity)arg).canBreed();
+        if (other instanceof DonkeyEntity || other instanceof HorseEntity) {
+            return this.canBreed() && ((HorseBaseEntity)other).canBreed();
         }
         return false;
     }

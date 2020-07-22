@@ -69,7 +69,7 @@ extends Feature<EndSpikeFeatureConfig> {
         return true;
     }
 
-    private void generateSpike(class_5425 arg, Random random, EndSpikeFeatureConfig arg2, Spike arg3) {
+    private void generateSpike(class_5425 arg, Random random, EndSpikeFeatureConfig config, Spike arg3) {
         int i = arg3.getRadius();
         for (BlockPos lv : BlockPos.iterate(new BlockPos(arg3.getCenterX() - i, 0, arg3.getCenterZ() - i), new BlockPos(arg3.getCenterX() + i, arg3.getHeight() + 10, arg3.getCenterZ() + i))) {
             if (lv.getSquaredDistance(arg3.getCenterX(), lv.getY(), arg3.getCenterZ(), false) <= (double)(i * i + 1) && lv.getY() < arg3.getHeight()) {
@@ -101,8 +101,8 @@ extends Feature<EndSpikeFeatureConfig> {
             }
         }
         EndCrystalEntity lv4 = EntityType.END_CRYSTAL.create(arg.getWorld());
-        lv4.setBeamTarget(arg2.getPos());
-        lv4.setInvulnerable(arg2.isCrystalInvulnerable());
+        lv4.setBeamTarget(config.getPos());
+        lv4.setInvulnerable(config.isCrystalInvulnerable());
         lv4.refreshPositionAndAngles((double)arg3.getCenterX() + 0.5, arg3.getHeight() + 1, (double)arg3.getCenterZ() + 0.5, random.nextFloat() * 360.0f, 0.0f);
         arg.spawnEntity(lv4);
         this.setBlockState(arg, new BlockPos(arg3.getCenterX(), arg3.getHeight(), arg3.getCenterZ()), Blocks.BEDROCK.getDefaultState());
@@ -135,7 +135,7 @@ extends Feature<EndSpikeFeatureConfig> {
     }
 
     public static class Spike {
-        public static final Codec<Spike> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Codec.INT.fieldOf("centerX").withDefault((Object)0).forGetter(arg -> arg.centerX), (App)Codec.INT.fieldOf("centerZ").withDefault((Object)0).forGetter(arg -> arg.centerZ), (App)Codec.INT.fieldOf("radius").withDefault((Object)0).forGetter(arg -> arg.radius), (App)Codec.INT.fieldOf("height").withDefault((Object)0).forGetter(arg -> arg.height), (App)Codec.BOOL.fieldOf("guarded").withDefault((Object)false).forGetter(arg -> arg.guarded)).apply((Applicative)instance, Spike::new));
+        public static final Codec<Spike> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Codec.INT.fieldOf("centerX").orElse((Object)0).forGetter(arg -> arg.centerX), (App)Codec.INT.fieldOf("centerZ").orElse((Object)0).forGetter(arg -> arg.centerZ), (App)Codec.INT.fieldOf("radius").orElse((Object)0).forGetter(arg -> arg.radius), (App)Codec.INT.fieldOf("height").orElse((Object)0).forGetter(arg -> arg.height), (App)Codec.BOOL.fieldOf("guarded").orElse((Object)false).forGetter(arg -> arg.guarded)).apply((Applicative)instance, Spike::new));
         private final int centerX;
         private final int centerZ;
         private final int radius;
@@ -143,17 +143,17 @@ extends Feature<EndSpikeFeatureConfig> {
         private final boolean guarded;
         private final Box boundingBox;
 
-        public Spike(int i, int j, int k, int l, boolean bl) {
-            this.centerX = i;
-            this.centerZ = j;
-            this.radius = k;
-            this.height = l;
+        public Spike(int centerX, int centerZ, int radius, int height, boolean bl) {
+            this.centerX = centerX;
+            this.centerZ = centerZ;
+            this.radius = radius;
+            this.height = height;
             this.guarded = bl;
-            this.boundingBox = new Box(i - k, 0.0, j - k, i + k, 256.0, j + k);
+            this.boundingBox = new Box(centerX - radius, 0.0, centerZ - radius, centerX + radius, 256.0, centerZ + radius);
         }
 
-        public boolean isInChunk(BlockPos arg) {
-            return arg.getX() >> 4 == this.centerX >> 4 && arg.getZ() >> 4 == this.centerZ >> 4;
+        public boolean isInChunk(BlockPos pos) {
+            return pos.getX() >> 4 == this.centerX >> 4 && pos.getZ() >> 4 == this.centerZ >> 4;
         }
 
         public int getCenterX() {

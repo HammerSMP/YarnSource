@@ -7,29 +7,29 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 
 public class Boxes {
-    public static Box stretch(Box arg, Direction arg2, double d) {
-        double e = d * (double)arg2.getDirection().offset();
+    public static Box stretch(Box box, Direction direction, double length) {
+        double e = length * (double)direction.getDirection().offset();
         double f = Math.min(e, 0.0);
         double g = Math.max(e, 0.0);
-        switch (arg2) {
+        switch (direction) {
             case WEST: {
-                return new Box(arg.minX + f, arg.minY, arg.minZ, arg.minX + g, arg.maxY, arg.maxZ);
+                return new Box(box.minX + f, box.minY, box.minZ, box.minX + g, box.maxY, box.maxZ);
             }
             case EAST: {
-                return new Box(arg.maxX + f, arg.minY, arg.minZ, arg.maxX + g, arg.maxY, arg.maxZ);
+                return new Box(box.maxX + f, box.minY, box.minZ, box.maxX + g, box.maxY, box.maxZ);
             }
             case DOWN: {
-                return new Box(arg.minX, arg.minY + f, arg.minZ, arg.maxX, arg.minY + g, arg.maxZ);
+                return new Box(box.minX, box.minY + f, box.minZ, box.maxX, box.minY + g, box.maxZ);
             }
             default: {
-                return new Box(arg.minX, arg.maxY + f, arg.minZ, arg.maxX, arg.maxY + g, arg.maxZ);
+                return new Box(box.minX, box.maxY + f, box.minZ, box.maxX, box.maxY + g, box.maxZ);
             }
             case NORTH: {
-                return new Box(arg.minX, arg.minY, arg.minZ + f, arg.maxX, arg.maxY, arg.minZ + g);
+                return new Box(box.minX, box.minY, box.minZ + f, box.maxX, box.maxY, box.minZ + g);
             }
             case SOUTH: 
         }
-        return new Box(arg.minX, arg.minY, arg.maxZ + f, arg.maxX, arg.maxY, arg.maxZ + g);
+        return new Box(box.minX, box.minY, box.maxZ + f, box.maxX, box.maxY, box.maxZ + g);
     }
 }
 

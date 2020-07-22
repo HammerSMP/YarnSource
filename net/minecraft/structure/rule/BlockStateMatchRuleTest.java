@@ -22,8 +22,8 @@ extends RuleTest {
     }
 
     @Override
-    public boolean test(BlockState arg, Random random) {
-        return arg == this.blockState;
+    public boolean test(BlockState state, Random random) {
+        return state == this.blockState;
     }
 
     @Override

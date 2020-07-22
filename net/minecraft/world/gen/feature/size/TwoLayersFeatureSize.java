@@ -19,20 +19,20 @@ import net.minecraft.world.gen.feature.size.FeatureSizeType;
 
 public class TwoLayersFeatureSize
 extends FeatureSize {
-    public static final Codec<TwoLayersFeatureSize> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Codec.INT.fieldOf("limit").withDefault((Object)1).forGetter(arg -> arg.limit), (App)Codec.INT.fieldOf("lower_size").withDefault((Object)0).forGetter(arg -> arg.lowerSize), (App)Codec.INT.fieldOf("upper_size").withDefault((Object)1).forGetter(arg -> arg.upperSize), TwoLayersFeatureSize.createCodecBuilder()).apply((Applicative)instance, TwoLayersFeatureSize::new));
+    public static final Codec<TwoLayersFeatureSize> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Codec.intRange((int)0, (int)81).fieldOf("limit").orElse((Object)1).forGetter(arg -> arg.limit), (App)Codec.intRange((int)0, (int)16).fieldOf("lower_size").orElse((Object)0).forGetter(arg -> arg.lowerSize), (App)Codec.intRange((int)0, (int)16).fieldOf("upper_size").orElse((Object)1).forGetter(arg -> arg.upperSize), TwoLayersFeatureSize.createCodecBuilder()).apply((Applicative)instance, TwoLayersFeatureSize::new));
     private final int limit;
     private final int lowerSize;
     private final int upperSize;
 
-    public TwoLayersFeatureSize(int i, int j, int k) {
-        this(i, j, k, OptionalInt.empty());
+    public TwoLayersFeatureSize(int limit, int lowerSize, int upperSize) {
+        this(limit, lowerSize, upperSize, OptionalInt.empty());
     }
 
-    public TwoLayersFeatureSize(int i, int j, int k, OptionalInt optionalInt) {
-        super(optionalInt);
-        this.limit = i;
-        this.lowerSize = j;
-        this.upperSize = k;
+    public TwoLayersFeatureSize(int limit, int lowerSize, int upperSize, OptionalInt minClippedHeight) {
+        super(minClippedHeight);
+        this.limit = limit;
+        this.lowerSize = lowerSize;
+        this.upperSize = upperSize;
     }
 
     @Override

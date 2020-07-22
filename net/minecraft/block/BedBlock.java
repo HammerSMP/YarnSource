@@ -73,56 +73,56 @@ implements BlockEntityProvider {
     protected static final VoxelShape EAST_SHAPE = VoxelShapes.union(TOP_SHAPE, LEG_3_SHAPE, LEG_4_SHAPE);
     private final DyeColor color;
 
-    public BedBlock(DyeColor arg, AbstractBlock.Settings arg2) {
-        super(arg2);
-        this.color = arg;
+    public BedBlock(DyeColor color, AbstractBlock.Settings settings) {
+        super(settings);
+        this.color = color;
         this.setDefaultState((BlockState)((BlockState)((BlockState)this.stateManager.getDefaultState()).with(PART, BedPart.FOOT)).with(OCCUPIED, false));
     }
 
     @Nullable
     @Environment(value=EnvType.CLIENT)
-    public static Direction getDirection(BlockView arg, BlockPos arg2) {
-        BlockState lv = arg.getBlockState(arg2);
+    public static Direction getDirection(BlockView world, BlockPos pos) {
+        BlockState lv = world.getBlockState(pos);
         return lv.getBlock() instanceof BedBlock ? lv.get(FACING) : null;
     }
 
     @Override
-    public ActionResult onUse(BlockState arg, World arg22, BlockPos arg3, PlayerEntity arg4, Hand arg5, BlockHitResult arg6) {
-        if (arg22.isClient) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        if (world.isClient) {
             return ActionResult.CONSUME;
         }
-        if (arg.get(PART) != BedPart.HEAD && !(arg = arg22.getBlockState(arg3 = arg3.offset(arg.get(FACING)))).isOf(this)) {
+        if (state.get(PART) != BedPart.HEAD && !(state = world.getBlockState(pos = pos.offset(state.get(FACING)))).isOf(this)) {
             return ActionResult.CONSUME;
         }
-        if (!BedBlock.isOverworld(arg22)) {
-            arg22.removeBlock(arg3, false);
-            BlockPos lv = arg3.offset(arg.get(FACING).getOpposite());
-            if (arg22.getBlockState(lv).isOf(this)) {
-                arg22.removeBlock(lv, false);
+        if (!BedBlock.isOverworld(world)) {
+            world.removeBlock(pos, false);
+            BlockPos lv = pos.offset(state.get(FACING).getOpposite());
+            if (world.getBlockState(lv).isOf(this)) {
+                world.removeBlock(lv, false);
             }
-            arg22.createExplosion(null, DamageSource.badRespawnPoint(), null, (double)arg3.getX() + 0.5, (double)arg3.getY() + 0.5, (double)arg3.getZ() + 0.5, 5.0f, true, Explosion.DestructionType.DESTROY);
+            world.createExplosion(null, DamageSource.badRespawnPoint(), null, (double)pos.getX() + 0.5, (double)pos.getY() + 0.5, (double)pos.getZ() + 0.5, 5.0f, true, Explosion.DestructionType.DESTROY);
             return ActionResult.SUCCESS;
         }
-        if (arg.get(OCCUPIED).booleanValue()) {
-            if (!this.isFree(arg22, arg3)) {
-                arg4.sendMessage(new TranslatableText("block.minecraft.bed.occupied"), true);
+        if (state.get(OCCUPIED).booleanValue()) {
+            if (!this.isFree(world, pos)) {
+                player.sendMessage(new TranslatableText("block.minecraft.bed.occupied"), true);
             }
             return ActionResult.SUCCESS;
         }
-        arg4.trySleep(arg3).ifLeft(arg2 -> {
+        player.trySleep(pos).ifLeft(arg2 -> {
             if (arg2 != null) {
-                arg4.sendMessage(arg2.toText(), true);
+                player.sendMessage(arg2.toText(), true);
             }
         });
         return ActionResult.SUCCESS;
     }
 
-    public static boolean isOverworld(World arg) {
-        return arg.getDimension().isBedWorking();
+    public static boolean isOverworld(World world) {
+        return world.getDimension().isBedWorking();
     }
 
-    private boolean isFree(World arg, BlockPos arg2) {
-        List<VillagerEntity> list = arg.getEntities(VillagerEntity.class, new Box(arg2), LivingEntity::isSleeping);
+    private boolean isFree(World world, BlockPos pos) {
+        List<VillagerEntity> list = world.getEntitiesByClass(VillagerEntity.class, new Box(pos), LivingEntity::isSleeping);
         if (list.isEmpty()) {
             return false;
         }
@@ -131,69 +131,69 @@ implements BlockEntityProvider {
     }
 
     @Override
-    public void onLandedUpon(World arg, BlockPos arg2, Entity arg3, float f) {
-        super.onLandedUpon(arg, arg2, arg3, f * 0.5f);
+    public void onLandedUpon(World world, BlockPos pos, Entity entity, float distance) {
+        super.onLandedUpon(world, pos, entity, distance * 0.5f);
     }
 
     @Override
-    public void onEntityLand(BlockView arg, Entity arg2) {
-        if (arg2.bypassesLandingEffects()) {
-            super.onEntityLand(arg, arg2);
+    public void onEntityLand(BlockView world, Entity entity) {
+        if (entity.bypassesLandingEffects()) {
+            super.onEntityLand(world, entity);
         } else {
-            this.bounceEntity(arg2);
+            this.bounceEntity(entity);
         }
     }
 
-    private void bounceEntity(Entity arg) {
-        Vec3d lv = arg.getVelocity();
+    private void bounceEntity(Entity entity) {
+        Vec3d lv = entity.getVelocity();
         if (lv.y < 0.0) {
-            double d = arg instanceof LivingEntity ? 1.0 : 0.8;
-            arg.setVelocity(lv.x, -lv.y * (double)0.66f * d, lv.z);
+            double d = entity instanceof LivingEntity ? 1.0 : 0.8;
+            entity.setVelocity(lv.x, -lv.y * (double)0.66f * d, lv.z);
         }
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
-        if (arg2 == BedBlock.getDirectionTowardsOtherPart(arg.get(PART), arg.get(FACING))) {
-            if (arg3.isOf(this) && arg3.get(PART) != arg.get(PART)) {
-                return (BlockState)arg.with(OCCUPIED, arg3.get(OCCUPIED));
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
+        if (direction == BedBlock.getDirectionTowardsOtherPart(state.get(PART), state.get(FACING))) {
+            if (newState.isOf(this) && newState.get(PART) != state.get(PART)) {
+                return (BlockState)state.with(OCCUPIED, newState.get(OCCUPIED));
             }
             return Blocks.AIR.getDefaultState();
         }
-        return super.getStateForNeighborUpdate(arg, arg2, arg3, arg4, arg5, arg6);
+        return super.getStateForNeighborUpdate(state, direction, newState, world, pos, posFrom);
     }
 
-    private static Direction getDirectionTowardsOtherPart(BedPart arg, Direction arg2) {
-        return arg == BedPart.FOOT ? arg2 : arg2.getOpposite();
+    private static Direction getDirectionTowardsOtherPart(BedPart part, Direction direction) {
+        return part == BedPart.FOOT ? direction : direction.getOpposite();
     }
 
     @Override
-    public void onBreak(World arg, BlockPos arg2, BlockState arg3, PlayerEntity arg4) {
+    public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
         BlockPos lv2;
         BlockState lv3;
         BedPart lv;
-        if (!arg.isClient && arg4.isCreative() && (lv = arg3.get(PART)) == BedPart.FOOT && (lv3 = arg.getBlockState(lv2 = arg2.offset(BedBlock.getDirectionTowardsOtherPart(lv, arg3.get(FACING))))).getBlock() == this && lv3.get(PART) == BedPart.HEAD) {
-            arg.setBlockState(lv2, Blocks.AIR.getDefaultState(), 35);
-            arg.syncWorldEvent(arg4, 2001, lv2, Block.getRawIdFromState(lv3));
+        if (!world.isClient && player.isCreative() && (lv = state.get(PART)) == BedPart.FOOT && (lv3 = world.getBlockState(lv2 = pos.offset(BedBlock.getDirectionTowardsOtherPart(lv, state.get(FACING))))).getBlock() == this && lv3.get(PART) == BedPart.HEAD) {
+            world.setBlockState(lv2, Blocks.AIR.getDefaultState(), 35);
+            world.syncWorldEvent(player, 2001, lv2, Block.getRawIdFromState(lv3));
         }
-        super.onBreak(arg, arg2, arg3, arg4);
+        super.onBreak(world, pos, state, player);
     }
 
     @Override
     @Nullable
-    public BlockState getPlacementState(ItemPlacementContext arg) {
-        Direction lv = arg.getPlayerFacing();
-        BlockPos lv2 = arg.getBlockPos();
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        Direction lv = ctx.getPlayerFacing();
+        BlockPos lv2 = ctx.getBlockPos();
         BlockPos lv3 = lv2.offset(lv);
-        if (arg.getWorld().getBlockState(lv3).canReplace(arg)) {
+        if (ctx.getWorld().getBlockState(lv3).canReplace(ctx)) {
             return (BlockState)this.getDefaultState().with(FACING, lv);
         }
         return null;
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
-        Direction lv = BedBlock.getOppositePartDirection(arg).getOpposite();
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        Direction lv = BedBlock.getOppositePartDirection(state).getOpposite();
         switch (lv) {
             case NORTH: {
                 return NORTH_SHAPE;
@@ -208,25 +208,25 @@ implements BlockEntityProvider {
         return EAST_SHAPE;
     }
 
-    public static Direction getOppositePartDirection(BlockState arg) {
-        Direction lv = arg.get(FACING);
-        return arg.get(PART) == BedPart.HEAD ? lv.getOpposite() : lv;
+    public static Direction getOppositePartDirection(BlockState state) {
+        Direction lv = state.get(FACING);
+        return state.get(PART) == BedPart.HEAD ? lv.getOpposite() : lv;
     }
 
     @Environment(value=EnvType.CLIENT)
-    public static DoubleBlockProperties.Type getBedPart(BlockState arg) {
-        BedPart lv = arg.get(PART);
+    public static DoubleBlockProperties.Type getBedPart(BlockState state) {
+        BedPart lv = state.get(PART);
         if (lv == BedPart.HEAD) {
             return DoubleBlockProperties.Type.FIRST;
         }
         return DoubleBlockProperties.Type.SECOND;
     }
 
-    public static Optional<Vec3d> findWakeUpPosition(EntityType<?> arg, WorldView arg2, BlockPos arg3, int i) {
-        Direction lv = arg2.getBlockState(arg3).get(FACING);
-        int j = arg3.getX();
-        int k = arg3.getY();
-        int l = arg3.getZ();
+    public static Optional<Vec3d> findWakeUpPosition(EntityType<?> type, WorldView world, BlockPos pos, int index) {
+        Direction lv = world.getBlockState(pos).get(FACING);
+        int j = pos.getX();
+        int k = pos.getY();
+        int l = pos.getZ();
         for (int m = 0; m <= 1; ++m) {
             int n = j - lv.getOffsetX() * m - 1;
             int o = l - lv.getOffsetZ() * m - 1;
@@ -235,10 +235,10 @@ implements BlockEntityProvider {
             for (int r = n; r <= p; ++r) {
                 for (int s = o; s <= q; ++s) {
                     BlockPos lv2 = new BlockPos(r, k, s);
-                    Optional<Vec3d> optional = BedBlock.canWakeUpAt(arg, arg2, lv2);
+                    Optional<Vec3d> optional = BedBlock.canWakeUpAt(type, world, lv2);
                     if (!optional.isPresent()) continue;
-                    if (i > 0) {
-                        --i;
+                    if (index > 0) {
+                        --index;
                         continue;
                     }
                     return optional;
@@ -248,27 +248,27 @@ implements BlockEntityProvider {
         return Optional.empty();
     }
 
-    public static Optional<Vec3d> canWakeUpAt(EntityType<?> arg, WorldView arg2, BlockPos arg3) {
-        VoxelShape lv = arg2.getBlockState(arg3).getCollisionShape(arg2, arg3);
+    public static Optional<Vec3d> canWakeUpAt(EntityType<?> type, WorldView world, BlockPos pos) {
+        VoxelShape lv = world.getBlockState(pos).getCollisionShape(world, pos);
         if (lv.getMax(Direction.Axis.Y) > 0.4375) {
             return Optional.empty();
         }
-        BlockPos.Mutable lv2 = arg3.mutableCopy();
-        while (lv2.getY() >= 0 && arg3.getY() - lv2.getY() <= 2 && arg2.getBlockState(lv2).getCollisionShape(arg2, lv2).isEmpty()) {
+        BlockPos.Mutable lv2 = pos.mutableCopy();
+        while (lv2.getY() >= 0 && pos.getY() - lv2.getY() <= 2 && world.getBlockState(lv2).getCollisionShape(world, lv2).isEmpty()) {
             lv2.move(Direction.DOWN);
         }
-        VoxelShape lv3 = arg2.getBlockState(lv2).getCollisionShape(arg2, lv2);
+        VoxelShape lv3 = world.getBlockState(lv2).getCollisionShape(world, lv2);
         if (lv3.isEmpty()) {
             return Optional.empty();
         }
         double d = (double)lv2.getY() + lv3.getMax(Direction.Axis.Y) + 2.0E-7;
-        if ((double)arg3.getY() - d > 2.0) {
+        if ((double)pos.getY() - d > 2.0) {
             return Optional.empty();
         }
         Vec3d lv4 = new Vec3d((double)lv2.getX() + 0.5, d, (double)lv2.getZ() + 0.5);
-        Box lv5 = arg.createSimpleBoundingBox(lv4.x, lv4.y, lv4.z);
-        if (arg2.doesNotCollide(lv5)) {
-            if (arg2.method_29546(lv5.stretch(0.0, -0.2f, 0.0)).noneMatch(arg::method_29496)) {
+        Box lv5 = type.createSimpleBoundingBox(lv4.x, lv4.y, lv4.z);
+        if (world.doesNotCollide(lv5)) {
+            if (world.method_29546(lv5.stretch(0.0, -0.2f, 0.0)).noneMatch(type::isInvalidSpawn)) {
                 return Optional.of(lv4);
             }
         }
@@ -276,33 +276,33 @@ implements BlockEntityProvider {
     }
 
     @Override
-    public PistonBehavior getPistonBehavior(BlockState arg) {
+    public PistonBehavior getPistonBehavior(BlockState state) {
         return PistonBehavior.DESTROY;
     }
 
     @Override
-    public BlockRenderType getRenderType(BlockState arg) {
+    public BlockRenderType getRenderType(BlockState state) {
         return BlockRenderType.ENTITYBLOCK_ANIMATED;
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(FACING, PART, OCCUPIED);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(FACING, PART, OCCUPIED);
     }
 
     @Override
-    public BlockEntity createBlockEntity(BlockView arg) {
+    public BlockEntity createBlockEntity(BlockView world) {
         return new BedBlockEntity(this.color);
     }
 
     @Override
-    public void onPlaced(World arg, BlockPos arg2, BlockState arg3, @Nullable LivingEntity arg4, ItemStack arg5) {
-        super.onPlaced(arg, arg2, arg3, arg4, arg5);
-        if (!arg.isClient) {
-            BlockPos lv = arg2.offset(arg3.get(FACING));
-            arg.setBlockState(lv, (BlockState)arg3.with(PART, BedPart.HEAD), 3);
-            arg.updateNeighbors(arg2, Blocks.AIR);
-            arg3.method_30101(arg, arg2, 3);
+    public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
+        super.onPlaced(world, pos, state, placer, itemStack);
+        if (!world.isClient) {
+            BlockPos lv = pos.offset(state.get(FACING));
+            world.setBlockState(lv, (BlockState)state.with(PART, BedPart.HEAD), 3);
+            world.updateNeighbors(pos, Blocks.AIR);
+            state.method_30101(world, pos, 3);
         }
     }
 
@@ -313,13 +313,13 @@ implements BlockEntityProvider {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public long getRenderingSeed(BlockState arg, BlockPos arg2) {
-        BlockPos lv = arg2.offset(arg.get(FACING), arg.get(PART) == BedPart.HEAD ? 0 : 1);
-        return MathHelper.hashCode(lv.getX(), arg2.getY(), lv.getZ());
+    public long getRenderingSeed(BlockState state, BlockPos pos) {
+        BlockPos lv = pos.offset(state.get(FACING), state.get(PART) == BedPart.HEAD ? 0 : 1);
+        return MathHelper.hashCode(lv.getX(), pos.getY(), lv.getZ());
     }
 
     @Override
-    public boolean canPathfindThrough(BlockState arg, BlockView arg2, BlockPos arg3, NavigationType arg4) {
+    public boolean canPathfindThrough(BlockState state, BlockView world, BlockPos pos, NavigationType type) {
         return false;
     }
 }

@@ -31,29 +31,29 @@ extends AbstractCriterion<Conditions> {
         return new Conditions(arg, lv);
     }
 
-    public void trigger(ServerPlayerEntity arg2, BlockPos arg22) {
-        double d = arg2.getX() - (double)arg22.getX();
-        double e = arg2.getZ() - (double)arg22.getZ();
+    public void trigger(ServerPlayerEntity player, BlockPos strongholdPos) {
+        double d = player.getX() - (double)strongholdPos.getX();
+        double e = player.getZ() - (double)strongholdPos.getZ();
         double f = d * d + e * e;
-        this.test(arg2, arg -> arg.matches(f));
+        this.test(player, arg -> arg.matches(f));
     }
 
     @Override
-    public /* synthetic */ AbstractCriterionConditions conditionsFromJson(JsonObject jsonObject, EntityPredicate.Extended arg, AdvancementEntityPredicateDeserializer arg2) {
-        return this.conditionsFromJson(jsonObject, arg, arg2);
+    public /* synthetic */ AbstractCriterionConditions conditionsFromJson(JsonObject obj, EntityPredicate.Extended playerPredicate, AdvancementEntityPredicateDeserializer predicateDeserializer) {
+        return this.conditionsFromJson(obj, playerPredicate, predicateDeserializer);
     }
 
     public static class Conditions
     extends AbstractCriterionConditions {
         private final NumberRange.FloatRange distance;
 
-        public Conditions(EntityPredicate.Extended arg, NumberRange.FloatRange arg2) {
-            super(ID, arg);
-            this.distance = arg2;
+        public Conditions(EntityPredicate.Extended player, NumberRange.FloatRange distance) {
+            super(ID, player);
+            this.distance = distance;
         }
 
-        public boolean matches(double d) {
-            return this.distance.testSqrt(d);
+        public boolean matches(double distance) {
+            return this.distance.testSqrt(distance);
         }
     }
 }

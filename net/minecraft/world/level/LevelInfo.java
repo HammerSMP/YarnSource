@@ -17,23 +17,23 @@ import net.minecraft.world.GameRules;
 public final class LevelInfo {
     private final String name;
     private final GameMode gameMode;
-    private final boolean structures;
-    private final Difficulty difficulty;
     private final boolean hardcore;
+    private final Difficulty difficulty;
+    private final boolean allowCommands;
     private final GameRules gameRules;
-    private final DataPackSettings field_25403;
+    private final DataPackSettings dataPackSettings;
 
-    public LevelInfo(String string, GameMode arg, boolean bl, Difficulty arg2, boolean bl2, GameRules arg3, DataPackSettings arg4) {
-        this.name = string;
-        this.gameMode = arg;
-        this.structures = bl;
-        this.difficulty = arg2;
-        this.hardcore = bl2;
-        this.gameRules = arg3;
-        this.field_25403 = arg4;
+    public LevelInfo(String name, GameMode gameMode, boolean hardcore, Difficulty difficulty, boolean allowCommands, GameRules gameRules, DataPackSettings dataPackSettings) {
+        this.name = name;
+        this.gameMode = gameMode;
+        this.hardcore = hardcore;
+        this.difficulty = difficulty;
+        this.allowCommands = allowCommands;
+        this.gameRules = gameRules;
+        this.dataPackSettings = dataPackSettings;
     }
 
-    public static LevelInfo method_28383(Dynamic<?> dynamic, DataPackSettings arg) {
+    public static LevelInfo fromDynamic(Dynamic<?> dynamic, DataPackSettings arg) {
         GameMode lv;
         return new LevelInfo(dynamic.get("LevelName").asString(""), lv, dynamic.get("hardcore").asBoolean(false), dynamic.get("Difficulty").asNumber().map(number -> Difficulty.byOrdinal(number.byteValue())).result().orElse(Difficulty.NORMAL), dynamic.get("allowCommands").asBoolean((lv = GameMode.byId(dynamic.get("GameType").asInt(0))) == GameMode.CREATIVE), new GameRules((DynamicLike<?>)dynamic.get("GameRules")), arg);
     }
@@ -46,40 +46,40 @@ public final class LevelInfo {
         return this.gameMode;
     }
 
-    public boolean hasStructures() {
-        return this.structures;
+    public boolean isHardcore() {
+        return this.hardcore;
     }
 
     public Difficulty getDifficulty() {
         return this.difficulty;
     }
 
-    public boolean isHardcore() {
-        return this.hardcore;
+    public boolean areCommandsAllowed() {
+        return this.allowCommands;
     }
 
     public GameRules getGameRules() {
         return this.gameRules;
     }
 
-    public DataPackSettings method_29558() {
-        return this.field_25403;
+    public DataPackSettings getDataPackSettings() {
+        return this.dataPackSettings;
     }
 
-    public LevelInfo method_28382(GameMode arg) {
-        return new LevelInfo(this.name, arg, this.structures, this.difficulty, this.hardcore, this.gameRules, this.field_25403);
+    public LevelInfo withGameMode(GameMode mode) {
+        return new LevelInfo(this.name, mode, this.hardcore, this.difficulty, this.allowCommands, this.gameRules, this.dataPackSettings);
     }
 
-    public LevelInfo method_28381(Difficulty arg) {
-        return new LevelInfo(this.name, this.gameMode, this.structures, arg, this.hardcore, this.gameRules, this.field_25403);
+    public LevelInfo withDifficulty(Difficulty difficulty) {
+        return new LevelInfo(this.name, this.gameMode, this.hardcore, difficulty, this.allowCommands, this.gameRules, this.dataPackSettings);
     }
 
-    public LevelInfo method_29557(DataPackSettings arg) {
-        return new LevelInfo(this.name, this.gameMode, this.structures, this.difficulty, this.hardcore, this.gameRules, arg);
+    public LevelInfo withDataPackSettings(DataPackSettings dataPackSettings) {
+        return new LevelInfo(this.name, this.gameMode, this.hardcore, this.difficulty, this.allowCommands, this.gameRules, dataPackSettings);
     }
 
-    public LevelInfo method_28385() {
-        return new LevelInfo(this.name, this.gameMode, this.structures, this.difficulty, this.hardcore, this.gameRules.copy(), this.field_25403);
+    public LevelInfo withCopiedGameRules() {
+        return new LevelInfo(this.name, this.gameMode, this.hardcore, this.difficulty, this.allowCommands, this.gameRules.copy(), this.dataPackSettings);
     }
 }
 

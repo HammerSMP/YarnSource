@@ -27,44 +27,44 @@ extends Block {
     private final Block regularBlock;
     private static final Map<Block, Block> REGULAR_TO_INFESTED = Maps.newIdentityHashMap();
 
-    public InfestedBlock(Block arg, AbstractBlock.Settings arg2) {
-        super(arg2);
-        this.regularBlock = arg;
-        REGULAR_TO_INFESTED.put(arg, this);
+    public InfestedBlock(Block regularBlock, AbstractBlock.Settings settings) {
+        super(settings);
+        this.regularBlock = regularBlock;
+        REGULAR_TO_INFESTED.put(regularBlock, this);
     }
 
     public Block getRegularBlock() {
         return this.regularBlock;
     }
 
-    public static boolean isInfestable(BlockState arg) {
-        return REGULAR_TO_INFESTED.containsKey(arg.getBlock());
+    public static boolean isInfestable(BlockState block) {
+        return REGULAR_TO_INFESTED.containsKey(block.getBlock());
     }
 
-    private void spawnSilverfish(ServerWorld arg, BlockPos arg2) {
+    private void spawnSilverfish(ServerWorld arg, BlockPos pos) {
         SilverfishEntity lv = EntityType.SILVERFISH.create(arg);
-        lv.refreshPositionAndAngles((double)arg2.getX() + 0.5, arg2.getY(), (double)arg2.getZ() + 0.5, 0.0f, 0.0f);
+        lv.refreshPositionAndAngles((double)pos.getX() + 0.5, pos.getY(), (double)pos.getZ() + 0.5, 0.0f, 0.0f);
         arg.spawnEntity(lv);
         lv.playSpawnEffects();
     }
 
     @Override
-    public void onStacksDropped(BlockState arg, ServerWorld arg2, BlockPos arg3, ItemStack arg4) {
-        super.onStacksDropped(arg, arg2, arg3, arg4);
-        if (arg2.getGameRules().getBoolean(GameRules.DO_TILE_DROPS) && EnchantmentHelper.getLevel(Enchantments.SILK_TOUCH, arg4) == 0) {
-            this.spawnSilverfish(arg2, arg3);
+    public void onStacksDropped(BlockState state, ServerWorld arg2, BlockPos pos, ItemStack stack) {
+        super.onStacksDropped(state, arg2, pos, stack);
+        if (arg2.getGameRules().getBoolean(GameRules.DO_TILE_DROPS) && EnchantmentHelper.getLevel(Enchantments.SILK_TOUCH, stack) == 0) {
+            this.spawnSilverfish(arg2, pos);
         }
     }
 
     @Override
-    public void onDestroyedByExplosion(World arg, BlockPos arg2, Explosion arg3) {
-        if (arg instanceof ServerWorld) {
-            this.spawnSilverfish((ServerWorld)arg, arg2);
+    public void onDestroyedByExplosion(World world, BlockPos pos, Explosion explosion) {
+        if (world instanceof ServerWorld) {
+            this.spawnSilverfish((ServerWorld)world, pos);
         }
     }
 
-    public static BlockState fromRegularBlock(Block arg) {
-        return REGULAR_TO_INFESTED.get(arg).getDefaultState();
+    public static BlockState fromRegularBlock(Block regularBlock) {
+        return REGULAR_TO_INFESTED.get(regularBlock).getDefaultState();
     }
 }
 

@@ -20,20 +20,20 @@ import net.minecraft.util.Identifier;
 public class ItemModelGenerator {
     private final BiConsumer<Identifier, Supplier<JsonElement>> writer;
 
-    public ItemModelGenerator(BiConsumer<Identifier, Supplier<JsonElement>> biConsumer) {
-        this.writer = biConsumer;
+    public ItemModelGenerator(BiConsumer<Identifier, Supplier<JsonElement>> writer) {
+        this.writer = writer;
     }
 
-    private void register(Item arg, Model arg2) {
-        arg2.upload(ModelIds.getItemModelId(arg), Texture.layer0(arg), this.writer);
+    private void register(Item item, Model model) {
+        model.upload(ModelIds.getItemModelId(item), Texture.layer0(item), this.writer);
     }
 
-    private void register(Item arg, String string, Model arg2) {
-        arg2.upload(ModelIds.getItemSubModelId(arg, string), Texture.layer0(Texture.getSubId(arg, string)), this.writer);
+    private void register(Item item, String suffix, Model model) {
+        model.upload(ModelIds.getItemSubModelId(item, suffix), Texture.layer0(Texture.getSubId(item, suffix)), this.writer);
     }
 
-    private void register(Item arg, Item arg2, Model arg3) {
-        arg3.upload(ModelIds.getItemModelId(arg), Texture.layer0(arg2), this.writer);
+    private void register(Item item, Item texture, Model model) {
+        model.upload(ModelIds.getItemModelId(item), Texture.layer0(texture), this.writer);
     }
 
     public void register() {

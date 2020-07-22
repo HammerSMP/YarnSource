@@ -31,11 +31,11 @@ extends SpriteBillboardParticle {
     private final Fluid fluid;
     protected boolean obsidianTear;
 
-    private BlockLeakParticle(ClientWorld arg, double d, double e, double f, Fluid arg2) {
-        super(arg, d, e, f);
+    private BlockLeakParticle(ClientWorld world, double x, double y, double z, Fluid fluid) {
+        super(world, x, y, z);
         this.setBoundingBoxSpacing(0.01f, 0.01f);
         this.gravityStrength = 0.06f;
-        this.fluid = arg2;
+        this.fluid = fluid;
     }
 
     @Override
@@ -44,11 +44,11 @@ extends SpriteBillboardParticle {
     }
 
     @Override
-    public int getColorMultiplier(float f) {
+    public int getColorMultiplier(float tint) {
         if (this.obsidianTear) {
             return 240;
         }
-        return super.getColorMultiplier(f);
+        return super.getColorMultiplier(tint);
     }
 
     @Override
@@ -90,8 +90,8 @@ extends SpriteBillboardParticle {
     implements ParticleFactory<DefaultParticleType> {
         protected final SpriteProvider spriteProvider;
 
-        public LandingObsidianTearFactory(SpriteProvider arg) {
-            this.spriteProvider = arg;
+        public LandingObsidianTearFactory(SpriteProvider spriteProvider) {
+            this.spriteProvider = spriteProvider;
         }
 
         @Override
@@ -110,8 +110,8 @@ extends SpriteBillboardParticle {
     implements ParticleFactory<DefaultParticleType> {
         protected final SpriteProvider spriteProvider;
 
-        public FallingObsidianTearFactory(SpriteProvider arg) {
-            this.spriteProvider = arg;
+        public FallingObsidianTearFactory(SpriteProvider spriteProvider) {
+            this.spriteProvider = spriteProvider;
         }
 
         @Override
@@ -130,8 +130,8 @@ extends SpriteBillboardParticle {
     implements ParticleFactory<DefaultParticleType> {
         protected final SpriteProvider spriteProvider;
 
-        public DrippingObsidianTearFactory(SpriteProvider arg) {
-            this.spriteProvider = arg;
+        public DrippingObsidianTearFactory(SpriteProvider spriteProvider) {
+            this.spriteProvider = spriteProvider;
         }
 
         @Override
@@ -151,8 +151,8 @@ extends SpriteBillboardParticle {
     implements ParticleFactory<DefaultParticleType> {
         protected final SpriteProvider spriteProvider;
 
-        public FallingNectarFactory(SpriteProvider arg) {
-            this.spriteProvider = arg;
+        public FallingNectarFactory(SpriteProvider spriteProvider) {
+            this.spriteProvider = spriteProvider;
         }
 
         @Override
@@ -171,8 +171,8 @@ extends SpriteBillboardParticle {
     implements ParticleFactory<DefaultParticleType> {
         protected final SpriteProvider spriteProvider;
 
-        public LandingHoneyFactory(SpriteProvider arg) {
-            this.spriteProvider = arg;
+        public LandingHoneyFactory(SpriteProvider spriteProvider) {
+            this.spriteProvider = spriteProvider;
         }
 
         @Override
@@ -190,8 +190,8 @@ extends SpriteBillboardParticle {
     implements ParticleFactory<DefaultParticleType> {
         protected final SpriteProvider spriteProvider;
 
-        public FallingHoneyFactory(SpriteProvider arg) {
-            this.spriteProvider = arg;
+        public FallingHoneyFactory(SpriteProvider spriteProvider) {
+            this.spriteProvider = spriteProvider;
         }
 
         @Override
@@ -209,8 +209,8 @@ extends SpriteBillboardParticle {
     implements ParticleFactory<DefaultParticleType> {
         protected final SpriteProvider spriteProvider;
 
-        public DrippingHoneyFactory(SpriteProvider arg) {
-            this.spriteProvider = arg;
+        public DrippingHoneyFactory(SpriteProvider spriteProvider) {
+            this.spriteProvider = spriteProvider;
         }
 
         @Override
@@ -229,8 +229,8 @@ extends SpriteBillboardParticle {
     implements ParticleFactory<DefaultParticleType> {
         protected final SpriteProvider spriteProvider;
 
-        public LandingLavaFactory(SpriteProvider arg) {
-            this.spriteProvider = arg;
+        public LandingLavaFactory(SpriteProvider spriteProvider) {
+            this.spriteProvider = spriteProvider;
         }
 
         @Override
@@ -247,8 +247,8 @@ extends SpriteBillboardParticle {
     implements ParticleFactory<DefaultParticleType> {
         protected final SpriteProvider spriteProvider;
 
-        public FallingLavaFactory(SpriteProvider arg) {
-            this.spriteProvider = arg;
+        public FallingLavaFactory(SpriteProvider spriteProvider) {
+            this.spriteProvider = spriteProvider;
         }
 
         @Override
@@ -265,8 +265,8 @@ extends SpriteBillboardParticle {
     implements ParticleFactory<DefaultParticleType> {
         protected final SpriteProvider spriteProvider;
 
-        public DrippingLavaFactory(SpriteProvider arg) {
-            this.spriteProvider = arg;
+        public DrippingLavaFactory(SpriteProvider spriteProvider) {
+            this.spriteProvider = spriteProvider;
         }
 
         @Override
@@ -282,8 +282,8 @@ extends SpriteBillboardParticle {
     implements ParticleFactory<DefaultParticleType> {
         protected final SpriteProvider spriteProvider;
 
-        public FallingWaterFactory(SpriteProvider arg) {
-            this.spriteProvider = arg;
+        public FallingWaterFactory(SpriteProvider spriteProvider) {
+            this.spriteProvider = spriteProvider;
         }
 
         @Override
@@ -300,8 +300,8 @@ extends SpriteBillboardParticle {
     implements ParticleFactory<DefaultParticleType> {
         protected final SpriteProvider spriteProvider;
 
-        public DrippingWaterFactory(SpriteProvider arg) {
-            this.spriteProvider = arg;
+        public DrippingWaterFactory(SpriteProvider spriteProvider) {
+            this.spriteProvider = spriteProvider;
         }
 
         @Override
@@ -316,8 +316,8 @@ extends SpriteBillboardParticle {
     @Environment(value=EnvType.CLIENT)
     static class Landing
     extends BlockLeakParticle {
-        private Landing(ClientWorld arg, double d, double e, double f, Fluid arg2) {
-            super(arg, d, e, f, arg2);
+        private Landing(ClientWorld world, double x, double y, double z, Fluid fluid) {
+            super(world, x, y, z, fluid);
             this.maxAge = (int)(16.0 / (Math.random() * 0.8 + 0.2));
         }
     }
@@ -325,8 +325,8 @@ extends SpriteBillboardParticle {
     @Environment(value=EnvType.CLIENT)
     static class Falling
     extends BlockLeakParticle {
-        private Falling(ClientWorld arg, double d, double e, double f, Fluid arg2) {
-            super(arg, d, e, f, arg2);
+        private Falling(ClientWorld world, double x, double y, double z, Fluid fluid) {
+            super(world, x, y, z, fluid);
             this.maxAge = (int)(64.0 / (Math.random() * 0.8 + 0.2));
         }
 
@@ -341,8 +341,8 @@ extends SpriteBillboardParticle {
     @Environment(value=EnvType.CLIENT)
     static class FallingHoney
     extends ContinuousFalling {
-        private FallingHoney(ClientWorld arg, double d, double e, double f, Fluid arg2, ParticleEffect arg3) {
-            super(arg, d, e, f, arg2, arg3);
+        private FallingHoney(ClientWorld world, double x, double y, double z, Fluid fluid, ParticleEffect arg3) {
+            super(world, x, y, z, fluid, arg3);
         }
 
         @Override
@@ -360,9 +360,9 @@ extends SpriteBillboardParticle {
     extends Falling {
         protected final ParticleEffect nextParticle;
 
-        private ContinuousFalling(ClientWorld arg, double d, double e, double f, Fluid arg2, ParticleEffect arg3) {
-            super(arg, d, e, f, arg2);
-            this.nextParticle = arg3;
+        private ContinuousFalling(ClientWorld arg, double x, double y, double z, Fluid fluid, ParticleEffect nextParticle) {
+            super(arg, x, y, z, fluid);
+            this.nextParticle = nextParticle;
         }
 
         @Override
@@ -377,8 +377,8 @@ extends SpriteBillboardParticle {
     @Environment(value=EnvType.CLIENT)
     static class DrippingLava
     extends Dripping {
-        private DrippingLava(ClientWorld arg, double d, double e, double f, Fluid arg2, ParticleEffect arg3) {
-            super(arg, d, e, f, arg2, arg3);
+        private DrippingLava(ClientWorld arg, double x, double y, double z, Fluid fluid, ParticleEffect nextParticle) {
+            super(arg, x, y, z, fluid, nextParticle);
         }
 
         @Override
@@ -395,9 +395,9 @@ extends SpriteBillboardParticle {
     extends BlockLeakParticle {
         private final ParticleEffect nextParticle;
 
-        private Dripping(ClientWorld arg, double d, double e, double f, Fluid arg2, ParticleEffect arg3) {
-            super(arg, d, e, f, arg2);
-            this.nextParticle = arg3;
+        private Dripping(ClientWorld arg, double x, double y, double z, Fluid fluid, ParticleEffect nextParticle) {
+            super(arg, x, y, z, fluid);
+            this.nextParticle = nextParticle;
             this.gravityStrength *= 0.02f;
             this.maxAge = 40;
         }

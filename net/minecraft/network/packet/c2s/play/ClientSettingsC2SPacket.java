@@ -29,33 +29,33 @@ implements Packet<ServerPlayPacketListener> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public ClientSettingsC2SPacket(String string, int i, ChatVisibility arg, boolean bl, int j, Arm arg2) {
-        this.language = string;
-        this.viewDistance = i;
-        this.chatVisibility = arg;
-        this.chatColors = bl;
-        this.playerModelBitMask = j;
-        this.mainArm = arg2;
+    public ClientSettingsC2SPacket(String language, int viewDistance, ChatVisibility chatVisibility, boolean chatColors, int modelBitMask, Arm mainArm) {
+        this.language = language;
+        this.viewDistance = viewDistance;
+        this.chatVisibility = chatVisibility;
+        this.chatColors = chatColors;
+        this.playerModelBitMask = modelBitMask;
+        this.mainArm = mainArm;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.language = arg.readString(16);
-        this.viewDistance = arg.readByte();
-        this.chatVisibility = arg.readEnumConstant(ChatVisibility.class);
-        this.chatColors = arg.readBoolean();
-        this.playerModelBitMask = arg.readUnsignedByte();
-        this.mainArm = arg.readEnumConstant(Arm.class);
+    public void read(PacketByteBuf buf) throws IOException {
+        this.language = buf.readString(16);
+        this.viewDistance = buf.readByte();
+        this.chatVisibility = buf.readEnumConstant(ChatVisibility.class);
+        this.chatColors = buf.readBoolean();
+        this.playerModelBitMask = buf.readUnsignedByte();
+        this.mainArm = buf.readEnumConstant(Arm.class);
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeString(this.language);
-        arg.writeByte(this.viewDistance);
-        arg.writeEnumConstant(this.chatVisibility);
-        arg.writeBoolean(this.chatColors);
-        arg.writeByte(this.playerModelBitMask);
-        arg.writeEnumConstant(this.mainArm);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeString(this.language);
+        buf.writeByte(this.viewDistance);
+        buf.writeEnumConstant(this.chatVisibility);
+        buf.writeBoolean(this.chatColors);
+        buf.writeByte(this.playerModelBitMask);
+        buf.writeEnumConstant(this.mainArm);
     }
 
     @Override

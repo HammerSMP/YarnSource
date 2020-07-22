@@ -10,14 +10,14 @@ import net.minecraft.village.raid.Raid;
 
 public class HideInHomeDuringRaidTask
 extends HideInHomeTask {
-    public HideInHomeDuringRaidTask(int i, float f) {
-        super(i, f, 1);
+    public HideInHomeDuringRaidTask(int maxDistance, float walkSpeed) {
+        super(maxDistance, walkSpeed, 1);
     }
 
     @Override
-    protected boolean shouldRun(ServerWorld arg, LivingEntity arg2) {
-        Raid lv = arg.getRaidAt(arg2.getBlockPos());
-        return super.shouldRun(arg, arg2) && lv != null && lv.isActive() && !lv.hasWon() && !lv.hasLost();
+    protected boolean shouldRun(ServerWorld world, LivingEntity entity) {
+        Raid lv = world.getRaidAt(entity.getBlockPos());
+        return super.shouldRun(world, entity) && lv != null && lv.isActive() && !lv.hasWon() && !lv.hasLost();
     }
 }
 

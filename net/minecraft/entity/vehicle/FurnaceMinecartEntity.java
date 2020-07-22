@@ -39,8 +39,8 @@ extends AbstractMinecartEntity {
         super(arg, arg2);
     }
 
-    public FurnaceMinecartEntity(World arg, double d, double e, double f) {
-        super(EntityType.FURNACE_MINECART, arg, d, e, f);
+    public FurnaceMinecartEntity(World world, double x, double y, double z) {
+        super(EntityType.FURNACE_MINECART, world, x, y, z);
     }
 
     @Override
@@ -78,18 +78,18 @@ extends AbstractMinecartEntity {
     }
 
     @Override
-    public void dropItems(DamageSource arg) {
-        super.dropItems(arg);
-        if (!arg.isExplosive() && this.world.getGameRules().getBoolean(GameRules.DO_ENTITY_DROPS)) {
+    public void dropItems(DamageSource damageSource) {
+        super.dropItems(damageSource);
+        if (!damageSource.isExplosive() && this.world.getGameRules().getBoolean(GameRules.DO_ENTITY_DROPS)) {
             this.dropItem(Blocks.FURNACE);
         }
     }
 
     @Override
-    protected void moveOnRail(BlockPos arg, BlockState arg2) {
+    protected void moveOnRail(BlockPos pos, BlockState state) {
         double d = 1.0E-4;
         double e = 0.001;
-        super.moveOnRail(arg, arg2);
+        super.moveOnRail(pos, state);
         Vec3d lv = this.getVelocity();
         double f = FurnaceMinecartEntity.squaredHorizontalLength(lv);
         double g = this.pushX * this.pushX + this.pushZ * this.pushZ;
@@ -116,43 +116,43 @@ extends AbstractMinecartEntity {
     }
 
     @Override
-    public ActionResult interact(PlayerEntity arg, Hand arg2) {
-        ItemStack lv = arg.getStackInHand(arg2);
+    public ActionResult interact(PlayerEntity player, Hand hand) {
+        ItemStack lv = player.getStackInHand(hand);
         if (ACCEPTABLE_FUEL.test(lv) && this.fuel + 3600 <= 32000) {
-            if (!arg.abilities.creativeMode) {
+            if (!player.abilities.creativeMode) {
                 lv.decrement(1);
             }
             this.fuel += 3600;
         }
         if (this.fuel > 0) {
-            this.pushX = this.getX() - arg.getX();
-            this.pushZ = this.getZ() - arg.getZ();
+            this.pushX = this.getX() - player.getX();
+            this.pushZ = this.getZ() - player.getZ();
         }
         return ActionResult.success(this.world.isClient);
     }
 
     @Override
-    protected void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
-        arg.putDouble("PushX", this.pushX);
-        arg.putDouble("PushZ", this.pushZ);
-        arg.putShort("Fuel", (short)this.fuel);
+    protected void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
+        tag.putDouble("PushX", this.pushX);
+        tag.putDouble("PushZ", this.pushZ);
+        tag.putShort("Fuel", (short)this.fuel);
     }
 
     @Override
-    protected void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        this.pushX = arg.getDouble("PushX");
-        this.pushZ = arg.getDouble("PushZ");
-        this.fuel = arg.getShort("Fuel");
+    protected void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        this.pushX = tag.getDouble("PushX");
+        this.pushZ = tag.getDouble("PushZ");
+        this.fuel = tag.getShort("Fuel");
     }
 
     protected boolean isLit() {
         return this.dataTracker.get(LIT);
     }
 
-    protected void setLit(boolean bl) {
-        this.dataTracker.set(LIT, bl);
+    protected void setLit(boolean lit) {
+        this.dataTracker.set(LIT, lit);
     }
 
     @Override

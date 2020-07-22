@@ -52,14 +52,14 @@ Waterloggable {
 
     @Override
     @Nullable
-    public BlockState getPlacementState(ItemPlacementContext arg) {
-        BlockState lv = arg.getWorld().getBlockState(arg.getBlockPos());
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        BlockState lv = ctx.getWorld().getBlockState(ctx.getBlockPos());
         if (lv.isOf(this)) {
             return (BlockState)lv.with(PICKLES, Math.min(4, lv.get(PICKLES) + 1));
         }
-        FluidState lv2 = arg.getWorld().getFluidState(arg.getBlockPos());
+        FluidState lv2 = ctx.getWorld().getFluidState(ctx.getBlockPos());
         boolean bl = lv2.getFluid() == Fluids.WATER;
-        return (BlockState)super.getPlacementState(arg).with(WATERLOGGED, bl);
+        return (BlockState)super.getPlacementState(ctx).with(WATERLOGGED, bl);
     }
 
     public static boolean isDry(BlockState arg) {
@@ -67,38 +67,38 @@ Waterloggable {
     }
 
     @Override
-    protected boolean canPlantOnTop(BlockState arg, BlockView arg2, BlockPos arg3) {
-        return !arg.getCollisionShape(arg2, arg3).getFace(Direction.UP).isEmpty();
+    protected boolean canPlantOnTop(BlockState floor, BlockView world, BlockPos pos) {
+        return !floor.getCollisionShape(world, pos).getFace(Direction.UP).isEmpty() || floor.isSideSolidFullSquare(world, pos, Direction.UP);
     }
 
     @Override
-    public boolean canPlaceAt(BlockState arg, WorldView arg2, BlockPos arg3) {
-        BlockPos lv = arg3.down();
-        return this.canPlantOnTop(arg2.getBlockState(lv), arg2, lv);
+    public boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
+        BlockPos lv = pos.down();
+        return this.canPlantOnTop(world.getBlockState(lv), world, lv);
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
-        if (!arg.canPlaceAt(arg4, arg5)) {
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
+        if (!state.canPlaceAt(world, pos)) {
             return Blocks.AIR.getDefaultState();
         }
-        if (arg.get(WATERLOGGED).booleanValue()) {
-            arg4.getFluidTickScheduler().schedule(arg5, Fluids.WATER, Fluids.WATER.getTickRate(arg4));
+        if (state.get(WATERLOGGED).booleanValue()) {
+            world.getFluidTickScheduler().schedule(pos, Fluids.WATER, Fluids.WATER.getTickRate(world));
         }
-        return super.getStateForNeighborUpdate(arg, arg2, arg3, arg4, arg5, arg6);
+        return super.getStateForNeighborUpdate(state, direction, newState, world, pos, posFrom);
     }
 
     @Override
-    public boolean canReplace(BlockState arg, ItemPlacementContext arg2) {
-        if (arg2.getStack().getItem() == this.asItem() && arg.get(PICKLES) < 4) {
+    public boolean canReplace(BlockState state, ItemPlacementContext context) {
+        if (context.getStack().getItem() == this.asItem() && state.get(PICKLES) < 4) {
             return true;
         }
-        return super.canReplace(arg, arg2);
+        return super.canReplace(state, context);
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
-        switch (arg.get(PICKLES)) {
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        switch (state.get(PICKLES)) {
             default: {
                 return ONE_PICKLE_SHAPE;
             }
@@ -114,45 +114,45 @@ Waterloggable {
     }
 
     @Override
-    public FluidState getFluidState(BlockState arg) {
-        if (arg.get(WATERLOGGED).booleanValue()) {
+    public FluidState getFluidState(BlockState state) {
+        if (state.get(WATERLOGGED).booleanValue()) {
             return Fluids.WATER.getStill(false);
         }
-        return super.getFluidState(arg);
+        return super.getFluidState(state);
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(PICKLES, WATERLOGGED);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(PICKLES, WATERLOGGED);
     }
 
     @Override
-    public boolean isFertilizable(BlockView arg, BlockPos arg2, BlockState arg3, boolean bl) {
+    public boolean isFertilizable(BlockView world, BlockPos pos, BlockState state, boolean isClient) {
         return true;
     }
 
     @Override
-    public boolean canGrow(World arg, Random random, BlockPos arg2, BlockState arg3) {
+    public boolean canGrow(World world, Random random, BlockPos pos, BlockState state) {
         return true;
     }
 
     @Override
-    public void grow(ServerWorld arg, Random random, BlockPos arg2, BlockState arg3) {
-        if (!SeaPickleBlock.isDry(arg3) && arg.getBlockState(arg2.down()).isIn(BlockTags.CORAL_BLOCKS)) {
+    public void grow(ServerWorld world, Random random, BlockPos pos, BlockState state) {
+        if (!SeaPickleBlock.isDry(state) && world.getBlockState(pos.down()).isIn(BlockTags.CORAL_BLOCKS)) {
             int i = 5;
             int j = 1;
             int k = 2;
             int l = 0;
-            int m = arg2.getX() - 2;
+            int m = pos.getX() - 2;
             int n = 0;
             for (int o = 0; o < 5; ++o) {
                 for (int p = 0; p < j; ++p) {
-                    int q = 2 + arg2.getY() - 1;
+                    int q = 2 + pos.getY() - 1;
                     for (int r = q - 2; r < q; ++r) {
                         BlockState lv2;
-                        BlockPos lv = new BlockPos(m + o, r, arg2.getZ() - n + p);
-                        if (lv == arg2 || random.nextInt(6) != 0 || !arg.getBlockState(lv).isOf(Blocks.WATER) || !(lv2 = arg.getBlockState(lv.down())).isIn(BlockTags.CORAL_BLOCKS)) continue;
-                        arg.setBlockState(lv, (BlockState)Blocks.SEA_PICKLE.getDefaultState().with(PICKLES, random.nextInt(4) + 1), 3);
+                        BlockPos lv = new BlockPos(m + o, r, pos.getZ() - n + p);
+                        if (lv == pos || random.nextInt(6) != 0 || !world.getBlockState(lv).isOf(Blocks.WATER) || !(lv2 = world.getBlockState(lv.down())).isIn(BlockTags.CORAL_BLOCKS)) continue;
+                        world.setBlockState(lv, (BlockState)Blocks.SEA_PICKLE.getDefaultState().with(PICKLES, random.nextInt(4) + 1), 3);
                     }
                 }
                 if (l < 2) {
@@ -164,12 +164,12 @@ Waterloggable {
                 }
                 ++l;
             }
-            arg.setBlockState(arg2, (BlockState)arg3.with(PICKLES, 4), 2);
+            world.setBlockState(pos, (BlockState)state.with(PICKLES, 4), 2);
         }
     }
 
     @Override
-    public boolean canPathfindThrough(BlockState arg, BlockView arg2, BlockPos arg3, NavigationType arg4) {
+    public boolean canPathfindThrough(BlockState state, BlockView world, BlockPos pos, NavigationType type) {
         return false;
     }
 }

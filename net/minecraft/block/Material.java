@@ -59,14 +59,14 @@ public final class Material {
     private final boolean replaceable;
     private final boolean solid;
 
-    public Material(MaterialColor arg, boolean bl, boolean bl2, boolean bl3, boolean bl4, boolean bl5, boolean bl6, PistonBehavior arg2) {
-        this.color = arg;
-        this.liquid = bl;
-        this.solid = bl2;
-        this.blocksMovement = bl3;
-        this.blocksLight = bl4;
-        this.burnable = bl5;
-        this.replaceable = bl6;
+    public Material(MaterialColor color, boolean liquid, boolean solid, boolean blocksMovement, boolean blocksLight, boolean breakByHand, boolean burnable, PistonBehavior arg2) {
+        this.color = color;
+        this.liquid = liquid;
+        this.solid = solid;
+        this.blocksMovement = blocksMovement;
+        this.blocksLight = blocksLight;
+        this.burnable = breakByHand;
+        this.replaceable = burnable;
         this.pistonBehavior = arg2;
     }
 
@@ -112,8 +112,8 @@ public final class Material {
         private final MaterialColor color;
         private boolean blocksLight = true;
 
-        public Builder(MaterialColor arg) {
-            this.color = arg;
+        public Builder(MaterialColor color) {
+            this.color = color;
         }
 
         public Builder liquid() {

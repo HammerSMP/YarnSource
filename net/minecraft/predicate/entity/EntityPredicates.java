@@ -27,14 +27,14 @@ public final class EntityPredicates {
     public static final Predicate<Entity> EXCEPT_CREATIVE_SPECTATOR_OR_PEACEFUL = arg -> !(arg instanceof PlayerEntity) || !arg.isSpectator() && !((PlayerEntity)arg).isCreative() && arg.world.getDifficulty() != Difficulty.PEACEFUL;
     public static final Predicate<Entity> EXCEPT_SPECTATOR = arg -> !arg.isSpectator();
 
-    public static Predicate<Entity> maxDistance(double d, double e, double f, double g) {
+    public static Predicate<Entity> maxDistance(double x, double y, double z, double g) {
         double h = g * g;
-        return arg -> arg != null && arg.squaredDistanceTo(d, e, f) <= h;
+        return arg -> arg != null && arg.squaredDistanceTo(x, y, z) <= h;
     }
 
-    public static Predicate<Entity> canBePushedBy(Entity arg) {
+    public static Predicate<Entity> canBePushedBy(Entity entity) {
         AbstractTeam.CollisionRule lv2;
-        AbstractTeam lv = arg.getScoreboardTeam();
+        AbstractTeam lv = entity.getScoreboardTeam();
         AbstractTeam.CollisionRule collisionRule = lv2 = lv == null ? AbstractTeam.CollisionRule.ALWAYS : lv.getCollisionRule();
         if (lv2 == AbstractTeam.CollisionRule.NEVER) {
             return Predicates.alwaysFalse();
@@ -61,10 +61,10 @@ public final class EntityPredicates {
         });
     }
 
-    public static Predicate<Entity> rides(Entity arg) {
+    public static Predicate<Entity> rides(Entity entity) {
         return arg2 -> {
             while (arg2.hasVehicle()) {
-                if ((arg2 = arg2.getVehicle()) != arg) continue;
+                if ((arg2 = arg2.getVehicle()) != entity) continue;
                 return false;
             }
             return true;
@@ -75,8 +75,8 @@ public final class EntityPredicates {
     implements Predicate<Entity> {
         private final ItemStack stack;
 
-        public CanPickup(ItemStack arg) {
-            this.stack = arg;
+        public CanPickup(ItemStack stack) {
+            this.stack = stack;
         }
 
         @Override
@@ -92,8 +92,8 @@ public final class EntityPredicates {
         }
 
         @Override
-        public /* synthetic */ boolean test(@Nullable Object object) {
-            return this.test((Entity)object);
+        public /* synthetic */ boolean test(@Nullable Object context) {
+            return this.test((Entity)context);
         }
     }
 }

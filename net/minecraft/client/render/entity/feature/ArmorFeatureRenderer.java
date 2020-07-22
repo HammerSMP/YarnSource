@@ -38,10 +38,10 @@ extends FeatureRenderer<T, M> {
     private final A leggingsModel;
     private final A bodyModel;
 
-    public ArmorFeatureRenderer(FeatureRendererContext<T, M> arg, A arg2, A arg3) {
-        super(arg);
-        this.leggingsModel = arg2;
-        this.bodyModel = arg3;
+    public ArmorFeatureRenderer(FeatureRendererContext<T, M> context, A leggingsModel, A bodyModel) {
+        super(context);
+        this.leggingsModel = leggingsModel;
+        this.bodyModel = bodyModel;
     }
 
     @Override
@@ -52,7 +52,7 @@ extends FeatureRenderer<T, M> {
         this.renderArmor(arg, arg2, arg3, EquipmentSlot.HEAD, i, this.getArmor(EquipmentSlot.HEAD));
     }
 
-    private void renderArmor(MatrixStack arg, VertexConsumerProvider arg2, T arg3, EquipmentSlot arg4, int i, A arg5) {
+    private void renderArmor(MatrixStack matrices, VertexConsumerProvider vertexConsumers, T arg3, EquipmentSlot arg4, int i, A arg5) {
         ItemStack lv = ((LivingEntity)arg3).getEquippedStack(arg4);
         if (!(lv.getItem() instanceof ArmorItem)) {
             return;
@@ -70,51 +70,51 @@ extends FeatureRenderer<T, M> {
             float f = (float)(j >> 16 & 0xFF) / 255.0f;
             float g = (float)(j >> 8 & 0xFF) / 255.0f;
             float h = (float)(j & 0xFF) / 255.0f;
-            this.renderArmorParts(arg, arg2, i, lv2, bl2, arg5, bl, f, g, h, null);
-            this.renderArmorParts(arg, arg2, i, lv2, bl2, arg5, bl, 1.0f, 1.0f, 1.0f, "overlay");
+            this.renderArmorParts(matrices, vertexConsumers, i, lv2, bl2, arg5, bl, f, g, h, null);
+            this.renderArmorParts(matrices, vertexConsumers, i, lv2, bl2, arg5, bl, 1.0f, 1.0f, 1.0f, "overlay");
         } else {
-            this.renderArmorParts(arg, arg2, i, lv2, bl2, arg5, bl, 1.0f, 1.0f, 1.0f, null);
+            this.renderArmorParts(matrices, vertexConsumers, i, lv2, bl2, arg5, bl, 1.0f, 1.0f, 1.0f, null);
         }
     }
 
-    protected void setVisible(A arg, EquipmentSlot arg2) {
-        ((BipedEntityModel)arg).setVisible(false);
-        switch (arg2) {
+    protected void setVisible(A bipedModel, EquipmentSlot slot) {
+        ((BipedEntityModel)bipedModel).setVisible(false);
+        switch (slot) {
             case HEAD: {
-                arg.head.visible = true;
-                arg.helmet.visible = true;
+                bipedModel.head.visible = true;
+                bipedModel.helmet.visible = true;
                 break;
             }
             case CHEST: {
-                arg.torso.visible = true;
-                arg.rightArm.visible = true;
-                arg.leftArm.visible = true;
+                bipedModel.torso.visible = true;
+                bipedModel.rightArm.visible = true;
+                bipedModel.leftArm.visible = true;
                 break;
             }
             case LEGS: {
-                arg.torso.visible = true;
-                arg.rightLeg.visible = true;
-                arg.leftLeg.visible = true;
+                bipedModel.torso.visible = true;
+                bipedModel.rightLeg.visible = true;
+                bipedModel.leftLeg.visible = true;
                 break;
             }
             case FEET: {
-                arg.rightLeg.visible = true;
-                arg.leftLeg.visible = true;
+                bipedModel.rightLeg.visible = true;
+                bipedModel.leftLeg.visible = true;
             }
         }
     }
 
     private void renderArmorParts(MatrixStack arg, VertexConsumerProvider arg2, int i, ArmorItem arg3, boolean bl, A arg4, boolean bl2, float f, float g, float h, @Nullable String string) {
-        VertexConsumer lv = ItemRenderer.method_27952(arg2, RenderLayer.getArmorCutoutNoCull(this.getArmorTexture(arg3, bl2, string)), false, bl);
+        VertexConsumer lv = ItemRenderer.getArmorVertexConsumer(arg2, RenderLayer.getArmorCutoutNoCull(this.getArmorTexture(arg3, bl2, string)), false, bl);
         ((AnimalModel)arg4).render(arg, lv, i, OverlayTexture.DEFAULT_UV, f, g, h, 1.0f);
     }
 
-    private A getArmor(EquipmentSlot arg) {
-        return this.usesSecondLayer(arg) ? this.leggingsModel : this.bodyModel;
+    private A getArmor(EquipmentSlot slot) {
+        return this.usesSecondLayer(slot) ? this.leggingsModel : this.bodyModel;
     }
 
-    private boolean usesSecondLayer(EquipmentSlot arg) {
-        return arg == EquipmentSlot.LEGS;
+    private boolean usesSecondLayer(EquipmentSlot slot) {
+        return slot == EquipmentSlot.LEGS;
     }
 
     private Identifier getArmorTexture(ArmorItem arg, boolean bl, @Nullable String string) {

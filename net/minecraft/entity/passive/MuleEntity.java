@@ -47,8 +47,8 @@ extends AbstractDonkeyEntity {
     }
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource arg) {
-        super.getHurtSound(arg);
+    protected SoundEvent getHurtSound(DamageSource source) {
+        super.getHurtSound(source);
         return SoundEvents.ENTITY_MULE_HURT;
     }
 

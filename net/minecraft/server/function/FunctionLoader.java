@@ -29,7 +29,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executor;
-import net.minecraft.class_5414;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.ResourceReloadListener;
@@ -37,7 +36,8 @@ import net.minecraft.server.command.CommandOutput;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.function.CommandFunction;
 import net.minecraft.tag.Tag;
-import net.minecraft.tag.TagContainer;
+import net.minecraft.tag.TagGroup;
+import net.minecraft.tag.TagGroupLoader;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec2f;
@@ -53,50 +53,50 @@ implements ResourceReloadListener {
     private static final int PATH_PREFIX_LENGTH = "functions/".length();
     private static final int PATH_SUFFIX_LENGTH = ".mcfunction".length();
     private volatile Map<Identifier, CommandFunction> functions = ImmutableMap.of();
-    private final TagContainer<CommandFunction> tags = new TagContainer(this::get, "tags/functions", "function");
-    private volatile class_5414<CommandFunction> field_25801 = class_5414.method_30214();
+    private final TagGroupLoader<CommandFunction> tags = new TagGroupLoader(this::get, "tags/functions", "function");
+    private volatile TagGroup<CommandFunction> field_25801 = TagGroup.createEmpty();
     private final int level;
     private final CommandDispatcher<ServerCommandSource> commandDispatcher;
 
-    public Optional<CommandFunction> get(Identifier arg) {
-        return Optional.ofNullable(this.functions.get(arg));
+    public Optional<CommandFunction> get(Identifier id) {
+        return Optional.ofNullable(this.functions.get(id));
     }
 
     public Map<Identifier, CommandFunction> getFunctions() {
         return this.functions;
     }
 
-    public class_5414<CommandFunction> getTags() {
+    public TagGroup<CommandFunction> getTags() {
         return this.field_25801;
     }
 
-    public Tag<CommandFunction> getOrCreateTag(Identifier arg) {
-        return this.field_25801.method_30213(arg);
+    public Tag<CommandFunction> getOrCreateTag(Identifier id) {
+        return this.field_25801.getTagOrEmpty(id);
     }
 
-    public FunctionLoader(int i, CommandDispatcher<ServerCommandSource> commandDispatcher) {
-        this.level = i;
+    public FunctionLoader(int level, CommandDispatcher<ServerCommandSource> commandDispatcher) {
+        this.level = level;
         this.commandDispatcher = commandDispatcher;
     }
 
     @Override
-    public CompletableFuture<Void> reload(ResourceReloadListener.Synchronizer arg, ResourceManager arg2, Profiler arg3, Profiler arg4, Executor executor, Executor executor2) {
-        CompletableFuture<Map<Identifier, Tag.Builder>> completableFuture = this.tags.prepareReload(arg2, executor);
-        CompletionStage completableFuture2 = CompletableFuture.supplyAsync(() -> arg2.findResources("functions", string -> string.endsWith(".mcfunction")), executor).thenCompose(collection -> {
+    public CompletableFuture<Void> reload(ResourceReloadListener.Synchronizer synchronizer, ResourceManager manager, Profiler prepareProfiler, Profiler applyProfiler, Executor prepareExecutor, Executor applyExecutor) {
+        CompletableFuture<Map<Identifier, Tag.Builder>> completableFuture = this.tags.prepareReload(manager, prepareExecutor);
+        CompletionStage completableFuture2 = CompletableFuture.supplyAsync(() -> manager.findResources("functions", string -> string.endsWith(".mcfunction")), prepareExecutor).thenCompose(collection -> {
             HashMap map = Maps.newHashMap();
             ServerCommandSource lv = new ServerCommandSource(CommandOutput.DUMMY, Vec3d.ZERO, Vec2f.ZERO, null, this.level, "", LiteralText.EMPTY, null, null);
             for (Identifier lv2 : collection) {
                 String string = lv2.getPath();
                 Identifier lv3 = new Identifier(lv2.getNamespace(), string.substring(PATH_PREFIX_LENGTH, string.length() - PATH_SUFFIX_LENGTH));
                 map.put(lv3, CompletableFuture.supplyAsync(() -> {
-                    List<String> list = FunctionLoader.readLines(arg2, lv2);
+                    List<String> list = FunctionLoader.readLines(manager, lv2);
                     return CommandFunction.create(lv3, this.commandDispatcher, lv, list);
-                }, executor));
+                }, prepareExecutor));
             }
             CompletableFuture[] completableFutures = map.values().toArray(new CompletableFuture[0]);
             return CompletableFuture.allOf(completableFutures).handle((void_, throwable) -> map);
         });
-        return ((CompletableFuture)((CompletableFuture)completableFuture.thenCombine(completableFuture2, Pair::of)).thenCompose(arg::whenPrepared)).thenAcceptAsync(pair -> {
+        return ((CompletableFuture)((CompletableFuture)completableFuture.thenCombine(completableFuture2, Pair::of)).thenCompose(synchronizer::whenPrepared)).thenAcceptAsync(pair -> {
             Map map = (Map)pair.getSecond();
             ImmutableMap.Builder builder = ImmutableMap.builder();
             map.forEach((arg, completableFuture) -> ((CompletableFuture)completableFuture.handle((arg2, throwable) -> {
@@ -109,7 +109,7 @@ implements ResourceReloadListener {
             })).join());
             this.functions = builder.build();
             this.field_25801 = this.tags.applyReload((Map)pair.getFirst());
-        }, executor2);
+        }, applyExecutor);
     }
 
     /*
@@ -117,8 +117,8 @@ implements ResourceReloadListener {
      * Enabled unnecessary exception pruning
      * Enabled aggressive exception aggregation
      */
-    private static List<String> readLines(ResourceManager arg, Identifier arg2) {
-        try (Resource lv = arg.getResource(arg2);){
+    private static List<String> readLines(ResourceManager resourceManager, Identifier id) {
+        try (Resource lv = resourceManager.getResource(id);){
             List list = IOUtils.readLines((InputStream)lv.getInputStream(), (Charset)StandardCharsets.UTF_8);
             return list;
         }

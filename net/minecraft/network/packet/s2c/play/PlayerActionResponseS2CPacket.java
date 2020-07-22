@@ -33,27 +33,27 @@ implements Packet<ClientPlayPacketListener> {
     public PlayerActionResponseS2CPacket() {
     }
 
-    public PlayerActionResponseS2CPacket(BlockPos arg, BlockState arg2, PlayerActionC2SPacket.Action arg3, boolean bl, String string) {
-        this.pos = arg.toImmutable();
-        this.state = arg2;
-        this.action = arg3;
-        this.approved = bl;
+    public PlayerActionResponseS2CPacket(BlockPos pos, BlockState state, PlayerActionC2SPacket.Action action, boolean approved, String reason) {
+        this.pos = pos.toImmutable();
+        this.state = state;
+        this.action = action;
+        this.approved = approved;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.pos = arg.readBlockPos();
-        this.state = Block.STATE_IDS.get(arg.readVarInt());
-        this.action = arg.readEnumConstant(PlayerActionC2SPacket.Action.class);
-        this.approved = arg.readBoolean();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.pos = buf.readBlockPos();
+        this.state = Block.STATE_IDS.get(buf.readVarInt());
+        this.action = buf.readEnumConstant(PlayerActionC2SPacket.Action.class);
+        this.approved = buf.readBoolean();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeBlockPos(this.pos);
-        arg.writeVarInt(Block.getRawIdFromState(this.state));
-        arg.writeEnumConstant(this.action);
-        arg.writeBoolean(this.approved);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeBlockPos(this.pos);
+        buf.writeVarInt(Block.getRawIdFromState(this.state));
+        buf.writeEnumConstant(this.action);
+        buf.writeBoolean(this.approved);
     }
 
     @Override

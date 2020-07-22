@@ -32,12 +32,12 @@ public class DiffuseLighting {
         RenderSystem.disableColorMaterial();
     }
 
-    public static void enableForLevel(Matrix4f arg) {
-        RenderSystem.setupLevelDiffuseLighting(field_24428, field_24429, arg);
+    public static void enableForLevel(Matrix4f modelMatrix) {
+        RenderSystem.setupLevelDiffuseLighting(field_24428, field_24429, modelMatrix);
     }
 
-    public static void method_27869(Matrix4f arg) {
-        RenderSystem.setupLevelDiffuseLighting(field_24426, field_24427, arg);
+    public static void method_27869(Matrix4f modelMatrix) {
+        RenderSystem.setupLevelDiffuseLighting(field_24426, field_24427, modelMatrix);
     }
 
     public static void disableGuiDepthLighting() {

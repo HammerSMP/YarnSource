@@ -46,26 +46,26 @@ extends Screen {
     private Text status = new TranslatableText("connect.connecting");
     private long narratorTimer = -1L;
 
-    public ConnectScreen(Screen arg, MinecraftClient arg2, ServerInfo arg3) {
+    public ConnectScreen(Screen parent, MinecraftClient client, ServerInfo entry) {
         super(NarratorManager.EMPTY);
-        this.client = arg2;
-        this.parent = arg;
-        ServerAddress lv = ServerAddress.parse(arg3.address);
-        arg2.disconnect();
-        arg2.setCurrentServerEntry(arg3);
+        this.client = client;
+        this.parent = parent;
+        ServerAddress lv = ServerAddress.parse(entry.address);
+        client.disconnect();
+        client.setCurrentServerEntry(entry);
         this.connect(lv.getAddress(), lv.getPort());
     }
 
-    public ConnectScreen(Screen arg, MinecraftClient arg2, String string, int i) {
+    public ConnectScreen(Screen parent, MinecraftClient client, String address, int port) {
         super(NarratorManager.EMPTY);
-        this.client = arg2;
-        this.parent = arg;
-        arg2.disconnect();
-        this.connect(string, i);
+        this.client = client;
+        this.parent = parent;
+        client.disconnect();
+        this.connect(address, port);
     }
 
-    private void connect(final String string, final int i) {
-        LOGGER.info("Connecting to {}, {}", (Object)string, (Object)i);
+    private void connect(final String address, final int port) {
+        LOGGER.info("Connecting to {}, {}", (Object)address, (Object)port);
         Thread thread = new Thread("Server Connector #" + CONNECTOR_THREADS_COUNT.incrementAndGet()){
 
             @Override
@@ -75,10 +75,10 @@ extends Screen {
                     if (ConnectScreen.this.connectingCancelled) {
                         return;
                     }
-                    inetAddress = InetAddress.getByName(string);
-                    ConnectScreen.this.connection = ClientConnection.connect(inetAddress, i, ConnectScreen.this.client.options.shouldUseNativeTransport());
+                    inetAddress = InetAddress.getByName(address);
+                    ConnectScreen.this.connection = ClientConnection.connect(inetAddress, port, ConnectScreen.this.client.options.shouldUseNativeTransport());
                     ConnectScreen.this.connection.setPacketListener(new ClientLoginNetworkHandler(ConnectScreen.this.connection, ConnectScreen.this.client, ConnectScreen.this.parent, arg2 -> ConnectScreen.this.setStatus(arg2)));
-                    ConnectScreen.this.connection.send(new HandshakeC2SPacket(string, i, NetworkState.LOGIN));
+                    ConnectScreen.this.connection.send(new HandshakeC2SPacket(address, port, NetworkState.LOGIN));
                     ConnectScreen.this.connection.send(new LoginHelloC2SPacket(ConnectScreen.this.client.getSession().getProfile()));
                 }
                 catch (UnknownHostException unknownHostException) {
@@ -93,8 +93,8 @@ extends Screen {
                         return;
                     }
                     LOGGER.error("Couldn't connect to server", (Throwable)exception);
-                    String string2 = inetAddress == null ? exception.toString() : exception.toString().replaceAll(inetAddress + ":" + i, "");
-                    ConnectScreen.this.client.execute(() -> ConnectScreen.this.client.openScreen(new DisconnectedScreen(ConnectScreen.this.parent, "connect.failed", new TranslatableText("disconnect.genericReason", string2))));
+                    String string = inetAddress == null ? exception.toString() : exception.toString().replaceAll(inetAddress + ":" + port, "");
+                    ConnectScreen.this.client.execute(() -> ConnectScreen.this.client.openScreen(new DisconnectedScreen(ConnectScreen.this.parent, "connect.failed", new TranslatableText("disconnect.genericReason", string))));
                 }
             }
         };
@@ -102,8 +102,8 @@ extends Screen {
         thread.start();
     }
 
-    private void setStatus(Text arg) {
-        this.status = arg;
+    private void setStatus(Text status) {
+        this.status = status;
     }
 
     @Override
@@ -134,15 +134,15 @@ extends Screen {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.renderBackground(arg);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.renderBackground(matrices);
         long l = Util.getMeasuringTimeMs();
         if (l - this.narratorTimer > 2000L) {
             this.narratorTimer = l;
             NarratorManager.INSTANCE.narrate(new TranslatableText("narrator.joining").getString());
         }
-        this.drawCenteredText(arg, this.textRenderer, this.status, this.width / 2, this.height / 2 - 50, 0xFFFFFF);
-        super.render(arg, i, j, f);
+        this.drawCenteredText(matrices, this.textRenderer, this.status, this.width / 2, this.height / 2 - 50, 0xFFFFFF);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 }
 

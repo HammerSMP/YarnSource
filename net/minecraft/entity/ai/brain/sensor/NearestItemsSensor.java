@@ -28,7 +28,7 @@ extends Sensor<MobEntity> {
     @Override
     protected void sense(ServerWorld arg3, MobEntity arg22) {
         Brain<?> lv = arg22.getBrain();
-        List<ItemEntity> list = arg3.getEntities(ItemEntity.class, arg22.getBoundingBox().expand(8.0, 4.0, 8.0), arg -> true);
+        List<ItemEntity> list = arg3.getEntitiesByClass(ItemEntity.class, arg22.getBoundingBox().expand(8.0, 4.0, 8.0), arg -> true);
         list.sort(Comparator.comparingDouble(arg22::squaredDistanceTo));
         Optional<ItemEntity> optional = list.stream().filter(arg2 -> arg22.canGather(arg2.getStack())).filter(arg2 -> arg2.isInRange(arg22, 9.0)).filter(arg22::canSee).findFirst();
         lv.remember(MemoryModuleType.NEAREST_VISIBLE_WANTED_ITEM, optional);

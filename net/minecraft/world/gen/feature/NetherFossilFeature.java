@@ -9,13 +9,14 @@ package net.minecraft.world.gen.feature;
 import com.mojang.serialization.Codec;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.structure.MarginedStructureStart;
 import net.minecraft.structure.NetherFossilGenerator;
 import net.minecraft.structure.StructureManager;
-import net.minecraft.structure.VillageStructureStart;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.registry.DynamicRegistryManager;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
@@ -34,21 +35,21 @@ extends StructureFeature<DefaultFeatureConfig> {
     }
 
     public static class Start
-    extends VillageStructureStart<DefaultFeatureConfig> {
+    extends MarginedStructureStart<DefaultFeatureConfig> {
         public Start(StructureFeature<DefaultFeatureConfig> arg, int i, int j, BlockBox arg2, int k, long l) {
             super(arg, i, j, arg2, k, l);
         }
 
         @Override
-        public void init(ChunkGenerator arg, StructureManager arg2, int i, int j, Biome arg3, DefaultFeatureConfig arg4) {
+        public void init(DynamicRegistryManager arg, ChunkGenerator arg2, StructureManager arg3, int i, int j, Biome arg4, DefaultFeatureConfig arg5) {
             int n;
             ChunkPos lv = new ChunkPos(i, j);
             int k = lv.getStartX() + this.random.nextInt(16);
             int l = lv.getStartZ() + this.random.nextInt(16);
-            int m = arg.getSeaLevel();
-            BlockView lv2 = arg.getColumnSample(k, l);
+            int m = arg2.getSeaLevel();
+            BlockView lv2 = arg2.getColumnSample(k, l);
             BlockPos.Mutable lv3 = new BlockPos.Mutable(k, n, l);
-            for (n = m + this.random.nextInt(arg.getMaxY() - 2 - m); n > m; --n) {
+            for (n = m + this.random.nextInt(arg2.getMaxY() - 2 - m); n > m; --n) {
                 BlockState lv4 = lv2.getBlockState(lv3);
                 lv3.move(Direction.DOWN);
                 BlockState lv5 = lv2.getBlockState(lv3);
@@ -57,7 +58,7 @@ extends StructureFeature<DefaultFeatureConfig> {
             if (n <= m) {
                 return;
             }
-            NetherFossilGenerator.addPieces(arg2, this.children, this.random, new BlockPos(k, n, l));
+            NetherFossilGenerator.addPieces(arg3, this.children, this.random, new BlockPos(k, n, l));
             this.setBoundingBoxFromChildren();
         }
     }

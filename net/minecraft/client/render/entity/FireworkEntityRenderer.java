@@ -26,9 +26,9 @@ public class FireworkEntityRenderer
 extends EntityRenderer<FireworkRocketEntity> {
     private final ItemRenderer itemRenderer;
 
-    public FireworkEntityRenderer(EntityRenderDispatcher arg, ItemRenderer arg2) {
-        super(arg);
-        this.itemRenderer = arg2;
+    public FireworkEntityRenderer(EntityRenderDispatcher dispatcher, ItemRenderer itemRenderer) {
+        super(dispatcher);
+        this.itemRenderer = itemRenderer;
     }
 
     @Override

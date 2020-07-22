@@ -18,17 +18,17 @@ extends SimpleInventory {
         super(27);
     }
 
-    public void setActiveBlockEntity(EnderChestBlockEntity arg) {
-        this.activeBlockEntity = arg;
+    public void setActiveBlockEntity(EnderChestBlockEntity blockEntity) {
+        this.activeBlockEntity = blockEntity;
     }
 
     @Override
-    public void readTags(ListTag arg) {
+    public void readTags(ListTag tags) {
         for (int i = 0; i < this.size(); ++i) {
             this.setStack(i, ItemStack.EMPTY);
         }
-        for (int j = 0; j < arg.size(); ++j) {
-            CompoundTag lv = arg.getCompound(j);
+        for (int j = 0; j < tags.size(); ++j) {
+            CompoundTag lv = tags.getCompound(j);
             int k = lv.getByte("Slot") & 0xFF;
             if (k < 0 || k >= this.size()) continue;
             this.setStack(k, ItemStack.fromTag(lv));
@@ -50,27 +50,27 @@ extends SimpleInventory {
     }
 
     @Override
-    public boolean canPlayerUse(PlayerEntity arg) {
-        if (this.activeBlockEntity != null && !this.activeBlockEntity.canPlayerUse(arg)) {
+    public boolean canPlayerUse(PlayerEntity player) {
+        if (this.activeBlockEntity != null && !this.activeBlockEntity.canPlayerUse(player)) {
             return false;
         }
-        return super.canPlayerUse(arg);
+        return super.canPlayerUse(player);
     }
 
     @Override
-    public void onOpen(PlayerEntity arg) {
+    public void onOpen(PlayerEntity player) {
         if (this.activeBlockEntity != null) {
             this.activeBlockEntity.onOpen();
         }
-        super.onOpen(arg);
+        super.onOpen(player);
     }
 
     @Override
-    public void onClose(PlayerEntity arg) {
+    public void onClose(PlayerEntity player) {
         if (this.activeBlockEntity != null) {
             this.activeBlockEntity.onClose();
         }
-        super.onClose(arg);
+        super.onClose(player);
         this.activeBlockEntity = null;
     }
 }

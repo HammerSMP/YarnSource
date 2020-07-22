@@ -46,8 +46,8 @@ extends Carver<ProbabilityConfig> {
         return true;
     }
 
-    private void carveRavine(Chunk arg, Function<BlockPos, Biome> function, long l, int i, int j, int k, double d, double e, double f, float g, float h, float m, int n, int o, double p, BitSet bitSet) {
-        Random random = new Random(l);
+    private void carveRavine(Chunk chunk, Function<BlockPos, Biome> posToBiome, long seed, int seaLevel, int mainChunkX, int mainChunkZ, double x, double y, double z, float width, float yaw, float pitch, int branchStartIndex, int branchCount, double yawPitchRatio, BitSet carvingMask) {
+        Random random = new Random(seed);
         float q = 1.0f;
         for (int r = 0; r < 256; ++r) {
             if (r == 0 || random.nextInt(3) == 0) {
@@ -57,34 +57,34 @@ extends Carver<ProbabilityConfig> {
         }
         float s = 0.0f;
         float t = 0.0f;
-        for (int u = n; u < o; ++u) {
-            double v = 1.5 + (double)(MathHelper.sin((float)u * (float)Math.PI / (float)o) * g);
-            double w = v * p;
+        for (int u = branchStartIndex; u < branchCount; ++u) {
+            double v = 1.5 + (double)(MathHelper.sin((float)u * (float)Math.PI / (float)branchCount) * width);
+            double w = v * yawPitchRatio;
             v *= (double)random.nextFloat() * 0.25 + 0.75;
             w *= (double)random.nextFloat() * 0.25 + 0.75;
-            float x = MathHelper.cos(m);
-            float y = MathHelper.sin(m);
-            d += (double)(MathHelper.cos(h) * x);
-            e += (double)y;
-            f += (double)(MathHelper.sin(h) * x);
-            m *= 0.7f;
-            m += t * 0.05f;
-            h += s * 0.05f;
+            float x2 = MathHelper.cos(pitch);
+            float y2 = MathHelper.sin(pitch);
+            x += (double)(MathHelper.cos(yaw) * x2);
+            y += (double)y2;
+            z += (double)(MathHelper.sin(yaw) * x2);
+            pitch *= 0.7f;
+            pitch += t * 0.05f;
+            yaw += s * 0.05f;
             t *= 0.8f;
             s *= 0.5f;
             t += (random.nextFloat() - random.nextFloat()) * random.nextFloat() * 2.0f;
             s += (random.nextFloat() - random.nextFloat()) * random.nextFloat() * 4.0f;
             if (random.nextInt(4) == 0) continue;
-            if (!this.canCarveBranch(j, k, d, f, u, o, g)) {
+            if (!this.canCarveBranch(mainChunkX, mainChunkZ, x, z, u, branchCount, width)) {
                 return;
             }
-            this.carveRegion(arg, function, l, i, j, k, d, e, f, v, w, bitSet);
+            this.carveRegion(chunk, posToBiome, seed, seaLevel, mainChunkX, mainChunkZ, x, y, z, v, w, carvingMask);
         }
     }
 
     @Override
-    protected boolean isPositionExcluded(double d, double e, double f, int i) {
-        return (d * d + f * f) * (double)this.heightToHorizontalStretchFactor[i - 1] + e * e / 6.0 >= 1.0;
+    protected boolean isPositionExcluded(double scaledRelativeX, double scaledRelativeY, double scaledRelativeZ, int y) {
+        return (scaledRelativeX * scaledRelativeX + scaledRelativeZ * scaledRelativeZ) * (double)this.heightToHorizontalStretchFactor[y - 1] + scaledRelativeY * scaledRelativeY / 6.0 >= 1.0;
     }
 }
 

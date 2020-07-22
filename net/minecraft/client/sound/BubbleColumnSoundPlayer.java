@@ -24,8 +24,8 @@ implements ClientPlayerTickable {
     private boolean hasPlayedForCurrentColumn;
     private boolean firstTick = true;
 
-    public BubbleColumnSoundPlayer(ClientPlayerEntity arg) {
-        this.player = arg;
+    public BubbleColumnSoundPlayer(ClientPlayerEntity player) {
+        this.player = player;
     }
 
     @Override

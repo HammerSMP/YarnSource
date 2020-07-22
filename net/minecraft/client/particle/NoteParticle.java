@@ -21,8 +21,8 @@ import net.minecraft.util.math.MathHelper;
 @Environment(value=EnvType.CLIENT)
 public class NoteParticle
 extends SpriteBillboardParticle {
-    private NoteParticle(ClientWorld arg, double d, double e, double f, double g) {
-        super(arg, d, e, f, 0.0, 0.0, 0.0);
+    private NoteParticle(ClientWorld world, double x, double y, double z, double g) {
+        super(world, x, y, z, 0.0, 0.0, 0.0);
         this.velocityX *= (double)0.01f;
         this.velocityY *= (double)0.01f;
         this.velocityZ *= (double)0.01f;
@@ -40,8 +40,8 @@ extends SpriteBillboardParticle {
     }
 
     @Override
-    public float getSize(float f) {
-        return this.scale * MathHelper.clamp(((float)this.age + f) / (float)this.maxAge * 32.0f, 0.0f, 1.0f);
+    public float getSize(float tickDelta) {
+        return this.scale * MathHelper.clamp(((float)this.age + tickDelta) / (float)this.maxAge * 32.0f, 0.0f, 1.0f);
     }
 
     @Override
@@ -72,8 +72,8 @@ extends SpriteBillboardParticle {
     implements ParticleFactory<DefaultParticleType> {
         private final SpriteProvider spriteProvider;
 
-        public Factory(SpriteProvider arg) {
-            this.spriteProvider = arg;
+        public Factory(SpriteProvider spriteProvider) {
+            this.spriteProvider = spriteProvider;
         }
 
         @Override

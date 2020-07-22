@@ -43,40 +43,40 @@ implements Fertilizable {
     protected static final VoxelShape[] AGE_TO_SHAPE = new VoxelShape[]{Block.createCuboidShape(7.0, 0.0, 7.0, 9.0, 2.0, 9.0), Block.createCuboidShape(7.0, 0.0, 7.0, 9.0, 4.0, 9.0), Block.createCuboidShape(7.0, 0.0, 7.0, 9.0, 6.0, 9.0), Block.createCuboidShape(7.0, 0.0, 7.0, 9.0, 8.0, 9.0), Block.createCuboidShape(7.0, 0.0, 7.0, 9.0, 10.0, 9.0), Block.createCuboidShape(7.0, 0.0, 7.0, 9.0, 12.0, 9.0), Block.createCuboidShape(7.0, 0.0, 7.0, 9.0, 14.0, 9.0), Block.createCuboidShape(7.0, 0.0, 7.0, 9.0, 16.0, 9.0)};
     private final GourdBlock gourdBlock;
 
-    protected StemBlock(GourdBlock arg, AbstractBlock.Settings arg2) {
-        super(arg2);
-        this.gourdBlock = arg;
+    protected StemBlock(GourdBlock gourdBlock, AbstractBlock.Settings settings) {
+        super(settings);
+        this.gourdBlock = gourdBlock;
         this.setDefaultState((BlockState)((BlockState)this.stateManager.getDefaultState()).with(AGE, 0));
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
-        return AGE_TO_SHAPE[arg.get(AGE)];
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        return AGE_TO_SHAPE[state.get(AGE)];
     }
 
     @Override
-    protected boolean canPlantOnTop(BlockState arg, BlockView arg2, BlockPos arg3) {
-        return arg.isOf(Blocks.FARMLAND);
+    protected boolean canPlantOnTop(BlockState floor, BlockView world, BlockPos pos) {
+        return floor.isOf(Blocks.FARMLAND);
     }
 
     @Override
-    public void randomTick(BlockState arg, ServerWorld arg2, BlockPos arg3, Random random) {
-        if (arg2.getBaseLightLevel(arg3, 0) < 9) {
+    public void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        if (world.getBaseLightLevel(pos, 0) < 9) {
             return;
         }
-        float f = CropBlock.getAvailableMoisture(this, arg2, arg3);
+        float f = CropBlock.getAvailableMoisture(this, world, pos);
         if (random.nextInt((int)(25.0f / f) + 1) == 0) {
-            int i = arg.get(AGE);
+            int i = state.get(AGE);
             if (i < 7) {
-                arg = (BlockState)arg.with(AGE, i + 1);
-                arg2.setBlockState(arg3, arg, 2);
+                state = (BlockState)state.with(AGE, i + 1);
+                world.setBlockState(pos, state, 2);
             } else {
                 Direction lv = Direction.Type.HORIZONTAL.random(random);
-                BlockPos lv2 = arg3.offset(lv);
-                BlockState lv3 = arg2.getBlockState(lv2.down());
-                if (arg2.getBlockState(lv2).isAir() && (lv3.isOf(Blocks.FARMLAND) || lv3.isOf(Blocks.DIRT) || lv3.isOf(Blocks.COARSE_DIRT) || lv3.isOf(Blocks.PODZOL) || lv3.isOf(Blocks.GRASS_BLOCK))) {
-                    arg2.setBlockState(lv2, this.gourdBlock.getDefaultState());
-                    arg2.setBlockState(arg3, (BlockState)this.gourdBlock.getAttachedStem().getDefaultState().with(HorizontalFacingBlock.FACING, lv));
+                BlockPos lv2 = pos.offset(lv);
+                BlockState lv3 = world.getBlockState(lv2.down());
+                if (world.getBlockState(lv2).isAir() && (lv3.isOf(Blocks.FARMLAND) || lv3.isOf(Blocks.DIRT) || lv3.isOf(Blocks.COARSE_DIRT) || lv3.isOf(Blocks.PODZOL) || lv3.isOf(Blocks.GRASS_BLOCK))) {
+                    world.setBlockState(lv2, this.gourdBlock.getDefaultState());
+                    world.setBlockState(pos, (BlockState)this.gourdBlock.getAttachedStem().getDefaultState().with(HorizontalFacingBlock.FACING, lv));
                 }
             }
         }
@@ -96,34 +96,34 @@ implements Fertilizable {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public ItemStack getPickStack(BlockView arg, BlockPos arg2, BlockState arg3) {
+    public ItemStack getPickStack(BlockView world, BlockPos pos, BlockState state) {
         Item lv = this.getPickItem();
         return lv == null ? ItemStack.EMPTY : new ItemStack(lv);
     }
 
     @Override
-    public boolean isFertilizable(BlockView arg, BlockPos arg2, BlockState arg3, boolean bl) {
-        return arg3.get(AGE) != 7;
+    public boolean isFertilizable(BlockView world, BlockPos pos, BlockState state, boolean isClient) {
+        return state.get(AGE) != 7;
     }
 
     @Override
-    public boolean canGrow(World arg, Random random, BlockPos arg2, BlockState arg3) {
+    public boolean canGrow(World world, Random random, BlockPos pos, BlockState state) {
         return true;
     }
 
     @Override
-    public void grow(ServerWorld arg, Random random, BlockPos arg2, BlockState arg3) {
-        int i = Math.min(7, arg3.get(AGE) + MathHelper.nextInt(arg.random, 2, 5));
-        BlockState lv = (BlockState)arg3.with(AGE, i);
-        arg.setBlockState(arg2, lv, 2);
+    public void grow(ServerWorld world, Random random, BlockPos pos, BlockState state) {
+        int i = Math.min(7, state.get(AGE) + MathHelper.nextInt(world.random, 2, 5));
+        BlockState lv = (BlockState)state.with(AGE, i);
+        world.setBlockState(pos, lv, 2);
         if (i == 7) {
-            lv.randomTick(arg, arg2, arg.random);
+            lv.randomTick(world, pos, world.random);
         }
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(AGE);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(AGE);
     }
 
     public GourdBlock getGourdBlock() {

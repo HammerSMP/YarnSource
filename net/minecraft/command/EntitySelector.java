@@ -18,7 +18,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
-import net.minecraft.command.arguments.EntityArgumentType;
+import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.predicate.NumberRange;
@@ -49,20 +49,20 @@ public class EntitySelector {
     private final EntityType<?> type;
     private final boolean usesAt;
 
-    public EntitySelector(int i, boolean bl, boolean bl2, Predicate<Entity> predicate, NumberRange.FloatRange arg, Function<Vec3d, Vec3d> function, @Nullable Box arg2, BiConsumer<Vec3d, List<? extends Entity>> biConsumer, boolean bl3, @Nullable String string, @Nullable UUID uUID, @Nullable EntityType<?> arg3, boolean bl4) {
-        this.limit = i;
-        this.includesNonPlayers = bl;
-        this.localWorldOnly = bl2;
-        this.basePredicate = predicate;
-        this.distance = arg;
-        this.positionOffset = function;
-        this.box = arg2;
-        this.sorter = biConsumer;
-        this.senderOnly = bl3;
-        this.playerName = string;
-        this.uuid = uUID;
-        this.type = arg3;
-        this.usesAt = bl4;
+    public EntitySelector(int count, boolean includesNonPlayers, boolean localWorldOnly, Predicate<Entity> basePredicate, NumberRange.FloatRange distance, Function<Vec3d, Vec3d> positionOffset, @Nullable Box box, BiConsumer<Vec3d, List<? extends Entity>> sorter, boolean senderOnly, @Nullable String playerName, @Nullable UUID uuid, @Nullable EntityType<?> type, boolean usesAt) {
+        this.limit = count;
+        this.includesNonPlayers = includesNonPlayers;
+        this.localWorldOnly = localWorldOnly;
+        this.basePredicate = basePredicate;
+        this.distance = distance;
+        this.positionOffset = positionOffset;
+        this.box = box;
+        this.sorter = sorter;
+        this.senderOnly = senderOnly;
+        this.playerName = playerName;
+        this.uuid = uuid;
+        this.type = type;
+        this.usesAt = usesAt;
     }
 
     public int getLimit() {
@@ -140,9 +140,9 @@ public class EntitySelector {
 
     private void appendEntitiesFromWorld(List<Entity> list, ServerWorld arg, Vec3d arg2, Predicate<Entity> predicate) {
         if (this.box != null) {
-            list.addAll(arg.getEntities(this.type, this.box.offset(arg2), predicate));
+            list.addAll(arg.getEntitiesByType(this.type, this.box.offset(arg2), predicate));
         } else {
-            list.addAll(arg.getEntities(this.type, predicate));
+            list.addAll(arg.getEntitiesByType(this.type, predicate));
         }
     }
 

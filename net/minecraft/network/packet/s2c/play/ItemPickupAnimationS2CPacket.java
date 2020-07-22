@@ -23,24 +23,24 @@ implements Packet<ClientPlayPacketListener> {
     public ItemPickupAnimationS2CPacket() {
     }
 
-    public ItemPickupAnimationS2CPacket(int i, int j, int k) {
-        this.entityId = i;
-        this.collectorEntityId = j;
-        this.stackAmount = k;
+    public ItemPickupAnimationS2CPacket(int entityId, int collectorId, int stackAmount) {
+        this.entityId = entityId;
+        this.collectorEntityId = collectorId;
+        this.stackAmount = stackAmount;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.entityId = arg.readVarInt();
-        this.collectorEntityId = arg.readVarInt();
-        this.stackAmount = arg.readVarInt();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.entityId = buf.readVarInt();
+        this.collectorEntityId = buf.readVarInt();
+        this.stackAmount = buf.readVarInt();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeVarInt(this.entityId);
-        arg.writeVarInt(this.collectorEntityId);
-        arg.writeVarInt(this.stackAmount);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeVarInt(this.entityId);
+        buf.writeVarInt(this.collectorEntityId);
+        buf.writeVarInt(this.stackAmount);
     }
 
     @Override

@@ -36,9 +36,9 @@ implements AutoCloseable {
     private List<ResourcePackProfile> enabled = ImmutableList.of();
     private final ResourcePackProfile.Factory profileFactory;
 
-    public ResourcePackManager(ResourcePackProfile.Factory arg, ResourcePackProvider ... args) {
-        this.profileFactory = arg;
-        this.providers = ImmutableSet.copyOf((Object[])args);
+    public ResourcePackManager(ResourcePackProfile.Factory profileFactory, ResourcePackProvider ... providers) {
+        this.profileFactory = profileFactory;
+        this.providers = ImmutableSet.copyOf((Object[])providers);
     }
 
     public ResourcePackManager(ResourcePackProvider ... args) {
@@ -60,12 +60,12 @@ implements AutoCloseable {
         return ImmutableMap.copyOf((Map)map);
     }
 
-    public void setEnabledProfiles(Collection<String> collection) {
-        this.enabled = this.buildEnabledProfiles(collection);
+    public void setEnabledProfiles(Collection<String> enabled) {
+        this.enabled = this.buildEnabledProfiles(enabled);
     }
 
-    private List<ResourcePackProfile> buildEnabledProfiles(Collection<String> collection) {
-        List list = this.streamProfilesByName(collection).collect(Collectors.toList());
+    private List<ResourcePackProfile> buildEnabledProfiles(Collection<String> enabledNames) {
+        List list = this.streamProfilesByName(enabledNames).collect(Collectors.toList());
         for (ResourcePackProfile lv : this.profiles.values()) {
             if (!lv.isAlwaysEnabled() || list.contains(lv)) continue;
             lv.getInitialPosition().insert(list, lv, Functions.identity(), false);
@@ -73,8 +73,8 @@ implements AutoCloseable {
         return ImmutableList.copyOf(list);
     }
 
-    private Stream<ResourcePackProfile> streamProfilesByName(Collection<String> collection) {
-        return collection.stream().map(this.profiles::get).filter(Objects::nonNull);
+    private Stream<ResourcePackProfile> streamProfilesByName(Collection<String> names) {
+        return names.stream().map(this.profiles::get).filter(Objects::nonNull);
     }
 
     public Collection<String> getNames() {
@@ -94,8 +94,8 @@ implements AutoCloseable {
     }
 
     @Nullable
-    public ResourcePackProfile getProfile(String string) {
-        return this.profiles.get(string);
+    public ResourcePackProfile getProfile(String name) {
+        return this.profiles.get(name);
     }
 
     @Override
@@ -103,8 +103,8 @@ implements AutoCloseable {
         this.profiles.values().forEach(ResourcePackProfile::close);
     }
 
-    public boolean hasProfile(String string) {
-        return this.profiles.containsKey(string);
+    public boolean hasProfile(String name) {
+        return this.profiles.containsKey(name);
     }
 
     public List<ResourcePack> createResourcePacks() {

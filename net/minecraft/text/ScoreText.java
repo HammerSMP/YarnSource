@@ -14,7 +14,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 import net.minecraft.command.EntitySelector;
 import net.minecraft.command.EntitySelectorReader;
-import net.minecraft.command.arguments.EntityArgumentType;
+import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.scoreboard.ScoreboardObjective;
 import net.minecraft.scoreboard.ScoreboardPlayerScore;
@@ -35,23 +35,23 @@ implements ParsableText {
     private final String objective;
 
     @Nullable
-    private static EntitySelector parseEntitySelector(String string) {
+    private static EntitySelector parseEntitySelector(String name) {
         try {
-            return new EntitySelectorReader(new StringReader(string)).read();
+            return new EntitySelectorReader(new StringReader(name)).read();
         }
         catch (CommandSyntaxException commandSyntaxException) {
             return null;
         }
     }
 
-    public ScoreText(String string, String string2) {
-        this(string, ScoreText.parseEntitySelector(string), string2);
+    public ScoreText(String name, String objective) {
+        this(name, ScoreText.parseEntitySelector(name), objective);
     }
 
-    private ScoreText(String string, @Nullable EntitySelector arg, String string2) {
-        this.name = string;
-        this.selector = arg;
-        this.objective = string2;
+    private ScoreText(String name, @Nullable EntitySelector selector, String objective) {
+        this.name = name;
+        this.selector = selector;
+        this.objective = objective;
     }
 
     public String getName() {
@@ -62,9 +62,9 @@ implements ParsableText {
         return this.objective;
     }
 
-    private String getPlayerName(ServerCommandSource arg) throws CommandSyntaxException {
+    private String getPlayerName(ServerCommandSource source) throws CommandSyntaxException {
         List<? extends Entity> list;
-        if (this.selector != null && !(list = this.selector.getEntities(arg)).isEmpty()) {
+        if (this.selector != null && !(list = this.selector.getEntities(source)).isEmpty()) {
             if (list.size() != 1) {
                 throw EntityArgumentType.TOO_MANY_ENTITIES_EXCEPTION.create();
             }
@@ -73,12 +73,12 @@ implements ParsableText {
         return this.name;
     }
 
-    private String getScore(String string, ServerCommandSource arg) {
+    private String getScore(String playerName, ServerCommandSource source) {
         ScoreboardObjective lv2;
         ServerScoreboard lv;
-        MinecraftServer minecraftServer = arg.getMinecraftServer();
-        if (minecraftServer != null && (lv = minecraftServer.getScoreboard()).playerHasObjective(string, lv2 = lv.getNullableObjective(this.objective))) {
-            ScoreboardPlayerScore lv3 = lv.getPlayerScore(string, lv2);
+        MinecraftServer minecraftServer = source.getMinecraftServer();
+        if (minecraftServer != null && (lv = minecraftServer.getScoreboard()).playerHasObjective(playerName, lv2 = lv.getNullableObjective(this.objective))) {
+            ScoreboardPlayerScore lv3 = lv.getPlayerScore(playerName, lv2);
             return Integer.toString(lv3.getScore());
         }
         return "";
@@ -90,13 +90,13 @@ implements ParsableText {
     }
 
     @Override
-    public MutableText parse(@Nullable ServerCommandSource arg, @Nullable Entity arg2, int i) throws CommandSyntaxException {
-        if (arg == null) {
+    public MutableText parse(@Nullable ServerCommandSource source, @Nullable Entity sender, int depth) throws CommandSyntaxException {
+        if (source == null) {
             return new LiteralText("");
         }
-        String string = this.getPlayerName(arg);
-        String string2 = arg2 != null && string.equals("*") ? arg2.getEntityName() : string;
-        return new LiteralText(this.getScore(string2, arg));
+        String string = this.getPlayerName(source);
+        String string2 = sender != null && string.equals("*") ? sender.getEntityName() : string;
+        return new LiteralText(this.getScore(string2, source));
     }
 
     @Override

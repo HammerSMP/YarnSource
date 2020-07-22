@@ -35,7 +35,7 @@ import net.minecraft.world.gen.chunk.ChunkGenerator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public abstract class PoolStructurePiece
+public class PoolStructurePiece
 extends StructurePiece {
     private static final Logger field_24991 = LogManager.getLogger();
     protected final StructurePoolElement poolElement;
@@ -45,57 +45,57 @@ extends StructurePiece {
     private final List<JigsawJunction> junctions = Lists.newArrayList();
     private final StructureManager structureManager;
 
-    public PoolStructurePiece(StructurePieceType arg, StructureManager arg2, StructurePoolElement arg3, BlockPos arg4, int i, BlockRotation arg5, BlockBox arg6) {
-        super(arg, 0);
-        this.structureManager = arg2;
-        this.poolElement = arg3;
-        this.pos = arg4;
+    public PoolStructurePiece(StructureManager arg, StructurePoolElement arg2, BlockPos arg3, int i, BlockRotation arg4, BlockBox arg5) {
+        super(StructurePieceType.JIGSAW, 0);
+        this.structureManager = arg;
+        this.poolElement = arg2;
+        this.pos = arg3;
         this.groundLevelDelta = i;
-        this.rotation = arg5;
-        this.boundingBox = arg6;
+        this.rotation = arg4;
+        this.boundingBox = arg5;
     }
 
-    public PoolStructurePiece(StructureManager arg2, CompoundTag arg22, StructurePieceType arg3) {
-        super(arg3, arg22);
-        this.structureManager = arg2;
-        this.pos = new BlockPos(arg22.getInt("PosX"), arg22.getInt("PosY"), arg22.getInt("PosZ"));
-        this.groundLevelDelta = arg22.getInt("ground_level_delta");
-        this.poolElement = StructurePoolElement.field_24953.parse((DynamicOps)NbtOps.INSTANCE, (Object)arg22.getCompound("pool_element")).resultOrPartial(((Logger)field_24991)::error).orElse(EmptyPoolElement.INSTANCE);
-        this.rotation = BlockRotation.valueOf(arg22.getString("rotation"));
-        this.boundingBox = this.poolElement.getBoundingBox(arg2, this.pos, this.rotation);
-        ListTag lv = arg22.getList("junctions", 10);
+    public PoolStructurePiece(StructureManager manager, CompoundTag tag) {
+        super(StructurePieceType.JIGSAW, tag);
+        this.structureManager = manager;
+        this.pos = new BlockPos(tag.getInt("PosX"), tag.getInt("PosY"), tag.getInt("PosZ"));
+        this.groundLevelDelta = tag.getInt("ground_level_delta");
+        this.poolElement = StructurePoolElement.field_24953.parse((DynamicOps)NbtOps.INSTANCE, (Object)tag.getCompound("pool_element")).resultOrPartial(((Logger)field_24991)::error).orElse(EmptyPoolElement.INSTANCE);
+        this.rotation = BlockRotation.valueOf(tag.getString("rotation"));
+        this.boundingBox = this.poolElement.getBoundingBox(manager, this.pos, this.rotation);
+        ListTag lv = tag.getList("junctions", 10);
         this.junctions.clear();
         lv.forEach(arg -> this.junctions.add(JigsawJunction.method_28873(new Dynamic((DynamicOps)NbtOps.INSTANCE, arg))));
     }
 
     @Override
-    protected void toNbt(CompoundTag arg) {
-        arg.putInt("PosX", this.pos.getX());
-        arg.putInt("PosY", this.pos.getY());
-        arg.putInt("PosZ", this.pos.getZ());
-        arg.putInt("ground_level_delta", this.groundLevelDelta);
-        StructurePoolElement.field_24953.encodeStart((DynamicOps)NbtOps.INSTANCE, (Object)this.poolElement).resultOrPartial(((Logger)field_24991)::error).ifPresent(arg2 -> arg.put("pool_element", (Tag)arg2));
-        arg.putString("rotation", this.rotation.name());
+    protected void toNbt(CompoundTag tag) {
+        tag.putInt("PosX", this.pos.getX());
+        tag.putInt("PosY", this.pos.getY());
+        tag.putInt("PosZ", this.pos.getZ());
+        tag.putInt("ground_level_delta", this.groundLevelDelta);
+        StructurePoolElement.field_24953.encodeStart((DynamicOps)NbtOps.INSTANCE, (Object)this.poolElement).resultOrPartial(((Logger)field_24991)::error).ifPresent(arg2 -> tag.put("pool_element", (Tag)arg2));
+        tag.putString("rotation", this.rotation.name());
         ListTag lv = new ListTag();
         for (JigsawJunction lv2 : this.junctions) {
             lv.add(lv2.serialize(NbtOps.INSTANCE).getValue());
         }
-        arg.put("junctions", lv);
+        tag.put("junctions", lv);
     }
 
     @Override
-    public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockBox arg4, ChunkPos arg5, BlockPos arg6) {
-        return this.method_27236(arg, arg2, arg3, random, arg4, arg6, false);
+    public boolean generate(ServerWorldAccess arg, StructureAccessor structureAccessor, ChunkGenerator chunkGenerator, Random random, BlockBox boundingBox, ChunkPos arg5, BlockPos arg6) {
+        return this.method_27236(arg, structureAccessor, chunkGenerator, random, boundingBox, arg6, false);
     }
 
-    public boolean method_27236(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockBox arg4, BlockPos arg5, boolean bl) {
-        return this.poolElement.generate(this.structureManager, arg, arg2, arg3, this.pos, arg5, this.rotation, arg4, random, bl);
+    public boolean method_27236(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockBox arg4, BlockPos arg5, boolean keepJigsaws) {
+        return this.poolElement.generate(this.structureManager, arg, arg2, arg3, this.pos, arg5, this.rotation, arg4, random, keepJigsaws);
     }
 
     @Override
-    public void translate(int i, int j, int k) {
-        super.translate(i, j, k);
-        this.pos = this.pos.add(i, j, k);
+    public void translate(int x, int y, int z) {
+        super.translate(x, y, z);
+        this.pos = this.pos.add(x, y, z);
     }
 
     @Override
@@ -119,8 +119,8 @@ extends StructurePiece {
         return this.groundLevelDelta;
     }
 
-    public void addJunction(JigsawJunction arg) {
-        this.junctions.add(arg);
+    public void addJunction(JigsawJunction junction) {
+        this.junctions.add(junction);
     }
 
     public List<JigsawJunction> getJunctions() {

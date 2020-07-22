@@ -55,60 +55,60 @@ extends Task<PathAwareEntity> {
         this.getVisibleMob(arg22).ifPresent(arg2 -> PlayWithVillagerBabiesTask.setPlayTarget(arg22, arg2));
     }
 
-    private void setGroundTarget(ServerWorld arg, PathAwareEntity arg2, LivingEntity arg3) {
+    private void setGroundTarget(ServerWorld world, PathAwareEntity entity, LivingEntity unusedBaby) {
         for (int i = 0; i < 10; ++i) {
-            Vec3d lv = TargetFinder.findGroundTarget(arg2, 20, 8);
-            if (lv == null || !arg.isNearOccupiedPointOfInterest(new BlockPos(lv))) continue;
-            arg2.getBrain().remember(MemoryModuleType.WALK_TARGET, new WalkTarget(lv, 0.6f, 0));
+            Vec3d lv = TargetFinder.findGroundTarget(entity, 20, 8);
+            if (lv == null || !world.isNearOccupiedPointOfInterest(new BlockPos(lv))) continue;
+            entity.getBrain().remember(MemoryModuleType.WALK_TARGET, new WalkTarget(lv, 0.6f, 0));
             return;
         }
     }
 
-    private static void setPlayTarget(PathAwareEntity arg, LivingEntity arg2) {
-        Brain<?> lv = arg.getBrain();
-        lv.remember(MemoryModuleType.INTERACTION_TARGET, arg2);
-        lv.remember(MemoryModuleType.LOOK_TARGET, new EntityLookTarget(arg2, true));
-        lv.remember(MemoryModuleType.WALK_TARGET, new WalkTarget(new EntityLookTarget(arg2, false), 0.6f, 1));
+    private static void setPlayTarget(PathAwareEntity entity, LivingEntity target) {
+        Brain<?> lv = entity.getBrain();
+        lv.remember(MemoryModuleType.INTERACTION_TARGET, target);
+        lv.remember(MemoryModuleType.LOOK_TARGET, new EntityLookTarget(target, true));
+        lv.remember(MemoryModuleType.WALK_TARGET, new WalkTarget(new EntityLookTarget(target, false), 0.6f, 1));
     }
 
-    private Optional<LivingEntity> getVisibleMob(PathAwareEntity arg) {
-        return this.getVisibleVillagerBabies(arg).stream().findAny();
+    private Optional<LivingEntity> getVisibleMob(PathAwareEntity entity) {
+        return this.getVisibleVillagerBabies(entity).stream().findAny();
     }
 
-    private Optional<LivingEntity> getLeastPopularBabyInteractionTarget(PathAwareEntity arg) {
-        Map<LivingEntity, Integer> map = this.getBabyInteractionTargetCounts(arg);
+    private Optional<LivingEntity> getLeastPopularBabyInteractionTarget(PathAwareEntity entity) {
+        Map<LivingEntity, Integer> map = this.getBabyInteractionTargetCounts(entity);
         return map.entrySet().stream().sorted(Comparator.comparingInt(Map.Entry::getValue)).filter(entry -> (Integer)entry.getValue() > 0 && (Integer)entry.getValue() <= 5).map(Map.Entry::getKey).findFirst();
     }
 
-    private Map<LivingEntity, Integer> getBabyInteractionTargetCounts(PathAwareEntity arg) {
+    private Map<LivingEntity, Integer> getBabyInteractionTargetCounts(PathAwareEntity entity) {
         HashMap map = Maps.newHashMap();
-        this.getVisibleVillagerBabies(arg).stream().filter(this::hasInteractionTarget).forEach(arg2 -> map.compute(this.getInteractionTarget((LivingEntity)arg2), (arg, integer) -> integer == null ? 1 : integer + 1));
+        this.getVisibleVillagerBabies(entity).stream().filter(this::hasInteractionTarget).forEach(arg2 -> map.compute(this.getInteractionTarget((LivingEntity)arg2), (arg, integer) -> integer == null ? 1 : integer + 1));
         return map;
     }
 
-    private List<LivingEntity> getVisibleVillagerBabies(PathAwareEntity arg) {
-        return arg.getBrain().getOptionalMemory(MemoryModuleType.VISIBLE_VILLAGER_BABIES).get();
+    private List<LivingEntity> getVisibleVillagerBabies(PathAwareEntity entity) {
+        return entity.getBrain().getOptionalMemory(MemoryModuleType.VISIBLE_VILLAGER_BABIES).get();
     }
 
-    private LivingEntity getInteractionTarget(LivingEntity arg) {
-        return arg.getBrain().getOptionalMemory(MemoryModuleType.INTERACTION_TARGET).get();
+    private LivingEntity getInteractionTarget(LivingEntity entity) {
+        return entity.getBrain().getOptionalMemory(MemoryModuleType.INTERACTION_TARGET).get();
     }
 
     @Nullable
-    private LivingEntity findVisibleVillagerBaby(LivingEntity arg) {
-        return arg.getBrain().getOptionalMemory(MemoryModuleType.VISIBLE_VILLAGER_BABIES).get().stream().filter(arg2 -> this.isInteractionTargetOf(arg, (LivingEntity)arg2)).findAny().orElse(null);
+    private LivingEntity findVisibleVillagerBaby(LivingEntity entity) {
+        return entity.getBrain().getOptionalMemory(MemoryModuleType.VISIBLE_VILLAGER_BABIES).get().stream().filter(arg2 -> this.isInteractionTargetOf(entity, (LivingEntity)arg2)).findAny().orElse(null);
     }
 
-    private boolean hasInteractionTarget(LivingEntity arg) {
-        return arg.getBrain().getOptionalMemory(MemoryModuleType.INTERACTION_TARGET).isPresent();
+    private boolean hasInteractionTarget(LivingEntity entity) {
+        return entity.getBrain().getOptionalMemory(MemoryModuleType.INTERACTION_TARGET).isPresent();
     }
 
-    private boolean isInteractionTargetOf(LivingEntity arg, LivingEntity arg22) {
-        return arg22.getBrain().getOptionalMemory(MemoryModuleType.INTERACTION_TARGET).filter(arg2 -> arg2 == arg).isPresent();
+    private boolean isInteractionTargetOf(LivingEntity entity, LivingEntity other) {
+        return other.getBrain().getOptionalMemory(MemoryModuleType.INTERACTION_TARGET).filter(arg2 -> arg2 == entity).isPresent();
     }
 
-    private boolean hasVisibleVillagerBabies(PathAwareEntity arg) {
-        return arg.getBrain().hasMemoryModule(MemoryModuleType.VISIBLE_VILLAGER_BABIES);
+    private boolean hasVisibleVillagerBabies(PathAwareEntity entity) {
+        return entity.getBrain().hasMemoryModule(MemoryModuleType.VISIBLE_VILLAGER_BABIES);
     }
 }
 

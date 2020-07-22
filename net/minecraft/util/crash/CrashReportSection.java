@@ -26,35 +26,35 @@ public class CrashReportSection {
     private final List<Element> elements = Lists.newArrayList();
     private StackTraceElement[] stackTrace = new StackTraceElement[0];
 
-    public CrashReportSection(CrashReport arg, String string) {
-        this.report = arg;
-        this.title = string;
+    public CrashReportSection(CrashReport report, String title) {
+        this.report = report;
+        this.title = title;
     }
 
     @Environment(value=EnvType.CLIENT)
-    public static String createPositionString(double d, double e, double f) {
-        return String.format(Locale.ROOT, "%.2f,%.2f,%.2f - %s", d, e, f, CrashReportSection.createPositionString(new BlockPos(d, e, f)));
+    public static String createPositionString(double x, double y, double z) {
+        return String.format(Locale.ROOT, "%.2f,%.2f,%.2f - %s", x, y, z, CrashReportSection.createPositionString(new BlockPos(x, y, z)));
     }
 
-    public static String createPositionString(BlockPos arg) {
-        return CrashReportSection.createPositionString(arg.getX(), arg.getY(), arg.getZ());
+    public static String createPositionString(BlockPos pos) {
+        return CrashReportSection.createPositionString(pos.getX(), pos.getY(), pos.getZ());
     }
 
-    public static String createPositionString(int i, int j, int k) {
+    public static String createPositionString(int x, int y, int z) {
         StringBuilder stringBuilder = new StringBuilder();
         try {
-            stringBuilder.append(String.format("World: (%d,%d,%d)", i, j, k));
+            stringBuilder.append(String.format("World: (%d,%d,%d)", x, y, z));
         }
         catch (Throwable throwable) {
             stringBuilder.append("(Error finding world loc)");
         }
         stringBuilder.append(", ");
         try {
-            int l = i >> 4;
-            int m = k >> 4;
-            int n = i & 0xF;
-            int o = j >> 4;
-            int p = k & 0xF;
+            int l = x >> 4;
+            int m = z >> 4;
+            int n = x & 0xF;
+            int o = y >> 4;
+            int p = z & 0xF;
             int q = l << 4;
             int r = m << 4;
             int s = (l + 1 << 4) - 1;
@@ -66,17 +66,17 @@ public class CrashReportSection {
         }
         stringBuilder.append(", ");
         try {
-            int u = i >> 9;
-            int v = k >> 9;
+            int u = x >> 9;
+            int v = z >> 9;
             int w = u << 5;
-            int x = v << 5;
-            int y = (u + 1 << 5) - 1;
-            int z = (v + 1 << 5) - 1;
+            int x2 = v << 5;
+            int y2 = (u + 1 << 5) - 1;
+            int z2 = (v + 1 << 5) - 1;
             int aa = u << 9;
             int ab = v << 9;
             int ac = (u + 1 << 9) - 1;
             int ad = (v + 1 << 9) - 1;
-            stringBuilder.append(String.format("Region: (%d,%d; contains chunks %d,%d to %d,%d, blocks %d,0,%d to %d,255,%d)", u, v, w, x, y, z, aa, ab, ac, ad));
+            stringBuilder.append(String.format("Region: (%d,%d; contains chunks %d,%d to %d,%d, blocks %d,0,%d to %d,255,%d)", u, v, w, x2, y2, z2, aa, ab, ac, ad));
         }
         catch (Throwable throwable3) {
             stringBuilder.append("(Error finding world loc)");
@@ -94,22 +94,22 @@ public class CrashReportSection {
         return this;
     }
 
-    public CrashReportSection add(String string, Object object) {
-        this.elements.add(new Element(string, object));
+    public CrashReportSection add(String name, Object object) {
+        this.elements.add(new Element(name, object));
         return this;
     }
 
-    public void add(String string, Throwable throwable) {
-        this.add(string, (Object)throwable);
+    public void add(String name, Throwable throwable) {
+        this.add(name, (Object)throwable);
     }
 
-    public int initStackTrace(int i) {
+    public int initStackTrace(int ignoredCallCount) {
         StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
         if (stackTraceElements.length <= 0) {
             return 0;
         }
-        this.stackTrace = new StackTraceElement[stackTraceElements.length - 3 - i];
-        System.arraycopy(stackTraceElements, 3 + i, this.stackTrace, 0, this.stackTrace.length);
+        this.stackTrace = new StackTraceElement[stackTraceElements.length - 3 - ignoredCallCount];
+        System.arraycopy(stackTraceElements, 3 + ignoredCallCount, this.stackTrace, 0, this.stackTrace.length);
         return this.stackTrace.length;
     }
 
@@ -131,8 +131,8 @@ public class CrashReportSection {
         return true;
     }
 
-    public void trimStackTraceEnd(int i) {
-        StackTraceElement[] stackTraceElements = new StackTraceElement[this.stackTrace.length - i];
+    public void trimStackTraceEnd(int callCount) {
+        StackTraceElement[] stackTraceElements = new StackTraceElement[this.stackTrace.length - callCount];
         System.arraycopy(this.stackTrace, 0, stackTraceElements, 0, stackTraceElements.length);
         this.stackTrace = stackTraceElements;
     }
@@ -159,26 +159,26 @@ public class CrashReportSection {
         return this.stackTrace;
     }
 
-    public static void addBlockInfo(CrashReportSection arg, BlockPos arg2, @Nullable BlockState arg3) {
-        if (arg3 != null) {
-            arg.add("Block", arg3::toString);
+    public static void addBlockInfo(CrashReportSection element, BlockPos pos, @Nullable BlockState state) {
+        if (state != null) {
+            element.add("Block", state::toString);
         }
-        arg.add("Block location", () -> CrashReportSection.createPositionString(arg2));
+        element.add("Block location", () -> CrashReportSection.createPositionString(pos));
     }
 
     static class Element {
         private final String name;
         private final String detail;
 
-        public Element(String string, Object object) {
-            this.name = string;
-            if (object == null) {
+        public Element(String name, Object detail) {
+            this.name = name;
+            if (detail == null) {
                 this.detail = "~~NULL~~";
-            } else if (object instanceof Throwable) {
-                Throwable throwable = (Throwable)object;
+            } else if (detail instanceof Throwable) {
+                Throwable throwable = (Throwable)detail;
                 this.detail = "~~ERROR~~ " + throwable.getClass().getSimpleName() + ": " + throwable.getMessage();
             } else {
-                this.detail = object.toString();
+                this.detail = detail.toString();
             }
         }
 

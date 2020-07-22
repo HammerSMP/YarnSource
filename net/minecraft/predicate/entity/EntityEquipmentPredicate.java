@@ -31,23 +31,23 @@ public class EntityEquipmentPredicate {
     private final ItemPredicate mainhand;
     private final ItemPredicate offhand;
 
-    public EntityEquipmentPredicate(ItemPredicate arg, ItemPredicate arg2, ItemPredicate arg3, ItemPredicate arg4, ItemPredicate arg5, ItemPredicate arg6) {
-        this.head = arg;
-        this.chest = arg2;
-        this.legs = arg3;
-        this.feet = arg4;
-        this.mainhand = arg5;
-        this.offhand = arg6;
+    public EntityEquipmentPredicate(ItemPredicate head, ItemPredicate chest, ItemPredicate legs, ItemPredicate feet, ItemPredicate mainhand, ItemPredicate offhand) {
+        this.head = head;
+        this.chest = chest;
+        this.legs = legs;
+        this.feet = feet;
+        this.mainhand = mainhand;
+        this.offhand = offhand;
     }
 
-    public boolean test(@Nullable Entity arg) {
+    public boolean test(@Nullable Entity entity) {
         if (this == ANY) {
             return true;
         }
-        if (!(arg instanceof LivingEntity)) {
+        if (!(entity instanceof LivingEntity)) {
             return false;
         }
-        LivingEntity lv = (LivingEntity)arg;
+        LivingEntity lv = (LivingEntity)entity;
         if (!this.head.test(lv.getEquippedStack(EquipmentSlot.HEAD))) {
             return false;
         }
@@ -66,11 +66,11 @@ public class EntityEquipmentPredicate {
         return this.offhand.test(lv.getEquippedStack(EquipmentSlot.OFFHAND));
     }
 
-    public static EntityEquipmentPredicate fromJson(@Nullable JsonElement jsonElement) {
-        if (jsonElement == null || jsonElement.isJsonNull()) {
+    public static EntityEquipmentPredicate fromJson(@Nullable JsonElement json) {
+        if (json == null || json.isJsonNull()) {
             return ANY;
         }
-        JsonObject jsonObject = JsonHelper.asObject(jsonElement, "equipment");
+        JsonObject jsonObject = JsonHelper.asObject(json, "equipment");
         ItemPredicate lv = ItemPredicate.fromJson(jsonObject.get("head"));
         ItemPredicate lv2 = ItemPredicate.fromJson(jsonObject.get("chest"));
         ItemPredicate lv3 = ItemPredicate.fromJson(jsonObject.get("legs"));
@@ -106,23 +106,23 @@ public class EntityEquipmentPredicate {
             return new Builder();
         }
 
-        public Builder head(ItemPredicate arg) {
-            this.head = arg;
+        public Builder head(ItemPredicate head) {
+            this.head = head;
             return this;
         }
 
-        public Builder chest(ItemPredicate arg) {
-            this.chest = arg;
+        public Builder chest(ItemPredicate chest) {
+            this.chest = chest;
             return this;
         }
 
-        public Builder legs(ItemPredicate arg) {
-            this.legs = arg;
+        public Builder legs(ItemPredicate legs) {
+            this.legs = legs;
             return this;
         }
 
-        public Builder feet(ItemPredicate arg) {
-            this.feet = arg;
+        public Builder feet(ItemPredicate feet) {
+            this.feet = feet;
             return this;
         }
 

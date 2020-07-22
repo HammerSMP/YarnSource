@@ -77,7 +77,7 @@ extends ByteBuf {
     }
 
     public <T> T decode(Codec<T> codec) throws IOException {
-        CompoundTag lv = this.readCompoundTag();
+        CompoundTag lv = this.method_30617();
         DataResult dataResult = codec.parse((DynamicOps)NbtOps.INSTANCE, (Object)lv);
         if (dataResult.error().isPresent()) {
             throw new IOException("Failed to decode: " + ((DataResult.PartialResult)dataResult.error().get()).message() + " " + lv);
@@ -151,18 +151,18 @@ extends ByteBuf {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public long[] readLongArray(@Nullable long[] ls, int i) {
+    public long[] readLongArray(@Nullable long[] toArray, int i) {
         int j = this.readVarInt();
-        if (ls == null || ls.length != j) {
+        if (toArray == null || toArray.length != j) {
             if (j > i) {
                 throw new DecoderException("LongArray with size " + j + " is bigger than allowed " + i);
             }
-            ls = new long[j];
+            toArray = new long[j];
         }
-        for (int k = 0; k < ls.length; ++k) {
-            ls[k] = this.readLong();
+        for (int k = 0; k < toArray.length; ++k) {
+            toArray[k] = this.readLong();
         }
-        return ls;
+        return toArray;
     }
 
     public BlockPos readBlockPos() {
@@ -183,8 +183,8 @@ extends ByteBuf {
         return Text.Serializer.fromJson(this.readString(262144));
     }
 
-    public PacketByteBuf writeText(Text arg) {
-        return this.writeString(Text.Serializer.toJson(arg), 262144);
+    public PacketByteBuf writeText(Text text) {
+        return this.writeString(Text.Serializer.toJson(text), 262144);
     }
 
     public <T extends Enum<T>> T readEnumConstant(Class<T> class_) {
@@ -269,6 +269,16 @@ extends ByteBuf {
 
     @Nullable
     public CompoundTag readCompoundTag() {
+        return this.method_30616(new PositionTracker(0x200000L));
+    }
+
+    @Nullable
+    public CompoundTag method_30617() {
+        return this.method_30616(PositionTracker.DEFAULT);
+    }
+
+    @Nullable
+    public CompoundTag method_30616(PositionTracker arg) {
         int i = this.readerIndex();
         byte b = this.readByte();
         if (b == 0) {
@@ -276,7 +286,7 @@ extends ByteBuf {
         }
         this.readerIndex(i);
         try {
-            return NbtIo.read((DataInput)new ByteBufInputStream((ByteBuf)this), new PositionTracker(0x200000L));
+            return NbtIo.read((DataInput)new ByteBufInputStream((ByteBuf)this), arg);
         }
         catch (IOException iOException) {
             throw new EncoderException((Throwable)iOException);

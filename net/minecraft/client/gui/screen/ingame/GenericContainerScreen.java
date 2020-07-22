@@ -25,31 +25,31 @@ implements ScreenHandlerProvider<GenericContainerScreenHandler> {
     private static final Identifier TEXTURE = new Identifier("textures/gui/container/generic_54.png");
     private final int rows;
 
-    public GenericContainerScreen(GenericContainerScreenHandler arg, PlayerInventory arg2, Text arg3) {
-        super(arg, arg2, arg3);
+    public GenericContainerScreen(GenericContainerScreenHandler handler, PlayerInventory inventory, Text title) {
+        super(handler, inventory, title);
         this.passEvents = false;
         int i = 222;
         int j = 114;
-        this.rows = arg.getRows();
+        this.rows = handler.getRows();
         this.backgroundHeight = 114 + this.rows * 18;
         this.playerInventoryTitleY = this.backgroundHeight - 94;
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.renderBackground(arg);
-        super.render(arg, i, j, f);
-        this.drawMouseoverTooltip(arg, i, j);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.renderBackground(matrices);
+        super.render(matrices, mouseX, mouseY, delta);
+        this.drawMouseoverTooltip(matrices, mouseX, mouseY);
     }
 
     @Override
-    protected void drawBackground(MatrixStack arg, float f, int i, int j) {
+    protected void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY) {
         RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
         this.client.getTextureManager().bindTexture(TEXTURE);
         int k = (this.width - this.backgroundWidth) / 2;
         int l = (this.height - this.backgroundHeight) / 2;
-        this.drawTexture(arg, k, l, 0, 0, this.backgroundWidth, this.rows * 18 + 17);
-        this.drawTexture(arg, k, l + this.rows * 18 + 17, 0, 126, this.backgroundWidth, 96);
+        this.drawTexture(matrices, k, l, 0, 0, this.backgroundWidth, this.rows * 18 + 17);
+        this.drawTexture(matrices, k, l + this.rows * 18 + 17, 0, 126, this.backgroundWidth, 96);
     }
 }
 

@@ -63,7 +63,7 @@ public class WorldUpdater {
     private final Thread updateThread;
     private final DataFixer dataFixer;
     private volatile boolean keepUpgradingChunks = true;
-    private volatile boolean isDone;
+    private volatile boolean done;
     private volatile float progress;
     private volatile int totalChunkCount;
     private volatile int upgradedChunkCount;
@@ -73,17 +73,17 @@ public class WorldUpdater {
     private static final Pattern REGION_FILE_PATTERN = Pattern.compile("^r\\.(-?[0-9]+)\\.(-?[0-9]+)\\.mca$");
     private final PersistentStateManager persistentStateManager;
 
-    public WorldUpdater(LevelStorage.Session arg, DataFixer dataFixer, ImmutableSet<RegistryKey<World>> immutableSet, boolean bl) {
-        this.worlds = immutableSet;
-        this.eraseCache = bl;
+    public WorldUpdater(LevelStorage.Session session, DataFixer dataFixer, ImmutableSet<RegistryKey<World>> worlds, boolean eraseCache) {
+        this.worlds = worlds;
+        this.eraseCache = eraseCache;
         this.dataFixer = dataFixer;
-        this.session = arg;
+        this.session = session;
         this.persistentStateManager = new PersistentStateManager(new File(this.session.getWorldDirectory(World.OVERWORLD), "data"), dataFixer);
         this.updateThread = UPDATE_THREAD_FACTORY.newThread(this::updateWorld);
         this.updateThread.setUncaughtExceptionHandler((thread, throwable) -> {
             LOGGER.error("Error upgrading world", throwable);
             this.status = new TranslatableText("optimizeWorld.stage.failed");
-            this.isDone = true;
+            this.done = true;
         });
         this.updateThread.start();
     }
@@ -107,7 +107,7 @@ public class WorldUpdater {
             this.totalChunkCount += list.size();
         }
         if (this.totalChunkCount == 0) {
-            this.isDone = true;
+            this.done = true;
             return;
         }
         float f = this.totalChunkCount;
@@ -190,7 +190,7 @@ public class WorldUpdater {
         this.persistentStateManager.save();
         l = Util.getMeasuringTimeMs() - l;
         LOGGER.info("World optimizaton finished after {} ms", (Object)l);
-        this.isDone = true;
+        this.done = true;
     }
 
     private List<ChunkPos> getChunkPositions(RegistryKey<World> arg) {
@@ -223,7 +223,7 @@ public class WorldUpdater {
     }
 
     public boolean isDone() {
-        return this.isDone;
+        return this.done;
     }
 
     @Environment(value=EnvType.CLIENT)

@@ -23,13 +23,13 @@ extends Feature<U> {
     }
 
     @Override
-    public boolean generate(ServerWorldAccess arg, ChunkGenerator arg2, Random random, BlockPos arg3, U arg4) {
+    public boolean generate(ServerWorldAccess world, ChunkGenerator arg2, Random random, BlockPos arg3, U arg4) {
         BlockState lv = this.getFlowerState(random, arg3, arg4);
         int i = 0;
         for (int j = 0; j < this.getFlowerAmount(arg4); ++j) {
             BlockPos lv2 = this.getPos(random, arg3, arg4);
-            if (!arg.isAir(lv2) || lv2.getY() >= 255 || !lv.canPlaceAt(arg, lv2) || !this.isPosValid(arg, lv2, arg4)) continue;
-            arg.setBlockState(lv2, lv, 2);
+            if (!world.isAir(lv2) || lv2.getY() >= 255 || !lv.canPlaceAt(world, lv2) || !this.isPosValid(world, lv2, arg4)) continue;
+            world.setBlockState(lv2, lv, 2);
             ++i;
         }
         return i > 0;

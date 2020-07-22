@@ -85,8 +85,8 @@ implements RangedAttackMob {
         return false;
     }
 
-    private void setStrength(int i) {
-        this.dataTracker.set(ATTR_STRENGTH, Math.max(1, Math.min(5, i)));
+    private void setStrength(int strength) {
+        this.dataTracker.set(ATTR_STRENGTH, Math.max(1, Math.min(5, strength)));
     }
 
     private void initializeStrength() {
@@ -99,22 +99,22 @@ implements RangedAttackMob {
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
-        arg.putInt("Variant", this.getVariant());
-        arg.putInt("Strength", this.getStrength());
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
+        tag.putInt("Variant", this.getVariant());
+        tag.putInt("Strength", this.getStrength());
         if (!this.items.getStack(1).isEmpty()) {
-            arg.put("DecorItem", this.items.getStack(1).toTag(new CompoundTag()));
+            tag.put("DecorItem", this.items.getStack(1).toTag(new CompoundTag()));
         }
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        this.setStrength(arg.getInt("Strength"));
-        super.readCustomDataFromTag(arg);
-        this.setVariant(arg.getInt("Variant"));
-        if (arg.contains("DecorItem", 10)) {
-            this.items.setStack(1, ItemStack.fromTag(arg.getCompound("DecorItem")));
+    public void readCustomDataFromTag(CompoundTag tag) {
+        this.setStrength(tag.getInt("Strength"));
+        super.readCustomDataFromTag(tag);
+        this.setVariant(tag.getInt("Variant"));
+        if (tag.contains("DecorItem", 10)) {
+            this.items.setStack(1, ItemStack.fromTag(tag.getCompound("DecorItem")));
         }
         this.updateSaddle();
     }
@@ -151,8 +151,8 @@ implements RangedAttackMob {
         return MathHelper.clamp(this.dataTracker.get(ATTR_VARIANT), 0, 3);
     }
 
-    public void setVariant(int i) {
-        this.dataTracker.set(ATTR_VARIANT, i);
+    public void setVariant(int variant) {
+        this.dataTracker.set(ATTR_VARIANT, variant);
     }
 
     @Override
@@ -164,14 +164,14 @@ implements RangedAttackMob {
     }
 
     @Override
-    public void updatePassengerPosition(Entity arg) {
-        if (!this.hasPassenger(arg)) {
+    public void updatePassengerPosition(Entity passenger) {
+        if (!this.hasPassenger(passenger)) {
             return;
         }
         float f = MathHelper.cos(this.bodyYaw * ((float)Math.PI / 180));
         float g = MathHelper.sin(this.bodyYaw * ((float)Math.PI / 180));
         float h = 0.3f;
-        arg.updatePosition(this.getX() + (double)(0.3f * g), this.getY() + this.getMountedHeightOffset() + arg.getHeightOffset(), this.getZ() - (double)(0.3f * f));
+        passenger.updatePosition(this.getX() + (double)(0.3f * g), this.getY() + this.getMountedHeightOffset() + passenger.getHeightOffset(), this.getZ() - (double)(0.3f * f));
     }
 
     @Override
@@ -185,18 +185,18 @@ implements RangedAttackMob {
     }
 
     @Override
-    public boolean isBreedingItem(ItemStack arg) {
-        return field_25375.test(arg);
+    public boolean isBreedingItem(ItemStack stack) {
+        return field_25375.test(stack);
     }
 
     @Override
-    protected boolean receiveFood(PlayerEntity arg, ItemStack arg2) {
+    protected boolean receiveFood(PlayerEntity player, ItemStack item) {
         SoundEvent lv2;
         int i = 0;
         int j = 0;
         float f = 0.0f;
         boolean bl = false;
-        Item lv = arg2.getItem();
+        Item lv = item.getItem();
         if (lv == Items.WHEAT) {
             i = 10;
             j = 3;
@@ -207,7 +207,7 @@ implements RangedAttackMob {
             f = 10.0f;
             if (this.isTame() && this.getBreedingAge() == 0 && this.canEat()) {
                 bl = true;
-                this.lovePlayer(arg);
+                this.lovePlayer(player);
             }
         }
         if (this.getHealth() < this.getMaxHealth() && f > 0.0f) {
@@ -240,17 +240,17 @@ implements RangedAttackMob {
 
     @Override
     @Nullable
-    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(class_5425 arg, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable CompoundTag entityTag) {
         int j;
         this.initializeStrength();
-        if (arg4 instanceof LlamaData) {
-            int i = ((LlamaData)arg4).variant;
+        if (entityData instanceof LlamaData) {
+            int i = ((LlamaData)entityData).variant;
         } else {
             j = this.random.nextInt(4);
-            arg4 = new LlamaData(j);
+            entityData = new LlamaData(j);
         }
         this.setVariant(j);
-        return super.initialize(arg, arg2, arg3, arg4, arg5);
+        return super.initialize(arg, difficulty, spawnReason, entityData, entityTag);
     }
 
     @Override
@@ -264,7 +264,7 @@ implements RangedAttackMob {
     }
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource arg) {
+    protected SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.ENTITY_LLAMA_HURT;
     }
 
@@ -280,7 +280,7 @@ implements RangedAttackMob {
     }
 
     @Override
-    protected void playStepSound(BlockPos arg, BlockState arg2) {
+    protected void playStepSound(BlockPos pos, BlockState state) {
         this.playSound(SoundEvents.ENTITY_LLAMA_STEP, 0.15f, 1.0f);
     }
 
@@ -313,8 +313,8 @@ implements RangedAttackMob {
     }
 
     @Override
-    public boolean canEquip(ItemStack arg) {
-        Item lv = arg.getItem();
+    public boolean canEquip(ItemStack item) {
+        Item lv = item.getItem();
         return ItemTags.CARPETS.contains(lv);
     }
 
@@ -324,9 +324,9 @@ implements RangedAttackMob {
     }
 
     @Override
-    public void onInventoryChanged(Inventory arg) {
+    public void onInventoryChanged(Inventory sender) {
         DyeColor lv = this.getCarpetColor();
-        super.onInventoryChanged(arg);
+        super.onInventoryChanged(sender);
         DyeColor lv2 = this.getCarpetColor();
         if (this.age > 20 && lv2 != null && lv2 != lv) {
             this.playSound(SoundEvents.ENTITY_LLAMA_SWAG, 0.5f, 1.0f);
@@ -342,13 +342,13 @@ implements RangedAttackMob {
         this.setCarpetColor(LlamaEntity.getColorFromCarpet(this.items.getStack(1)));
     }
 
-    private void setCarpetColor(@Nullable DyeColor arg) {
-        this.dataTracker.set(CARPET_COLOR, arg == null ? -1 : arg.getId());
+    private void setCarpetColor(@Nullable DyeColor color) {
+        this.dataTracker.set(CARPET_COLOR, color == null ? -1 : color.getId());
     }
 
     @Nullable
-    private static DyeColor getColorFromCarpet(ItemStack arg) {
-        Block lv = Block.getBlockFromItem(arg.getItem());
+    private static DyeColor getColorFromCarpet(ItemStack color) {
+        Block lv = Block.getBlockFromItem(color.getItem());
         if (lv instanceof CarpetBlock) {
             return ((CarpetBlock)lv).getColor();
         }
@@ -367,8 +367,8 @@ implements RangedAttackMob {
     }
 
     @Override
-    public boolean canBreedWith(AnimalEntity arg) {
-        return arg != this && arg instanceof LlamaEntity && this.canBreed() && ((LlamaEntity)arg).canBreed();
+    public boolean canBreedWith(AnimalEntity other) {
+        return other != this && other instanceof LlamaEntity && this.canBreed() && ((LlamaEntity)other).canBreed();
     }
 
     @Override
@@ -389,11 +389,11 @@ implements RangedAttackMob {
         return EntityType.LLAMA.create(this.world);
     }
 
-    private void spitAt(LivingEntity arg) {
+    private void spitAt(LivingEntity target) {
         LlamaSpitEntity lv = new LlamaSpitEntity(this.world, this);
-        double d = arg.getX() - this.getX();
-        double e = arg.getBodyY(0.3333333333333333) - lv.getY();
-        double f = arg.getZ() - this.getZ();
+        double d = target.getX() - this.getX();
+        double e = target.getBodyY(0.3333333333333333) - lv.getY();
+        double f = target.getZ() - this.getZ();
         float g = MathHelper.sqrt(d * d + f * f) * 0.2f;
         lv.setVelocity(d, e + (double)g, f, 1.5f, 10.0f);
         if (!this.isSilent()) {
@@ -403,17 +403,17 @@ implements RangedAttackMob {
         this.spit = true;
     }
 
-    private void setSpit(boolean bl) {
-        this.spit = bl;
+    private void setSpit(boolean spit) {
+        this.spit = spit;
     }
 
     @Override
-    public boolean handleFallDamage(float f, float g) {
-        int i = this.computeFallDamage(f, g);
+    public boolean handleFallDamage(float fallDistance, float damageMultiplier) {
+        int i = this.computeFallDamage(fallDistance, damageMultiplier);
         if (i <= 0) {
             return false;
         }
-        if (f >= 6.0f) {
+        if (fallDistance >= 6.0f) {
             this.damage(DamageSource.FALL, i);
             if (this.hasPassengers()) {
                 for (Entity lv : this.getPassengersDeep()) {
@@ -432,8 +432,8 @@ implements RangedAttackMob {
         this.following = null;
     }
 
-    public void follow(LlamaEntity arg) {
-        this.following = arg;
+    public void follow(LlamaEntity llama) {
+        this.following = llama;
         this.following.follower = this;
     }
 
@@ -468,8 +468,8 @@ implements RangedAttackMob {
     }
 
     @Override
-    public void attack(LivingEntity arg, float f) {
-        this.spitAt(arg);
+    public void attack(LivingEntity target, float pullProgress) {
+        this.spitAt(target);
     }
 
     @Override
@@ -479,8 +479,8 @@ implements RangedAttackMob {
 
     static class ChaseWolvesGoal
     extends FollowTargetGoal<WolfEntity> {
-        public ChaseWolvesGoal(LlamaEntity arg2) {
-            super(arg2, WolfEntity.class, 16, false, true, arg -> !((WolfEntity)arg).isTamed());
+        public ChaseWolvesGoal(LlamaEntity llama) {
+            super(llama, WolfEntity.class, 16, false, true, arg -> !((WolfEntity)arg).isTamed());
         }
 
         @Override
@@ -491,8 +491,8 @@ implements RangedAttackMob {
 
     static class SpitRevengeGoal
     extends RevengeGoal {
-        public SpitRevengeGoal(LlamaEntity arg) {
-            super(arg, new Class[0]);
+        public SpitRevengeGoal(LlamaEntity llama) {
+            super(llama, new Class[0]);
         }
 
         @Override
@@ -510,8 +510,9 @@ implements RangedAttackMob {
     extends PassiveEntity.PassiveData {
         public final int variant;
 
-        private LlamaData(int i) {
-            this.variant = i;
+        private LlamaData(int variant) {
+            super(true);
+            this.variant = variant;
         }
     }
 }

@@ -22,21 +22,21 @@ extends NetworkSyncedItem {
     }
 
     @Override
-    public TypedActionResult<ItemStack> use(World arg, PlayerEntity arg2, Hand arg3) {
-        ItemStack lv = FilledMapItem.createMap(arg, MathHelper.floor(arg2.getX()), MathHelper.floor(arg2.getZ()), (byte)0, true, false);
-        ItemStack lv2 = arg2.getStackInHand(arg3);
-        if (!arg2.abilities.creativeMode) {
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+        ItemStack lv = FilledMapItem.createMap(world, MathHelper.floor(user.getX()), MathHelper.floor(user.getZ()), (byte)0, true, false);
+        ItemStack lv2 = user.getStackInHand(hand);
+        if (!user.abilities.creativeMode) {
             lv2.decrement(1);
         }
-        arg2.incrementStat(Stats.USED.getOrCreateStat(this));
-        arg2.playSound(SoundEvents.UI_CARTOGRAPHY_TABLE_TAKE_RESULT, 1.0f, 1.0f);
+        user.incrementStat(Stats.USED.getOrCreateStat(this));
+        user.playSound(SoundEvents.UI_CARTOGRAPHY_TABLE_TAKE_RESULT, 1.0f, 1.0f);
         if (lv2.isEmpty()) {
-            return TypedActionResult.method_29237(lv, arg.isClient());
+            return TypedActionResult.method_29237(lv, world.isClient());
         }
-        if (!arg2.inventory.insertStack(lv.copy())) {
-            arg2.dropItem(lv, false);
+        if (!user.inventory.insertStack(lv.copy())) {
+            user.dropItem(lv, false);
         }
-        return TypedActionResult.method_29237(lv2, arg.isClient());
+        return TypedActionResult.method_29237(lv2, world.isClient());
     }
 }
 

@@ -16,27 +16,27 @@ extends AbstractMinecartEntity {
         super(arg, arg2);
     }
 
-    public MinecartEntity(World arg, double d, double e, double f) {
-        super(EntityType.MINECART, arg, d, e, f);
+    public MinecartEntity(World world, double x, double y, double z) {
+        super(EntityType.MINECART, world, x, y, z);
     }
 
     @Override
-    public ActionResult interact(PlayerEntity arg, Hand arg2) {
-        if (arg.shouldCancelInteraction()) {
+    public ActionResult interact(PlayerEntity player, Hand hand) {
+        if (player.shouldCancelInteraction()) {
             return ActionResult.PASS;
         }
         if (this.hasPassengers()) {
             return ActionResult.PASS;
         }
         if (!this.world.isClient) {
-            return arg.startRiding(this) ? ActionResult.CONSUME : ActionResult.PASS;
+            return player.startRiding(this) ? ActionResult.CONSUME : ActionResult.PASS;
         }
         return ActionResult.SUCCESS;
     }
 
     @Override
-    public void onActivatorRail(int i, int j, int k, boolean bl) {
-        if (bl) {
+    public void onActivatorRail(int x, int y, int z, boolean powered) {
+        if (powered) {
             if (this.hasPassengers()) {
                 this.removeAllPassengers();
             }

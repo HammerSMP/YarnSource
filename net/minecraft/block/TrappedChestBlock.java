@@ -25,7 +25,7 @@ extends ChestBlock {
     }
 
     @Override
-    public BlockEntity createBlockEntity(BlockView arg) {
+    public BlockEntity createBlockEntity(BlockView world) {
         return new TrappedChestBlockEntity();
     }
 
@@ -35,19 +35,19 @@ extends ChestBlock {
     }
 
     @Override
-    public boolean emitsRedstonePower(BlockState arg) {
+    public boolean emitsRedstonePower(BlockState state) {
         return true;
     }
 
     @Override
-    public int getWeakRedstonePower(BlockState arg, BlockView arg2, BlockPos arg3, Direction arg4) {
-        return MathHelper.clamp(ChestBlockEntity.getPlayersLookingInChestCount(arg2, arg3), 0, 15);
+    public int getWeakRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction direction) {
+        return MathHelper.clamp(ChestBlockEntity.getPlayersLookingInChestCount(world, pos), 0, 15);
     }
 
     @Override
-    public int getStrongRedstonePower(BlockState arg, BlockView arg2, BlockPos arg3, Direction arg4) {
-        if (arg4 == Direction.UP) {
-            return arg.getWeakRedstonePower(arg2, arg3, arg4);
+    public int getStrongRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction direction) {
+        if (direction == Direction.UP) {
+            return state.getWeakRedstonePower(world, pos, direction);
         }
         return 0;
     }

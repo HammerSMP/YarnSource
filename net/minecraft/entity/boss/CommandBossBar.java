@@ -31,9 +31,9 @@ extends ServerBossBar {
     private int value;
     private int maxValue = 100;
 
-    public CommandBossBar(Identifier arg, Text arg2) {
-        super(arg2, BossBar.Color.WHITE, BossBar.Style.PROGRESS);
-        this.id = arg;
+    public CommandBossBar(Identifier id, Text displayName) {
+        super(displayName, BossBar.Color.WHITE, BossBar.Style.PROGRESS);
+        this.id = id;
         this.setPercent(0.0f);
     }
 
@@ -42,19 +42,19 @@ extends ServerBossBar {
     }
 
     @Override
-    public void addPlayer(ServerPlayerEntity arg) {
-        super.addPlayer(arg);
-        this.playerUuids.add(arg.getUuid());
+    public void addPlayer(ServerPlayerEntity player) {
+        super.addPlayer(player);
+        this.playerUuids.add(player.getUuid());
     }
 
-    public void addPlayer(UUID uUID) {
-        this.playerUuids.add(uUID);
+    public void addPlayer(UUID uuid) {
+        this.playerUuids.add(uuid);
     }
 
     @Override
-    public void removePlayer(ServerPlayerEntity arg) {
-        super.removePlayer(arg);
-        this.playerUuids.remove(arg.getUuid());
+    public void removePlayer(ServerPlayerEntity player) {
+        super.removePlayer(player);
+        this.playerUuids.remove(player.getUuid());
     }
 
     @Override
@@ -71,26 +71,26 @@ extends ServerBossBar {
         return this.maxValue;
     }
 
-    public void setValue(int i) {
-        this.value = i;
-        this.setPercent(MathHelper.clamp((float)i / (float)this.maxValue, 0.0f, 1.0f));
+    public void setValue(int value) {
+        this.value = value;
+        this.setPercent(MathHelper.clamp((float)value / (float)this.maxValue, 0.0f, 1.0f));
     }
 
-    public void setMaxValue(int i) {
-        this.maxValue = i;
-        this.setPercent(MathHelper.clamp((float)this.value / (float)i, 0.0f, 1.0f));
+    public void setMaxValue(int maxValue) {
+        this.maxValue = maxValue;
+        this.setPercent(MathHelper.clamp((float)this.value / (float)maxValue, 0.0f, 1.0f));
     }
 
     public final Text toHoverableText() {
-        return Texts.bracketed(this.getName()).styled(arg -> arg.withColor(this.getColor().getTextFormat()).setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText(this.getId().toString()))).withInsertion(this.getId().toString()));
+        return Texts.bracketed(this.getName()).styled(style -> style.withColor(this.getColor().getTextFormat()).withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText(this.getId().toString()))).withInsertion(this.getId().toString()));
     }
 
-    public boolean addPlayers(Collection<ServerPlayerEntity> collection) {
+    public boolean addPlayers(Collection<ServerPlayerEntity> players) {
         HashSet set = Sets.newHashSet();
         HashSet set2 = Sets.newHashSet();
         for (UUID uUID : this.playerUuids) {
             boolean bl = false;
-            for (ServerPlayerEntity lv : collection) {
+            for (ServerPlayerEntity lv : players) {
                 if (!lv.getUuid().equals(uUID)) continue;
                 bl = true;
                 break;
@@ -98,7 +98,7 @@ extends ServerBossBar {
             if (bl) continue;
             set.add(uUID);
         }
-        for (ServerPlayerEntity lv2 : collection) {
+        for (ServerPlayerEntity lv2 : players) {
             boolean bl2 = false;
             for (UUID uUID2 : this.playerUuids) {
                 if (!lv2.getUuid().equals(uUID2)) continue;
@@ -141,31 +141,31 @@ extends ServerBossBar {
         return lv;
     }
 
-    public static CommandBossBar fromTag(CompoundTag arg, Identifier arg2) {
-        CommandBossBar lv = new CommandBossBar(arg2, Text.Serializer.fromJson(arg.getString("Name")));
-        lv.setVisible(arg.getBoolean("Visible"));
-        lv.setValue(arg.getInt("Value"));
-        lv.setMaxValue(arg.getInt("Max"));
-        lv.setColor(BossBar.Color.byName(arg.getString("Color")));
-        lv.setOverlay(BossBar.Style.byName(arg.getString("Overlay")));
-        lv.setDarkenSky(arg.getBoolean("DarkenScreen"));
-        lv.setDragonMusic(arg.getBoolean("PlayBossMusic"));
-        lv.setThickenFog(arg.getBoolean("CreateWorldFog"));
-        ListTag lv2 = arg.getList("Players", 11);
+    public static CommandBossBar fromTag(CompoundTag tag, Identifier id) {
+        CommandBossBar lv = new CommandBossBar(id, Text.Serializer.fromJson(tag.getString("Name")));
+        lv.setVisible(tag.getBoolean("Visible"));
+        lv.setValue(tag.getInt("Value"));
+        lv.setMaxValue(tag.getInt("Max"));
+        lv.setColor(BossBar.Color.byName(tag.getString("Color")));
+        lv.setOverlay(BossBar.Style.byName(tag.getString("Overlay")));
+        lv.setDarkenSky(tag.getBoolean("DarkenScreen"));
+        lv.setDragonMusic(tag.getBoolean("PlayBossMusic"));
+        lv.setThickenFog(tag.getBoolean("CreateWorldFog"));
+        ListTag lv2 = tag.getList("Players", 11);
         for (int i = 0; i < lv2.size(); ++i) {
             lv.addPlayer(NbtHelper.toUuid(lv2.get(i)));
         }
         return lv;
     }
 
-    public void onPlayerConnect(ServerPlayerEntity arg) {
-        if (this.playerUuids.contains(arg.getUuid())) {
-            this.addPlayer(arg);
+    public void onPlayerConnect(ServerPlayerEntity player) {
+        if (this.playerUuids.contains(player.getUuid())) {
+            this.addPlayer(player);
         }
     }
 
-    public void onPlayerDisconnect(ServerPlayerEntity arg) {
-        super.removePlayer(arg);
+    public void onPlayerDisconnect(ServerPlayerEntity player) {
+        super.removePlayer(player);
     }
 }
 

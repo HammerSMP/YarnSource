@@ -52,17 +52,17 @@ extends DrawableHelper {
     private float alpha;
     private boolean initialized;
 
-    public AdvancementTab(MinecraftClient arg, AdvancementsScreen arg2, AdvancementTabType arg3, int i, Advancement arg4, AdvancementDisplay arg5) {
-        this.client = arg;
-        this.screen = arg2;
-        this.type = arg3;
-        this.index = i;
-        this.root = arg4;
-        this.display = arg5;
-        this.icon = arg5.getIcon();
-        this.title = arg5.getTitle();
-        this.rootWidget = new AdvancementWidget(this, arg, arg4, arg5);
-        this.addWidget(this.rootWidget, arg4);
+    public AdvancementTab(MinecraftClient client, AdvancementsScreen screen, AdvancementTabType type, int index, Advancement root, AdvancementDisplay display) {
+        this.client = client;
+        this.screen = screen;
+        this.type = type;
+        this.index = index;
+        this.root = root;
+        this.display = display;
+        this.icon = display.getIcon();
+        this.title = display.getTitle();
+        this.rootWidget = new AdvancementWidget(this, client, root, display);
+        this.addWidget(this.rootWidget, root);
     }
 
     public Advancement getRoot() {
@@ -77,8 +77,8 @@ extends DrawableHelper {
         this.type.drawBackground(arg, this, i, j, bl, this.index);
     }
 
-    public void drawIcon(int i, int j, ItemRenderer arg) {
-        this.type.drawIcon(i, j, this.index, arg, this.icon);
+    public void drawIcon(int x, int y, ItemRenderer itemRenderer) {
+        this.type.drawIcon(x, y, this.index, itemRenderer, this.icon);
     }
 
     public void render(MatrixStack arg) {
@@ -144,47 +144,47 @@ extends DrawableHelper {
         this.alpha = bl ? MathHelper.clamp(this.alpha + 0.02f, 0.0f, 0.3f) : MathHelper.clamp(this.alpha - 0.04f, 0.0f, 1.0f);
     }
 
-    public boolean isClickOnTab(int i, int j, double d, double e) {
-        return this.type.isClickOnTab(i, j, this.index, d, e);
+    public boolean isClickOnTab(int screenX, int screenY, double mouseX, double mouseY) {
+        return this.type.isClickOnTab(screenX, screenY, this.index, mouseX, mouseY);
     }
 
     @Nullable
-    public static AdvancementTab create(MinecraftClient arg, AdvancementsScreen arg2, int i, Advancement arg3) {
-        if (arg3.getDisplay() == null) {
+    public static AdvancementTab create(MinecraftClient minecraft, AdvancementsScreen screen, int index, Advancement root) {
+        if (root.getDisplay() == null) {
             return null;
         }
         for (AdvancementTabType lv : AdvancementTabType.values()) {
-            if (i >= lv.getTabCount()) {
-                i -= lv.getTabCount();
+            if (index >= lv.getTabCount()) {
+                index -= lv.getTabCount();
                 continue;
             }
-            return new AdvancementTab(arg, arg2, lv, i, arg3, arg3.getDisplay());
+            return new AdvancementTab(minecraft, screen, lv, index, root, root.getDisplay());
         }
         return null;
     }
 
-    public void move(double d, double e) {
+    public void move(double offsetX, double offsetY) {
         if (this.maxPanX - this.minPanX > 234) {
-            this.originX = MathHelper.clamp(this.originX + d, (double)(-(this.maxPanX - 234)), 0.0);
+            this.originX = MathHelper.clamp(this.originX + offsetX, (double)(-(this.maxPanX - 234)), 0.0);
         }
         if (this.maxPanY - this.minPanY > 113) {
-            this.originY = MathHelper.clamp(this.originY + e, (double)(-(this.maxPanY - 113)), 0.0);
+            this.originY = MathHelper.clamp(this.originY + offsetY, (double)(-(this.maxPanY - 113)), 0.0);
         }
     }
 
-    public void addAdvancement(Advancement arg) {
-        if (arg.getDisplay() == null) {
+    public void addAdvancement(Advancement advancement) {
+        if (advancement.getDisplay() == null) {
             return;
         }
-        AdvancementWidget lv = new AdvancementWidget(this, this.client, arg, arg.getDisplay());
-        this.addWidget(lv, arg);
+        AdvancementWidget lv = new AdvancementWidget(this, this.client, advancement, advancement.getDisplay());
+        this.addWidget(lv, advancement);
     }
 
-    private void addWidget(AdvancementWidget arg, Advancement arg2) {
-        this.widgets.put(arg2, arg);
-        int i = arg.getX();
+    private void addWidget(AdvancementWidget widget, Advancement advancement) {
+        this.widgets.put(advancement, widget);
+        int i = widget.getX();
         int j = i + 28;
-        int k = arg.getY();
+        int k = widget.getY();
         int l = k + 27;
         this.minPanX = Math.min(this.minPanX, i);
         this.maxPanX = Math.max(this.maxPanX, j);
@@ -196,8 +196,8 @@ extends DrawableHelper {
     }
 
     @Nullable
-    public AdvancementWidget getWidget(Advancement arg) {
-        return this.widgets.get(arg);
+    public AdvancementWidget getWidget(Advancement advancement) {
+        return this.widgets.get(advancement);
     }
 
     public AdvancementsScreen getScreen() {

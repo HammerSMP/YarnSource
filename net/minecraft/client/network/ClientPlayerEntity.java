@@ -102,8 +102,8 @@ extends AbstractClientPlayerEntity {
     private float lastYaw;
     private float lastPitch;
     private boolean lastOnGround;
-    private boolean field_23093;
-    private boolean lastIsHoldingSneakKey;
+    private boolean inSneakingPose;
+    private boolean lastSneaking;
     private boolean lastSprinting;
     private int ticksSinceLastPositionPacketSent;
     private boolean healthInitialized;
@@ -129,40 +129,40 @@ extends AbstractClientPlayerEntity {
     private int underwaterVisibilityTicks;
     private boolean showsDeathScreen = true;
 
-    public ClientPlayerEntity(MinecraftClient arg, ClientWorld arg2, ClientPlayNetworkHandler arg3, StatHandler arg4, ClientRecipeBook arg5, boolean bl, boolean bl2) {
-        super(arg2, arg3.getProfile());
-        this.client = arg;
-        this.networkHandler = arg3;
-        this.statHandler = arg4;
-        this.recipeBook = arg5;
-        this.lastIsHoldingSneakKey = bl;
-        this.lastSprinting = bl2;
-        this.tickables.add(new AmbientSoundPlayer(this, arg.getSoundManager()));
+    public ClientPlayerEntity(MinecraftClient client, ClientWorld world, ClientPlayNetworkHandler networkHandler, StatHandler stats, ClientRecipeBook recipeBook, boolean lastSneaking, boolean lastSprinting) {
+        super(world, networkHandler.getProfile());
+        this.client = client;
+        this.networkHandler = networkHandler;
+        this.statHandler = stats;
+        this.recipeBook = recipeBook;
+        this.lastSneaking = lastSneaking;
+        this.lastSprinting = lastSprinting;
+        this.tickables.add(new AmbientSoundPlayer(this, client.getSoundManager()));
         this.tickables.add(new BubbleColumnSoundPlayer(this));
-        this.tickables.add(new BiomeEffectSoundPlayer(this, arg.getSoundManager(), arg2.getBiomeAccess()));
+        this.tickables.add(new BiomeEffectSoundPlayer(this, client.getSoundManager(), world.getBiomeAccess()));
     }
 
     @Override
-    public boolean damage(DamageSource arg, float f) {
+    public boolean damage(DamageSource source, float amount) {
         return false;
     }
 
     @Override
-    public void heal(float f) {
+    public void heal(float amount) {
     }
 
     @Override
-    public boolean startRiding(Entity arg, boolean bl) {
-        if (!super.startRiding(arg, bl)) {
+    public boolean startRiding(Entity entity, boolean force) {
+        if (!super.startRiding(entity, force)) {
             return false;
         }
-        if (arg instanceof AbstractMinecartEntity) {
-            this.client.getSoundManager().play(new MinecartInsideSoundInstance(this, (AbstractMinecartEntity)arg));
+        if (entity instanceof AbstractMinecartEntity) {
+            this.client.getSoundManager().play(new MinecartInsideSoundInstance(this, (AbstractMinecartEntity)entity));
         }
-        if (arg instanceof BoatEntity) {
-            this.prevYaw = arg.yaw;
-            this.yaw = arg.yaw;
-            this.setHeadYaw(arg.yaw);
+        if (entity instanceof BoatEntity) {
+            this.prevYaw = entity.yaw;
+            this.yaw = entity.yaw;
+            this.setHeadYaw(entity.yaw);
         }
         return true;
     }
@@ -174,14 +174,14 @@ extends AbstractClientPlayerEntity {
     }
 
     @Override
-    public float getPitch(float f) {
+    public float getPitch(float tickDelta) {
         return this.pitch;
     }
 
     @Override
-    public float getYaw(float f) {
+    public float getYaw(float tickDelta) {
         if (this.hasVehicle()) {
-            return super.getYaw(f);
+            return super.getYaw(tickDelta);
         }
         return this.yaw;
     }
@@ -223,10 +223,10 @@ extends AbstractClientPlayerEntity {
             this.networkHandler.sendPacket(new ClientCommandC2SPacket(this, lv));
             this.lastSprinting = bl;
         }
-        if ((bl2 = this.isSneaking()) != this.lastIsHoldingSneakKey) {
+        if ((bl2 = this.isSneaking()) != this.lastSneaking) {
             ClientCommandC2SPacket.Mode lv2 = bl2 ? ClientCommandC2SPacket.Mode.PRESS_SHIFT_KEY : ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY;
             this.networkHandler.sendPacket(new ClientCommandC2SPacket(this, lv2));
-            this.lastIsHoldingSneakKey = bl2;
+            this.lastSneaking = bl2;
         }
         if (this.isCamera()) {
             boolean bl4;
@@ -267,20 +267,20 @@ extends AbstractClientPlayerEntity {
     }
 
     @Override
-    public boolean dropSelectedItem(boolean bl) {
-        PlayerActionC2SPacket.Action lv = bl ? PlayerActionC2SPacket.Action.DROP_ALL_ITEMS : PlayerActionC2SPacket.Action.DROP_ITEM;
+    public boolean dropSelectedItem(boolean dropEntireStack) {
+        PlayerActionC2SPacket.Action lv = dropEntireStack ? PlayerActionC2SPacket.Action.DROP_ALL_ITEMS : PlayerActionC2SPacket.Action.DROP_ITEM;
         this.networkHandler.sendPacket(new PlayerActionC2SPacket(lv, BlockPos.ORIGIN, Direction.DOWN));
-        return this.inventory.removeStack(this.inventory.selectedSlot, bl && !this.inventory.getMainHandStack().isEmpty() ? this.inventory.getMainHandStack().getCount() : 1) != ItemStack.EMPTY;
+        return this.inventory.removeStack(this.inventory.selectedSlot, dropEntireStack && !this.inventory.getMainHandStack().isEmpty() ? this.inventory.getMainHandStack().getCount() : 1) != ItemStack.EMPTY;
     }
 
-    public void sendChatMessage(String string) {
-        this.networkHandler.sendPacket(new ChatMessageC2SPacket(string));
+    public void sendChatMessage(String message) {
+        this.networkHandler.sendPacket(new ChatMessageC2SPacket(message));
     }
 
     @Override
-    public void swingHand(Hand arg) {
-        super.swingHand(arg);
-        this.networkHandler.sendPacket(new HandSwingC2SPacket(arg));
+    public void swingHand(Hand hand) {
+        super.swingHand(hand);
+        this.networkHandler.sendPacket(new HandSwingC2SPacket(hand));
     }
 
     @Override
@@ -289,11 +289,11 @@ extends AbstractClientPlayerEntity {
     }
 
     @Override
-    protected void applyDamage(DamageSource arg, float f) {
-        if (this.isInvulnerableTo(arg)) {
+    protected void applyDamage(DamageSource source, float amount) {
+        if (this.isInvulnerableTo(source)) {
             return;
         }
-        this.setHealth(this.getHealth() - f);
+        this.setHealth(this.getHealth() - amount);
     }
 
     @Override
@@ -308,11 +308,11 @@ extends AbstractClientPlayerEntity {
         this.client.openScreen(null);
     }
 
-    public void updateHealth(float f) {
+    public void updateHealth(float health) {
         if (this.healthInitialized) {
-            float g = this.getHealth() - f;
+            float g = this.getHealth() - health;
             if (g <= 0.0f) {
-                this.setHealth(f);
+                this.setHealth(health);
                 if (g < 0.0f) {
                     this.timeUntilRegen = 10;
                 }
@@ -324,7 +324,7 @@ extends AbstractClientPlayerEntity {
                 this.hurtTime = this.maxHurtTime = 10;
             }
         } else {
-            this.setHealth(f);
+            this.setHealth(health);
             this.healthInitialized = true;
         }
     }
@@ -362,8 +362,8 @@ extends AbstractClientPlayerEntity {
         this.networkHandler.sendPacket(new ClientCommandC2SPacket(this, ClientCommandC2SPacket.Mode.OPEN_INVENTORY));
     }
 
-    public void setServerBrand(String string) {
-        this.serverBrand = string;
+    public void setServerBrand(String serverBrand) {
+        this.serverBrand = serverBrand;
     }
 
     public String getServerBrand() {
@@ -378,10 +378,10 @@ extends AbstractClientPlayerEntity {
         return this.recipeBook;
     }
 
-    public void onRecipeDisplayed(Recipe<?> arg) {
-        if (this.recipeBook.shouldDisplay(arg)) {
-            this.recipeBook.onRecipeDisplayed(arg);
-            this.networkHandler.sendPacket(new RecipeBookDataC2SPacket(arg));
+    public void onRecipeDisplayed(Recipe<?> recipe) {
+        if (this.recipeBook.shouldDisplay(recipe)) {
+            this.recipeBook.onRecipeDisplayed(recipe);
+            this.networkHandler.sendPacket(new RecipeBookDataC2SPacket(recipe));
         }
     }
 
@@ -390,105 +390,81 @@ extends AbstractClientPlayerEntity {
         return this.clientPermissionLevel;
     }
 
-    public void setClientPermissionLevel(int i) {
-        this.clientPermissionLevel = i;
+    public void setClientPermissionLevel(int clientPermissionLevel) {
+        this.clientPermissionLevel = clientPermissionLevel;
     }
 
     @Override
-    public void sendMessage(Text arg, boolean bl) {
-        if (bl) {
-            this.client.inGameHud.setOverlayMessage(arg, false);
+    public void sendMessage(Text message, boolean actionBar) {
+        if (actionBar) {
+            this.client.inGameHud.setOverlayMessage(message, false);
         } else {
-            this.client.inGameHud.getChatHud().addMessage(arg);
+            this.client.inGameHud.getChatHud().addMessage(message);
         }
     }
 
-    @Override
-    protected void pushOutOfBlocks(double d, double e, double f) {
-        BlockPos lv = new BlockPos(d, e, f);
-        if (this.cannotFitAt(lv)) {
-            double g = d - (double)lv.getX();
-            double h = f - (double)lv.getZ();
-            Direction lv2 = null;
-            double i = 9999.0;
-            if (!this.cannotFitAt(lv.west()) && g < i) {
-                i = g;
-                lv2 = Direction.WEST;
-            }
-            if (!this.cannotFitAt(lv.east()) && 1.0 - g < i) {
-                i = 1.0 - g;
-                lv2 = Direction.EAST;
-            }
-            if (!this.cannotFitAt(lv.north()) && h < i) {
-                i = h;
-                lv2 = Direction.NORTH;
-            }
-            if (!this.cannotFitAt(lv.south()) && 1.0 - h < i) {
-                i = 1.0 - h;
-                lv2 = Direction.SOUTH;
-            }
-            if (lv2 != null) {
-                Vec3d lv3 = this.getVelocity();
-                switch (lv2) {
-                    case WEST: {
-                        this.setVelocity(-0.1, lv3.y, lv3.z);
-                        break;
-                    }
-                    case EAST: {
-                        this.setVelocity(0.1, lv3.y, lv3.z);
-                        break;
-                    }
-                    case NORTH: {
-                        this.setVelocity(lv3.x, lv3.y, -0.1);
-                        break;
-                    }
-                    case SOUTH: {
-                        this.setVelocity(lv3.x, lv3.y, 0.1);
-                    }
-                }
+    private void method_30673(double d, double e) {
+        Direction[] lvs;
+        BlockPos lv = new BlockPos(d, this.getY(), e);
+        if (!this.method_30674(lv)) {
+            return;
+        }
+        double f = d - (double)lv.getX();
+        double g = e - (double)lv.getZ();
+        Direction lv2 = null;
+        double h = Double.MAX_VALUE;
+        for (Direction lv3 : lvs = new Direction[]{Direction.WEST, Direction.EAST, Direction.NORTH, Direction.SOUTH}) {
+            double j;
+            double i = lv3.getAxis().choose(f, 0.0, g);
+            double d2 = j = lv3.getDirection() == Direction.AxisDirection.POSITIVE ? 1.0 - i : i;
+            if (!(j < h) || this.method_30674(lv.offset(lv3))) continue;
+            h = j;
+            lv2 = lv3;
+        }
+        if (lv2 != null) {
+            Vec3d lv4 = this.getVelocity();
+            if (lv2.getAxis() == Direction.Axis.X) {
+                this.setVelocity(0.1 * (double)lv2.getOffsetX(), lv4.y, lv4.z);
+            } else {
+                this.setVelocity(lv4.x, lv4.y, 0.1 * (double)lv2.getOffsetZ());
             }
         }
     }
 
-    private boolean cannotFitAt(BlockPos arg) {
+    private boolean method_30674(BlockPos arg3) {
         Box lv = this.getBoundingBox();
-        BlockPos.Mutable lv2 = arg.mutableCopy();
-        for (int i = MathHelper.floor(lv.minY); i < MathHelper.ceil(lv.maxY); ++i) {
-            lv2.setY(i);
-            if (this.doesNotSuffocate(lv2)) continue;
-            return true;
-        }
-        return false;
+        Box lv2 = new Box(arg3.getX(), lv.minY, arg3.getZ(), (double)arg3.getX() + 1.0, lv.maxY, (double)arg3.getZ() + 1.0).contract(1.0E-7);
+        return !this.world.method_30635(this, lv2, (arg, arg2) -> arg.shouldSuffocate(this.world, (BlockPos)arg2));
     }
 
     @Override
-    public void setSprinting(boolean bl) {
-        super.setSprinting(bl);
+    public void setSprinting(boolean sprinting) {
+        super.setSprinting(sprinting);
         this.ticksSinceSprintingChanged = 0;
     }
 
-    public void setExperience(float f, int i, int j) {
-        this.experienceProgress = f;
-        this.totalExperience = i;
-        this.experienceLevel = j;
+    public void setExperience(float progress, int total, int level) {
+        this.experienceProgress = progress;
+        this.totalExperience = total;
+        this.experienceLevel = level;
     }
 
     @Override
-    public void sendSystemMessage(Text arg, UUID uUID) {
-        this.client.inGameHud.getChatHud().addMessage(arg);
+    public void sendSystemMessage(Text message, UUID senderUuid) {
+        this.client.inGameHud.getChatHud().addMessage(message);
     }
 
     @Override
-    public void handleStatus(byte b) {
-        if (b >= 24 && b <= 28) {
-            this.setClientPermissionLevel(b - 24);
+    public void handleStatus(byte status) {
+        if (status >= 24 && status <= 28) {
+            this.setClientPermissionLevel(status - 24);
         } else {
-            super.handleStatus(b);
+            super.handleStatus(status);
         }
     }
 
-    public void setShowsDeathScreen(boolean bl) {
-        this.showsDeathScreen = bl;
+    public void setShowsDeathScreen(boolean shouldShow) {
+        this.showsDeathScreen = shouldShow;
     }
 
     public boolean showsDeathScreen() {
@@ -496,13 +472,13 @@ extends AbstractClientPlayerEntity {
     }
 
     @Override
-    public void playSound(SoundEvent arg, float f, float g) {
-        this.world.playSound(this.getX(), this.getY(), this.getZ(), arg, this.getSoundCategory(), f, g, false);
+    public void playSound(SoundEvent sound, float volume, float pitch) {
+        this.world.playSound(this.getX(), this.getY(), this.getZ(), sound, this.getSoundCategory(), volume, pitch, false);
     }
 
     @Override
-    public void playSound(SoundEvent arg, SoundCategory arg2, float f, float g) {
-        this.world.playSound(this.getX(), this.getY(), this.getZ(), arg, arg2, f, g, false);
+    public void playSound(SoundEvent event, SoundCategory category, float volume, float pitch) {
+        this.world.playSound(this.getX(), this.getY(), this.getZ(), event, category, volume, pitch, false);
     }
 
     @Override
@@ -511,14 +487,14 @@ extends AbstractClientPlayerEntity {
     }
 
     @Override
-    public void setCurrentHand(Hand arg) {
-        ItemStack lv = this.getStackInHand(arg);
+    public void setCurrentHand(Hand hand) {
+        ItemStack lv = this.getStackInHand(hand);
         if (lv.isEmpty() || this.isUsingItem()) {
             return;
         }
-        super.setCurrentHand(arg);
+        super.setCurrentHand(hand);
         this.usingItem = true;
-        this.activeHand = arg;
+        this.activeHand = hand;
     }
 
     @Override
@@ -538,9 +514,9 @@ extends AbstractClientPlayerEntity {
     }
 
     @Override
-    public void onTrackedDataSet(TrackedData<?> arg) {
-        super.onTrackedDataSet(arg);
-        if (LIVING_FLAGS.equals(arg)) {
+    public void onTrackedDataSet(TrackedData<?> data) {
+        super.onTrackedDataSet(data);
+        if (LIVING_FLAGS.equals(data)) {
             Hand lv;
             boolean bl = ((Byte)this.dataTracker.get(LIVING_FLAGS) & 1) > 0;
             Hand hand = lv = ((Byte)this.dataTracker.get(LIVING_FLAGS) & 2) > 0 ? Hand.OFF_HAND : Hand.MAIN_HAND;
@@ -550,7 +526,7 @@ extends AbstractClientPlayerEntity {
                 this.clearActiveItem();
             }
         }
-        if (FLAGS.equals(arg) && this.isFallFlying() && !this.field_3939) {
+        if (FLAGS.equals(data) && this.isFallFlying() && !this.field_3939) {
             this.client.getSoundManager().play(new ElytraSoundInstance(this));
         }
     }
@@ -565,46 +541,46 @@ extends AbstractClientPlayerEntity {
     }
 
     @Override
-    public void openEditSignScreen(SignBlockEntity arg) {
-        this.client.openScreen(new SignEditScreen(arg));
+    public void openEditSignScreen(SignBlockEntity sign) {
+        this.client.openScreen(new SignEditScreen(sign));
     }
 
     @Override
-    public void openCommandBlockMinecartScreen(CommandBlockExecutor arg) {
-        this.client.openScreen(new MinecartCommandBlockScreen(arg));
+    public void openCommandBlockMinecartScreen(CommandBlockExecutor commandBlockExecutor) {
+        this.client.openScreen(new MinecartCommandBlockScreen(commandBlockExecutor));
     }
 
     @Override
-    public void openCommandBlockScreen(CommandBlockBlockEntity arg) {
-        this.client.openScreen(new CommandBlockScreen(arg));
+    public void openCommandBlockScreen(CommandBlockBlockEntity commandBlock) {
+        this.client.openScreen(new CommandBlockScreen(commandBlock));
     }
 
     @Override
-    public void openStructureBlockScreen(StructureBlockBlockEntity arg) {
-        this.client.openScreen(new StructureBlockScreen(arg));
+    public void openStructureBlockScreen(StructureBlockBlockEntity structureBlock) {
+        this.client.openScreen(new StructureBlockScreen(structureBlock));
     }
 
     @Override
-    public void openJigsawScreen(JigsawBlockEntity arg) {
-        this.client.openScreen(new JigsawBlockScreen(arg));
+    public void openJigsawScreen(JigsawBlockEntity jigsaw) {
+        this.client.openScreen(new JigsawBlockScreen(jigsaw));
     }
 
     @Override
-    public void openEditBookScreen(ItemStack arg, Hand arg2) {
-        Item lv = arg.getItem();
+    public void openEditBookScreen(ItemStack book, Hand hand) {
+        Item lv = book.getItem();
         if (lv == Items.WRITABLE_BOOK) {
-            this.client.openScreen(new BookEditScreen(this, arg, arg2));
+            this.client.openScreen(new BookEditScreen(this, book, hand));
         }
     }
 
     @Override
-    public void addCritParticles(Entity arg) {
-        this.client.particleManager.addEmitter(arg, ParticleTypes.CRIT);
+    public void addCritParticles(Entity target) {
+        this.client.particleManager.addEmitter(target, ParticleTypes.CRIT);
     }
 
     @Override
-    public void addEnchantedHitParticles(Entity arg) {
-        this.client.particleManager.addEmitter(arg, ParticleTypes.ENCHANTED_HIT);
+    public void addEnchantedHitParticles(Entity target) {
+        this.client.particleManager.addEmitter(target, ParticleTypes.ENCHANTED_HIT);
     }
 
     @Override
@@ -614,10 +590,10 @@ extends AbstractClientPlayerEntity {
 
     @Override
     public boolean isInSneakingPose() {
-        return this.field_23093;
+        return this.inSneakingPose;
     }
 
-    public boolean isHoldingSneakKey() {
+    public boolean shouldSlowDown() {
         return this.isInSneakingPose() || this.shouldLeaveSwimmingPose();
     }
 
@@ -651,8 +627,8 @@ extends AbstractClientPlayerEntity {
         boolean bl = this.input.jumping;
         boolean bl2 = this.input.sneaking;
         boolean bl3 = this.isWalking();
-        this.field_23093 = !this.abilities.flying && !this.isSwimming() && this.wouldPoseNotCollide(EntityPose.CROUCHING) && (this.isSneaking() || !this.isSleeping() && !this.wouldPoseNotCollide(EntityPose.STANDING));
-        this.input.tick(this.isHoldingSneakKey());
+        this.inSneakingPose = !this.abilities.flying && !this.isSwimming() && this.wouldPoseNotCollide(EntityPose.CROUCHING) && (this.isSneaking() || !this.isSleeping() && !this.wouldPoseNotCollide(EntityPose.STANDING));
+        this.input.tick(this.shouldSlowDown());
         this.client.getTutorialManager().onMovement(this.input);
         if (this.isUsingItem() && !this.hasVehicle()) {
             this.input.movementSideways *= 0.2f;
@@ -666,10 +642,10 @@ extends AbstractClientPlayerEntity {
             this.input.jumping = true;
         }
         if (!this.noClip) {
-            this.pushOutOfBlocks(this.getX() - (double)this.getWidth() * 0.35, this.getY() + 0.5, this.getZ() + (double)this.getWidth() * 0.35);
-            this.pushOutOfBlocks(this.getX() - (double)this.getWidth() * 0.35, this.getY() + 0.5, this.getZ() - (double)this.getWidth() * 0.35);
-            this.pushOutOfBlocks(this.getX() + (double)this.getWidth() * 0.35, this.getY() + 0.5, this.getZ() - (double)this.getWidth() * 0.35);
-            this.pushOutOfBlocks(this.getX() + (double)this.getWidth() * 0.35, this.getY() + 0.5, this.getZ() + (double)this.getWidth() * 0.35);
+            this.method_30673(this.getX() - (double)this.getWidth() * 0.35, this.getZ() + (double)this.getWidth() * 0.35);
+            this.method_30673(this.getX() - (double)this.getWidth() * 0.35, this.getZ() - (double)this.getWidth() * 0.35);
+            this.method_30673(this.getX() + (double)this.getWidth() * 0.35, this.getZ() - (double)this.getWidth() * 0.35);
+            this.method_30673(this.getX() + (double)this.getWidth() * 0.35, this.getZ() + (double)this.getWidth() * 0.35);
         }
         if (bl2) {
             this.ticksLeftToDoubleTapSprint = 0;
@@ -821,19 +797,19 @@ extends AbstractClientPlayerEntity {
 
     @Override
     @Nullable
-    public StatusEffectInstance removeStatusEffectInternal(@Nullable StatusEffect arg) {
-        if (arg == StatusEffects.NAUSEA) {
+    public StatusEffectInstance removeStatusEffectInternal(@Nullable StatusEffect type) {
+        if (type == StatusEffects.NAUSEA) {
             this.lastNauseaStrength = 0.0f;
             this.nextNauseaStrength = 0.0f;
         }
-        return super.removeStatusEffectInternal(arg);
+        return super.removeStatusEffectInternal(type);
     }
 
     @Override
-    public void move(MovementType arg, Vec3d arg2) {
+    public void move(MovementType type, Vec3d movement) {
         double d = this.getX();
         double e = this.getZ();
-        super.move(arg, arg2);
+        super.move(type, movement);
         this.autoJump((float)(this.getX() - d), (float)(this.getZ() - e));
     }
 
@@ -841,13 +817,13 @@ extends AbstractClientPlayerEntity {
         return this.autoJumpEnabled;
     }
 
-    protected void autoJump(float f, float g) {
+    protected void autoJump(float dx, float dz) {
         if (!this.shouldAutoJump()) {
             return;
         }
         Vec3d lv = this.getPos();
-        Vec3d lv2 = lv.add(f, 0.0, g);
-        Vec3d lv3 = new Vec3d(f, 0.0, g);
+        Vec3d lv2 = lv.add(dx, 0.0, dz);
+        Vec3d lv3 = new Vec3d(dx, 0.0, dz);
         float h = this.getMovementSpeed();
         float i = (float)lv3.lengthSquared();
         if (i <= 0.001f) {

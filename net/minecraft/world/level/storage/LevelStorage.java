@@ -31,8 +31,6 @@ import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.Lifecycle;
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.FileVisitResult;
@@ -74,8 +72,8 @@ import net.minecraft.util.FileNameUtil;
 import net.minecraft.util.ProgressListener;
 import net.minecraft.util.Util;
 import net.minecraft.util.WorldSavePath;
+import net.minecraft.util.registry.DynamicRegistryManager;
 import net.minecraft.util.registry.RegistryKey;
-import net.minecraft.util.registry.RegistryTracker;
 import net.minecraft.world.SaveProperties;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldSaveHandler;
@@ -99,16 +97,16 @@ public class LevelStorage {
     private final Path backupsDirectory;
     private final DataFixer dataFixer;
 
-    public LevelStorage(Path path, Path path2, DataFixer dataFixer) {
+    public LevelStorage(Path savesDirectory, Path backupsDirectory, DataFixer dataFixer) {
         this.dataFixer = dataFixer;
         try {
-            Files.createDirectories(Files.exists(path, new LinkOption[0]) ? path.toRealPath(new LinkOption[0]) : path, new FileAttribute[0]);
+            Files.createDirectories(Files.exists(savesDirectory, new LinkOption[0]) ? savesDirectory.toRealPath(new LinkOption[0]) : savesDirectory, new FileAttribute[0]);
         }
         catch (IOException iOException) {
             throw new RuntimeException(iOException);
         }
-        this.savesDirectory = path;
-        this.backupsDirectory = path2;
+        this.savesDirectory = savesDirectory;
+        this.backupsDirectory = backupsDirectory;
     }
 
     public static LevelStorage create(Path path) {
@@ -182,7 +180,7 @@ public class LevelStorage {
     @Nullable
     private static DataPackSettings method_29583(File file, DataFixer dataFixer) {
         try {
-            CompoundTag lv = NbtIo.readCompressed(new FileInputStream(file));
+            CompoundTag lv = NbtIo.method_30613(file);
             CompoundTag lv2 = lv.getCompound("Data");
             lv2.remove("Player");
             int i = lv2.contains("DataVersion", 99) ? lv2.getInt("DataVersion") : -1;
@@ -198,7 +196,7 @@ public class LevelStorage {
     private static BiFunction<File, DataFixer, LevelProperties> readLevelProperties(DynamicOps<Tag> dynamicOps, DataPackSettings arg) {
         return (file, dataFixer) -> {
             try {
-                CompoundTag lv = NbtIo.readCompressed(new FileInputStream((File)file));
+                CompoundTag lv = NbtIo.method_30613(file);
                 CompoundTag lv2 = lv.getCompound("Data");
                 CompoundTag lv3 = lv2.contains("Player", 10) ? lv2.getCompound("Player") : null;
                 lv2.remove("Player");
@@ -206,7 +204,7 @@ public class LevelStorage {
                 Dynamic dynamic = dataFixer.update(DataFixTypes.LEVEL.getTypeReference(), new Dynamic(dynamicOps, (Object)lv2), i, SharedConstants.getGameVersion().getWorldVersion());
                 Pair<GeneratorOptions, Lifecycle> pair = LevelStorage.method_29010(dynamic, dataFixer, i);
                 SaveVersionInfo lv4 = SaveVersionInfo.fromDynamic(dynamic);
-                LevelInfo lv5 = LevelInfo.method_28383(dynamic, arg);
+                LevelInfo lv5 = LevelInfo.fromDynamic(dynamic, arg);
                 return LevelProperties.method_29029((Dynamic<Tag>)dynamic, dataFixer, i, lv3, lv5, lv4, (GeneratorOptions)pair.getFirst(), (Lifecycle)pair.getSecond());
             }
             catch (Exception exception) {
@@ -219,7 +217,7 @@ public class LevelStorage {
     private BiFunction<File, DataFixer, LevelSummary> method_29014(File file, boolean bl) {
         return (file2, dataFixer) -> {
             try {
-                CompoundTag lv = NbtIo.readCompressed(new FileInputStream((File)file2));
+                CompoundTag lv = NbtIo.method_30613(file2);
                 CompoundTag lv2 = lv.getCompound("Data");
                 lv2.remove("Player");
                 int i = lv2.contains("DataVersion", 99) ? lv2.getInt("DataVersion") : -1;
@@ -230,7 +228,7 @@ public class LevelStorage {
                     boolean bl2 = j != this.getCurrentVersion();
                     File file3 = new File(file, "icon.png");
                     DataPackSettings lv4 = dynamic.get("DataPacks").result().map(LevelStorage::method_29580).orElse(DataPackSettings.SAFE_MODE);
-                    LevelInfo lv5 = LevelInfo.method_28383(dynamic, lv4);
+                    LevelInfo lv5 = LevelInfo.fromDynamic(dynamic, lv4);
                     return new LevelSummary(lv5, lv3, file.getName(), bl2, bl, file3);
                 }
                 return null;
@@ -243,9 +241,9 @@ public class LevelStorage {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public boolean isLevelNameValid(String string) {
+    public boolean isLevelNameValid(String name) {
         try {
-            Path path = this.savesDirectory.resolve(string);
+            Path path = this.savesDirectory.resolve(name);
             Files.createDirectory(path, new FileAttribute[0]);
             Files.deleteIfExists(path);
             return true;
@@ -256,8 +254,8 @@ public class LevelStorage {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public boolean levelExists(String string) {
-        return Files.isDirectory(this.savesDirectory.resolve(string), new LinkOption[0]);
+    public boolean levelExists(String name) {
+        return Files.isDirectory(this.savesDirectory.resolve(name), new LinkOption[0]);
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -270,8 +268,8 @@ public class LevelStorage {
         return this.backupsDirectory;
     }
 
-    public Session createSession(String string) throws IOException {
-        return new Session(string);
+    public Session createSession(String directoryName) throws IOException {
+        return new Session(directoryName);
     }
 
     public class Session
@@ -281,9 +279,9 @@ public class LevelStorage {
         private final String directoryName;
         private final Map<WorldSavePath, Path> paths = Maps.newHashMap();
 
-        public Session(String string) throws IOException {
-            this.directoryName = string;
-            this.directory = LevelStorage.this.savesDirectory.resolve(string);
+        public Session(String directoryName) throws IOException {
+            this.directoryName = directoryName;
+            this.directory = LevelStorage.this.savesDirectory.resolve(directoryName);
             this.lock = SessionLock.create(this.directory);
         }
 
@@ -291,12 +289,12 @@ public class LevelStorage {
             return this.directoryName;
         }
 
-        public Path getDirectory(WorldSavePath arg2) {
-            return this.paths.computeIfAbsent(arg2, arg -> this.directory.resolve(arg.getRelativePath()));
+        public Path getDirectory(WorldSavePath savePath) {
+            return this.paths.computeIfAbsent(savePath, path -> this.directory.resolve(path.getRelativePath()));
         }
 
-        public File getWorldDirectory(RegistryKey<World> arg) {
-            return DimensionType.getSaveDirectory(arg, this.directory.toFile());
+        public File getWorldDirectory(RegistryKey<World> key) {
+            return DimensionType.getSaveDirectory(key, this.directory.toFile());
         }
 
         private void checkValid() {
@@ -315,9 +313,9 @@ public class LevelStorage {
             return lv != null && lv.method_29586().getLevelFormatVersion() != LevelStorage.this.getCurrentVersion();
         }
 
-        public boolean convert(ProgressListener arg) {
+        public boolean convert(ProgressListener progressListener) {
             this.checkValid();
-            return AnvilLevelStorage.convertLevel(this, arg);
+            return AnvilLevelStorage.convertLevel(this, progressListener);
         }
 
         @Nullable
@@ -338,21 +336,21 @@ public class LevelStorage {
             return (DataPackSettings)LevelStorage.this.readLevelProperties(this.directory.toFile(), (file, dataFixer) -> LevelStorage.method_29583(file, dataFixer));
         }
 
-        public void method_27425(RegistryTracker arg, SaveProperties arg2) {
+        public void method_27425(DynamicRegistryManager arg, SaveProperties arg2) {
             this.method_27426(arg, arg2, null);
         }
 
-        public void method_27426(RegistryTracker arg, SaveProperties arg2, @Nullable CompoundTag arg3) {
+        public void method_27426(DynamicRegistryManager arg, SaveProperties arg2, @Nullable CompoundTag arg3) {
             File file = this.directory.toFile();
             CompoundTag lv = arg2.cloneWorldTag(arg, arg3);
             CompoundTag lv2 = new CompoundTag();
             lv2.put("Data", lv);
             try {
                 File file2 = File.createTempFile("level", ".dat", file);
-                NbtIo.writeCompressed(lv2, new FileOutputStream(file2));
+                NbtIo.method_30614(lv2, file2);
                 File file3 = new File(file, "level.dat_old");
                 File file4 = new File(file, "level.dat");
-                Util.method_27760(file4, file2, file3);
+                Util.backupAndReplace(file4, file2, file3);
             }
             catch (Exception exception) {
                 LOGGER.error("Failed to save level {}", (Object)file, (Object)exception);
@@ -422,7 +420,7 @@ public class LevelStorage {
         }
 
         @Environment(value=EnvType.CLIENT)
-        public void save(String string) throws IOException {
+        public void save(String name) throws IOException {
             this.checkValid();
             File file = new File(LevelStorage.this.savesDirectory.toFile(), this.directoryName);
             if (!file.exists()) {
@@ -430,10 +428,10 @@ public class LevelStorage {
             }
             File file2 = new File(file, "level.dat");
             if (file2.exists()) {
-                CompoundTag lv = NbtIo.readCompressed(new FileInputStream(file2));
+                CompoundTag lv = NbtIo.method_30613(file2);
                 CompoundTag lv2 = lv.getCompound("Data");
-                lv2.putString("LevelName", string);
-                NbtIo.writeCompressed(lv, new FileOutputStream(file2));
+                lv2.putString("LevelName", name);
+                NbtIo.method_30614(lv, file2);
             }
         }
 

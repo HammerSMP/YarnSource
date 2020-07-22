@@ -30,10 +30,10 @@ public enum SpawnGroup implements StringIdentifiable
     private final int despawnStartRange = 32;
     private final int immediateDespawnRange;
 
-    private SpawnGroup(String string2, int j, boolean bl, boolean bl2, int k) {
-        this.name = string2;
-        this.capacity = j;
-        this.peaceful = bl;
+    private SpawnGroup(String name, int spawnCap, boolean peaceful, boolean bl2, int k) {
+        this.name = name;
+        this.capacity = spawnCap;
+        this.peaceful = peaceful;
         this.animal = bl2;
         this.immediateDespawnRange = k;
     }
@@ -72,7 +72,7 @@ public enum SpawnGroup implements StringIdentifiable
     }
 
     static {
-        field_24655 = StringIdentifiable.method_28140(SpawnGroup::values, SpawnGroup::method_28307);
+        field_24655 = StringIdentifiable.createCodec(SpawnGroup::values, SpawnGroup::method_28307);
         BY_NAME = Arrays.stream(SpawnGroup.values()).collect(Collectors.toMap(SpawnGroup::getName, arg -> arg));
     }
 }

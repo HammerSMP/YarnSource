@@ -97,9 +97,9 @@ extends DrawableHelper {
     @Nullable
     private CompletableFuture<WorldChunk> chunkFuture;
 
-    public DebugHud(MinecraftClient arg) {
-        this.client = arg;
-        this.fontRenderer = arg.textRenderer;
+    public DebugHud(MinecraftClient client) {
+        this.client = client;
+        this.fontRenderer = client.textRenderer;
     }
 
     public void resetChunk() {
@@ -255,7 +255,7 @@ extends DrawableHelper {
                     }
                     list.add(stringBuilder.toString());
                     if (lv3.getY() >= 0 && lv3.getY() < 256) {
-                        list.add("Biome: " + Registry.BIOME.getId(this.client.world.getBiome(lv3)));
+                        list.add("Biome: " + this.client.world.getRegistryManager().get(Registry.BIOME_KEY).getId(this.client.world.getBiome(lv3)));
                         long l = 0L;
                         float h = 0.0f;
                         if (lv9 != null) {
@@ -352,7 +352,7 @@ extends DrawableHelper {
             for (Map.Entry entry : lv2.getEntries().entrySet()) {
                 list.add(this.propertyToString(entry));
             }
-            for (Identifier lv3 : this.client.getNetworkHandler().getTagManager().method_30215().method_30206(lv2.getBlock())) {
+            for (Identifier lv3 : this.client.getNetworkHandler().getTagManager().getBlocks().getTagsFor(lv2.getBlock())) {
                 list.add("#" + lv3);
             }
         }
@@ -365,7 +365,7 @@ extends DrawableHelper {
             for (Map.Entry entry2 : lv5.getEntries().entrySet()) {
                 list.add(this.propertyToString(entry2));
             }
-            for (Identifier lv6 : this.client.getNetworkHandler().getTagManager().method_30220().method_30206(lv5.getFluid())) {
+            for (Identifier lv6 : this.client.getNetworkHandler().getTagManager().getFluids().getTagsFor(lv5.getFluid())) {
                 list.add("#" + lv6);
             }
         }
@@ -377,9 +377,9 @@ extends DrawableHelper {
         return list;
     }
 
-    private String propertyToString(Map.Entry<Property<?>, Comparable<?>> entry) {
-        Property<?> lv = entry.getKey();
-        Comparable<?> comparable = entry.getValue();
+    private String propertyToString(Map.Entry<Property<?>, Comparable<?>> propEntry) {
+        Property<?> lv = propEntry.getKey();
+        Comparable<?> comparable = propEntry.getValue();
         String string = Util.getValueAsString(lv, comparable);
         if (Boolean.TRUE.equals(comparable)) {
             string = (Object)((Object)Formatting.GREEN) + string;
@@ -465,31 +465,31 @@ extends DrawableHelper {
         RenderSystem.enableDepthTest();
     }
 
-    private int getMetricsLineColor(int i, int j, int k, int l) {
-        if (i < k) {
-            return this.interpolateColor(-16711936, -256, (float)i / (float)k);
+    private int getMetricsLineColor(int value, int greenValue, int yellowValue, int redValue) {
+        if (value < yellowValue) {
+            return this.interpolateColor(-16711936, -256, (float)value / (float)yellowValue);
         }
-        return this.interpolateColor(-256, -65536, (float)(i - k) / (float)(l - k));
+        return this.interpolateColor(-256, -65536, (float)(value - yellowValue) / (float)(redValue - yellowValue));
     }
 
-    private int interpolateColor(int i, int j, float f) {
-        int k = i >> 24 & 0xFF;
-        int l = i >> 16 & 0xFF;
-        int m = i >> 8 & 0xFF;
-        int n = i & 0xFF;
-        int o = j >> 24 & 0xFF;
-        int p = j >> 16 & 0xFF;
-        int q = j >> 8 & 0xFF;
-        int r = j & 0xFF;
-        int s = MathHelper.clamp((int)MathHelper.lerp(f, k, o), 0, 255);
-        int t = MathHelper.clamp((int)MathHelper.lerp(f, l, p), 0, 255);
-        int u = MathHelper.clamp((int)MathHelper.lerp(f, m, q), 0, 255);
-        int v = MathHelper.clamp((int)MathHelper.lerp(f, n, r), 0, 255);
+    private int interpolateColor(int color1, int color2, float dt) {
+        int k = color1 >> 24 & 0xFF;
+        int l = color1 >> 16 & 0xFF;
+        int m = color1 >> 8 & 0xFF;
+        int n = color1 & 0xFF;
+        int o = color2 >> 24 & 0xFF;
+        int p = color2 >> 16 & 0xFF;
+        int q = color2 >> 8 & 0xFF;
+        int r = color2 & 0xFF;
+        int s = MathHelper.clamp((int)MathHelper.lerp(dt, k, o), 0, 255);
+        int t = MathHelper.clamp((int)MathHelper.lerp(dt, l, p), 0, 255);
+        int u = MathHelper.clamp((int)MathHelper.lerp(dt, m, q), 0, 255);
+        int v = MathHelper.clamp((int)MathHelper.lerp(dt, n, r), 0, 255);
         return s << 24 | t << 16 | u << 8 | v;
     }
 
-    private static long toMiB(long l) {
-        return l / 1024L / 1024L;
+    private static long toMiB(long bytes) {
+        return bytes / 1024L / 1024L;
     }
 }
 

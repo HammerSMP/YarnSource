@@ -25,20 +25,20 @@ extends LootPoolEntry {
     protected final LootPoolEntry[] children;
     private final EntryCombiner predicate;
 
-    protected CombinedEntry(LootPoolEntry[] args, LootCondition[] args2) {
-        super(args2);
-        this.children = args;
-        this.predicate = this.combine(args);
+    protected CombinedEntry(LootPoolEntry[] children, LootCondition[] conditions) {
+        super(conditions);
+        this.children = children;
+        this.predicate = this.combine(children);
     }
 
     @Override
-    public void validate(LootTableReporter arg) {
-        super.validate(arg);
+    public void validate(LootTableReporter reporter) {
+        super.validate(reporter);
         if (this.children.length == 0) {
-            arg.report("Empty children list");
+            reporter.report("Empty children list");
         }
         for (int i = 0; i < this.children.length; ++i) {
-            this.children[i].validate(arg.makeChild(".entry[" + i + "]"));
+            this.children[i].validate(reporter.makeChild(".entry[" + i + "]"));
         }
     }
 
@@ -67,8 +67,8 @@ extends LootPoolEntry {
             }
 
             @Override
-            public /* synthetic */ LootPoolEntry fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
-                return this.fromJson(jsonObject, jsonDeserializationContext, args);
+            public /* synthetic */ LootPoolEntry fromJson(JsonObject json, JsonDeserializationContext context, LootCondition[] conditions) {
+                return this.fromJson(json, context, conditions);
             }
         };
     }

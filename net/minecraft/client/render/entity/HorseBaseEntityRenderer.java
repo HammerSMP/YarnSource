@@ -20,9 +20,9 @@ public abstract class HorseBaseEntityRenderer<T extends HorseBaseEntity, M exten
 extends MobEntityRenderer<T, M> {
     private final float scale;
 
-    public HorseBaseEntityRenderer(EntityRenderDispatcher arg, M arg2, float f) {
-        super(arg, arg2, 0.75f);
-        this.scale = f;
+    public HorseBaseEntityRenderer(EntityRenderDispatcher dispatcher, M model, float scale) {
+        super(dispatcher, model, 0.75f);
+        this.scale = scale;
     }
 
     @Override

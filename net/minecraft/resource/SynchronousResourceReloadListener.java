@@ -13,14 +13,14 @@ import net.minecraft.util.profiler.Profiler;
 public interface SynchronousResourceReloadListener
 extends ResourceReloadListener {
     @Override
-    default public CompletableFuture<Void> reload(ResourceReloadListener.Synchronizer arg, ResourceManager arg2, Profiler arg3, Profiler arg4, Executor executor, Executor executor2) {
-        return arg.whenPrepared(Unit.INSTANCE).thenRunAsync(() -> {
-            arg4.startTick();
-            arg4.push("listener");
-            this.apply(arg2);
-            arg4.pop();
-            arg4.endTick();
-        }, executor2);
+    default public CompletableFuture<Void> reload(ResourceReloadListener.Synchronizer synchronizer, ResourceManager manager, Profiler prepareProfiler, Profiler applyProfiler, Executor prepareExecutor, Executor applyExecutor) {
+        return synchronizer.whenPrepared(Unit.INSTANCE).thenRunAsync(() -> {
+            applyProfiler.startTick();
+            applyProfiler.push("listener");
+            this.apply(manager);
+            applyProfiler.pop();
+            applyProfiler.endTick();
+        }, applyExecutor);
     }
 
     public void apply(ResourceManager var1);

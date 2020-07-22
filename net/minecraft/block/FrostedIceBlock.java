@@ -35,62 +35,62 @@ extends IceBlock {
     }
 
     @Override
-    public void randomTick(BlockState arg, ServerWorld arg2, BlockPos arg3, Random random) {
-        this.scheduledTick(arg, arg2, arg3, random);
+    public void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        this.scheduledTick(state, world, pos, random);
     }
 
     @Override
-    public void scheduledTick(BlockState arg, ServerWorld arg2, BlockPos arg3, Random random) {
-        if ((random.nextInt(3) == 0 || this.canMelt(arg2, arg3, 4)) && arg2.getLightLevel(arg3) > 11 - arg.get(AGE) - arg.getOpacity(arg2, arg3) && this.increaseAge(arg, arg2, arg3)) {
+    public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        if ((random.nextInt(3) == 0 || this.canMelt(world, pos, 4)) && world.getLightLevel(pos) > 11 - state.get(AGE) - state.getOpacity(world, pos) && this.increaseAge(state, world, pos)) {
             BlockPos.Mutable lv = new BlockPos.Mutable();
             for (Direction lv2 : Direction.values()) {
-                lv.set(arg3, lv2);
-                BlockState lv3 = arg2.getBlockState(lv);
-                if (!lv3.isOf(this) || this.increaseAge(lv3, arg2, lv)) continue;
-                arg2.getBlockTickScheduler().schedule(lv, this, MathHelper.nextInt(random, 20, 40));
+                lv.set(pos, lv2);
+                BlockState lv3 = world.getBlockState(lv);
+                if (!lv3.isOf(this) || this.increaseAge(lv3, world, lv)) continue;
+                world.getBlockTickScheduler().schedule(lv, this, MathHelper.nextInt(random, 20, 40));
             }
             return;
         }
-        arg2.getBlockTickScheduler().schedule(arg3, this, MathHelper.nextInt(random, 20, 40));
+        world.getBlockTickScheduler().schedule(pos, this, MathHelper.nextInt(random, 20, 40));
     }
 
-    private boolean increaseAge(BlockState arg, World arg2, BlockPos arg3) {
-        int i = arg.get(AGE);
+    private boolean increaseAge(BlockState state, World world, BlockPos pos) {
+        int i = state.get(AGE);
         if (i < 3) {
-            arg2.setBlockState(arg3, (BlockState)arg.with(AGE, i + 1), 2);
+            world.setBlockState(pos, (BlockState)state.with(AGE, i + 1), 2);
             return false;
         }
-        this.melt(arg, arg2, arg3);
+        this.melt(state, world, pos);
         return true;
     }
 
     @Override
-    public void neighborUpdate(BlockState arg, World arg2, BlockPos arg3, Block arg4, BlockPos arg5, boolean bl) {
-        if (arg4 == this && this.canMelt(arg2, arg3, 2)) {
-            this.melt(arg, arg2, arg3);
+    public void neighborUpdate(BlockState state, World world, BlockPos pos, Block block, BlockPos fromPos, boolean notify) {
+        if (block == this && this.canMelt(world, pos, 2)) {
+            this.melt(state, world, pos);
         }
-        super.neighborUpdate(arg, arg2, arg3, arg4, arg5, bl);
+        super.neighborUpdate(state, world, pos, block, fromPos, notify);
     }
 
-    private boolean canMelt(BlockView arg, BlockPos arg2, int i) {
+    private boolean canMelt(BlockView world, BlockPos pos, int maxNeighbors) {
         int j = 0;
         BlockPos.Mutable lv = new BlockPos.Mutable();
         for (Direction lv2 : Direction.values()) {
-            lv.set(arg2, lv2);
-            if (!arg.getBlockState(lv).isOf(this) || ++j < i) continue;
+            lv.set(pos, lv2);
+            if (!world.getBlockState(lv).isOf(this) || ++j < maxNeighbors) continue;
             return false;
         }
         return true;
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(AGE);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(AGE);
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public ItemStack getPickStack(BlockView arg, BlockPos arg2, BlockState arg3) {
+    public ItemStack getPickStack(BlockView world, BlockPos pos, BlockState state) {
         return ItemStack.EMPTY;
     }
 }

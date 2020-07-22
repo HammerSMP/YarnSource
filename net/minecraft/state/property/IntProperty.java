@@ -18,16 +18,16 @@ public class IntProperty
 extends Property<Integer> {
     private final ImmutableSet<Integer> values;
 
-    protected IntProperty(String string, int i, int j) {
-        super(string, Integer.class);
-        if (i < 0) {
-            throw new IllegalArgumentException("Min value of " + string + " must be 0 or greater");
+    protected IntProperty(String name, int min, int max) {
+        super(name, Integer.class);
+        if (min < 0) {
+            throw new IllegalArgumentException("Min value of " + name + " must be 0 or greater");
         }
-        if (j <= i) {
-            throw new IllegalArgumentException("Max value of " + string + " must be greater than min (" + i + ")");
+        if (max <= min) {
+            throw new IllegalArgumentException("Max value of " + name + " must be greater than min (" + min + ")");
         }
         HashSet set = Sets.newHashSet();
-        for (int k = i; k <= j; ++k) {
+        for (int k = min; k <= max; ++k) {
             set.add(k);
         }
         this.values = ImmutableSet.copyOf((Collection)set);
@@ -55,14 +55,14 @@ extends Property<Integer> {
         return 31 * super.computeHashCode() + this.values.hashCode();
     }
 
-    public static IntProperty of(String string, int i, int j) {
-        return new IntProperty(string, i, j);
+    public static IntProperty of(String name, int min, int max) {
+        return new IntProperty(name, min, max);
     }
 
     @Override
-    public Optional<Integer> parse(String string) {
+    public Optional<Integer> parse(String name) {
         try {
-            Integer integer = Integer.valueOf(string);
+            Integer integer = Integer.valueOf(name);
             return this.values.contains((Object)integer) ? Optional.of(integer) : Optional.empty();
         }
         catch (NumberFormatException numberFormatException) {

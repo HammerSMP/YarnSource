@@ -39,27 +39,27 @@ public class GlyphRenderer {
         this.yMax = m;
     }
 
-    public void draw(boolean bl, float f, float g, Matrix4f arg, VertexConsumer arg2, float h, float i, float j, float k, int l) {
+    public void draw(boolean italic, float x, float y, Matrix4f matrix, VertexConsumer vertexConsumer, float red, float green, float blue, float alpha, int light) {
         int m = 3;
-        float n = f + this.xMin;
-        float o = f + this.xMax;
+        float n = x + this.xMin;
+        float o = x + this.xMax;
         float p = this.yMin - 3.0f;
         float q = this.yMax - 3.0f;
-        float r = g + p;
-        float s = g + q;
-        float t = bl ? 1.0f - 0.25f * p : 0.0f;
-        float u = bl ? 1.0f - 0.25f * q : 0.0f;
-        arg2.vertex(arg, n + t, r, 0.0f).color(h, i, j, k).texture(this.uMin, this.vMin).light(l).next();
-        arg2.vertex(arg, n + u, s, 0.0f).color(h, i, j, k).texture(this.uMin, this.vMax).light(l).next();
-        arg2.vertex(arg, o + u, s, 0.0f).color(h, i, j, k).texture(this.uMax, this.vMax).light(l).next();
-        arg2.vertex(arg, o + t, r, 0.0f).color(h, i, j, k).texture(this.uMax, this.vMin).light(l).next();
+        float r = y + p;
+        float s = y + q;
+        float t = italic ? 1.0f - 0.25f * p : 0.0f;
+        float u = italic ? 1.0f - 0.25f * q : 0.0f;
+        vertexConsumer.vertex(matrix, n + t, r, 0.0f).color(red, green, blue, alpha).texture(this.uMin, this.vMin).light(light).next();
+        vertexConsumer.vertex(matrix, n + u, s, 0.0f).color(red, green, blue, alpha).texture(this.uMin, this.vMax).light(light).next();
+        vertexConsumer.vertex(matrix, o + u, s, 0.0f).color(red, green, blue, alpha).texture(this.uMax, this.vMax).light(light).next();
+        vertexConsumer.vertex(matrix, o + t, r, 0.0f).color(red, green, blue, alpha).texture(this.uMax, this.vMin).light(light).next();
     }
 
-    public void drawRectangle(Rectangle arg, Matrix4f arg2, VertexConsumer arg3, int i) {
-        arg3.vertex(arg2, arg.xMin, arg.yMin, arg.zIndex).color(arg.red, arg.green, arg.blue, arg.alpha).texture(this.uMin, this.vMin).light(i).next();
-        arg3.vertex(arg2, arg.xMax, arg.yMin, arg.zIndex).color(arg.red, arg.green, arg.blue, arg.alpha).texture(this.uMin, this.vMax).light(i).next();
-        arg3.vertex(arg2, arg.xMax, arg.yMax, arg.zIndex).color(arg.red, arg.green, arg.blue, arg.alpha).texture(this.uMax, this.vMax).light(i).next();
-        arg3.vertex(arg2, arg.xMin, arg.yMax, arg.zIndex).color(arg.red, arg.green, arg.blue, arg.alpha).texture(this.uMax, this.vMin).light(i).next();
+    public void drawRectangle(Rectangle rectangle, Matrix4f matrix, VertexConsumer vertexConsumer, int light) {
+        vertexConsumer.vertex(matrix, rectangle.xMin, rectangle.yMin, rectangle.zIndex).color(rectangle.red, rectangle.green, rectangle.blue, rectangle.alpha).texture(this.uMin, this.vMin).light(light).next();
+        vertexConsumer.vertex(matrix, rectangle.xMax, rectangle.yMin, rectangle.zIndex).color(rectangle.red, rectangle.green, rectangle.blue, rectangle.alpha).texture(this.uMin, this.vMax).light(light).next();
+        vertexConsumer.vertex(matrix, rectangle.xMax, rectangle.yMax, rectangle.zIndex).color(rectangle.red, rectangle.green, rectangle.blue, rectangle.alpha).texture(this.uMax, this.vMax).light(light).next();
+        vertexConsumer.vertex(matrix, rectangle.xMin, rectangle.yMax, rectangle.zIndex).color(rectangle.red, rectangle.green, rectangle.blue, rectangle.alpha).texture(this.uMax, this.vMin).light(light).next();
     }
 
     public RenderLayer method_24045(boolean bl) {
@@ -78,16 +78,16 @@ public class GlyphRenderer {
         protected final float blue;
         protected final float alpha;
 
-        public Rectangle(float f, float g, float h, float i, float j, float k, float l, float m, float n) {
-            this.xMin = f;
-            this.yMin = g;
-            this.xMax = h;
-            this.yMax = i;
-            this.zIndex = j;
-            this.red = k;
-            this.green = l;
-            this.blue = m;
-            this.alpha = n;
+        public Rectangle(float xMin, float yMin, float xMax, float yMax, float zIndex, float red, float green, float blue, float alpha) {
+            this.xMin = xMin;
+            this.yMin = yMin;
+            this.xMax = xMax;
+            this.yMax = yMax;
+            this.zIndex = zIndex;
+            this.red = red;
+            this.green = green;
+            this.blue = blue;
+            this.alpha = alpha;
         }
     }
 }

@@ -26,38 +26,38 @@ implements Packet<ClientPlayPacketListener> {
     public StopSoundS2CPacket() {
     }
 
-    public StopSoundS2CPacket(@Nullable Identifier arg, @Nullable SoundCategory arg2) {
-        this.soundId = arg;
-        this.category = arg2;
+    public StopSoundS2CPacket(@Nullable Identifier soundId, @Nullable SoundCategory category) {
+        this.soundId = soundId;
+        this.category = category;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        byte i = arg.readByte();
+    public void read(PacketByteBuf buf) throws IOException {
+        byte i = buf.readByte();
         if ((i & 1) > 0) {
-            this.category = arg.readEnumConstant(SoundCategory.class);
+            this.category = buf.readEnumConstant(SoundCategory.class);
         }
         if ((i & 2) > 0) {
-            this.soundId = arg.readIdentifier();
+            this.soundId = buf.readIdentifier();
         }
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
+    public void write(PacketByteBuf buf) throws IOException {
         if (this.category != null) {
             if (this.soundId != null) {
-                arg.writeByte(3);
-                arg.writeEnumConstant(this.category);
-                arg.writeIdentifier(this.soundId);
+                buf.writeByte(3);
+                buf.writeEnumConstant(this.category);
+                buf.writeIdentifier(this.soundId);
             } else {
-                arg.writeByte(1);
-                arg.writeEnumConstant(this.category);
+                buf.writeByte(1);
+                buf.writeEnumConstant(this.category);
             }
         } else if (this.soundId != null) {
-            arg.writeByte(2);
-            arg.writeIdentifier(this.soundId);
+            buf.writeByte(2);
+            buf.writeIdentifier(this.soundId);
         } else {
-            arg.writeByte(0);
+            buf.writeByte(0);
         }
     }
 

@@ -60,11 +60,11 @@ extends Screen {
     private static final Logger LOGGER = LogManager.getLogger();
     private static final Text DROP_INFO = new TranslatableText("pack.dropInfo").formatted(Formatting.DARK_GRAY);
     private static final Text FOLDER_INFO = new TranslatableText("pack.folderInfo");
-    private static final Identifier field_25786 = new Identifier("textures/misc/unknown_pack.png");
+    private static final Identifier UNKNOWN_PACK = new Identifier("textures/misc/unknown_pack.png");
     private final ResourcePackOrganizer organizer;
     private final Screen parent;
     @Nullable
-    private class_5426 field_25787;
+    private DirectoryWatcher directoryWatcher;
     private long field_25788;
     private PackListWidget availablePackList;
     private PackListWidget selectedPackList;
@@ -77,21 +77,21 @@ extends Screen {
         this.parent = arg;
         this.organizer = new ResourcePackOrganizer(this::updatePackLists, this::method_30287, arg2, consumer);
         this.field_25474 = file;
-        this.field_25787 = class_5426.method_30293(file);
+        this.directoryWatcher = DirectoryWatcher.create(file);
     }
 
     @Override
     public void onClose() {
         this.organizer.apply();
         this.client.openScreen(this.parent);
-        this.method_30291();
+        this.closeDirectoryWatcher();
     }
 
-    private void method_30291() {
-        if (this.field_25787 != null) {
+    private void closeDirectoryWatcher() {
+        if (this.directoryWatcher != null) {
             try {
-                this.field_25787.close();
-                this.field_25787 = null;
+                this.directoryWatcher.close();
+                this.directoryWatcher = null;
             }
             catch (Exception exception) {
                 // empty catch block
@@ -109,24 +109,24 @@ extends Screen {
         this.selectedPackList = new PackListWidget(this.client, 200, this.height, new TranslatableText("pack.selected.title"));
         this.selectedPackList.setLeftPos(this.width / 2 + 4);
         this.children.add(this.selectedPackList);
-        this.method_29680();
+        this.refresh();
     }
 
     @Override
     public void tick() {
-        if (this.field_25787 != null) {
+        if (this.directoryWatcher != null) {
             try {
-                if (this.field_25787.method_30292()) {
+                if (this.directoryWatcher.pollForChange()) {
                     this.field_25788 = 20L;
                 }
             }
             catch (IOException iOException) {
                 LOGGER.warn("Failed to poll for directory {} changes, stopping", (Object)this.field_25474);
-                this.method_30291();
+                this.closeDirectoryWatcher();
             }
         }
         if (this.field_25788 > 0L && --this.field_25788 == 0L) {
-            this.method_29680();
+            this.refresh();
         }
     }
 
@@ -136,26 +136,26 @@ extends Screen {
         this.doneButton.active = !this.selectedPackList.children().isEmpty();
     }
 
-    private void updatePackList(PackListWidget arg, Stream<ResourcePackOrganizer.Pack> stream) {
-        arg.children().clear();
-        stream.forEach(arg2 -> arg.children().add(new PackListWidget.ResourcePackEntry(this.client, arg, this, (ResourcePackOrganizer.Pack)arg2)));
+    private void updatePackList(PackListWidget widget, Stream<ResourcePackOrganizer.Pack> packs) {
+        widget.children().clear();
+        packs.forEach(arg2 -> widget.children().add(new PackListWidget.ResourcePackEntry(this.client, widget, this, (ResourcePackOrganizer.Pack)arg2)));
     }
 
-    private void method_29680() {
-        this.organizer.method_29981();
+    private void refresh() {
+        this.organizer.refresh();
         this.updatePackLists();
         this.field_25788 = 0L;
         this.field_25789.clear();
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         this.renderBackgroundTexture(0);
-        this.availablePackList.render(arg, i, j, f);
-        this.selectedPackList.render(arg, i, j, f);
-        this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 8, 0xFFFFFF);
-        this.drawCenteredText(arg, this.textRenderer, DROP_INFO, this.width / 2, 20, 0xFFFFFF);
-        super.render(arg, i, j, f);
+        this.availablePackList.render(matrices, mouseX, mouseY, delta);
+        this.selectedPackList.render(matrices, mouseX, mouseY, delta);
+        this.drawCenteredText(matrices, this.textRenderer, this.title, this.width / 2, 8, 0xFFFFFF);
+        this.drawCenteredText(matrices, this.textRenderer, DROP_INFO, this.width / 2, 20, 0xFFFFFF);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 
     protected static void method_29669(MinecraftClient arg, List<Path> list, Path path) {
@@ -164,7 +164,7 @@ extends Screen {
             try (Stream<Path> stream = Files.walk(path2, new FileVisitOption[0]);){
                 stream.forEach(path3 -> {
                     try {
-                        Util.method_29775(path2.getParent(), path, path3);
+                        Util.relativeCopy(path2.getParent(), path, path3);
                     }
                     catch (IOException iOException) {
                         LOGGER.warn("Failed to copy datapack file  from {} to {}", path3, (Object)path, (Object)iOException);
@@ -178,17 +178,17 @@ extends Screen {
             }
         });
         if (mutableBoolean.isTrue()) {
-            SystemToast.method_29627(arg, path.toString());
+            SystemToast.addPackCopyFailure(arg, path.toString());
         }
     }
 
     @Override
-    public void method_29638(List<Path> list) {
-        String string = list.stream().map(Path::getFileName).map(Path::toString).collect(Collectors.joining(", "));
+    public void filesDragged(List<Path> paths) {
+        String string = paths.stream().map(Path::getFileName).map(Path::toString).collect(Collectors.joining(", "));
         this.client.openScreen(new ConfirmScreen(bl -> {
             if (bl) {
-                AbstractPackScreen.method_29669(this.client, list, this.field_25474.toPath());
-                this.method_29680();
+                AbstractPackScreen.method_29669(this.client, paths, this.field_25474.toPath());
+                this.refresh();
             }
             this.client.openScreen(this);
         }, new TranslatableText("pack.dropConfirm"), new LiteralText(string)));
@@ -224,33 +224,33 @@ extends Screen {
     }
 
     @Environment(value=EnvType.CLIENT)
-    static class class_5426
+    static class DirectoryWatcher
     implements AutoCloseable {
-        private final WatchService field_25790;
-        private final Path field_25791;
+        private final WatchService watchService;
+        private final Path path;
 
-        public class_5426(File file) throws IOException {
-            this.field_25791 = file.toPath();
-            this.field_25790 = this.field_25791.getFileSystem().newWatchService();
+        public DirectoryWatcher(File file) throws IOException {
+            this.path = file.toPath();
+            this.watchService = this.path.getFileSystem().newWatchService();
             try {
-                this.method_30294(this.field_25791);
-                try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(this.field_25791);){
+                this.watchDirectory(this.path);
+                try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(this.path);){
                     for (Path path : directoryStream) {
                         if (!Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)) continue;
-                        this.method_30294(path);
+                        this.watchDirectory(path);
                     }
                 }
             }
             catch (Exception exception) {
-                this.field_25790.close();
+                this.watchService.close();
                 throw exception;
             }
         }
 
         @Nullable
-        public static class_5426 method_30293(File file) {
+        public static DirectoryWatcher create(File file) {
             try {
-                return new class_5426(file);
+                return new DirectoryWatcher(file);
             }
             catch (IOException iOException) {
                 LOGGER.warn("Failed to initialize pack directory {} monitoring", (Object)file, (Object)iOException);
@@ -258,21 +258,21 @@ extends Screen {
             }
         }
 
-        private void method_30294(Path path) throws IOException {
-            path.register(this.field_25790, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_MODIFY);
+        private void watchDirectory(Path path) throws IOException {
+            path.register(this.watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_MODIFY);
         }
 
-        public boolean method_30292() throws IOException {
+        public boolean pollForChange() throws IOException {
             WatchKey watchKey;
             boolean bl = false;
-            while ((watchKey = this.field_25790.poll()) != null) {
+            while ((watchKey = this.watchService.poll()) != null) {
                 List<WatchEvent<?>> list = watchKey.pollEvents();
                 for (WatchEvent<?> watchEvent : list) {
                     bl = true;
-                    if (watchKey.watchable() != this.field_25791 || watchEvent.kind() != StandardWatchEventKinds.ENTRY_CREATE) continue;
-                    Path path = this.field_25791.resolve((Path)watchEvent.context());
+                    if (watchKey.watchable() != this.path || watchEvent.kind() != StandardWatchEventKinds.ENTRY_CREATE) continue;
+                    Path path = this.path.resolve((Path)watchEvent.context());
                     if (!Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)) continue;
-                    this.method_30294(path);
+                    this.watchDirectory(path);
                 }
                 watchKey.reset();
             }
@@ -281,7 +281,7 @@ extends Screen {
 
         @Override
         public void close() throws IOException {
-            this.field_25790.close();
+            this.watchService.close();
         }
     }
 }

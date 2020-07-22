@@ -20,112 +20,112 @@ public enum EnchantmentTarget {
     ARMOR{
 
         @Override
-        public boolean isAcceptableItem(Item arg) {
-            return arg instanceof ArmorItem;
+        public boolean isAcceptableItem(Item item) {
+            return item instanceof ArmorItem;
         }
     }
     ,
     ARMOR_FEET{
 
         @Override
-        public boolean isAcceptableItem(Item arg) {
-            return arg instanceof ArmorItem && ((ArmorItem)arg).getSlotType() == EquipmentSlot.FEET;
+        public boolean isAcceptableItem(Item item) {
+            return item instanceof ArmorItem && ((ArmorItem)item).getSlotType() == EquipmentSlot.FEET;
         }
     }
     ,
     ARMOR_LEGS{
 
         @Override
-        public boolean isAcceptableItem(Item arg) {
-            return arg instanceof ArmorItem && ((ArmorItem)arg).getSlotType() == EquipmentSlot.LEGS;
+        public boolean isAcceptableItem(Item item) {
+            return item instanceof ArmorItem && ((ArmorItem)item).getSlotType() == EquipmentSlot.LEGS;
         }
     }
     ,
     ARMOR_CHEST{
 
         @Override
-        public boolean isAcceptableItem(Item arg) {
-            return arg instanceof ArmorItem && ((ArmorItem)arg).getSlotType() == EquipmentSlot.CHEST;
+        public boolean isAcceptableItem(Item item) {
+            return item instanceof ArmorItem && ((ArmorItem)item).getSlotType() == EquipmentSlot.CHEST;
         }
     }
     ,
     ARMOR_HEAD{
 
         @Override
-        public boolean isAcceptableItem(Item arg) {
-            return arg instanceof ArmorItem && ((ArmorItem)arg).getSlotType() == EquipmentSlot.HEAD;
+        public boolean isAcceptableItem(Item item) {
+            return item instanceof ArmorItem && ((ArmorItem)item).getSlotType() == EquipmentSlot.HEAD;
         }
     }
     ,
     WEAPON{
 
         @Override
-        public boolean isAcceptableItem(Item arg) {
-            return arg instanceof SwordItem;
+        public boolean isAcceptableItem(Item item) {
+            return item instanceof SwordItem;
         }
     }
     ,
     DIGGER{
 
         @Override
-        public boolean isAcceptableItem(Item arg) {
-            return arg instanceof MiningToolItem;
+        public boolean isAcceptableItem(Item item) {
+            return item instanceof MiningToolItem;
         }
     }
     ,
     FISHING_ROD{
 
         @Override
-        public boolean isAcceptableItem(Item arg) {
-            return arg instanceof FishingRodItem;
+        public boolean isAcceptableItem(Item item) {
+            return item instanceof FishingRodItem;
         }
     }
     ,
     TRIDENT{
 
         @Override
-        public boolean isAcceptableItem(Item arg) {
-            return arg instanceof TridentItem;
+        public boolean isAcceptableItem(Item item) {
+            return item instanceof TridentItem;
         }
     }
     ,
     BREAKABLE{
 
         @Override
-        public boolean isAcceptableItem(Item arg) {
-            return arg.isDamageable();
+        public boolean isAcceptableItem(Item item) {
+            return item.isDamageable();
         }
     }
     ,
     BOW{
 
         @Override
-        public boolean isAcceptableItem(Item arg) {
-            return arg instanceof BowItem;
+        public boolean isAcceptableItem(Item item) {
+            return item instanceof BowItem;
         }
     }
     ,
     WEARABLE{
 
         @Override
-        public boolean isAcceptableItem(Item arg) {
-            return arg instanceof Wearable || Block.getBlockFromItem(arg) instanceof Wearable;
+        public boolean isAcceptableItem(Item item) {
+            return item instanceof Wearable || Block.getBlockFromItem(item) instanceof Wearable;
         }
     }
     ,
     CROSSBOW{
 
         @Override
-        public boolean isAcceptableItem(Item arg) {
-            return arg instanceof CrossbowItem;
+        public boolean isAcceptableItem(Item item) {
+            return item instanceof CrossbowItem;
         }
     }
     ,
     VANISHABLE{
 
         @Override
-        public boolean isAcceptableItem(Item arg) {
-            return arg instanceof Vanishable || Block.getBlockFromItem(arg) instanceof Vanishable || BREAKABLE.isAcceptableItem(arg);
+        public boolean isAcceptableItem(Item item) {
+            return item instanceof Vanishable || Block.getBlockFromItem(item) instanceof Vanishable || BREAKABLE.isAcceptableItem(item);
         }
     };
 

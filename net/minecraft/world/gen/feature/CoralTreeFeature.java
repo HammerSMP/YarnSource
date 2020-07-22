@@ -27,11 +27,11 @@ extends CoralFeature {
     }
 
     @Override
-    protected boolean spawnCoral(WorldAccess arg, Random random, BlockPos arg2, BlockState arg3) {
-        BlockPos.Mutable lv = arg2.mutableCopy();
+    protected boolean spawnCoral(WorldAccess world, Random random, BlockPos pos, BlockState state) {
+        BlockPos.Mutable lv = pos.mutableCopy();
         int i = random.nextInt(3) + 1;
         for (int j = 0; j < i; ++j) {
-            if (!this.spawnCoralPiece(arg, random, lv, arg3)) {
+            if (!this.spawnCoralPiece(world, random, lv, state)) {
                 return true;
             }
             lv.move(Direction.UP);
@@ -46,7 +46,7 @@ extends CoralFeature {
             lv.move(lv3);
             int l = random.nextInt(5) + 2;
             int m = 0;
-            for (int n = 0; n < l && this.spawnCoralPiece(arg, random, lv, arg3); ++n) {
+            for (int n = 0; n < l && this.spawnCoralPiece(world, random, lv, state); ++n) {
                 lv.move(Direction.UP);
                 if (n != 0 && (++m < 2 || !(random.nextFloat() < 0.25f))) continue;
                 lv.move(lv3);

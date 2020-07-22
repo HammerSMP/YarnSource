@@ -70,7 +70,6 @@ import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.SkullBlockEntity;
-import net.minecraft.class_5407;
 import net.minecraft.client.ClientBrandRetriever;
 import net.minecraft.client.Keyboard;
 import net.minecraft.client.MinecraftClientGame;
@@ -148,6 +147,7 @@ import net.minecraft.client.resource.Format3ResourcePack;
 import net.minecraft.client.resource.Format4ResourcePack;
 import net.minecraft.client.resource.GrassColormapResourceSupplier;
 import net.minecraft.client.resource.SplashTextResourceSupplier;
+import net.minecraft.client.resource.VideoWarningManager;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.resource.language.LanguageManager;
 import net.minecraft.client.search.IdentifierSearchableContainer;
@@ -247,8 +247,8 @@ import net.minecraft.util.profiler.ProfileResult;
 import net.minecraft.util.profiler.Profiler;
 import net.minecraft.util.profiler.ProfilerTiming;
 import net.minecraft.util.profiler.TickTimeTracker;
+import net.minecraft.util.registry.DynamicRegistryManager;
 import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryTracker;
 import net.minecraft.util.registry.SimpleRegistry;
 import net.minecraft.util.snooper.Snooper;
 import net.minecraft.util.snooper.SnooperListener;
@@ -322,7 +322,7 @@ WindowEventHandler {
     private final MusicTracker musicTracker;
     private final FontManager fontManager;
     private final SplashTextResourceSupplier splashTextLoader;
-    private final class_5407 field_25671;
+    private final VideoWarningManager videoWarningManager;
     private final MinecraftSessionService sessionService;
     private final PlayerSkinProvider skinProvider;
     private final BakedModelManager bakedModelManager;
@@ -385,33 +385,33 @@ WindowEventHandler {
     private ProfileResult tickProfilerResult;
     private String openProfilerSection = "root";
 
-    public MinecraftClient(RunArgs arg) {
+    public MinecraftClient(RunArgs args) {
         super("Client");
         WindowSettings lv2;
         int j;
         String string2;
         instance = this;
-        this.runDirectory = arg.directories.runDir;
-        File file = arg.directories.assetDir;
-        this.resourcePackDir = arg.directories.resourcePackDir;
-        this.gameVersion = arg.game.version;
-        this.versionType = arg.game.versionType;
-        this.sessionPropertyMap = arg.network.profileProperties;
-        this.builtinPackProvider = new ClientBuiltinResourcePackProvider(new File(this.runDirectory, "server-resource-packs"), arg.directories.getResourceIndex());
+        this.runDirectory = args.directories.runDir;
+        File file = args.directories.assetDir;
+        this.resourcePackDir = args.directories.resourcePackDir;
+        this.gameVersion = args.game.version;
+        this.versionType = args.game.versionType;
+        this.sessionPropertyMap = args.network.profileProperties;
+        this.builtinPackProvider = new ClientBuiltinResourcePackProvider(new File(this.runDirectory, "server-resource-packs"), args.directories.getResourceIndex());
         this.resourcePackManager = new ResourcePackManager(MinecraftClient::createResourcePackProfile, this.builtinPackProvider, new FileResourcePackProvider(this.resourcePackDir, ResourcePackSource.field_25347));
-        this.netProxy = arg.network.netProxy;
+        this.netProxy = args.network.netProxy;
         this.sessionService = new YggdrasilAuthenticationService(this.netProxy, UUID.randomUUID().toString()).createMinecraftSessionService();
-        this.session = arg.network.session;
+        this.session = args.network.session;
         LOGGER.info("Setting user: {}", (Object)this.session.getUsername());
         LOGGER.debug("(Session ID is {})", (Object)this.session.getSessionId());
-        this.isDemo = arg.game.demo;
-        this.multiplayerEnabled = !arg.game.multiplayerDisabled;
-        this.onlineChatEnabled = !arg.game.onlineChatDisabled;
+        this.isDemo = args.game.demo;
+        this.multiplayerEnabled = !args.game.multiplayerDisabled;
+        this.onlineChatEnabled = !args.game.onlineChatDisabled;
         this.is64Bit = MinecraftClient.checkIs64Bit();
         this.server = null;
-        if (this.multiplayerEnabled && arg.autoConnect.serverAddress != null) {
-            String string = arg.autoConnect.serverAddress;
-            int i = arg.autoConnect.serverPort;
+        if (this.multiplayerEnabled && args.autoConnect.serverAddress != null) {
+            String string = args.autoConnect.serverAddress;
+            int i = args.autoConnect.serverPort;
         } else {
             string2 = null;
             j = 0;
@@ -425,9 +425,9 @@ WindowEventHandler {
         this.creativeHotbarStorage = new HotbarStorage(this.runDirectory, this.dataFixer);
         LOGGER.info("Backend library: {}", (Object)RenderSystem.getBackendDescription());
         if (this.options.overrideHeight > 0 && this.options.overrideWidth > 0) {
-            WindowSettings lv = new WindowSettings(this.options.overrideWidth, this.options.overrideHeight, arg.windowSettings.fullscreenWidth, arg.windowSettings.fullscreenHeight, arg.windowSettings.fullscreen);
+            WindowSettings lv = new WindowSettings(this.options.overrideWidth, this.options.overrideHeight, args.windowSettings.fullscreenWidth, args.windowSettings.fullscreenHeight, args.windowSettings.fullscreen);
         } else {
-            lv2 = arg.windowSettings;
+            lv2 = args.windowSettings;
         }
         Util.nanoTimeSupplier = RenderSystem.initBackendSystem();
         this.windowProvider = new WindowProvider(this);
@@ -495,8 +495,8 @@ WindowEventHandler {
         this.resourceManager.registerListener(this.paintingManager);
         this.statusEffectSpriteManager = new StatusEffectSpriteManager(this.textureManager);
         this.resourceManager.registerListener(this.statusEffectSpriteManager);
-        this.field_25671 = new class_5407();
-        this.resourceManager.registerListener(this.field_25671);
+        this.videoWarningManager = new VideoWarningManager();
+        this.resourceManager.registerListener(this.videoWarningManager);
         this.inGameHud = new InGameHud(this);
         this.debugRenderer = new DebugRenderer(this);
         RenderSystem.setErrorCallback((arg_0, arg_1) -> this.handleGlErrorByDisableVsync(arg_0, arg_1));
@@ -619,13 +619,13 @@ WindowEventHandler {
         }
     }
 
-    void initFont(boolean bl) {
-        this.fontManager.setIdOverrides((Map<Identifier, Identifier>)(bl ? ImmutableMap.of((Object)DEFAULT_FONT_ID, (Object)UNICODE_FONT_ID) : ImmutableMap.of()));
+    void initFont(boolean forcesUnicode) {
+        this.fontManager.setIdOverrides((Map<Identifier, Identifier>)(forcesUnicode ? ImmutableMap.of((Object)DEFAULT_FONT_ID, (Object)UNICODE_FONT_ID) : ImmutableMap.of()));
     }
 
     private void initializeSearchableContainers() {
         TextSearchableContainer<ItemStack> lv = new TextSearchableContainer<ItemStack>(arg2 -> arg2.getTooltip(null, TooltipContext.Default.NORMAL).stream().map(arg -> Formatting.strip(arg.getString()).trim()).filter(string -> !string.isEmpty()), arg -> Stream.of(Registry.ITEM.getId(arg.getItem())));
-        IdentifierSearchableContainer<ItemStack> lv2 = new IdentifierSearchableContainer<ItemStack>(arg -> ItemTags.getContainer().method_30206(arg.getItem()).stream());
+        IdentifierSearchableContainer<ItemStack> lv2 = new IdentifierSearchableContainer<ItemStack>(arg -> ItemTags.getTagGroup().getTagsFor(arg.getItem()).stream());
         DefaultedList<ItemStack> lv3 = DefaultedList.of();
         for (Item lv4 : Registry.ITEM) {
             lv4.appendStacks(ItemGroup.SEARCH, lv3);
@@ -640,7 +640,7 @@ WindowEventHandler {
         this.searchManager.put(SearchManager.RECIPE_OUTPUT, lv5);
     }
 
-    private void handleGlErrorByDisableVsync(int i, long l) {
+    private void handleGlErrorByDisableVsync(int error, long description) {
         this.options.enableVsync = false;
         this.options.write();
     }
@@ -760,30 +760,30 @@ WindowEventHandler {
         }
     }
 
-    public void openScreen(@Nullable Screen arg) {
+    public void openScreen(@Nullable Screen screen) {
         if (this.currentScreen != null) {
             this.currentScreen.removed();
         }
-        if (arg == null && this.world == null) {
-            arg = new TitleScreen();
-        } else if (arg == null && this.player.isDead()) {
+        if (screen == null && this.world == null) {
+            screen = new TitleScreen();
+        } else if (screen == null && this.player.isDead()) {
             if (this.player.showsDeathScreen()) {
-                arg = new DeathScreen(null, this.world.getLevelProperties().isHardcore());
+                screen = new DeathScreen(null, this.world.getLevelProperties().isHardcore());
             } else {
                 this.player.requestRespawn();
             }
         }
-        if (arg instanceof TitleScreen || arg instanceof MultiplayerScreen) {
+        if (screen instanceof TitleScreen || screen instanceof MultiplayerScreen) {
             this.options.debugEnabled = false;
             this.inGameHud.getChatHud().clear(true);
         }
-        this.currentScreen = arg;
-        if (arg != null) {
+        this.currentScreen = screen;
+        if (screen != null) {
             this.mouse.unlockCursor();
             KeyBinding.unpressAll();
-            arg.init(this, this.window.getScaledWidth(), this.window.getScaledHeight());
+            screen.init(this, this.window.getScaledWidth(), this.window.getScaledHeight());
             this.skipGameRender = false;
-            NarratorManager.INSTANCE.narrate(arg.getNarrationMessage());
+            NarratorManager.INSTANCE.narrate(screen.getNarrationMessage());
         } else {
             this.soundManager.resumeAll();
             this.mouse.lockCursor();
@@ -791,8 +791,8 @@ WindowEventHandler {
         this.updateWindowTitle();
     }
 
-    public void setOverlay(@Nullable Overlay arg) {
-        this.overlay = arg;
+    public void setOverlay(@Nullable Overlay overlay) {
+        this.overlay = overlay;
     }
 
     public void stop() {
@@ -852,7 +852,7 @@ WindowEventHandler {
         }
     }
 
-    private void render(boolean bl) {
+    private void render(boolean tick) {
         boolean bl2;
         Runnable runnable;
         this.window.setPhase("Pre render");
@@ -868,7 +868,7 @@ WindowEventHandler {
         while ((runnable = this.renderTaskQueue.poll()) != null) {
             runnable.run();
         }
-        if (bl) {
+        if (tick) {
             int i = this.renderTickCounter.beginRenderTick(Util.getMeasuringTimeMs());
             this.profiler.push("scheduledExecutables");
             this.runTasks();
@@ -896,7 +896,7 @@ WindowEventHandler {
         this.profiler.pop();
         if (!this.skipGameRender) {
             this.profiler.swap("gameRenderer");
-            this.gameRenderer.render(this.paused ? this.pausedTickDelta : this.renderTickCounter.tickDelta, l, bl);
+            this.gameRenderer.render(this.paused ? this.pausedTickDelta : this.renderTickCounter.tickDelta, l, tick);
             this.profiler.swap("toasts");
             this.toastManager.draw(new MatrixStack());
             this.profiler.pop();
@@ -923,7 +923,7 @@ WindowEventHandler {
         this.profiler.pop();
         this.window.setPhase("Post render");
         ++this.fpsCounter;
-        boolean bl3 = bl2 = this.isIntegratedServerRunning() && (this.currentScreen != null && this.currentScreen.isPauseScreen() || this.overlay != null && this.overlay.pausesGame()) && !this.server.isRemote();
+        boolean bl = bl2 = this.isIntegratedServerRunning() && (this.currentScreen != null && this.currentScreen.isPauseScreen() || this.overlay != null && this.overlay.pausesGame()) && !this.server.isRemote();
         if (this.paused != bl2) {
             if (this.paused) {
                 this.pausedTickDelta = this.renderTickCounter.tickDelta;
@@ -952,8 +952,8 @@ WindowEventHandler {
         return this.options.debugEnabled && this.options.debugProfilerEnabled && !this.options.hudHidden;
     }
 
-    private void startMonitor(boolean bl, @Nullable TickDurationMonitor arg) {
-        if (bl) {
+    private void startMonitor(boolean active, @Nullable TickDurationMonitor monitor) {
+        if (active) {
             if (!this.tickTimeTracker.isActive()) {
                 this.trackingTick = 0;
                 this.tickTimeTracker.enable();
@@ -962,14 +962,14 @@ WindowEventHandler {
         } else {
             this.tickTimeTracker.disable();
         }
-        this.profiler = TickDurationMonitor.tickProfiler(this.tickTimeTracker.getProfiler(), arg);
+        this.profiler = TickDurationMonitor.tickProfiler(this.tickTimeTracker.getProfiler(), monitor);
     }
 
-    private void endMonitor(boolean bl, @Nullable TickDurationMonitor arg) {
-        if (arg != null) {
-            arg.endTick();
+    private void endMonitor(boolean active, @Nullable TickDurationMonitor monitor) {
+        if (monitor != null) {
+            monitor.endTick();
         }
-        this.tickProfilerResult = bl ? this.tickTimeTracker.getResult() : null;
+        this.tickProfilerResult = active ? this.tickTimeTracker.getResult() : null;
         this.profiler = this.tickTimeTracker.getProfiler();
     }
 
@@ -1019,7 +1019,7 @@ WindowEventHandler {
         System.gc();
     }
 
-    void handleProfilerKeyPress(int i) {
+    void handleProfilerKeyPress(int digit) {
         if (this.tickProfilerResult == null) {
             return;
         }
@@ -1028,16 +1028,16 @@ WindowEventHandler {
             return;
         }
         ProfilerTiming lv = list.remove(0);
-        if (i == 0) {
+        if (digit == 0) {
             int j;
             if (!lv.name.isEmpty() && (j = this.openProfilerSection.lastIndexOf(30)) >= 0) {
                 this.openProfilerSection = this.openProfilerSection.substring(0, j);
             }
-        } else if (--i < list.size() && !"unspecified".equals(list.get((int)i).name)) {
+        } else if (--digit < list.size() && !"unspecified".equals(list.get((int)digit).name)) {
             if (!this.openProfilerSection.isEmpty()) {
                 this.openProfilerSection = this.openProfilerSection + '\u001e';
             }
-            this.openProfilerSection = this.openProfilerSection + list.get((int)i).name;
+            this.openProfilerSection = this.openProfilerSection + list.get((int)digit).name;
         }
     }
 
@@ -1132,14 +1132,14 @@ WindowEventHandler {
         return this.running;
     }
 
-    public void openPauseMenu(boolean bl) {
+    public void openPauseMenu(boolean pause) {
         boolean bl2;
         if (this.currentScreen != null) {
             return;
         }
-        boolean bl3 = bl2 = this.isIntegratedServerRunning() && !this.server.isRemote();
+        boolean bl = bl2 = this.isIntegratedServerRunning() && !this.server.isRemote();
         if (bl2) {
-            this.openScreen(new GameMenuScreen(!bl));
+            this.openScreen(new GameMenuScreen(!pause));
             this.soundManager.pauseAll();
         } else {
             this.openScreen(new GameMenuScreen(true));
@@ -1459,76 +1459,76 @@ WindowEventHandler {
         return lv;
     }
 
-    public static SaveProperties createSaveProperties(LevelStorage.Session arg, RegistryTracker.Modifiable arg2, ResourceManager arg3, DataPackSettings arg4) {
-        RegistryOps<Tag> lv = RegistryOps.of(NbtOps.INSTANCE, arg3, arg2);
-        SaveProperties lv2 = arg.readLevelProperties(lv, arg4);
+    public static SaveProperties createSaveProperties(LevelStorage.Session session, DynamicRegistryManager.Impl registryTracker, ResourceManager resourceManager, DataPackSettings arg4) {
+        RegistryOps<Tag> lv = RegistryOps.of(NbtOps.INSTANCE, resourceManager, registryTracker);
+        SaveProperties lv2 = session.readLevelProperties(lv, arg4);
         if (lv2 == null) {
             throw new IllegalStateException("Failed to load world");
         }
         return lv2;
     }
 
-    public void startIntegratedServer(String string) {
-        this.startIntegratedServer(string, RegistryTracker.create(), MinecraftClient::method_29598, (Function4<LevelStorage.Session, RegistryTracker.Modifiable, ResourceManager, DataPackSettings, SaveProperties>)((Function4)MinecraftClient::createSaveProperties), false, WorldLoadAction.BACKUP);
+    public void startIntegratedServer(String worldName) {
+        this.startIntegratedServer(worldName, DynamicRegistryManager.create(), MinecraftClient::method_29598, (Function4<LevelStorage.Session, DynamicRegistryManager.Impl, ResourceManager, DataPackSettings, SaveProperties>)((Function4)MinecraftClient::createSaveProperties), false, WorldLoadAction.BACKUP);
     }
 
-    public void method_29607(String string, LevelInfo arg, RegistryTracker.Modifiable arg22, GeneratorOptions arg3) {
-        this.startIntegratedServer(string, arg22, arg2 -> arg.method_29558(), (Function4<LevelStorage.Session, RegistryTracker.Modifiable, ResourceManager, DataPackSettings, SaveProperties>)((Function4)(arg4, arg5, arg6, arg7) -> {
-            RegistryOps lv = RegistryOps.of(JsonOps.INSTANCE, arg6, arg22);
-            DataResult<SimpleRegistry<DimensionOptions>> dataResult = lv.loadToRegistry(arg3.getDimensionMap(), Registry.DIMENSION_OPTIONS, DimensionOptions.CODEC);
-            SimpleRegistry<DimensionOptions> lv2 = dataResult.resultOrPartial(((Logger)LOGGER)::error).orElse(arg3.getDimensionMap());
-            return new LevelProperties(arg, arg3.method_29573(lv2), dataResult.lifecycle());
+    public void method_29607(String worldName, LevelInfo levelInfo, DynamicRegistryManager.Impl registryTracker, GeneratorOptions generatorOptions) {
+        this.startIntegratedServer(worldName, registryTracker, arg2 -> levelInfo.getDataPackSettings(), (Function4<LevelStorage.Session, DynamicRegistryManager.Impl, ResourceManager, DataPackSettings, SaveProperties>)((Function4)(arg4, arg5, arg6, arg7) -> {
+            RegistryOps lv = RegistryOps.of(JsonOps.INSTANCE, arg6, registryTracker);
+            DataResult<SimpleRegistry<DimensionOptions>> dataResult = lv.loadToRegistry(generatorOptions.getDimensionMap(), Registry.DIMENSION_OPTIONS, DimensionOptions.CODEC);
+            SimpleRegistry<DimensionOptions> lv2 = dataResult.resultOrPartial(((Logger)LOGGER)::error).orElse(generatorOptions.getDimensionMap());
+            return new LevelProperties(levelInfo, generatorOptions.method_29573(lv2), dataResult.lifecycle());
         }), false, WorldLoadAction.CREATE);
     }
 
     /*
      * WARNING - void declaration
      */
-    private void startIntegratedServer(String string, RegistryTracker.Modifiable arg2, Function<LevelStorage.Session, DataPackSettings> function, Function4<LevelStorage.Session, RegistryTracker.Modifiable, ResourceManager, DataPackSettings, SaveProperties> function4, boolean bl, WorldLoadAction arg22) {
+    private void startIntegratedServer(String worldName, DynamicRegistryManager.Impl registryTracker, Function<LevelStorage.Session, DataPackSettings> function, Function4<LevelStorage.Session, DynamicRegistryManager.Impl, ResourceManager, DataPackSettings, SaveProperties> function4, boolean safeMode, WorldLoadAction arg2) {
         boolean bl3;
         void lv4;
         void lv2;
         try {
-            LevelStorage.Session lv = this.levelStorage.createSession(string);
+            LevelStorage.Session lv = this.levelStorage.createSession(worldName);
         }
         catch (IOException iOException) {
-            LOGGER.warn("Failed to read level {} data", (Object)string, (Object)iOException);
-            SystemToast.addWorldAccessFailureToast(this, string);
+            LOGGER.warn("Failed to read level {} data", (Object)worldName, (Object)iOException);
+            SystemToast.addWorldAccessFailureToast(this, worldName);
             this.openScreen(null);
             return;
         }
         try {
-            IntegratedResourceManager lv3 = this.method_29604(arg2, function, function4, bl, (LevelStorage.Session)lv2);
+            IntegratedResourceManager lv3 = this.method_29604(registryTracker, function, function4, safeMode, (LevelStorage.Session)lv2);
         }
         catch (Exception exception) {
             LOGGER.warn("Failed to load datapacks, can't proceed with server load", (Throwable)exception);
-            this.openScreen(new DatapackFailureScreen(() -> this.startIntegratedServer(string, arg2, function, function4, true, arg22)));
+            this.openScreen(new DatapackFailureScreen(() -> this.startIntegratedServer(worldName, registryTracker, function, function4, true, arg2)));
             try {
                 lv2.close();
             }
             catch (IOException iOException2) {
-                LOGGER.warn("Failed to unlock access to level {}", (Object)string, (Object)iOException2);
+                LOGGER.warn("Failed to unlock access to level {}", (Object)worldName, (Object)iOException2);
             }
             return;
         }
         SaveProperties lv5 = lv4.getSaveProperties();
         boolean bl2 = lv5.getGeneratorOptions().isLegacyCustomizedType();
-        boolean bl4 = bl3 = lv5.method_29588() != Lifecycle.stable();
-        if (arg22 != WorldLoadAction.NONE && (bl2 || bl3)) {
-            this.method_29601(arg22, string, bl2, () -> this.startIntegratedServer(string, arg2, function, function4, bl, WorldLoadAction.NONE));
+        boolean bl = bl3 = lv5.method_29588() != Lifecycle.stable();
+        if (arg2 != WorldLoadAction.NONE && (bl2 || bl3)) {
+            this.method_29601(arg2, worldName, bl2, () -> this.startIntegratedServer(worldName, registryTracker, function, function4, safeMode, WorldLoadAction.NONE));
             lv4.close();
             try {
                 lv2.close();
             }
             catch (IOException iOException3) {
-                LOGGER.warn("Failed to unlock access to level {}", (Object)string, (Object)iOException3);
+                LOGGER.warn("Failed to unlock access to level {}", (Object)worldName, (Object)iOException3);
             }
             return;
         }
         this.disconnect();
         this.worldGenProgressTracker.set(null);
         try {
-            lv2.method_27425(arg2, lv5);
+            lv2.method_27425(registryTracker, lv5);
             lv4.getServerResourceManager().loadRegistryTags();
             YggdrasilAuthenticationService yggdrasilAuthenticationService = new YggdrasilAuthenticationService(this.netProxy, UUID.randomUUID().toString());
             MinecraftSessionService minecraftSessionService = yggdrasilAuthenticationService.createMinecraftSessionService();
@@ -1537,13 +1537,13 @@ WindowEventHandler {
             SkullBlockEntity.setUserCache(lv6);
             SkullBlockEntity.setSessionService(minecraftSessionService);
             UserCache.setUseRemote(false);
-            this.server = MinecraftServer.startServer(arg_0 -> this.method_29603(arg2, (LevelStorage.Session)lv2, (IntegratedResourceManager)lv4, lv5, minecraftSessionService, gameProfileRepository, lv6, arg_0));
+            this.server = MinecraftServer.startServer(arg_0 -> this.method_29603(registryTracker, (LevelStorage.Session)lv2, (IntegratedResourceManager)lv4, lv5, minecraftSessionService, gameProfileRepository, lv6, arg_0));
             this.isIntegratedServerRunning = true;
         }
         catch (Throwable throwable) {
             CrashReport lv7 = CrashReport.create(throwable, "Starting integrated server");
             CrashReportSection lv8 = lv7.addElement("Starting integrated server");
-            lv8.add("Level ID", string);
+            lv8.add("Level ID", worldName);
             lv8.add("Level Name", lv5.getLevelName());
             throw new CrashException(lv7);
         }
@@ -1610,7 +1610,7 @@ WindowEventHandler {
         }
     }
 
-    public IntegratedResourceManager method_29604(RegistryTracker.Modifiable arg, Function<LevelStorage.Session, DataPackSettings> function, Function4<LevelStorage.Session, RegistryTracker.Modifiable, ResourceManager, DataPackSettings, SaveProperties> function4, boolean bl, LevelStorage.Session arg2) throws InterruptedException, ExecutionException {
+    public IntegratedResourceManager method_29604(DynamicRegistryManager.Impl arg, Function<LevelStorage.Session, DataPackSettings> function, Function4<LevelStorage.Session, DynamicRegistryManager.Impl, ResourceManager, DataPackSettings, SaveProperties> function4, boolean bl, LevelStorage.Session arg2) throws InterruptedException, ExecutionException {
         DataPackSettings lv = function.apply(arg2);
         ResourcePackManager lv2 = new ResourcePackManager(new VanillaDataPackProvider(), new FileResourcePackProvider(arg2.getDirectory(WorldSavePath.DATAPACKS).toFile(), ResourcePackSource.PACK_SOURCE_WORLD));
         try {
@@ -1627,12 +1627,12 @@ WindowEventHandler {
         }
     }
 
-    public void joinWorld(ClientWorld arg) {
+    public void joinWorld(ClientWorld world) {
         ProgressScreen lv = new ProgressScreen();
         lv.method_15412(new TranslatableText("connect.joining"));
         this.reset(lv);
-        this.world = arg;
-        this.setWorld(arg);
+        this.world = world;
+        this.setWorld(world);
         if (!this.isIntegratedServerRunning) {
             YggdrasilAuthenticationService authenticationService = new YggdrasilAuthenticationService(this.netProxy, UUID.randomUUID().toString());
             MinecraftSessionService minecraftSessionService = authenticationService.createMinecraftSessionService();
@@ -1648,7 +1648,7 @@ WindowEventHandler {
         this.disconnect(new ProgressScreen());
     }
 
-    public void disconnect(Screen arg) {
+    public void disconnect(Screen screen) {
         ClientPlayNetworkHandler lv = this.getNetworkHandler();
         if (lv != null) {
             this.cancelTasks();
@@ -1659,7 +1659,7 @@ WindowEventHandler {
         this.gameRenderer.reset();
         this.interactionManager = null;
         NarratorManager.INSTANCE.clear();
-        this.reset(arg);
+        this.reset(screen);
         if (this.world != null) {
             if (lv2 != null) {
                 this.profiler.push("waitForServer");
@@ -1679,12 +1679,12 @@ WindowEventHandler {
         this.player = null;
     }
 
-    private void reset(Screen arg) {
+    private void reset(Screen screen) {
         this.profiler.push("forcedTick");
         this.soundManager.stopAll();
         this.cameraEntity = null;
         this.connection = null;
-        this.openScreen(arg);
+        this.openScreen(screen);
         this.render(false);
         this.profiler.pop();
     }
@@ -1696,10 +1696,10 @@ WindowEventHandler {
         this.profiler.pop();
     }
 
-    private void setWorld(@Nullable ClientWorld arg) {
-        this.worldRenderer.setWorld(arg);
-        this.particleManager.setWorld(arg);
-        BlockEntityRenderDispatcher.INSTANCE.setWorld(arg);
+    private void setWorld(@Nullable ClientWorld world) {
+        this.worldRenderer.setWorld(world);
+        this.particleManager.setWorld(world);
+        BlockEntityRenderDispatcher.INSTANCE.setWorld(world);
         this.updateWindowTitle();
     }
 
@@ -1707,9 +1707,9 @@ WindowEventHandler {
         return this.multiplayerEnabled;
     }
 
-    public boolean shouldBlockMessages(UUID uUID) {
+    public boolean shouldBlockMessages(UUID sender) {
         if (!this.isOnlineChatEnabled()) {
-            return (this.player == null || !uUID.equals(this.player.getUuid())) && !uUID.equals(Util.NIL_UUID);
+            return (this.player == null || !sender.equals(this.player.getUuid())) && !sender.equals(Util.NIL_UUID);
         }
         return false;
     }
@@ -1854,33 +1854,33 @@ WindowEventHandler {
         }
     }
 
-    private ItemStack addBlockEntityNbt(ItemStack arg, BlockEntity arg2) {
-        CompoundTag lv = arg2.toTag(new CompoundTag());
-        if (arg.getItem() instanceof SkullItem && lv.contains("SkullOwner")) {
+    private ItemStack addBlockEntityNbt(ItemStack stack, BlockEntity blockEntity) {
+        CompoundTag lv = blockEntity.toTag(new CompoundTag());
+        if (stack.getItem() instanceof SkullItem && lv.contains("SkullOwner")) {
             CompoundTag lv2 = lv.getCompound("SkullOwner");
-            arg.getOrCreateTag().put("SkullOwner", lv2);
-            return arg;
+            stack.getOrCreateTag().put("SkullOwner", lv2);
+            return stack;
         }
-        arg.putSubTag("BlockEntityTag", lv);
+        stack.putSubTag("BlockEntityTag", lv);
         CompoundTag lv3 = new CompoundTag();
         ListTag lv4 = new ListTag();
         lv4.add(StringTag.of("\"(+NBT)\""));
         lv3.put("Lore", lv4);
-        arg.putSubTag("display", lv3);
-        return arg;
+        stack.putSubTag("display", lv3);
+        return stack;
     }
 
-    public CrashReport addDetailsToCrashReport(CrashReport arg) {
-        MinecraftClient.addSystemDetailsToCrashReport(this.languageManager, this.gameVersion, this.options, arg);
+    public CrashReport addDetailsToCrashReport(CrashReport report) {
+        MinecraftClient.addSystemDetailsToCrashReport(this.languageManager, this.gameVersion, this.options, report);
         if (this.world != null) {
-            this.world.addDetailsToCrashReport(arg);
+            this.world.addDetailsToCrashReport(report);
         }
-        return arg;
+        return report;
     }
 
-    public static void addSystemDetailsToCrashReport(@Nullable LanguageManager arg, String string, @Nullable GameOptions arg2, CrashReport arg3) {
-        CrashReportSection lv = arg3.getSystemDetailsSection();
-        lv.add("Launched Version", () -> string);
+    public static void addSystemDetailsToCrashReport(@Nullable LanguageManager languageManager, String version, @Nullable GameOptions options, CrashReport report) {
+        CrashReportSection lv = report.getSystemDetailsSection();
+        lv.add("Launched Version", () -> version);
         lv.add("Backend library", RenderSystem::getBackendDescription);
         lv.add("Backend API", RenderSystem::getApiDescription);
         lv.add("GL Caps", RenderSystem::getCapsString);
@@ -1896,7 +1896,7 @@ WindowEventHandler {
             return "Probably not. Jar signature remains and client brand is untouched.";
         });
         lv.add("Type", "Client (map_client.txt)");
-        if (arg2 != null) {
+        if (options != null) {
             lv.add("Resource Packs", () -> {
                 StringBuilder stringBuilder = new StringBuilder();
                 for (String string : arg.resourcePacks) {
@@ -1910,8 +1910,8 @@ WindowEventHandler {
                 return stringBuilder.toString();
             });
         }
-        if (arg != null) {
-            lv.add("Current Language", () -> arg.getLanguage().toString());
+        if (languageManager != null) {
+            lv.add("Current Language", () -> languageManager.getLanguage().toString());
         }
         lv.add("CPU", GlDebugInfo::getCpuInfo);
     }
@@ -1925,26 +1925,26 @@ WindowEventHandler {
     }
 
     @Override
-    public void addSnooperInfo(Snooper arg) {
-        arg.addInfo("fps", currentFps);
-        arg.addInfo("vsync_enabled", this.options.enableVsync);
-        arg.addInfo("display_frequency", this.window.getRefreshRate());
-        arg.addInfo("display_type", this.window.isFullscreen() ? "fullscreen" : "windowed");
-        arg.addInfo("run_time", (Util.getMeasuringTimeMs() - arg.getStartTime()) / 60L * 1000L);
-        arg.addInfo("current_action", this.getCurrentAction());
-        arg.addInfo("language", this.options.language == null ? "en_us" : this.options.language);
+    public void addSnooperInfo(Snooper snooper) {
+        snooper.addInfo("fps", currentFps);
+        snooper.addInfo("vsync_enabled", this.options.enableVsync);
+        snooper.addInfo("display_frequency", this.window.getRefreshRate());
+        snooper.addInfo("display_type", this.window.isFullscreen() ? "fullscreen" : "windowed");
+        snooper.addInfo("run_time", (Util.getMeasuringTimeMs() - snooper.getStartTime()) / 60L * 1000L);
+        snooper.addInfo("current_action", this.getCurrentAction());
+        snooper.addInfo("language", this.options.language == null ? "en_us" : this.options.language);
         String string = ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN ? "little" : "big";
-        arg.addInfo("endianness", string);
-        arg.addInfo("subtitles", this.options.showSubtitles);
-        arg.addInfo("touch", this.options.touchscreen ? "touch" : "mouse");
+        snooper.addInfo("endianness", string);
+        snooper.addInfo("subtitles", this.options.showSubtitles);
+        snooper.addInfo("touch", this.options.touchscreen ? "touch" : "mouse");
         int i = 0;
         for (ResourcePackProfile lv : this.resourcePackManager.getEnabledProfiles()) {
             if (lv.isAlwaysEnabled() || lv.isPinned()) continue;
-            arg.addInfo("resource_pack[" + i++ + "]", lv.getName());
+            snooper.addInfo("resource_pack[" + i++ + "]", lv.getName());
         }
-        arg.addInfo("resource_packs", i);
+        snooper.addInfo("resource_packs", i);
         if (this.server != null) {
-            arg.addInfo("snooper_partner", this.server.getSnooper().getToken());
+            snooper.addInfo("snooper_partner", this.server.getSnooper().getToken());
         }
     }
 
@@ -2042,8 +2042,8 @@ WindowEventHandler {
         return this.paused;
     }
 
-    public class_5407 method_30049() {
-        return this.field_25671;
+    public VideoWarningManager getVideoWarningManager() {
+        return this.videoWarningManager;
     }
 
     public SoundManager getSoundManager() {
@@ -2086,9 +2086,9 @@ WindowEventHandler {
         return this.cameraEntity;
     }
 
-    public void setCameraEntity(Entity arg) {
-        this.cameraEntity = arg;
-        this.gameRenderer.onCameraEntitySet(arg);
+    public void setCameraEntity(Entity entity) {
+        this.cameraEntity = entity;
+        this.gameRenderer.onCameraEntitySet(entity);
     }
 
     public boolean method_27022(Entity arg) {
@@ -2106,7 +2106,7 @@ WindowEventHandler {
     }
 
     @Override
-    protected boolean canExecute(Runnable runnable) {
+    protected boolean canExecute(Runnable task) {
         return true;
     }
 
@@ -2126,8 +2126,8 @@ WindowEventHandler {
         return this.heldItemRenderer;
     }
 
-    public <T> SearchableContainer<T> getSearchableContainer(SearchManager.Key<T> arg) {
-        return this.searchManager.get(arg);
+    public <T> SearchableContainer<T> getSearchableContainer(SearchManager.Key<T> key) {
+        return this.searchManager.get(key);
     }
 
     public MetricsData getMetricsData() {
@@ -2138,8 +2138,8 @@ WindowEventHandler {
         return this.connectedToRealms;
     }
 
-    public void setConnectedToRealms(boolean bl) {
-        this.connectedToRealms = bl;
+    public void setConnectedToRealms(boolean connectedToRealms) {
+        this.connectedToRealms = connectedToRealms;
     }
 
     public DataFixer getDataFixer() {
@@ -2191,8 +2191,8 @@ WindowEventHandler {
     }
 
     @Override
-    public void onWindowFocusChanged(boolean bl) {
-        this.windowFocused = bl;
+    public void onWindowFocusChanged(boolean focused) {
+        this.windowFocused = focused;
     }
 
     public Profiler getProfiler() {
@@ -2244,12 +2244,12 @@ WindowEventHandler {
         return () -> new Format4ResourcePack((ResourcePack)supplier.get());
     }
 
-    public void resetMipmapLevels(int i) {
-        this.bakedModelManager.resetMipmapLevels(i);
+    public void resetMipmapLevels(int mipmapLevels) {
+        this.bakedModelManager.resetMipmapLevels(mipmapLevels);
     }
 
-    private /* synthetic */ IntegratedServer method_29603(RegistryTracker.Modifiable arg, LevelStorage.Session arg2, IntegratedResourceManager arg3, SaveProperties arg4, MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository, UserCache arg5, Thread thread) {
-        return new IntegratedServer(thread, this, arg, arg2, arg3.getResourcePackManager(), arg3.getServerResourceManager(), arg4, minecraftSessionService, gameProfileRepository, arg5, i -> {
+    private /* synthetic */ IntegratedServer method_29603(DynamicRegistryManager.Impl registryTracker, LevelStorage.Session session, IntegratedResourceManager arg3, SaveProperties saveProperties, MinecraftSessionService sessionService, GameProfileRepository profileRepository, UserCache userCache, Thread serverThread) {
+        return new IntegratedServer(serverThread, this, registryTracker, session, arg3.getResourcePackManager(), arg3.getServerResourceManager(), saveProperties, sessionService, profileRepository, userCache, i -> {
             WorldGenerationProgressTracker lv = new WorldGenerationProgressTracker(i + 0);
             lv.start();
             this.worldGenProgressTracker.set(lv);
@@ -2274,10 +2274,10 @@ WindowEventHandler {
         private final ServerResourceManager serverResourceManager;
         private final SaveProperties saveProperties;
 
-        private IntegratedResourceManager(ResourcePackManager arg, ServerResourceManager arg2, SaveProperties arg3) {
-            this.resourcePackManager = arg;
-            this.serverResourceManager = arg2;
-            this.saveProperties = arg3;
+        private IntegratedResourceManager(ResourcePackManager resourcePackManager, ServerResourceManager serverResourceManager, SaveProperties saveProperties) {
+            this.resourcePackManager = resourcePackManager;
+            this.serverResourceManager = serverResourceManager;
+            this.saveProperties = saveProperties;
         }
 
         public ResourcePackManager getResourcePackManager() {

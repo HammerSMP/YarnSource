@@ -29,18 +29,18 @@ public class BlockStateFlattening {
     private static final Object2IntMap<Dynamic<?>> OLD_STATE_TO_ID = (Object2IntMap)DataFixUtils.make((Object)new Object2IntOpenHashMap(), object2IntOpenHashMap -> object2IntOpenHashMap.defaultReturnValue(-1));
     private static final Object2IntMap<String> OLD_BLOCK_TO_ID = (Object2IntMap)DataFixUtils.make((Object)new Object2IntOpenHashMap(), object2IntOpenHashMap -> object2IntOpenHashMap.defaultReturnValue(-1));
 
-    private static void putStates(int i, String string, String ... strings) {
-        Dynamic<?> dynamic = BlockStateFlattening.parseState(string);
-        BlockStateFlattening.field_24645[i] = dynamic;
-        int j = i >> 4;
+    private static void putStates(int oldId, String newStateStr, String ... oldStateStrings) {
+        Dynamic<?> dynamic = BlockStateFlattening.parseState(newStateStr);
+        BlockStateFlattening.field_24645[oldId] = dynamic;
+        int j = oldId >> 4;
         if (field_24646[j] == null) {
             BlockStateFlattening.field_24646[j] = dynamic;
         }
-        for (String string2 : strings) {
+        for (String string2 : oldStateStrings) {
             Dynamic<?> dynamic2 = BlockStateFlattening.parseState(string2);
             String string3 = dynamic2.get("Name").asString("");
-            OLD_BLOCK_TO_ID.putIfAbsent((Object)string3, i);
-            OLD_STATE_TO_ID.put(dynamic2, i);
+            OLD_BLOCK_TO_ID.putIfAbsent((Object)string3, oldId);
+            OLD_STATE_TO_ID.put(dynamic2, oldId);
         }
     }
 
@@ -60,37 +60,37 @@ public class BlockStateFlattening {
         return dynamic2 == null ? dynamic : dynamic2;
     }
 
-    public static String lookupBlock(String string) {
-        int i = OLD_BLOCK_TO_ID.getInt((Object)string);
+    public static String lookupBlock(String oldBlockName) {
+        int i = OLD_BLOCK_TO_ID.getInt((Object)oldBlockName);
         if (i < 0 || i >= field_24645.length) {
-            return string;
+            return oldBlockName;
         }
         Dynamic<?> dynamic = field_24645[i];
-        return dynamic == null ? string : dynamic.get("Name").asString("");
+        return dynamic == null ? oldBlockName : dynamic.get("Name").asString("");
     }
 
-    public static String lookupStateBlock(int i) {
-        if (i < 0 || i >= field_24645.length) {
+    public static String lookupStateBlock(int stateId) {
+        if (stateId < 0 || stateId >= field_24645.length) {
             return "minecraft:air";
         }
-        Dynamic<?> dynamic = field_24645[i];
+        Dynamic<?> dynamic = field_24645[stateId];
         return dynamic == null ? "minecraft:air" : dynamic.get("Name").asString("");
     }
 
-    public static Dynamic<?> parseState(String string) {
+    public static Dynamic<?> parseState(String stateStr) {
         try {
-            return new Dynamic((DynamicOps)NbtOps.INSTANCE, (Object)StringNbtReader.parse(string.replace('\'', '\"')));
+            return new Dynamic((DynamicOps)NbtOps.INSTANCE, (Object)StringNbtReader.parse(stateStr.replace('\'', '\"')));
         }
         catch (Exception exception) {
-            LOGGER.error("Parsing {}", (Object)string, (Object)exception);
+            LOGGER.error("Parsing {}", (Object)stateStr, (Object)exception);
             throw new RuntimeException(exception);
         }
     }
 
-    public static Dynamic<?> lookupState(int i) {
+    public static Dynamic<?> lookupState(int stateId) {
         Dynamic<?> dynamic = null;
-        if (i >= 0 && i < field_24645.length) {
-            dynamic = field_24645[i];
+        if (stateId >= 0 && stateId < field_24645.length) {
+            dynamic = field_24645[stateId];
         }
         return dynamic == null ? field_24645[0] : dynamic;
     }

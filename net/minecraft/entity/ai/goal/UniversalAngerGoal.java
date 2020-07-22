@@ -20,9 +20,9 @@ extends Goal {
     private final boolean triggerOthers;
     private int field_25606;
 
-    public UniversalAngerGoal(T arg, boolean bl) {
-        this.mob = arg;
-        this.triggerOthers = bl;
+    public UniversalAngerGoal(T mob, boolean triggerOthers) {
+        this.mob = mob;
+        this.triggerOthers = triggerOthers;
     }
 
     @Override
@@ -39,7 +39,7 @@ extends Goal {
         this.field_25606 = ((LivingEntity)this.mob).getLastAttackedTime();
         ((Angerable)this.mob).universallyAnger();
         if (this.triggerOthers) {
-            this.getOthersInRange().stream().filter(arg -> arg != this.mob).map(arg -> (Angerable)((Object)arg)).forEach(Angerable::universallyAnger);
+            this.getOthersInRange().stream().filter(entity -> entity != this.mob).map(entity -> (Angerable)((Object)entity)).forEach(Angerable::universallyAnger);
         }
         super.start();
     }

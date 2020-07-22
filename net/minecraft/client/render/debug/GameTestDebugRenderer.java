@@ -25,8 +25,8 @@ public class GameTestDebugRenderer
 implements DebugRenderer.Renderer {
     private final Map<BlockPos, Marker> markers = Maps.newHashMap();
 
-    public void addMarker(BlockPos arg, int i, String string, int j) {
-        this.markers.put(arg, new Marker(i, string, Util.getMeasuringTimeMs() + (long)j));
+    public void addMarker(BlockPos pos, int color, String message, int duration) {
+        this.markers.put(pos, new Marker(color, message, Util.getMeasuringTimeMs() + (long)duration));
     }
 
     @Override
@@ -35,7 +35,7 @@ implements DebugRenderer.Renderer {
     }
 
     @Override
-    public void render(MatrixStack arg, VertexConsumerProvider arg2, double d, double e, double f) {
+    public void render(MatrixStack matrices, VertexConsumerProvider vertexConsumers, double cameraX, double cameraY, double cameraZ) {
         long l = Util.getMeasuringTimeMs();
         this.markers.entrySet().removeIf(entry -> l > ((Marker)entry.getValue()).removalTime);
         this.markers.forEach((arg_0, arg_1) -> this.method_23111(arg_0, arg_1));
@@ -65,10 +65,10 @@ implements DebugRenderer.Renderer {
         public String message;
         public long removalTime;
 
-        public Marker(int i, String string, long l) {
-            this.color = i;
-            this.message = string;
-            this.removalTime = l;
+        public Marker(int color, String message, long removalTime) {
+            this.color = color;
+            this.message = message;
+            this.removalTime = removalTime;
         }
 
         public float method_23112() {

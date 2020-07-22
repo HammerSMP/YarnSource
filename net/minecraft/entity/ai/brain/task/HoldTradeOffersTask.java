@@ -35,8 +35,8 @@ extends Task<VillagerEntity> {
     private int offerIndex;
     private int ticksLeft;
 
-    public HoldTradeOffersTask(int i, int j) {
-        super((Map<MemoryModuleType<?>, MemoryModuleState>)ImmutableMap.of(MemoryModuleType.INTERACTION_TARGET, (Object)((Object)MemoryModuleState.VALUE_PRESENT)), i, j);
+    public HoldTradeOffersTask(int minRunTime, int maxRunTime) {
+        super((Map<MemoryModuleType<?>, MemoryModuleState>)ImmutableMap.of(MemoryModuleType.INTERACTION_TARGET, (Object)((Object)MemoryModuleState.VALUE_PRESENT)), minRunTime, maxRunTime);
     }
 
     @Override
@@ -84,74 +84,74 @@ extends Task<VillagerEntity> {
         this.customerHeldStack = null;
     }
 
-    private void setupOffers(LivingEntity arg, VillagerEntity arg2) {
+    private void setupOffers(LivingEntity customer, VillagerEntity villager) {
         boolean bl = false;
-        ItemStack lv = arg.getMainHandStack();
+        ItemStack lv = customer.getMainHandStack();
         if (this.customerHeldStack == null || !ItemStack.areItemsEqualIgnoreDamage(this.customerHeldStack, lv)) {
             this.customerHeldStack = lv;
             bl = true;
             this.offers.clear();
         }
         if (bl && !this.customerHeldStack.isEmpty()) {
-            this.loadPossibleOffers(arg2);
+            this.loadPossibleOffers(villager);
             if (!this.offers.isEmpty()) {
                 this.ticksLeft = 900;
-                this.holdOffer(arg2);
+                this.holdOffer(villager);
             }
         }
     }
 
-    private void holdOffer(VillagerEntity arg) {
-        arg.equipStack(EquipmentSlot.MAINHAND, this.offers.get(0));
+    private void holdOffer(VillagerEntity villager) {
+        villager.equipStack(EquipmentSlot.MAINHAND, this.offers.get(0));
     }
 
-    private void loadPossibleOffers(VillagerEntity arg) {
-        for (TradeOffer lv : arg.getOffers()) {
+    private void loadPossibleOffers(VillagerEntity villager) {
+        for (TradeOffer lv : villager.getOffers()) {
             if (lv.isDisabled() || !this.isPossible(lv)) continue;
             this.offers.add(lv.getMutableSellItem());
         }
     }
 
-    private boolean isPossible(TradeOffer arg) {
-        return ItemStack.areItemsEqualIgnoreDamage(this.customerHeldStack, arg.getAdjustedFirstBuyItem()) || ItemStack.areItemsEqualIgnoreDamage(this.customerHeldStack, arg.getSecondBuyItem());
+    private boolean isPossible(TradeOffer offer) {
+        return ItemStack.areItemsEqualIgnoreDamage(this.customerHeldStack, offer.getAdjustedFirstBuyItem()) || ItemStack.areItemsEqualIgnoreDamage(this.customerHeldStack, offer.getSecondBuyItem());
     }
 
-    private LivingEntity findPotentialCustomer(VillagerEntity arg) {
-        Brain<VillagerEntity> lv = arg.getBrain();
+    private LivingEntity findPotentialCustomer(VillagerEntity villager) {
+        Brain<VillagerEntity> lv = villager.getBrain();
         LivingEntity lv2 = lv.getOptionalMemory(MemoryModuleType.INTERACTION_TARGET).get();
         lv.remember(MemoryModuleType.LOOK_TARGET, new EntityLookTarget(lv2, true));
         return lv2;
     }
 
-    private void refreshShownOffer(VillagerEntity arg) {
+    private void refreshShownOffer(VillagerEntity villager) {
         if (this.offers.size() >= 2 && ++this.offerShownTicks >= 40) {
             ++this.offerIndex;
             this.offerShownTicks = 0;
             if (this.offerIndex > this.offers.size() - 1) {
                 this.offerIndex = 0;
             }
-            arg.equipStack(EquipmentSlot.MAINHAND, this.offers.get(this.offerIndex));
+            villager.equipStack(EquipmentSlot.MAINHAND, this.offers.get(this.offerIndex));
         }
     }
 
     @Override
-    public /* synthetic */ boolean shouldKeepRunning(ServerWorld arg, LivingEntity arg2, long l) {
-        return this.shouldKeepRunning(arg, (VillagerEntity)arg2, l);
+    public /* synthetic */ boolean shouldKeepRunning(ServerWorld world, LivingEntity entity, long time) {
+        return this.shouldKeepRunning(world, (VillagerEntity)entity, time);
     }
 
     @Override
-    public /* synthetic */ void finishRunning(ServerWorld arg, LivingEntity arg2, long l) {
-        this.finishRunning(arg, (VillagerEntity)arg2, l);
+    public /* synthetic */ void finishRunning(ServerWorld world, LivingEntity entity, long time) {
+        this.finishRunning(world, (VillagerEntity)entity, time);
     }
 
     @Override
-    public /* synthetic */ void keepRunning(ServerWorld arg, LivingEntity arg2, long l) {
-        this.keepRunning(arg, (VillagerEntity)arg2, l);
+    public /* synthetic */ void keepRunning(ServerWorld world, LivingEntity entity, long time) {
+        this.keepRunning(world, (VillagerEntity)entity, time);
     }
 
     @Override
-    public /* synthetic */ void run(ServerWorld arg, LivingEntity arg2, long l) {
-        this.run(arg, (VillagerEntity)arg2, l);
+    public /* synthetic */ void run(ServerWorld world, LivingEntity entity, long time) {
+        this.run(world, (VillagerEntity)entity, time);
     }
 }
 

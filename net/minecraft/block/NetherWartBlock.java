@@ -37,38 +37,38 @@ extends PlantBlock {
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
-        return AGE_TO_SHAPE[arg.get(AGE)];
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        return AGE_TO_SHAPE[state.get(AGE)];
     }
 
     @Override
-    protected boolean canPlantOnTop(BlockState arg, BlockView arg2, BlockPos arg3) {
-        return arg.isOf(Blocks.SOUL_SAND);
+    protected boolean canPlantOnTop(BlockState floor, BlockView world, BlockPos pos) {
+        return floor.isOf(Blocks.SOUL_SAND);
     }
 
     @Override
-    public boolean hasRandomTicks(BlockState arg) {
-        return arg.get(AGE) < 3;
+    public boolean hasRandomTicks(BlockState state) {
+        return state.get(AGE) < 3;
     }
 
     @Override
-    public void randomTick(BlockState arg, ServerWorld arg2, BlockPos arg3, Random random) {
-        int i = arg.get(AGE);
+    public void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        int i = state.get(AGE);
         if (i < 3 && random.nextInt(10) == 0) {
-            arg = (BlockState)arg.with(AGE, i + 1);
-            arg2.setBlockState(arg3, arg, 2);
+            state = (BlockState)state.with(AGE, i + 1);
+            world.setBlockState(pos, state, 2);
         }
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public ItemStack getPickStack(BlockView arg, BlockPos arg2, BlockState arg3) {
+    public ItemStack getPickStack(BlockView world, BlockPos pos, BlockState state) {
         return new ItemStack(Items.NETHER_WART);
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(AGE);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(AGE);
     }
 }
 

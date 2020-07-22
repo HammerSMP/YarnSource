@@ -32,8 +32,8 @@ implements TutorialStepHandler {
     private TutorialToast toast;
     private int ticks;
 
-    public CraftPlanksTutorialStepHandler(TutorialManager arg) {
-        this.manager = arg;
+    public CraftPlanksTutorialStepHandler(TutorialManager manager) {
+        this.manager = manager;
     }
 
     @Override
@@ -69,16 +69,16 @@ implements TutorialStepHandler {
     }
 
     @Override
-    public void onSlotUpdate(ItemStack arg) {
-        Item lv = arg.getItem();
+    public void onSlotUpdate(ItemStack stack) {
+        Item lv = stack.getItem();
         if (ItemTags.PLANKS.contains(lv)) {
             this.manager.setStep(TutorialStep.NONE);
         }
     }
 
-    public static boolean hasCrafted(ClientPlayerEntity arg, Tag<Item> arg2) {
-        for (Item lv : arg2.values()) {
-            if (arg.getStatHandler().getStat(Stats.CRAFTED.getOrCreateStat(lv)) <= 0) continue;
+    public static boolean hasCrafted(ClientPlayerEntity player, Tag<Item> tag) {
+        for (Item lv : tag.values()) {
+            if (player.getStatHandler().getStat(Stats.CRAFTED.getOrCreateStat(lv)) <= 0) continue;
             return true;
         }
         return false;

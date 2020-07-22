@@ -11,8 +11,8 @@ public abstract class SpecialCraftingRecipe
 implements CraftingRecipe {
     private final Identifier id;
 
-    public SpecialCraftingRecipe(Identifier arg) {
-        this.id = arg;
+    public SpecialCraftingRecipe(Identifier id) {
+        this.id = id;
     }
 
     @Override

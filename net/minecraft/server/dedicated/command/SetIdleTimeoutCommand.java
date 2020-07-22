@@ -18,14 +18,14 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.TranslatableText;
 
 public class SetIdleTimeoutCommand {
-    public static void register(CommandDispatcher<ServerCommandSource> commandDispatcher) {
-        commandDispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)CommandManager.literal("setidletimeout").requires(arg -> arg.hasPermissionLevel(3))).then(CommandManager.argument("minutes", IntegerArgumentType.integer((int)0)).executes(commandContext -> SetIdleTimeoutCommand.execute((ServerCommandSource)commandContext.getSource(), IntegerArgumentType.getInteger((CommandContext)commandContext, (String)"minutes")))));
+    public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
+        dispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)CommandManager.literal("setidletimeout").requires(arg -> arg.hasPermissionLevel(3))).then(CommandManager.argument("minutes", IntegerArgumentType.integer((int)0)).executes(commandContext -> SetIdleTimeoutCommand.execute((ServerCommandSource)commandContext.getSource(), IntegerArgumentType.getInteger((CommandContext)commandContext, (String)"minutes")))));
     }
 
-    private static int execute(ServerCommandSource arg, int i) {
-        arg.getMinecraftServer().setPlayerIdleTimeout(i);
-        arg.sendFeedback(new TranslatableText("commands.setidletimeout.success", i), true);
-        return i;
+    private static int execute(ServerCommandSource source, int minutes) {
+        source.getMinecraftServer().setPlayerIdleTimeout(minutes);
+        source.sendFeedback(new TranslatableText("commands.setidletimeout.success", minutes), true);
+        return minutes;
     }
 }
 

@@ -61,17 +61,17 @@ extends ChoiceFix {
             throw new JsonParseException("Don't know how to turn " + (Object)jsonElement + " into a Component");
         }
 
-        public /* synthetic */ Object deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
-            return this.deserialize(jsonElement, type, jsonDeserializationContext);
+        public /* synthetic */ Object deserialize(JsonElement functionJson, Type unused, JsonDeserializationContext context) throws JsonParseException {
+            return this.deserialize(functionJson, unused, context);
         }
     }).create();
 
-    public BlockEntitySignTextStrictJsonFix(Schema schema, boolean bl) {
-        super(schema, bl, "BlockEntitySignTextStrictJsonFix", TypeReferences.BLOCK_ENTITY, "Sign");
+    public BlockEntitySignTextStrictJsonFix(Schema outputSchema, boolean changesType) {
+        super(outputSchema, changesType, "BlockEntitySignTextStrictJsonFix", TypeReferences.BLOCK_ENTITY, "Sign");
     }
 
-    private Dynamic<?> fix(Dynamic<?> dynamic, String string) {
-        String string2 = dynamic.get(string).asString("");
+    private Dynamic<?> fix(Dynamic<?> dynamic, String lineName) {
+        String string2 = dynamic.get(lineName).asString("");
         Text lv = null;
         if ("null".equals(string2) || StringUtils.isEmpty((CharSequence)string2)) {
             lv = LiteralText.EMPTY;
@@ -107,12 +107,12 @@ extends ChoiceFix {
         } else {
             lv = new LiteralText(string2);
         }
-        return dynamic.set(string, dynamic.createString(Text.Serializer.toJson(lv)));
+        return dynamic.set(lineName, dynamic.createString(Text.Serializer.toJson(lv)));
     }
 
     @Override
-    protected Typed<?> transform(Typed<?> typed) {
-        return typed.update(DSL.remainderFinder(), dynamic -> {
+    protected Typed<?> transform(Typed<?> inputType) {
+        return inputType.update(DSL.remainderFinder(), dynamic -> {
             dynamic = this.fix((Dynamic<?>)dynamic, "Text1");
             dynamic = this.fix((Dynamic<?>)dynamic, "Text2");
             dynamic = this.fix((Dynamic<?>)dynamic, "Text3");

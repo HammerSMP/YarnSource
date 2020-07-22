@@ -29,8 +29,8 @@ implements LootCondition {
     private static final Logger LOGGER = LogManager.getLogger();
     private final Identifier id;
 
-    private ReferenceLootCondition(Identifier arg) {
-        this.id = arg;
+    private ReferenceLootCondition(Identifier id) {
+        this.id = id;
     }
 
     @Override
@@ -39,17 +39,17 @@ implements LootCondition {
     }
 
     @Override
-    public void validate(LootTableReporter arg) {
-        if (arg.hasCondition(this.id)) {
-            arg.report("Condition " + this.id + " is recursively called");
+    public void validate(LootTableReporter reporter) {
+        if (reporter.hasCondition(this.id)) {
+            reporter.report("Condition " + this.id + " is recursively called");
             return;
         }
-        LootCondition.super.validate(arg);
-        LootCondition lv = arg.getCondition(this.id);
+        LootCondition.super.validate(reporter);
+        LootCondition lv = reporter.getCondition(this.id);
         if (lv == null) {
-            arg.report("Unknown condition table called " + this.id);
+            reporter.report("Unknown condition table called " + this.id);
         } else {
-            lv.validate(arg.withTable(".{" + this.id + "}", this.id));
+            lv.validate(reporter.withTable(".{" + this.id + "}", this.id));
         }
     }
 
@@ -73,8 +73,8 @@ implements LootCondition {
     }
 
     @Override
-    public /* synthetic */ boolean test(Object object) {
-        return this.test((LootContext)object);
+    public /* synthetic */ boolean test(Object context) {
+        return this.test((LootContext)context);
     }
 
     public static class Serializer
@@ -91,8 +91,8 @@ implements LootCondition {
         }
 
         @Override
-        public /* synthetic */ Object fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext) {
-            return this.fromJson(jsonObject, jsonDeserializationContext);
+        public /* synthetic */ Object fromJson(JsonObject json, JsonDeserializationContext context) {
+            return this.fromJson(json, context);
         }
     }
 }

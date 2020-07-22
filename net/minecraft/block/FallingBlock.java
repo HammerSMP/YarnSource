@@ -32,58 +32,58 @@ extends Block {
     }
 
     @Override
-    public void onBlockAdded(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
-        arg2.getBlockTickScheduler().schedule(arg3, this, this.getFallDelay());
+    public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
+        world.getBlockTickScheduler().schedule(pos, this, this.getFallDelay());
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
-        arg4.getBlockTickScheduler().schedule(arg5, this, this.getFallDelay());
-        return super.getStateForNeighborUpdate(arg, arg2, arg3, arg4, arg5, arg6);
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
+        world.getBlockTickScheduler().schedule(pos, this, this.getFallDelay());
+        return super.getStateForNeighborUpdate(state, direction, newState, world, pos, posFrom);
     }
 
     @Override
-    public void scheduledTick(BlockState arg, ServerWorld arg2, BlockPos arg3, Random random) {
-        if (!FallingBlock.canFallThrough(arg2.getBlockState(arg3.down())) || arg3.getY() < 0) {
+    public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        if (!FallingBlock.canFallThrough(world.getBlockState(pos.down())) || pos.getY() < 0) {
             return;
         }
-        FallingBlockEntity lv = new FallingBlockEntity(arg2, (double)arg3.getX() + 0.5, arg3.getY(), (double)arg3.getZ() + 0.5, arg2.getBlockState(arg3));
+        FallingBlockEntity lv = new FallingBlockEntity(world, (double)pos.getX() + 0.5, pos.getY(), (double)pos.getZ() + 0.5, world.getBlockState(pos));
         this.configureFallingBlockEntity(lv);
-        arg2.spawnEntity(lv);
+        world.spawnEntity(lv);
     }
 
-    protected void configureFallingBlockEntity(FallingBlockEntity arg) {
+    protected void configureFallingBlockEntity(FallingBlockEntity entity) {
     }
 
     protected int getFallDelay() {
         return 2;
     }
 
-    public static boolean canFallThrough(BlockState arg) {
-        Material lv = arg.getMaterial();
-        return arg.isAir() || arg.isIn(BlockTags.FIRE) || lv.isLiquid() || lv.isReplaceable();
+    public static boolean canFallThrough(BlockState state) {
+        Material lv = state.getMaterial();
+        return state.isAir() || state.isIn(BlockTags.FIRE) || lv.isLiquid() || lv.isReplaceable();
     }
 
-    public void onLanding(World arg, BlockPos arg2, BlockState arg3, BlockState arg4, FallingBlockEntity arg5) {
+    public void onLanding(World world, BlockPos pos, BlockState fallingBlockState, BlockState currentStateInPos, FallingBlockEntity fallingBlockEntity) {
     }
 
-    public void onDestroyedOnLanding(World arg, BlockPos arg2, FallingBlockEntity arg3) {
+    public void onDestroyedOnLanding(World world, BlockPos pos, FallingBlockEntity fallingBlockEntity) {
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void randomDisplayTick(BlockState arg, World arg2, BlockPos arg3, Random random) {
+    public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
         BlockPos lv;
-        if (random.nextInt(16) == 0 && FallingBlock.canFallThrough(arg2.getBlockState(lv = arg3.down()))) {
-            double d = (double)arg3.getX() + random.nextDouble();
-            double e = (double)arg3.getY() - 0.05;
-            double f = (double)arg3.getZ() + random.nextDouble();
-            arg2.addParticle(new BlockStateParticleEffect(ParticleTypes.FALLING_DUST, arg), d, e, f, 0.0, 0.0, 0.0);
+        if (random.nextInt(16) == 0 && FallingBlock.canFallThrough(world.getBlockState(lv = pos.down()))) {
+            double d = (double)pos.getX() + random.nextDouble();
+            double e = (double)pos.getY() - 0.05;
+            double f = (double)pos.getZ() + random.nextDouble();
+            world.addParticle(new BlockStateParticleEffect(ParticleTypes.FALLING_DUST, state), d, e, f, 0.0, 0.0, 0.0);
         }
     }
 
     @Environment(value=EnvType.CLIENT)
-    public int getColor(BlockState arg, BlockView arg2, BlockPos arg3) {
+    public int getColor(BlockState state, BlockView world, BlockPos pos) {
         return -16777216;
     }
 }

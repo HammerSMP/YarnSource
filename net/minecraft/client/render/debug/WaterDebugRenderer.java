@@ -25,12 +25,12 @@ public class WaterDebugRenderer
 implements DebugRenderer.Renderer {
     private final MinecraftClient client;
 
-    public WaterDebugRenderer(MinecraftClient arg) {
-        this.client = arg;
+    public WaterDebugRenderer(MinecraftClient client) {
+        this.client = client;
     }
 
     @Override
-    public void render(MatrixStack arg, VertexConsumerProvider arg2, double d, double e, double f) {
+    public void render(MatrixStack matrices, VertexConsumerProvider vertexConsumers, double cameraX, double cameraY, double cameraZ) {
         BlockPos lv = this.client.player.getBlockPos();
         World lv2 = this.client.player.world;
         RenderSystem.enableBlend();
@@ -42,7 +42,7 @@ implements DebugRenderer.Renderer {
             FluidState lv4 = lv2.getFluidState(lv3);
             if (!lv4.isIn(FluidTags.WATER)) continue;
             double g = (float)lv3.getY() + lv4.getHeight(lv2, lv3);
-            DebugRenderer.drawBox(new Box((float)lv3.getX() + 0.01f, (float)lv3.getY() + 0.01f, (float)lv3.getZ() + 0.01f, (float)lv3.getX() + 0.99f, g, (float)lv3.getZ() + 0.99f).offset(-d, -e, -f), 1.0f, 1.0f, 1.0f, 0.2f);
+            DebugRenderer.drawBox(new Box((float)lv3.getX() + 0.01f, (float)lv3.getY() + 0.01f, (float)lv3.getZ() + 0.01f, (float)lv3.getX() + 0.99f, g, (float)lv3.getZ() + 0.99f).offset(-cameraX, -cameraY, -cameraZ), 1.0f, 1.0f, 1.0f, 0.2f);
         }
         for (BlockPos lv5 : BlockPos.iterate(lv.add(-10, -10, -10), lv.add(10, 10, 10))) {
             FluidState lv6 = lv2.getFluidState(lv5);

@@ -33,11 +33,6 @@ extends StructurePoolElement {
     public static final Codec<ListPoolElement> field_24950 = RecordCodecBuilder.create(instance -> instance.group((App)StructurePoolElement.field_24953.listOf().fieldOf("elements").forGetter(arg -> arg.elements), ListPoolElement.method_28883()).apply((Applicative)instance, ListPoolElement::new));
     private final List<StructurePoolElement> elements;
 
-    @Deprecated
-    public ListPoolElement(List<StructurePoolElement> list) {
-        this(list, StructurePool.Projection.RIGID);
-    }
-
     public ListPoolElement(List<StructurePoolElement> list, StructurePool.Projection arg) {
         super(arg);
         if (list.isEmpty()) {
@@ -48,24 +43,24 @@ extends StructurePoolElement {
     }
 
     @Override
-    public List<Structure.StructureBlockInfo> getStructureBlockInfos(StructureManager arg, BlockPos arg2, BlockRotation arg3, Random random) {
-        return this.elements.get(0).getStructureBlockInfos(arg, arg2, arg3, random);
+    public List<Structure.StructureBlockInfo> getStructureBlockInfos(StructureManager structureManager, BlockPos pos, BlockRotation rotation, Random random) {
+        return this.elements.get(0).getStructureBlockInfos(structureManager, pos, rotation, random);
     }
 
     @Override
-    public BlockBox getBoundingBox(StructureManager arg, BlockPos arg2, BlockRotation arg3) {
+    public BlockBox getBoundingBox(StructureManager structureManager, BlockPos pos, BlockRotation rotation) {
         BlockBox lv = BlockBox.empty();
         for (StructurePoolElement lv2 : this.elements) {
-            BlockBox lv3 = lv2.getBoundingBox(arg, arg2, arg3);
+            BlockBox lv3 = lv2.getBoundingBox(structureManager, pos, rotation);
             lv.encompass(lv3);
         }
         return lv;
     }
 
     @Override
-    public boolean generate(StructureManager arg, ServerWorldAccess arg2, StructureAccessor arg3, ChunkGenerator arg4, BlockPos arg5, BlockPos arg6, BlockRotation arg7, BlockBox arg8, Random random, boolean bl) {
+    public boolean generate(StructureManager structureManager, ServerWorldAccess arg2, StructureAccessor arg3, ChunkGenerator arg4, BlockPos arg5, BlockPos arg6, BlockRotation arg7, BlockBox arg8, Random random, boolean keepJigsaws) {
         for (StructurePoolElement lv : this.elements) {
-            if (lv.generate(arg, arg2, arg3, arg4, arg5, arg6, arg7, arg8, random, bl)) continue;
+            if (lv.generate(structureManager, arg2, arg3, arg4, arg5, arg6, arg7, arg8, random, keepJigsaws)) continue;
             return false;
         }
         return true;
@@ -77,9 +72,9 @@ extends StructurePoolElement {
     }
 
     @Override
-    public StructurePoolElement setProjection(StructurePool.Projection arg) {
-        super.setProjection(arg);
-        this.setAllElementsProjection(arg);
+    public StructurePoolElement setProjection(StructurePool.Projection projection) {
+        super.setProjection(projection);
+        this.setAllElementsProjection(projection);
         return this;
     }
 

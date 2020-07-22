@@ -26,20 +26,20 @@ extends Sensor<LivingEntity> {
     }
 
     @Override
-    protected void sense(ServerWorld arg, LivingEntity arg2) {
-        arg2.getBrain().remember(MemoryModuleType.VISIBLE_VILLAGER_BABIES, this.getVisibleVillagerBabies(arg2));
+    protected void sense(ServerWorld world, LivingEntity entity) {
+        entity.getBrain().remember(MemoryModuleType.VISIBLE_VILLAGER_BABIES, this.getVisibleVillagerBabies(entity));
     }
 
-    private List<LivingEntity> getVisibleVillagerBabies(LivingEntity arg) {
-        return this.getVisibleMobs(arg).stream().filter(this::isVillagerBaby).collect(Collectors.toList());
+    private List<LivingEntity> getVisibleVillagerBabies(LivingEntity entities) {
+        return this.getVisibleMobs(entities).stream().filter(this::isVillagerBaby).collect(Collectors.toList());
     }
 
-    private boolean isVillagerBaby(LivingEntity arg) {
-        return arg.getType() == EntityType.VILLAGER && arg.isBaby();
+    private boolean isVillagerBaby(LivingEntity entity) {
+        return entity.getType() == EntityType.VILLAGER && entity.isBaby();
     }
 
-    private List<LivingEntity> getVisibleMobs(LivingEntity arg) {
-        return arg.getBrain().getOptionalMemory(MemoryModuleType.VISIBLE_MOBS).orElse(Lists.newArrayList());
+    private List<LivingEntity> getVisibleMobs(LivingEntity entity) {
+        return entity.getBrain().getOptionalMemory(MemoryModuleType.VISIBLE_MOBS).orElse(Lists.newArrayList());
     }
 }
 

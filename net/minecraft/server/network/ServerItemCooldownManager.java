@@ -12,20 +12,20 @@ public class ServerItemCooldownManager
 extends ItemCooldownManager {
     private final ServerPlayerEntity player;
 
-    public ServerItemCooldownManager(ServerPlayerEntity arg) {
-        this.player = arg;
+    public ServerItemCooldownManager(ServerPlayerEntity player) {
+        this.player = player;
     }
 
     @Override
-    protected void onCooldownUpdate(Item arg, int i) {
-        super.onCooldownUpdate(arg, i);
-        this.player.networkHandler.sendPacket(new CooldownUpdateS2CPacket(arg, i));
+    protected void onCooldownUpdate(Item item, int duration) {
+        super.onCooldownUpdate(item, duration);
+        this.player.networkHandler.sendPacket(new CooldownUpdateS2CPacket(item, duration));
     }
 
     @Override
-    protected void onCooldownUpdate(Item arg) {
-        super.onCooldownUpdate(arg);
-        this.player.networkHandler.sendPacket(new CooldownUpdateS2CPacket(arg, 0));
+    protected void onCooldownUpdate(Item item) {
+        super.onCooldownUpdate(item);
+        this.player.networkHandler.sendPacket(new CooldownUpdateS2CPacket(item, 0));
     }
 }
 

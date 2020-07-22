@@ -73,8 +73,8 @@ public class StringNbtReader {
         return lv;
     }
 
-    public StringNbtReader(StringReader stringReader) {
-        this.reader = stringReader;
+    public StringNbtReader(StringReader reader) {
+        this.reader = reader;
     }
 
     protected String readString() throws CommandSyntaxException {
@@ -99,40 +99,40 @@ public class StringNbtReader {
         return this.parsePrimitive(string);
     }
 
-    private Tag parsePrimitive(String string) {
+    private Tag parsePrimitive(String input) {
         try {
-            if (FLOAT_PATTERN.matcher(string).matches()) {
-                return FloatTag.of(Float.parseFloat(string.substring(0, string.length() - 1)));
+            if (FLOAT_PATTERN.matcher(input).matches()) {
+                return FloatTag.of(Float.parseFloat(input.substring(0, input.length() - 1)));
             }
-            if (BYTE_PATTERN.matcher(string).matches()) {
-                return ByteTag.of(Byte.parseByte(string.substring(0, string.length() - 1)));
+            if (BYTE_PATTERN.matcher(input).matches()) {
+                return ByteTag.of(Byte.parseByte(input.substring(0, input.length() - 1)));
             }
-            if (LONG_PATTERN.matcher(string).matches()) {
-                return LongTag.of(Long.parseLong(string.substring(0, string.length() - 1)));
+            if (LONG_PATTERN.matcher(input).matches()) {
+                return LongTag.of(Long.parseLong(input.substring(0, input.length() - 1)));
             }
-            if (SHORT_PATTERN.matcher(string).matches()) {
-                return ShortTag.of(Short.parseShort(string.substring(0, string.length() - 1)));
+            if (SHORT_PATTERN.matcher(input).matches()) {
+                return ShortTag.of(Short.parseShort(input.substring(0, input.length() - 1)));
             }
-            if (INT_PATTERN.matcher(string).matches()) {
-                return IntTag.of(Integer.parseInt(string));
+            if (INT_PATTERN.matcher(input).matches()) {
+                return IntTag.of(Integer.parseInt(input));
             }
-            if (DOUBLE_PATTERN.matcher(string).matches()) {
-                return DoubleTag.of(Double.parseDouble(string.substring(0, string.length() - 1)));
+            if (DOUBLE_PATTERN.matcher(input).matches()) {
+                return DoubleTag.of(Double.parseDouble(input.substring(0, input.length() - 1)));
             }
-            if (DOUBLE_PATTERN_IMPLICIT.matcher(string).matches()) {
-                return DoubleTag.of(Double.parseDouble(string));
+            if (DOUBLE_PATTERN_IMPLICIT.matcher(input).matches()) {
+                return DoubleTag.of(Double.parseDouble(input));
             }
-            if ("true".equalsIgnoreCase(string)) {
+            if ("true".equalsIgnoreCase(input)) {
                 return ByteTag.ONE;
             }
-            if ("false".equalsIgnoreCase(string)) {
+            if ("false".equalsIgnoreCase(input)) {
                 return ByteTag.ZERO;
             }
         }
         catch (NumberFormatException numberFormatException) {
             // empty catch block
         }
-        return StringTag.of(string);
+        return StringTag.of(input);
     }
 
     public Tag parseTag() throws CommandSyntaxException {
@@ -227,19 +227,19 @@ public class StringNbtReader {
         throw ARRAY_INVALID.createWithContext((ImmutableStringReader)this.reader, (Object)String.valueOf(c));
     }
 
-    private <T extends Number> List<T> readArray(TagReader<?> arg, TagReader<?> arg2) throws CommandSyntaxException {
+    private <T extends Number> List<T> readArray(TagReader<?> arrayTypeReader, TagReader<?> typeReader) throws CommandSyntaxException {
         ArrayList list = Lists.newArrayList();
         while (this.reader.peek() != ']') {
             int i = this.reader.getCursor();
             Tag lv = this.parseTag();
             TagReader<?> lv2 = lv.getReader();
-            if (lv2 != arg2) {
+            if (lv2 != typeReader) {
                 this.reader.setCursor(i);
-                throw ARRAY_MIXED.createWithContext((ImmutableStringReader)this.reader, (Object)lv2.getCommandFeedbackName(), (Object)arg.getCommandFeedbackName());
+                throw ARRAY_MIXED.createWithContext((ImmutableStringReader)this.reader, (Object)lv2.getCommandFeedbackName(), (Object)arrayTypeReader.getCommandFeedbackName());
             }
-            if (arg2 == ByteTag.READER) {
+            if (typeReader == ByteTag.READER) {
                 list.add(((AbstractNumberTag)lv).getByte());
-            } else if (arg2 == LongTag.READER) {
+            } else if (typeReader == LongTag.READER) {
                 list.add(((AbstractNumberTag)lv).getLong());
             } else {
                 list.add(((AbstractNumberTag)lv).getInt());

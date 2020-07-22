@@ -30,21 +30,21 @@ extends CombinedEntry {
     }
 
     @Override
-    protected EntryCombiner combine(EntryCombiner[] args) {
-        switch (args.length) {
+    protected EntryCombiner combine(EntryCombiner[] children) {
+        switch (children.length) {
             case 0: {
                 return ALWAYS_FALSE;
             }
             case 1: {
-                return args[0];
+                return children[0];
             }
             case 2: {
-                return args[0].or(args[1]);
+                return children[0].or(children[1]);
             }
         }
-        return (arg, consumer) -> {
-            for (EntryCombiner lv : args) {
-                if (!lv.expand(arg, consumer)) continue;
+        return (context, lootChoiceExpander) -> {
+            for (EntryCombiner lv : children) {
+                if (!lv.expand(context, lootChoiceExpander)) continue;
                 return true;
             }
             return false;
@@ -52,24 +52,24 @@ extends CombinedEntry {
     }
 
     @Override
-    public void validate(LootTableReporter arg) {
-        super.validate(arg);
+    public void validate(LootTableReporter reporter) {
+        super.validate(reporter);
         for (int i = 0; i < this.children.length - 1; ++i) {
             if (!ArrayUtils.isEmpty((Object[])this.children[i].conditions)) continue;
-            arg.report("Unreachable entry!");
+            reporter.report("Unreachable entry!");
         }
     }
 
-    public static Builder builder(LootPoolEntry.Builder<?> ... args) {
-        return new Builder(args);
+    public static Builder builder(LootPoolEntry.Builder<?> ... children) {
+        return new Builder(children);
     }
 
     public static class Builder
     extends LootPoolEntry.Builder<Builder> {
         private final List<LootPoolEntry> children = Lists.newArrayList();
 
-        public Builder(LootPoolEntry.Builder<?> ... args) {
-            for (LootPoolEntry.Builder<?> lv : args) {
+        public Builder(LootPoolEntry.Builder<?> ... children) {
+            for (LootPoolEntry.Builder<?> lv : children) {
                 this.children.add(lv.build());
             }
         }
@@ -80,8 +80,8 @@ extends CombinedEntry {
         }
 
         @Override
-        public Builder alternatively(LootPoolEntry.Builder<?> arg) {
-            this.children.add(arg.build());
+        public Builder alternatively(LootPoolEntry.Builder<?> builder) {
+            this.children.add(builder.build());
             return this;
         }
 

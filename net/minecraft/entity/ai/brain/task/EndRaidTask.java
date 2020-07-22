@@ -24,17 +24,17 @@ extends Task<LivingEntity> {
     }
 
     @Override
-    protected boolean shouldRun(ServerWorld arg, LivingEntity arg2) {
-        return arg.random.nextInt(20) == 0;
+    protected boolean shouldRun(ServerWorld world, LivingEntity entity) {
+        return world.random.nextInt(20) == 0;
     }
 
     @Override
-    protected void run(ServerWorld arg, LivingEntity arg2, long l) {
-        Brain<?> lv = arg2.getBrain();
-        Raid lv2 = arg.getRaidAt(arg2.getBlockPos());
+    protected void run(ServerWorld world, LivingEntity entity, long time) {
+        Brain<?> lv = entity.getBrain();
+        Raid lv2 = world.getRaidAt(entity.getBlockPos());
         if (lv2 == null || lv2.hasStopped() || lv2.hasLost()) {
             lv.setDefaultActivity(Activity.IDLE);
-            lv.refreshActivities(arg.getTimeOfDay(), arg.getTime());
+            lv.refreshActivities(world.getTimeOfDay(), world.getTime());
         }
     }
 }

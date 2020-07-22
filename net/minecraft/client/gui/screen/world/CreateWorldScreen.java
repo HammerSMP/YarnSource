@@ -23,6 +23,8 @@ import java.nio.file.Path;
 import java.nio.file.attribute.FileAttribute;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
+import java.util.OptionalLong;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
@@ -42,6 +44,7 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.toast.SystemToast;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.world.GeneratorType;
 import net.minecraft.resource.DataPackSettings;
 import net.minecraft.resource.FileResourcePackProvider;
 import net.minecraft.resource.ResourcePackManager;
@@ -56,7 +59,7 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.util.FileNameUtil;
 import net.minecraft.util.Util;
 import net.minecraft.util.WorldSavePath;
-import net.minecraft.util.registry.RegistryTracker;
+import net.minecraft.util.registry.DynamicRegistryManager;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
@@ -71,6 +74,7 @@ import org.apache.logging.log4j.Logger;
 public class CreateWorldScreen
 extends Screen {
     private static final Logger field_25480 = LogManager.getLogger();
+    private static final TranslatableText field_25898 = new TranslatableText("selectWorld.gameMode");
     private final Screen parent;
     private TextFieldWidget levelNameField;
     private String saveDirectoryName;
@@ -82,7 +86,7 @@ extends Screen {
     private boolean cheatsEnabled;
     private boolean tweakedCheats;
     public boolean hardcore;
-    protected DataPackSettings field_25479 = DataPackSettings.SAFE_MODE;
+    protected DataPackSettings field_25479;
     @Nullable
     private Path field_25477;
     @Nullable
@@ -101,15 +105,14 @@ extends Screen {
     private GameRules gameRules = new GameRules();
     public final MoreOptionsDialog moreOptionsDialog;
 
-    public CreateWorldScreen(@Nullable Screen arg, LevelInfo arg2, GeneratorOptions arg3, @Nullable Path path, RegistryTracker.Modifiable arg4) {
-        this(arg, new MoreOptionsDialog(arg4, arg3));
+    public CreateWorldScreen(@Nullable Screen arg, LevelInfo arg2, GeneratorOptions arg3, @Nullable Path path, DataPackSettings arg4, DynamicRegistryManager.Impl arg5) {
+        this(arg, arg4, new MoreOptionsDialog(arg5, arg3, GeneratorType.method_29078(arg3), OptionalLong.of(arg3.getSeed())));
         this.levelName = arg2.getLevelName();
-        this.cheatsEnabled = arg2.isHardcore();
+        this.cheatsEnabled = arg2.areCommandsAllowed();
         this.tweakedCheats = true;
         this.field_24290 = this.field_24289 = arg2.getDifficulty();
         this.gameRules.setAllValues(arg2.getGameRules(), null);
-        this.field_25479 = arg2.method_29558();
-        if (arg2.hasStructures()) {
+        if (arg2.isHardcore()) {
             this.currentMode = Mode.HARDCORE;
         } else if (arg2.getGameMode().isSurvivalLike()) {
             this.currentMode = Mode.SURVIVAL;
@@ -119,15 +122,16 @@ extends Screen {
         this.field_25477 = path;
     }
 
-    public CreateWorldScreen(@Nullable Screen arg) {
-        this(arg, new MoreOptionsDialog());
+    public CreateWorldScreen(@Nullable Screen parent) {
+        this(parent, DataPackSettings.SAFE_MODE, new MoreOptionsDialog(DynamicRegistryManager.create(), GeneratorOptions.getDefaultOptions(), Optional.of(GeneratorType.DEFAULT), OptionalLong.empty()));
     }
 
-    private CreateWorldScreen(@Nullable Screen arg, MoreOptionsDialog arg2) {
+    private CreateWorldScreen(@Nullable Screen arg, DataPackSettings arg2, MoreOptionsDialog arg3) {
         super(new TranslatableText("selectWorld.create"));
         this.parent = arg;
         this.levelName = I18n.translate("selectWorld.newWorld", new Object[0]);
-        this.moreOptionsDialog = arg2;
+        this.field_25479 = arg2;
+        this.moreOptionsDialog = arg3;
     }
 
     @Override
@@ -155,7 +159,7 @@ extends Screen {
         this.children.add(this.levelNameField);
         int i = this.width / 2 - 155;
         int j = this.width / 2 + 5;
-        this.gameModeSwitchButton = this.addButton(new ButtonWidget(i, 100, 150, 20, new TranslatableText("selectWorld.gameMode"), arg -> {
+        this.gameModeSwitchButton = this.addButton(new ButtonWidget(i, 100, 150, 20, LiteralText.EMPTY, arg -> {
             switch (this.currentMode) {
                 case SURVIVAL: {
                     this.tweakDefaultsTo(Mode.HARDCORE);
@@ -174,7 +178,7 @@ extends Screen {
 
             @Override
             public Text getMessage() {
-                return super.getMessage().shallowCopy().append(": ").append(new TranslatableText("selectWorld.gameMode." + CreateWorldScreen.this.currentMode.translationSuffix));
+                return new TranslatableText("options.generic_value", field_25898, new TranslatableText("selectWorld.gameMode." + CreateWorldScreen.this.currentMode.translationSuffix));
             }
 
             @Override
@@ -200,7 +204,7 @@ extends Screen {
 
             @Override
             public Text getMessage() {
-                return super.getMessage().shallowCopy().append(" ").append(ScreenTexts.getToggleText(CreateWorldScreen.this.cheatsEnabled && !CreateWorldScreen.this.hardcore));
+                return ScreenTexts.method_30619(super.getMessage(), CreateWorldScreen.this.cheatsEnabled && !CreateWorldScreen.this.hardcore);
             }
 
             @Override
@@ -302,10 +306,10 @@ extends Screen {
         this.setMoreOptionsOpen(this.moreOptionsOpen);
     }
 
-    private void setMoreOptionsOpen(boolean bl) {
-        this.moreOptionsOpen = bl;
+    private void setMoreOptionsOpen(boolean moreOptionsOpen) {
+        this.moreOptionsOpen = moreOptionsOpen;
         this.gameModeSwitchButton.visible = !this.moreOptionsOpen;
-        boolean bl2 = this.field_24286.visible = !this.moreOptionsOpen;
+        boolean bl = this.field_24286.visible = !this.moreOptionsOpen;
         if (this.moreOptionsDialog.isDebugWorld()) {
             this.field_25478.visible = false;
             this.gameModeSwitchButton.active = false;
@@ -333,11 +337,11 @@ extends Screen {
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (super.keyPressed(i, j, k)) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (super.keyPressed(keyCode, scanCode, modifiers)) {
             return true;
         }
-        if (i == 257 || i == 335) {
+        if (keyCode == 257 || keyCode == 335) {
             this.createLevel();
             return true;
         }
@@ -366,34 +370,34 @@ extends Screen {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.renderBackground(arg);
-        this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 20, -1);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.renderBackground(matrices);
+        this.drawCenteredText(matrices, this.textRenderer, this.title, this.width / 2, 20, -1);
         if (this.moreOptionsOpen) {
-            this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("selectWorld.enterSeed", new Object[0]), this.width / 2 - 100, 47, -6250336);
-            this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("selectWorld.seedInfo", new Object[0]), this.width / 2 - 100, 85, -6250336);
-            this.moreOptionsDialog.render(arg, i, j, f);
+            this.drawStringWithShadow(matrices, this.textRenderer, I18n.translate("selectWorld.enterSeed", new Object[0]), this.width / 2 - 100, 47, -6250336);
+            this.drawStringWithShadow(matrices, this.textRenderer, I18n.translate("selectWorld.seedInfo", new Object[0]), this.width / 2 - 100, 85, -6250336);
+            this.moreOptionsDialog.render(matrices, mouseX, mouseY, delta);
         } else {
-            this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("selectWorld.enterName", new Object[0]), this.width / 2 - 100, 47, -6250336);
-            this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("selectWorld.resultFolder", new Object[0]) + " " + this.saveDirectoryName, this.width / 2 - 100, 85, -6250336);
-            this.levelNameField.render(arg, i, j, f);
-            this.drawTextWithShadow(arg, this.textRenderer, this.firstGameModeDescriptionLine, this.width / 2 - 150, 122, -6250336);
-            this.drawTextWithShadow(arg, this.textRenderer, this.secondGameModeDescriptionLine, this.width / 2 - 150, 134, -6250336);
+            this.drawStringWithShadow(matrices, this.textRenderer, I18n.translate("selectWorld.enterName", new Object[0]), this.width / 2 - 100, 47, -6250336);
+            this.drawStringWithShadow(matrices, this.textRenderer, I18n.translate("selectWorld.resultFolder", new Object[0]) + " " + this.saveDirectoryName, this.width / 2 - 100, 85, -6250336);
+            this.levelNameField.render(matrices, mouseX, mouseY, delta);
+            this.drawTextWithShadow(matrices, this.textRenderer, this.firstGameModeDescriptionLine, this.width / 2 - 150, 122, -6250336);
+            this.drawTextWithShadow(matrices, this.textRenderer, this.secondGameModeDescriptionLine, this.width / 2 - 150, 134, -6250336);
             if (this.enableCheatsButton.visible) {
-                this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("selectWorld.allowCommands.info", new Object[0]), this.width / 2 - 150, 172, -6250336);
+                this.drawStringWithShadow(matrices, this.textRenderer, I18n.translate("selectWorld.allowCommands.info", new Object[0]), this.width / 2 - 150, 172, -6250336);
             }
         }
-        super.render(arg, i, j, f);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 
     @Override
-    protected <T extends Element> T addChild(T arg) {
-        return super.addChild(arg);
+    protected <T extends Element> T addChild(T child) {
+        return super.addChild(child);
     }
 
     @Override
-    protected <T extends AbstractButtonWidget> T addButton(T arg) {
-        return super.addButton(arg);
+    protected <T extends AbstractButtonWidget> T addButton(T button) {
+        return super.addButton(button);
     }
 
     @Nullable
@@ -404,7 +408,7 @@ extends Screen {
             }
             catch (IOException iOException) {
                 field_25480.warn("Failed to create temporary dir", (Throwable)iOException);
-                SystemToast.method_29627(this.client, this.saveDirectoryName);
+                SystemToast.addPackCopyFailure(this.client, this.saveDirectoryName);
                 this.method_30297();
             }
         }
@@ -441,6 +445,8 @@ extends Screen {
             } else {
                 this.client.send(() -> {
                     this.field_25479 = lv;
+                    this.moreOptionsDialog.method_30509(DynamicRegistryManager.load(arg2.getResourceManager()));
+                    arg2.close();
                     this.client.openScreen(this);
                 });
             }
@@ -469,7 +475,7 @@ extends Screen {
 
     private static void method_29687(Path path, Path path2, Path path3) {
         try {
-            Util.method_29775(path, path2, path3);
+            Util.relativeCopy(path, path2, path3);
         }
         catch (IOException iOException) {
             field_25480.warn("Failed to copy datapack file from {} to {}", (Object)path3, (Object)path2);
@@ -487,7 +493,7 @@ extends Screen {
             }
             catch (IOException | WorldCreationException exception) {
                 field_25480.warn("Failed to copy datapacks to world {}", (Object)this.saveDirectoryName, (Object)exception);
-                SystemToast.method_29627(this.client, this.saveDirectoryName);
+                SystemToast.addPackCopyFailure(this.client, this.saveDirectoryName);
                 this.method_30297();
                 return false;
             }
@@ -516,7 +522,7 @@ extends Screen {
         }
         catch (IOException | WorldCreationException exception) {
             field_25480.warn("Failed to copy datapacks from world {}", (Object)path, (Object)exception);
-            SystemToast.method_29627(arg, path.toString());
+            SystemToast.addPackCopyFailure(arg, path.toString());
             return null;
         }
         return (Path)mutableObject.getValue();
@@ -559,9 +565,9 @@ extends Screen {
         private final String translationSuffix;
         private final GameMode defaultGameMode;
 
-        private Mode(String string2, GameMode arg) {
-            this.translationSuffix = string2;
-            this.defaultGameMode = arg;
+        private Mode(String translationSuffix, GameMode defaultGameMode) {
+            this.translationSuffix = translationSuffix;
+            this.defaultGameMode = defaultGameMode;
         }
     }
 }

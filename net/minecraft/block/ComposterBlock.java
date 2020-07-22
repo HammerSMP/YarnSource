@@ -150,8 +150,8 @@ implements InventoryProvider {
         ComposterBlock.registerCompostableItem(1.0f, Items.PUMPKIN_PIE);
     }
 
-    private static void registerCompostableItem(float f, ItemConvertible arg) {
-        ITEM_TO_LEVEL_INCREASE_CHANCE.put((Object)arg.asItem(), f);
+    private static void registerCompostableItem(float levelIncreaseChance, ItemConvertible item) {
+        ITEM_TO_LEVEL_INCREASE_CHANCE.put((Object)item.asItem(), levelIncreaseChance);
     }
 
     public ComposterBlock(AbstractBlock.Settings arg) {
@@ -160,146 +160,146 @@ implements InventoryProvider {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public static void playEffects(World arg, BlockPos arg2, boolean bl) {
-        BlockState lv = arg.getBlockState(arg2);
-        arg.playSound(arg2.getX(), (double)arg2.getY(), (double)arg2.getZ(), bl ? SoundEvents.BLOCK_COMPOSTER_FILL_SUCCESS : SoundEvents.BLOCK_COMPOSTER_FILL, SoundCategory.BLOCKS, 1.0f, 1.0f, false);
-        double d = lv.getOutlineShape(arg, arg2).getEndingCoord(Direction.Axis.Y, 0.5, 0.5) + 0.03125;
+    public static void playEffects(World world, BlockPos pos, boolean fill) {
+        BlockState lv = world.getBlockState(pos);
+        world.playSound(pos.getX(), (double)pos.getY(), (double)pos.getZ(), fill ? SoundEvents.BLOCK_COMPOSTER_FILL_SUCCESS : SoundEvents.BLOCK_COMPOSTER_FILL, SoundCategory.BLOCKS, 1.0f, 1.0f, false);
+        double d = lv.getOutlineShape(world, pos).getEndingCoord(Direction.Axis.Y, 0.5, 0.5) + 0.03125;
         double e = 0.13125f;
         double f = 0.7375f;
-        Random random = arg.getRandom();
+        Random random = world.getRandom();
         for (int i = 0; i < 10; ++i) {
             double g = random.nextGaussian() * 0.02;
             double h = random.nextGaussian() * 0.02;
             double j = random.nextGaussian() * 0.02;
-            arg.addParticle(ParticleTypes.COMPOSTER, (double)arg2.getX() + (double)0.13125f + (double)0.7375f * (double)random.nextFloat(), (double)arg2.getY() + d + (double)random.nextFloat() * (1.0 - d), (double)arg2.getZ() + (double)0.13125f + (double)0.7375f * (double)random.nextFloat(), g, h, j);
+            world.addParticle(ParticleTypes.COMPOSTER, (double)pos.getX() + (double)0.13125f + (double)0.7375f * (double)random.nextFloat(), (double)pos.getY() + d + (double)random.nextFloat() * (1.0 - d), (double)pos.getZ() + (double)0.13125f + (double)0.7375f * (double)random.nextFloat(), g, h, j);
         }
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
-        return LEVEL_TO_COLLISION_SHAPE[arg.get(LEVEL)];
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        return LEVEL_TO_COLLISION_SHAPE[state.get(LEVEL)];
     }
 
     @Override
-    public VoxelShape getRayTraceShape(BlockState arg, BlockView arg2, BlockPos arg3) {
+    public VoxelShape getRayTraceShape(BlockState state, BlockView world, BlockPos pos) {
         return RAY_TRACE_SHAPE;
     }
 
     @Override
-    public VoxelShape getCollisionShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
+    public VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
         return LEVEL_TO_COLLISION_SHAPE[0];
     }
 
     @Override
-    public void onBlockAdded(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
-        if (arg.get(LEVEL) == 7) {
-            arg2.getBlockTickScheduler().schedule(arg3, arg.getBlock(), 20);
+    public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
+        if (state.get(LEVEL) == 7) {
+            world.getBlockTickScheduler().schedule(pos, state.getBlock(), 20);
         }
     }
 
     @Override
-    public ActionResult onUse(BlockState arg, World arg2, BlockPos arg3, PlayerEntity arg4, Hand arg5, BlockHitResult arg6) {
-        int i = arg.get(LEVEL);
-        ItemStack lv = arg4.getStackInHand(arg5);
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        int i = state.get(LEVEL);
+        ItemStack lv = player.getStackInHand(hand);
         if (i < 8 && ITEM_TO_LEVEL_INCREASE_CHANCE.containsKey((Object)lv.getItem())) {
-            if (i < 7 && !arg2.isClient) {
-                BlockState lv2 = ComposterBlock.addToComposter(arg, arg2, arg3, lv);
-                arg2.syncWorldEvent(1500, arg3, arg != lv2 ? 1 : 0);
-                if (!arg4.abilities.creativeMode) {
+            if (i < 7 && !world.isClient) {
+                BlockState lv2 = ComposterBlock.addToComposter(state, world, pos, lv);
+                world.syncWorldEvent(1500, pos, state != lv2 ? 1 : 0);
+                if (!player.abilities.creativeMode) {
                     lv.decrement(1);
                 }
             }
-            return ActionResult.success(arg2.isClient);
+            return ActionResult.success(world.isClient);
         }
         if (i == 8) {
-            ComposterBlock.emptyFullComposter(arg, arg2, arg3);
-            return ActionResult.success(arg2.isClient);
+            ComposterBlock.emptyFullComposter(state, world, pos);
+            return ActionResult.success(world.isClient);
         }
         return ActionResult.PASS;
     }
 
-    public static BlockState compost(BlockState arg, ServerWorld arg2, ItemStack arg3, BlockPos arg4) {
-        int i = arg.get(LEVEL);
-        if (i < 7 && ITEM_TO_LEVEL_INCREASE_CHANCE.containsKey((Object)arg3.getItem())) {
-            BlockState lv = ComposterBlock.addToComposter(arg, arg2, arg4, arg3);
-            arg3.decrement(1);
+    public static BlockState compost(BlockState state, ServerWorld world, ItemStack stack, BlockPos pos) {
+        int i = state.get(LEVEL);
+        if (i < 7 && ITEM_TO_LEVEL_INCREASE_CHANCE.containsKey((Object)stack.getItem())) {
+            BlockState lv = ComposterBlock.addToComposter(state, world, pos, stack);
+            stack.decrement(1);
             return lv;
         }
-        return arg;
+        return state;
     }
 
-    public static BlockState emptyFullComposter(BlockState arg, World arg2, BlockPos arg3) {
-        if (!arg2.isClient) {
+    public static BlockState emptyFullComposter(BlockState state, World world, BlockPos pos) {
+        if (!world.isClient) {
             float f = 0.7f;
-            double d = (double)(arg2.random.nextFloat() * 0.7f) + (double)0.15f;
-            double e = (double)(arg2.random.nextFloat() * 0.7f) + 0.06000000238418579 + 0.6;
-            double g = (double)(arg2.random.nextFloat() * 0.7f) + (double)0.15f;
-            ItemEntity lv = new ItemEntity(arg2, (double)arg3.getX() + d, (double)arg3.getY() + e, (double)arg3.getZ() + g, new ItemStack(Items.BONE_MEAL));
+            double d = (double)(world.random.nextFloat() * 0.7f) + (double)0.15f;
+            double e = (double)(world.random.nextFloat() * 0.7f) + 0.06000000238418579 + 0.6;
+            double g = (double)(world.random.nextFloat() * 0.7f) + (double)0.15f;
+            ItemEntity lv = new ItemEntity(world, (double)pos.getX() + d, (double)pos.getY() + e, (double)pos.getZ() + g, new ItemStack(Items.BONE_MEAL));
             lv.setToDefaultPickupDelay();
-            arg2.spawnEntity(lv);
+            world.spawnEntity(lv);
         }
-        BlockState lv2 = ComposterBlock.emptyComposter(arg, arg2, arg3);
-        arg2.playSound(null, arg3, SoundEvents.BLOCK_COMPOSTER_EMPTY, SoundCategory.BLOCKS, 1.0f, 1.0f);
+        BlockState lv2 = ComposterBlock.emptyComposter(state, world, pos);
+        world.playSound(null, pos, SoundEvents.BLOCK_COMPOSTER_EMPTY, SoundCategory.BLOCKS, 1.0f, 1.0f);
         return lv2;
     }
 
-    private static BlockState emptyComposter(BlockState arg, WorldAccess arg2, BlockPos arg3) {
-        BlockState lv = (BlockState)arg.with(LEVEL, 0);
-        arg2.setBlockState(arg3, lv, 3);
+    private static BlockState emptyComposter(BlockState state, WorldAccess world, BlockPos pos) {
+        BlockState lv = (BlockState)state.with(LEVEL, 0);
+        world.setBlockState(pos, lv, 3);
         return lv;
     }
 
-    private static BlockState addToComposter(BlockState arg, WorldAccess arg2, BlockPos arg3, ItemStack arg4) {
-        int i = arg.get(LEVEL);
-        float f = ITEM_TO_LEVEL_INCREASE_CHANCE.getFloat((Object)arg4.getItem());
-        if (i == 0 && f > 0.0f || arg2.getRandom().nextDouble() < (double)f) {
+    private static BlockState addToComposter(BlockState state, WorldAccess world, BlockPos pos, ItemStack item) {
+        int i = state.get(LEVEL);
+        float f = ITEM_TO_LEVEL_INCREASE_CHANCE.getFloat((Object)item.getItem());
+        if (i == 0 && f > 0.0f || world.getRandom().nextDouble() < (double)f) {
             int j = i + 1;
-            BlockState lv = (BlockState)arg.with(LEVEL, j);
-            arg2.setBlockState(arg3, lv, 3);
+            BlockState lv = (BlockState)state.with(LEVEL, j);
+            world.setBlockState(pos, lv, 3);
             if (j == 7) {
-                arg2.getBlockTickScheduler().schedule(arg3, arg.getBlock(), 20);
+                world.getBlockTickScheduler().schedule(pos, state.getBlock(), 20);
             }
             return lv;
         }
-        return arg;
+        return state;
     }
 
     @Override
-    public void scheduledTick(BlockState arg, ServerWorld arg2, BlockPos arg3, Random random) {
-        if (arg.get(LEVEL) == 7) {
-            arg2.setBlockState(arg3, (BlockState)arg.cycle(LEVEL), 3);
-            arg2.playSound(null, arg3, SoundEvents.BLOCK_COMPOSTER_READY, SoundCategory.BLOCKS, 1.0f, 1.0f);
+    public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        if (state.get(LEVEL) == 7) {
+            world.setBlockState(pos, (BlockState)state.cycle(LEVEL), 3);
+            world.playSound(null, pos, SoundEvents.BLOCK_COMPOSTER_READY, SoundCategory.BLOCKS, 1.0f, 1.0f);
         }
     }
 
     @Override
-    public boolean hasComparatorOutput(BlockState arg) {
+    public boolean hasComparatorOutput(BlockState state) {
         return true;
     }
 
     @Override
-    public int getComparatorOutput(BlockState arg, World arg2, BlockPos arg3) {
-        return arg.get(LEVEL);
+    public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
+        return state.get(LEVEL);
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(LEVEL);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(LEVEL);
     }
 
     @Override
-    public boolean canPathfindThrough(BlockState arg, BlockView arg2, BlockPos arg3, NavigationType arg4) {
+    public boolean canPathfindThrough(BlockState state, BlockView world, BlockPos pos, NavigationType type) {
         return false;
     }
 
     @Override
-    public SidedInventory getInventory(BlockState arg, WorldAccess arg2, BlockPos arg3) {
-        int i = arg.get(LEVEL);
+    public SidedInventory getInventory(BlockState state, WorldAccess world, BlockPos pos) {
+        int i = state.get(LEVEL);
         if (i == 8) {
-            return new FullComposterInventory(arg, arg2, arg3, new ItemStack(Items.BONE_MEAL));
+            return new FullComposterInventory(state, world, pos, new ItemStack(Items.BONE_MEAL));
         }
         if (i < 7) {
-            return new ComposterInventory(arg, arg2, arg3);
+            return new ComposterInventory(state, world, pos);
         }
         return new DummyInventory();
     }
@@ -312,11 +312,11 @@ implements InventoryProvider {
         private final BlockPos pos;
         private boolean dirty;
 
-        public ComposterInventory(BlockState arg, WorldAccess arg2, BlockPos arg3) {
+        public ComposterInventory(BlockState state, WorldAccess world, BlockPos pos) {
             super(1);
-            this.state = arg;
-            this.world = arg2;
-            this.pos = arg3;
+            this.state = state;
+            this.world = world;
+            this.pos = pos;
         }
 
         @Override
@@ -325,9 +325,9 @@ implements InventoryProvider {
         }
 
         @Override
-        public int[] getAvailableSlots(Direction arg) {
+        public int[] getAvailableSlots(Direction side) {
             int[] arrn;
-            if (arg == Direction.UP) {
+            if (side == Direction.UP) {
                 int[] arrn2 = new int[1];
                 arrn = arrn2;
                 arrn2[0] = 0;
@@ -338,12 +338,12 @@ implements InventoryProvider {
         }
 
         @Override
-        public boolean canInsert(int i, ItemStack arg, @Nullable Direction arg2) {
-            return !this.dirty && arg2 == Direction.UP && ITEM_TO_LEVEL_INCREASE_CHANCE.containsKey((Object)arg.getItem());
+        public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
+            return !this.dirty && dir == Direction.UP && ITEM_TO_LEVEL_INCREASE_CHANCE.containsKey((Object)stack.getItem());
         }
 
         @Override
-        public boolean canExtract(int i, ItemStack arg, Direction arg2) {
+        public boolean canExtract(int slot, ItemStack stack, Direction dir) {
             return false;
         }
 
@@ -367,11 +367,11 @@ implements InventoryProvider {
         private final BlockPos pos;
         private boolean dirty;
 
-        public FullComposterInventory(BlockState arg, WorldAccess arg2, BlockPos arg3, ItemStack arg4) {
-            super(arg4);
-            this.state = arg;
-            this.world = arg2;
-            this.pos = arg3;
+        public FullComposterInventory(BlockState state, WorldAccess world, BlockPos pos, ItemStack outputItem) {
+            super(outputItem);
+            this.state = state;
+            this.world = world;
+            this.pos = pos;
         }
 
         @Override
@@ -380,9 +380,9 @@ implements InventoryProvider {
         }
 
         @Override
-        public int[] getAvailableSlots(Direction arg) {
+        public int[] getAvailableSlots(Direction side) {
             int[] arrn;
-            if (arg == Direction.DOWN) {
+            if (side == Direction.DOWN) {
                 int[] arrn2 = new int[1];
                 arrn = arrn2;
                 arrn2[0] = 0;
@@ -393,13 +393,13 @@ implements InventoryProvider {
         }
 
         @Override
-        public boolean canInsert(int i, ItemStack arg, @Nullable Direction arg2) {
+        public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
             return false;
         }
 
         @Override
-        public boolean canExtract(int i, ItemStack arg, Direction arg2) {
-            return !this.dirty && arg2 == Direction.DOWN && arg.getItem() == Items.BONE_MEAL;
+        public boolean canExtract(int slot, ItemStack stack, Direction dir) {
+            return !this.dirty && dir == Direction.DOWN && stack.getItem() == Items.BONE_MEAL;
         }
 
         @Override
@@ -417,17 +417,17 @@ implements InventoryProvider {
         }
 
         @Override
-        public int[] getAvailableSlots(Direction arg) {
+        public int[] getAvailableSlots(Direction side) {
             return new int[0];
         }
 
         @Override
-        public boolean canInsert(int i, ItemStack arg, @Nullable Direction arg2) {
+        public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
             return false;
         }
 
         @Override
-        public boolean canExtract(int i, ItemStack arg, Direction arg2) {
+        public boolean canExtract(int slot, ItemStack stack, Direction dir) {
             return false;
         }
     }

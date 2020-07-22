@@ -23,36 +23,36 @@ public class BiomeColorCache {
     private final Long2ObjectLinkedOpenHashMap<int[]> colors = new Long2ObjectLinkedOpenHashMap(256, 0.25f);
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
-    public int getBiomeColor(BlockPos arg, IntSupplier intSupplier) {
+    public int getBiomeColor(BlockPos pos, IntSupplier colorFactory) {
         int o;
-        int i = arg.getX() >> 4;
-        int j = arg.getZ() >> 4;
+        int i = pos.getX() >> 4;
+        int j = pos.getZ() >> 4;
         Last lv = this.last.get();
         if (lv.x != i || lv.z != j) {
             lv.x = i;
             lv.z = j;
             lv.colors = this.getColorArray(i, j);
         }
-        int k = arg.getX() & 0xF;
-        int l = arg.getZ() & 0xF;
+        int k = pos.getX() & 0xF;
+        int l = pos.getZ() & 0xF;
         int m = l << 4 | k;
         int n = lv.colors[m];
         if (n != -1) {
             return n;
         }
-        lv.colors[m] = o = intSupplier.getAsInt();
+        lv.colors[m] = o = colorFactory.getAsInt();
         return o;
     }
 
     /*
      * WARNING - Removed try catching itself - possible behaviour change.
      */
-    public void reset(int i, int j) {
+    public void reset(int chunkX, int chunkZ) {
         try {
             this.lock.writeLock().lock();
             for (int k = -1; k <= 1; ++k) {
                 for (int l = -1; l <= 1; ++l) {
-                    long m = ChunkPos.toLong(i + k, j + l);
+                    long m = ChunkPos.toLong(chunkX + k, chunkZ + l);
                     this.colors.remove(m);
                 }
             }
@@ -76,9 +76,9 @@ public class BiomeColorCache {
      * WARNING - Removed try catching itself - possible behaviour change.
      * WARNING - void declaration
      */
-    private int[] getColorArray(int i, int j) {
+    private int[] getColorArray(int chunkX, int chunkZ) {
         void js;
-        long l = ChunkPos.toLong(i, j);
+        long l = ChunkPos.toLong(chunkX, chunkZ);
         this.lock.readLock().lock();
         try {
             int[] is = (int[])this.colors.get(l);

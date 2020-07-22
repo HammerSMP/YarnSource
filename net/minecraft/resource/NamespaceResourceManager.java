@@ -45,13 +45,13 @@ implements ResourceManager {
     private final ResourceType type;
     private final String namespace;
 
-    public NamespaceResourceManager(ResourceType arg, String string) {
-        this.type = arg;
-        this.namespace = string;
+    public NamespaceResourceManager(ResourceType type, String namespace) {
+        this.type = type;
+        this.namespace = namespace;
     }
 
-    public void addPack(ResourcePack arg) {
-        this.packList.add(arg);
+    public void addPack(ResourcePack pack) {
+        this.packList.add(pack);
     }
 
     @Override
@@ -61,83 +61,83 @@ implements ResourceManager {
     }
 
     @Override
-    public Resource getResource(Identifier arg) throws IOException {
-        this.validate(arg);
+    public Resource getResource(Identifier id) throws IOException {
+        this.validate(id);
         ResourcePack lv = null;
-        Identifier lv2 = NamespaceResourceManager.getMetadataPath(arg);
+        Identifier lv2 = NamespaceResourceManager.getMetadataPath(id);
         for (int i = this.packList.size() - 1; i >= 0; --i) {
             ResourcePack lv3 = this.packList.get(i);
             if (lv == null && lv3.contains(this.type, lv2)) {
                 lv = lv3;
             }
-            if (!lv3.contains(this.type, arg)) continue;
+            if (!lv3.contains(this.type, id)) continue;
             InputStream inputStream = null;
             if (lv != null) {
                 inputStream = this.open(lv2, lv);
             }
-            return new ResourceImpl(lv3.getName(), arg, this.open(arg, lv3), inputStream);
+            return new ResourceImpl(lv3.getName(), id, this.open(id, lv3), inputStream);
         }
-        throw new FileNotFoundException(arg.toString());
+        throw new FileNotFoundException(id.toString());
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public boolean containsResource(Identifier arg) {
-        if (!this.isPathAbsolute(arg)) {
+    public boolean containsResource(Identifier id) {
+        if (!this.isPathAbsolute(id)) {
             return false;
         }
         for (int i = this.packList.size() - 1; i >= 0; --i) {
             ResourcePack lv = this.packList.get(i);
-            if (!lv.contains(this.type, arg)) continue;
+            if (!lv.contains(this.type, id)) continue;
             return true;
         }
         return false;
     }
 
-    protected InputStream open(Identifier arg, ResourcePack arg2) throws IOException {
-        InputStream inputStream = arg2.open(this.type, arg);
-        return LOGGER.isDebugEnabled() ? new DebugInputStream(inputStream, arg, arg2.getName()) : inputStream;
+    protected InputStream open(Identifier id, ResourcePack pack) throws IOException {
+        InputStream inputStream = pack.open(this.type, id);
+        return LOGGER.isDebugEnabled() ? new DebugInputStream(inputStream, id, pack.getName()) : inputStream;
     }
 
-    private void validate(Identifier arg) throws IOException {
-        if (!this.isPathAbsolute(arg)) {
-            throw new IOException("Invalid relative path to resource: " + arg);
+    private void validate(Identifier id) throws IOException {
+        if (!this.isPathAbsolute(id)) {
+            throw new IOException("Invalid relative path to resource: " + id);
         }
     }
 
-    private boolean isPathAbsolute(Identifier arg) {
-        return !arg.getPath().contains("..");
+    private boolean isPathAbsolute(Identifier id) {
+        return !id.getPath().contains("..");
     }
 
     @Override
-    public List<Resource> getAllResources(Identifier arg) throws IOException {
-        this.validate(arg);
+    public List<Resource> getAllResources(Identifier id) throws IOException {
+        this.validate(id);
         ArrayList list = Lists.newArrayList();
-        Identifier lv = NamespaceResourceManager.getMetadataPath(arg);
+        Identifier lv = NamespaceResourceManager.getMetadataPath(id);
         for (ResourcePack lv2 : this.packList) {
-            if (!lv2.contains(this.type, arg)) continue;
+            if (!lv2.contains(this.type, id)) continue;
             InputStream inputStream = lv2.contains(this.type, lv) ? this.open(lv, lv2) : null;
-            list.add(new ResourceImpl(lv2.getName(), arg, this.open(arg, lv2), inputStream));
+            list.add(new ResourceImpl(lv2.getName(), id, this.open(id, lv2), inputStream));
         }
         if (list.isEmpty()) {
-            throw new FileNotFoundException(arg.toString());
+            throw new FileNotFoundException(id.toString());
         }
         return list;
     }
 
     @Override
-    public Collection<Identifier> findResources(Identifier arg, Predicate<String> predicate) {
-        if (Objects.equals(arg.getNamespace(), this.namespace)) {
-            return this.findResources(arg.getPath(), predicate);
+    public Collection<Identifier> findResources(Identifier resourceType, Predicate<String> predicate) {
+        if (Objects.equals(resourceType.getNamespace(), this.namespace)) {
+            return this.findResources(resourceType.getPath(), predicate);
         }
         return ImmutableSet.of();
     }
 
     @Override
-    public Collection<Identifier> findResources(String string, Predicate<String> predicate) {
+    public Collection<Identifier> findResources(String resourceType, Predicate<String> pathPredicate) {
         ArrayList list = Lists.newArrayList();
         for (ResourcePack lv : this.packList) {
-            list.addAll(lv.findResources(this.type, this.namespace, string, Integer.MAX_VALUE, predicate));
+            list.addAll(lv.findResources(this.type, this.namespace, resourceType, Integer.MAX_VALUE, pathPredicate));
         }
         Collections.sort(list);
         return list;
@@ -149,8 +149,8 @@ implements ResourceManager {
         return this.packList.stream();
     }
 
-    static Identifier getMetadataPath(Identifier arg) {
-        return new Identifier(arg.getNamespace(), arg.getPath() + ".mcmeta");
+    static Identifier getMetadataPath(Identifier id) {
+        return new Identifier(id.getNamespace(), id.getPath() + ".mcmeta");
     }
 
     static class DebugInputStream
@@ -158,11 +158,11 @@ implements ResourceManager {
         private final String leakMessage;
         private boolean closed;
 
-        public DebugInputStream(InputStream inputStream, Identifier arg, String string) {
-            super(inputStream);
+        public DebugInputStream(InputStream parent, Identifier id, String packName) {
+            super(parent);
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             new Exception().printStackTrace(new PrintStream(byteArrayOutputStream));
-            this.leakMessage = "Leaked resource: '" + arg + "' loaded from pack: '" + string + "'\n" + byteArrayOutputStream;
+            this.leakMessage = "Leaked resource: '" + id + "' loaded from pack: '" + packName + "'\n" + byteArrayOutputStream;
         }
 
         @Override

@@ -38,78 +38,78 @@ extends Block {
     }
 
     @Override
-    public void scheduledTick(BlockState arg, ServerWorld arg2, BlockPos arg3, Random random) {
-        if (!arg.canPlaceAt(arg2, arg3)) {
-            arg2.breakBlock(arg3, true);
+    public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        if (!state.canPlaceAt(world, pos)) {
+            world.breakBlock(pos, true);
         }
     }
 
     @Override
-    public void randomTick(BlockState arg, ServerWorld arg2, BlockPos arg3, Random random) {
-        BlockPos lv = arg3.up();
-        if (!arg2.isAir(lv)) {
+    public void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        BlockPos lv = pos.up();
+        if (!world.isAir(lv)) {
             return;
         }
         int i = 1;
-        while (arg2.getBlockState(arg3.down(i)).isOf(this)) {
+        while (world.getBlockState(pos.down(i)).isOf(this)) {
             ++i;
         }
         if (i >= 3) {
             return;
         }
-        int j = arg.get(AGE);
+        int j = state.get(AGE);
         if (j == 15) {
-            arg2.setBlockState(lv, this.getDefaultState());
-            BlockState lv2 = (BlockState)arg.with(AGE, 0);
-            arg2.setBlockState(arg3, lv2, 4);
-            lv2.neighborUpdate(arg2, lv, this, arg3, false);
+            world.setBlockState(lv, this.getDefaultState());
+            BlockState lv2 = (BlockState)state.with(AGE, 0);
+            world.setBlockState(pos, lv2, 4);
+            lv2.neighborUpdate(world, lv, this, pos, false);
         } else {
-            arg2.setBlockState(arg3, (BlockState)arg.with(AGE, j + 1), 4);
+            world.setBlockState(pos, (BlockState)state.with(AGE, j + 1), 4);
         }
     }
 
     @Override
-    public VoxelShape getCollisionShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
+    public VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
         return COLLISION_SHAPE;
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
         return OUTLINE_SHAPE;
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
-        if (!arg.canPlaceAt(arg4, arg5)) {
-            arg4.getBlockTickScheduler().schedule(arg5, this, 1);
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
+        if (!state.canPlaceAt(world, pos)) {
+            world.getBlockTickScheduler().schedule(pos, this, 1);
         }
-        return super.getStateForNeighborUpdate(arg, arg2, arg3, arg4, arg5, arg6);
+        return super.getStateForNeighborUpdate(state, direction, newState, world, pos, posFrom);
     }
 
     @Override
-    public boolean canPlaceAt(BlockState arg, WorldView arg2, BlockPos arg3) {
+    public boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
         for (Direction lv : Direction.Type.HORIZONTAL) {
-            BlockState lv2 = arg2.getBlockState(arg3.offset(lv));
+            BlockState lv2 = world.getBlockState(pos.offset(lv));
             Material lv3 = lv2.getMaterial();
-            if (!lv3.isSolid() && !arg2.getFluidState(arg3.offset(lv)).isIn(FluidTags.LAVA)) continue;
+            if (!lv3.isSolid() && !world.getFluidState(pos.offset(lv)).isIn(FluidTags.LAVA)) continue;
             return false;
         }
-        BlockState lv4 = arg2.getBlockState(arg3.down());
-        return (lv4.isOf(Blocks.CACTUS) || lv4.isOf(Blocks.SAND) || lv4.isOf(Blocks.RED_SAND)) && !arg2.getBlockState(arg3.up()).getMaterial().isLiquid();
+        BlockState lv4 = world.getBlockState(pos.down());
+        return (lv4.isOf(Blocks.CACTUS) || lv4.isOf(Blocks.SAND) || lv4.isOf(Blocks.RED_SAND)) && !world.getBlockState(pos.up()).getMaterial().isLiquid();
     }
 
     @Override
-    public void onEntityCollision(BlockState arg, World arg2, BlockPos arg3, Entity arg4) {
-        arg4.damage(DamageSource.CACTUS, 1.0f);
+    public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
+        entity.damage(DamageSource.CACTUS, 1.0f);
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(AGE);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(AGE);
     }
 
     @Override
-    public boolean canPathfindThrough(BlockState arg, BlockView arg2, BlockPos arg3, NavigationType arg4) {
+    public boolean canPathfindThrough(BlockState state, BlockView world, BlockPos pos, NavigationType type) {
         return false;
     }
 }

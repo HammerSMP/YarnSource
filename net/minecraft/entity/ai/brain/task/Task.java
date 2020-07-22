@@ -16,66 +16,66 @@ public abstract class Task<E extends LivingEntity> {
     private final int minRunTime;
     private final int maxRunTime;
 
-    public Task(Map<MemoryModuleType<?>, MemoryModuleState> map) {
-        this(map, 60);
+    public Task(Map<MemoryModuleType<?>, MemoryModuleState> requiredMemoryState) {
+        this(requiredMemoryState, 60);
     }
 
-    public Task(Map<MemoryModuleType<?>, MemoryModuleState> map, int i) {
-        this(map, i, i);
+    public Task(Map<MemoryModuleType<?>, MemoryModuleState> requiredMemoryState, int runTime) {
+        this(requiredMemoryState, runTime, runTime);
     }
 
-    public Task(Map<MemoryModuleType<?>, MemoryModuleState> map, int i, int j) {
-        this.minRunTime = i;
-        this.maxRunTime = j;
-        this.requiredMemoryStates = map;
+    public Task(Map<MemoryModuleType<?>, MemoryModuleState> requiredMemoryState, int minRunTime, int maxRunTime) {
+        this.minRunTime = minRunTime;
+        this.maxRunTime = maxRunTime;
+        this.requiredMemoryStates = requiredMemoryState;
     }
 
     public Status getStatus() {
         return this.status;
     }
 
-    public final boolean tryStarting(ServerWorld arg, E arg2, long l) {
-        if (this.hasRequiredMemoryState(arg2) && this.shouldRun(arg, arg2)) {
+    public final boolean tryStarting(ServerWorld world, E entity, long time) {
+        if (this.hasRequiredMemoryState(entity) && this.shouldRun(world, entity)) {
             this.status = Status.RUNNING;
-            int i = this.minRunTime + arg.getRandom().nextInt(this.maxRunTime + 1 - this.minRunTime);
-            this.endTime = l + (long)i;
-            this.run(arg, arg2, l);
+            int i = this.minRunTime + world.getRandom().nextInt(this.maxRunTime + 1 - this.minRunTime);
+            this.endTime = time + (long)i;
+            this.run(world, entity, time);
             return true;
         }
         return false;
     }
 
-    protected void run(ServerWorld arg, E arg2, long l) {
+    protected void run(ServerWorld world, E entity, long time) {
     }
 
-    public final void tick(ServerWorld arg, E arg2, long l) {
-        if (!this.isTimeLimitExceeded(l) && this.shouldKeepRunning(arg, arg2, l)) {
-            this.keepRunning(arg, arg2, l);
+    public final void tick(ServerWorld world, E entity, long time) {
+        if (!this.isTimeLimitExceeded(time) && this.shouldKeepRunning(world, entity, time)) {
+            this.keepRunning(world, entity, time);
         } else {
-            this.stop(arg, arg2, l);
+            this.stop(world, entity, time);
         }
     }
 
-    protected void keepRunning(ServerWorld arg, E arg2, long l) {
+    protected void keepRunning(ServerWorld world, E entity, long time) {
     }
 
-    public final void stop(ServerWorld arg, E arg2, long l) {
+    public final void stop(ServerWorld world, E entity, long time) {
         this.status = Status.STOPPED;
-        this.finishRunning(arg, arg2, l);
+        this.finishRunning(world, entity, time);
     }
 
-    protected void finishRunning(ServerWorld arg, E arg2, long l) {
+    protected void finishRunning(ServerWorld world, E entity, long time) {
     }
 
-    protected boolean shouldKeepRunning(ServerWorld arg, E arg2, long l) {
+    protected boolean shouldKeepRunning(ServerWorld world, E entity, long time) {
         return false;
     }
 
-    protected boolean isTimeLimitExceeded(long l) {
-        return l > this.endTime;
+    protected boolean isTimeLimitExceeded(long time) {
+        return time > this.endTime;
     }
 
-    protected boolean shouldRun(ServerWorld arg, E arg2) {
+    protected boolean shouldRun(ServerWorld world, E entity) {
         return true;
     }
 

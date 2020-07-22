@@ -23,7 +23,7 @@ import net.minecraft.village.VillagerType;
 
 public class VillagerData {
     private static final int[] LEVEL_BASE_EXPERIENCE = new int[]{0, 10, 70, 150, 250};
-    public static final Codec<VillagerData> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Registry.VILLAGER_TYPE.fieldOf("type").withDefault(() -> VillagerType.PLAINS).forGetter(arg -> arg.type), (App)Registry.VILLAGER_PROFESSION.fieldOf("profession").withDefault(() -> VillagerProfession.NONE).forGetter(arg -> arg.profession), (App)Codec.INT.fieldOf("level").withDefault((Object)1).forGetter(arg -> arg.level)).apply((Applicative)instance, VillagerData::new));
+    public static final Codec<VillagerData> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Registry.VILLAGER_TYPE.fieldOf("type").orElseGet(() -> VillagerType.PLAINS).forGetter(arg -> arg.type), (App)Registry.VILLAGER_PROFESSION.fieldOf("profession").orElseGet(() -> VillagerProfession.NONE).forGetter(arg -> arg.profession), (App)Codec.INT.fieldOf("level").orElse((Object)1).forGetter(arg -> arg.level)).apply((Applicative)instance, VillagerData::new));
     private final VillagerType type;
     private final VillagerProfession profession;
     private final int level;
@@ -54,21 +54,21 @@ public class VillagerData {
         return new VillagerData(this.type, arg, this.level);
     }
 
-    public VillagerData withLevel(int i) {
-        return new VillagerData(this.type, this.profession, i);
+    public VillagerData withLevel(int level) {
+        return new VillagerData(this.type, this.profession, level);
     }
 
     @Environment(value=EnvType.CLIENT)
-    public static int getLowerLevelExperience(int i) {
-        return VillagerData.canLevelUp(i) ? LEVEL_BASE_EXPERIENCE[i - 1] : 0;
+    public static int getLowerLevelExperience(int level) {
+        return VillagerData.canLevelUp(level) ? LEVEL_BASE_EXPERIENCE[level - 1] : 0;
     }
 
-    public static int getUpperLevelExperience(int i) {
-        return VillagerData.canLevelUp(i) ? LEVEL_BASE_EXPERIENCE[i] : 0;
+    public static int getUpperLevelExperience(int level) {
+        return VillagerData.canLevelUp(level) ? LEVEL_BASE_EXPERIENCE[level] : 0;
     }
 
-    public static boolean canLevelUp(int i) {
-        return i >= 1 && i < 5;
+    public static boolean canLevelUp(int level) {
+        return level >= 1 && level < 5;
     }
 }
 

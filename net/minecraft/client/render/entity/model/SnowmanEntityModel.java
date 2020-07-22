@@ -46,10 +46,10 @@ extends CompositeEntityModel<T> {
     }
 
     @Override
-    public void setAngles(T arg, float f, float g, float h, float i, float j) {
-        this.topSnowball.yaw = i * ((float)Math.PI / 180);
-        this.topSnowball.pitch = j * ((float)Math.PI / 180);
-        this.middleSnowball.yaw = i * ((float)Math.PI / 180) * 0.25f;
+    public void setAngles(T entity, float limbAngle, float limbDistance, float animationProgress, float headYaw, float headPitch) {
+        this.topSnowball.yaw = headYaw * ((float)Math.PI / 180);
+        this.topSnowball.pitch = headPitch * ((float)Math.PI / 180);
+        this.middleSnowball.yaw = headYaw * ((float)Math.PI / 180) * 0.25f;
         float k = MathHelper.sin(this.middleSnowball.yaw);
         float l = MathHelper.cos(this.middleSnowball.yaw);
         this.leftArm.roll = 1.0f;

@@ -33,31 +33,31 @@ public class SuggestionProviders {
     public static final SuggestionProvider<CommandSource> ASK_SERVER = SuggestionProviders.register(ASK_SERVER_NAME, (SuggestionProvider<CommandSource>)((SuggestionProvider)(commandContext, suggestionsBuilder) -> ((CommandSource)commandContext.getSource()).getCompletions((CommandContext<CommandSource>)commandContext, suggestionsBuilder)));
     public static final SuggestionProvider<ServerCommandSource> ALL_RECIPES = SuggestionProviders.register(new Identifier("all_recipes"), (SuggestionProvider<CommandSource>)((SuggestionProvider)(commandContext, suggestionsBuilder) -> CommandSource.suggestIdentifiers(((CommandSource)commandContext.getSource()).getRecipeIds(), suggestionsBuilder)));
     public static final SuggestionProvider<ServerCommandSource> AVAILABLE_SOUNDS = SuggestionProviders.register(new Identifier("available_sounds"), (SuggestionProvider<CommandSource>)((SuggestionProvider)(commandContext, suggestionsBuilder) -> CommandSource.suggestIdentifiers(((CommandSource)commandContext.getSource()).getSoundIds(), suggestionsBuilder)));
-    public static final SuggestionProvider<ServerCommandSource> ALL_BIOMES = SuggestionProviders.register(new Identifier("available_biomes"), (SuggestionProvider<CommandSource>)((SuggestionProvider)(commandContext, suggestionsBuilder) -> CommandSource.suggestIdentifiers(Registry.BIOME.getIds(), suggestionsBuilder)));
+    public static final SuggestionProvider<ServerCommandSource> ALL_BIOMES = SuggestionProviders.register(new Identifier("available_biomes"), (SuggestionProvider<CommandSource>)((SuggestionProvider)(commandContext, suggestionsBuilder) -> CommandSource.suggestIdentifiers(((CommandSource)commandContext.getSource()).getRegistryManager().get(Registry.BIOME_KEY).getIds(), suggestionsBuilder)));
     public static final SuggestionProvider<ServerCommandSource> SUMMONABLE_ENTITIES = SuggestionProviders.register(new Identifier("summonable_entities"), (SuggestionProvider<CommandSource>)((SuggestionProvider)(commandContext, suggestionsBuilder) -> CommandSource.suggestFromIdentifier(Registry.ENTITY_TYPE.stream().filter(EntityType::isSummonable), suggestionsBuilder, EntityType::getId, arg -> new TranslatableText(Util.createTranslationKey("entity", EntityType.getId(arg))))));
 
-    public static <S extends CommandSource> SuggestionProvider<S> register(Identifier arg, SuggestionProvider<CommandSource> suggestionProvider) {
-        if (REGISTRY.containsKey(arg)) {
-            throw new IllegalArgumentException("A command suggestion provider is already registered with the name " + arg);
+    public static <S extends CommandSource> SuggestionProvider<S> register(Identifier name, SuggestionProvider<CommandSource> provider) {
+        if (REGISTRY.containsKey(name)) {
+            throw new IllegalArgumentException("A command suggestion provider is already registered with the name " + name);
         }
-        REGISTRY.put(arg, suggestionProvider);
-        return new LocalProvider(arg, suggestionProvider);
+        REGISTRY.put(name, provider);
+        return new LocalProvider(name, provider);
     }
 
-    public static SuggestionProvider<CommandSource> byId(Identifier arg) {
-        return REGISTRY.getOrDefault(arg, ASK_SERVER);
+    public static SuggestionProvider<CommandSource> byId(Identifier id) {
+        return REGISTRY.getOrDefault(id, ASK_SERVER);
     }
 
-    public static Identifier computeName(SuggestionProvider<CommandSource> suggestionProvider) {
-        if (suggestionProvider instanceof LocalProvider) {
-            return ((LocalProvider)suggestionProvider).name;
+    public static Identifier computeName(SuggestionProvider<CommandSource> provider) {
+        if (provider instanceof LocalProvider) {
+            return ((LocalProvider)provider).name;
         }
         return ASK_SERVER_NAME;
     }
 
-    public static SuggestionProvider<CommandSource> getLocalProvider(SuggestionProvider<CommandSource> suggestionProvider) {
-        if (suggestionProvider instanceof LocalProvider) {
-            return suggestionProvider;
+    public static SuggestionProvider<CommandSource> getLocalProvider(SuggestionProvider<CommandSource> provider) {
+        if (provider instanceof LocalProvider) {
+            return provider;
         }
         return ASK_SERVER;
     }
@@ -67,9 +67,9 @@ public class SuggestionProviders {
         private final SuggestionProvider<CommandSource> provider;
         private final Identifier name;
 
-        public LocalProvider(Identifier arg, SuggestionProvider<CommandSource> suggestionProvider) {
+        public LocalProvider(Identifier name, SuggestionProvider<CommandSource> suggestionProvider) {
             this.provider = suggestionProvider;
-            this.name = arg;
+            this.name = name;
         }
 
         public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSource> commandContext, SuggestionsBuilder suggestionsBuilder) throws CommandSyntaxException {

@@ -39,60 +39,60 @@ extends BlockWithEntity {
     }
 
     @Override
-    public BlockEntity createBlockEntity(BlockView arg) {
+    public BlockEntity createBlockEntity(BlockView world) {
         return new StructureBlockBlockEntity();
     }
 
     @Override
-    public ActionResult onUse(BlockState arg, World arg2, BlockPos arg3, PlayerEntity arg4, Hand arg5, BlockHitResult arg6) {
-        BlockEntity lv = arg2.getBlockEntity(arg3);
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        BlockEntity lv = world.getBlockEntity(pos);
         if (lv instanceof StructureBlockBlockEntity) {
-            return ((StructureBlockBlockEntity)lv).openScreen(arg4) ? ActionResult.success(arg2.isClient) : ActionResult.PASS;
+            return ((StructureBlockBlockEntity)lv).openScreen(player) ? ActionResult.success(world.isClient) : ActionResult.PASS;
         }
         return ActionResult.PASS;
     }
 
     @Override
-    public void onPlaced(World arg, BlockPos arg2, BlockState arg3, @Nullable LivingEntity arg4, ItemStack arg5) {
+    public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
         BlockEntity lv;
-        if (arg.isClient) {
+        if (world.isClient) {
             return;
         }
-        if (arg4 != null && (lv = arg.getBlockEntity(arg2)) instanceof StructureBlockBlockEntity) {
-            ((StructureBlockBlockEntity)lv).setAuthor(arg4);
+        if (placer != null && (lv = world.getBlockEntity(pos)) instanceof StructureBlockBlockEntity) {
+            ((StructureBlockBlockEntity)lv).setAuthor(placer);
         }
     }
 
     @Override
-    public BlockRenderType getRenderType(BlockState arg) {
+    public BlockRenderType getRenderType(BlockState state) {
         return BlockRenderType.MODEL;
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext arg) {
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
         return (BlockState)this.getDefaultState().with(MODE, StructureBlockMode.DATA);
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(MODE);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(MODE);
     }
 
     @Override
-    public void neighborUpdate(BlockState arg, World arg2, BlockPos arg3, Block arg4, BlockPos arg5, boolean bl) {
-        if (!(arg2 instanceof ServerWorld)) {
+    public void neighborUpdate(BlockState state, World world, BlockPos pos, Block block, BlockPos fromPos, boolean notify) {
+        if (!(world instanceof ServerWorld)) {
             return;
         }
-        BlockEntity lv = arg2.getBlockEntity(arg3);
+        BlockEntity lv = world.getBlockEntity(pos);
         if (!(lv instanceof StructureBlockBlockEntity)) {
             return;
         }
         StructureBlockBlockEntity lv2 = (StructureBlockBlockEntity)lv;
-        boolean bl2 = arg2.isReceivingRedstonePower(arg3);
+        boolean bl2 = world.isReceivingRedstonePower(pos);
         boolean bl3 = lv2.isPowered();
         if (bl2 && !bl3) {
             lv2.setPowered(true);
-            this.doAction((ServerWorld)arg2, lv2);
+            this.doAction((ServerWorld)world, lv2);
         } else if (!bl2 && bl3) {
             lv2.setPowered(false);
         }

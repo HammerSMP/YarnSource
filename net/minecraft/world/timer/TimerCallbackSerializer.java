@@ -33,9 +33,9 @@ public class TimerCallbackSerializer<C> {
     public TimerCallbackSerializer() {
     }
 
-    public TimerCallbackSerializer<C> registerSerializer(TimerCallback.Serializer<C, ?> arg) {
-        this.serializersByType.put(arg.getId(), arg);
-        this.serializersByClass.put(arg.getCallbackClass(), arg);
+    public TimerCallbackSerializer<C> registerSerializer(TimerCallback.Serializer<C, ?> serializer) {
+        this.serializersByType.put(serializer.getId(), serializer);
+        this.serializersByClass.put(serializer.getCallbackClass(), serializer);
         return this;
     }
 
@@ -43,27 +43,27 @@ public class TimerCallbackSerializer<C> {
         return this.serializersByClass.get(class_);
     }
 
-    public <T extends TimerCallback<C>> CompoundTag serialize(T arg) {
-        TimerCallback.Serializer<T, T> lv = this.getSerializer(arg.getClass());
+    public <T extends TimerCallback<C>> CompoundTag serialize(T callback) {
+        TimerCallback.Serializer<T, T> lv = this.getSerializer(callback.getClass());
         CompoundTag lv2 = new CompoundTag();
-        lv.serialize(lv2, arg);
+        lv.serialize(lv2, callback);
         lv2.putString("Type", lv.getId().toString());
         return lv2;
     }
 
     @Nullable
-    public TimerCallback<C> deserialize(CompoundTag arg) {
-        Identifier lv = Identifier.tryParse(arg.getString("Type"));
+    public TimerCallback<C> deserialize(CompoundTag tag) {
+        Identifier lv = Identifier.tryParse(tag.getString("Type"));
         TimerCallback.Serializer<C, ?> lv2 = this.serializersByType.get(lv);
         if (lv2 == null) {
-            LOGGER.error("Failed to deserialize timer callback: " + arg);
+            LOGGER.error("Failed to deserialize timer callback: " + tag);
             return null;
         }
         try {
-            return lv2.deserialize(arg);
+            return lv2.deserialize(tag);
         }
         catch (Exception exception) {
-            LOGGER.error("Failed to deserialize timer callback: " + arg, (Throwable)exception);
+            LOGGER.error("Failed to deserialize timer callback: " + tag, (Throwable)exception);
             return null;
         }
     }

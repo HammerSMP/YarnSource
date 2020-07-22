@@ -33,69 +33,69 @@ implements Packet<ClientPlayPacketListener> {
     public MapUpdateS2CPacket() {
     }
 
-    public MapUpdateS2CPacket(int i, byte b, boolean bl, boolean bl2, Collection<MapIcon> collection, byte[] bs, int j, int k, int l, int m) {
-        this.id = i;
-        this.scale = b;
-        this.showIcons = bl;
-        this.locked = bl2;
-        this.icons = collection.toArray(new MapIcon[collection.size()]);
-        this.startX = j;
-        this.startZ = k;
-        this.width = l;
-        this.height = m;
-        this.colors = new byte[l * m];
-        for (int n = 0; n < l; ++n) {
-            for (int o = 0; o < m; ++o) {
-                this.colors[n + o * l] = bs[j + n + (k + o) * 128];
+    public MapUpdateS2CPacket(int id, byte scale, boolean showIcons, boolean locked, Collection<MapIcon> icons, byte[] mapColors, int startX, int startZ, int width, int height) {
+        this.id = id;
+        this.scale = scale;
+        this.showIcons = showIcons;
+        this.locked = locked;
+        this.icons = icons.toArray(new MapIcon[icons.size()]);
+        this.startX = startX;
+        this.startZ = startZ;
+        this.width = width;
+        this.height = height;
+        this.colors = new byte[width * height];
+        for (int n = 0; n < width; ++n) {
+            for (int o = 0; o < height; ++o) {
+                this.colors[n + o * width] = mapColors[startX + n + (startZ + o) * 128];
             }
         }
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.id = arg.readVarInt();
-        this.scale = arg.readByte();
-        this.showIcons = arg.readBoolean();
-        this.locked = arg.readBoolean();
-        this.icons = new MapIcon[arg.readVarInt()];
+    public void read(PacketByteBuf buf) throws IOException {
+        this.id = buf.readVarInt();
+        this.scale = buf.readByte();
+        this.showIcons = buf.readBoolean();
+        this.locked = buf.readBoolean();
+        this.icons = new MapIcon[buf.readVarInt()];
         for (int i = 0; i < this.icons.length; ++i) {
-            MapIcon.Type lv = arg.readEnumConstant(MapIcon.Type.class);
-            this.icons[i] = new MapIcon(lv, arg.readByte(), arg.readByte(), (byte)(arg.readByte() & 0xF), arg.readBoolean() ? arg.readText() : null);
+            MapIcon.Type lv = buf.readEnumConstant(MapIcon.Type.class);
+            this.icons[i] = new MapIcon(lv, buf.readByte(), buf.readByte(), (byte)(buf.readByte() & 0xF), buf.readBoolean() ? buf.readText() : null);
         }
-        this.width = arg.readUnsignedByte();
+        this.width = buf.readUnsignedByte();
         if (this.width > 0) {
-            this.height = arg.readUnsignedByte();
-            this.startX = arg.readUnsignedByte();
-            this.startZ = arg.readUnsignedByte();
-            this.colors = arg.readByteArray();
+            this.height = buf.readUnsignedByte();
+            this.startX = buf.readUnsignedByte();
+            this.startZ = buf.readUnsignedByte();
+            this.colors = buf.readByteArray();
         }
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeVarInt(this.id);
-        arg.writeByte(this.scale);
-        arg.writeBoolean(this.showIcons);
-        arg.writeBoolean(this.locked);
-        arg.writeVarInt(this.icons.length);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeVarInt(this.id);
+        buf.writeByte(this.scale);
+        buf.writeBoolean(this.showIcons);
+        buf.writeBoolean(this.locked);
+        buf.writeVarInt(this.icons.length);
         for (MapIcon lv : this.icons) {
-            arg.writeEnumConstant(lv.getType());
-            arg.writeByte(lv.getX());
-            arg.writeByte(lv.getZ());
-            arg.writeByte(lv.getRotation() & 0xF);
+            buf.writeEnumConstant(lv.getType());
+            buf.writeByte(lv.getX());
+            buf.writeByte(lv.getZ());
+            buf.writeByte(lv.getRotation() & 0xF);
             if (lv.getText() != null) {
-                arg.writeBoolean(true);
-                arg.writeText(lv.getText());
+                buf.writeBoolean(true);
+                buf.writeText(lv.getText());
                 continue;
             }
-            arg.writeBoolean(false);
+            buf.writeBoolean(false);
         }
-        arg.writeByte(this.width);
+        buf.writeByte(this.width);
         if (this.width > 0) {
-            arg.writeByte(this.height);
-            arg.writeByte(this.startX);
-            arg.writeByte(this.startZ);
-            arg.writeByteArray(this.colors);
+            buf.writeByte(this.height);
+            buf.writeByte(this.startX);
+            buf.writeByte(this.startZ);
+            buf.writeByteArray(this.colors);
         }
     }
 

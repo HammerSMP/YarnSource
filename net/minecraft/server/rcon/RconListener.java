@@ -32,13 +32,13 @@ extends RconBase {
     private final List<RconClient> clients = Lists.newArrayList();
     private final DedicatedServer server;
 
-    public RconListener(DedicatedServer arg) {
+    public RconListener(DedicatedServer server) {
         super("RCON Listener");
-        this.server = arg;
-        ServerPropertiesHandler lv = arg.getProperties();
+        this.server = server;
+        ServerPropertiesHandler lv = server.getProperties();
         this.port = lv.rconPort;
         this.password = lv.rconPassword;
-        this.hostname = arg.getHostname();
+        this.hostname = server.getHostname();
         if (this.hostname.isEmpty()) {
             this.hostname = "0.0.0.0";
         }
@@ -109,10 +109,10 @@ extends RconBase {
         this.clients.clear();
     }
 
-    private void closeSocket(ServerSocket serverSocket) {
-        SERVER_LOGGER.debug("closeSocket: {}", (Object)serverSocket);
+    private void closeSocket(ServerSocket socket) {
+        SERVER_LOGGER.debug("closeSocket: {}", (Object)socket);
         try {
-            serverSocket.close();
+            socket.close();
         }
         catch (IOException iOException) {
             SERVER_LOGGER.warn("Failed to close socket", (Throwable)iOException);

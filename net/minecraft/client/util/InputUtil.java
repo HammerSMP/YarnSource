@@ -51,44 +51,44 @@ public class InputUtil {
     private static final int GLFW_RAW_MOUSE_MOTION;
     public static final Key UNKNOWN_KEY;
 
-    public static Key fromKeyCode(int i, int j) {
-        if (i == -1) {
-            return Type.SCANCODE.createFromCode(j);
+    public static Key fromKeyCode(int keyCode, int scanCode) {
+        if (keyCode == -1) {
+            return Type.SCANCODE.createFromCode(scanCode);
         }
-        return Type.KEYSYM.createFromCode(i);
+        return Type.KEYSYM.createFromCode(keyCode);
     }
 
-    public static Key fromTranslationKey(String string) {
-        if (Key.KEYS.containsKey(string)) {
-            return (Key)Key.KEYS.get(string);
+    public static Key fromTranslationKey(String translationKey) {
+        if (Key.KEYS.containsKey(translationKey)) {
+            return (Key)Key.KEYS.get(translationKey);
         }
         for (Type lv : Type.values()) {
-            if (!string.startsWith(lv.name)) continue;
-            String string2 = string.substring(lv.name.length() + 1);
+            if (!translationKey.startsWith(lv.name)) continue;
+            String string2 = translationKey.substring(lv.name.length() + 1);
             return lv.createFromCode(Integer.parseInt(string2));
         }
-        throw new IllegalArgumentException("Unknown key name: " + string);
+        throw new IllegalArgumentException("Unknown key name: " + translationKey);
     }
 
-    public static boolean isKeyPressed(long l, int i) {
-        return GLFW.glfwGetKey((long)l, (int)i) == 1;
+    public static boolean isKeyPressed(long handle, int code) {
+        return GLFW.glfwGetKey((long)handle, (int)code) == 1;
     }
 
-    public static void setKeyboardCallbacks(long l, GLFWKeyCallbackI gLFWKeyCallbackI, GLFWCharModsCallbackI gLFWCharModsCallbackI) {
-        GLFW.glfwSetKeyCallback((long)l, (GLFWKeyCallbackI)gLFWKeyCallbackI);
-        GLFW.glfwSetCharModsCallback((long)l, (GLFWCharModsCallbackI)gLFWCharModsCallbackI);
+    public static void setKeyboardCallbacks(long handle, GLFWKeyCallbackI keyCallback, GLFWCharModsCallbackI charModsCallback) {
+        GLFW.glfwSetKeyCallback((long)handle, (GLFWKeyCallbackI)keyCallback);
+        GLFW.glfwSetCharModsCallback((long)handle, (GLFWCharModsCallbackI)charModsCallback);
     }
 
-    public static void setMouseCallbacks(long l, GLFWCursorPosCallbackI gLFWCursorPosCallbackI, GLFWMouseButtonCallbackI gLFWMouseButtonCallbackI, GLFWScrollCallbackI gLFWScrollCallbackI, GLFWDropCallbackI gLFWDropCallbackI) {
-        GLFW.glfwSetCursorPosCallback((long)l, (GLFWCursorPosCallbackI)gLFWCursorPosCallbackI);
-        GLFW.glfwSetMouseButtonCallback((long)l, (GLFWMouseButtonCallbackI)gLFWMouseButtonCallbackI);
-        GLFW.glfwSetScrollCallback((long)l, (GLFWScrollCallbackI)gLFWScrollCallbackI);
-        GLFW.glfwSetDropCallback((long)l, (GLFWDropCallbackI)gLFWDropCallbackI);
+    public static void setMouseCallbacks(long handle, GLFWCursorPosCallbackI cursorPosCallback, GLFWMouseButtonCallbackI mouseButtonCallback, GLFWScrollCallbackI scrollCallback, GLFWDropCallbackI gLFWDropCallbackI) {
+        GLFW.glfwSetCursorPosCallback((long)handle, (GLFWCursorPosCallbackI)cursorPosCallback);
+        GLFW.glfwSetMouseButtonCallback((long)handle, (GLFWMouseButtonCallbackI)mouseButtonCallback);
+        GLFW.glfwSetScrollCallback((long)handle, (GLFWScrollCallbackI)scrollCallback);
+        GLFW.glfwSetDropCallback((long)handle, (GLFWDropCallbackI)gLFWDropCallbackI);
     }
 
-    public static void setCursorParameters(long l, int i, double d, double e) {
-        GLFW.glfwSetCursorPos((long)l, (double)d, (double)e);
-        GLFW.glfwSetInputMode((long)l, (int)208897, (int)i);
+    public static void setCursorParameters(long handler, int i, double d, double e) {
+        GLFW.glfwSetCursorPos((long)handler, (double)d, (double)e);
+        GLFW.glfwSetInputMode((long)handler, (int)208897, (int)i);
     }
 
     public static boolean isRawMouseMotionSupported() {
@@ -100,9 +100,9 @@ public class InputUtil {
         }
     }
 
-    public static void setRawMouseMotionMode(long l, boolean bl) {
+    public static void setRawMouseMotionMode(long window, boolean value) {
         if (InputUtil.isRawMouseMotionSupported()) {
-            GLFW.glfwSetInputMode((long)l, (int)GLFW_RAW_MOUSE_MOTION, (int)(bl ? 1 : 0));
+            GLFW.glfwSetInputMode((long)window, (int)GLFW_RAW_MOUSE_MOTION, (int)(value ? 1 : 0));
         }
     }
 
@@ -134,12 +134,12 @@ public class InputUtil {
         private final Lazy<Text> localizedText;
         private static final Map<String, Key> KEYS = Maps.newHashMap();
 
-        private Key(String string, Type arg, int i) {
-            this.translationKey = string;
-            this.type = arg;
-            this.code = i;
-            this.localizedText = new Lazy<Text>(() -> (Text)arg.textTranslator.apply(i, string));
-            KEYS.put(string, this);
+        private Key(String translationKey, Type type, int code) {
+            this.translationKey = translationKey;
+            this.type = type;
+            this.code = code;
+            this.localizedText = new Lazy<Text>(() -> (Text)type.textTranslator.apply(code, translationKey));
+            KEYS.put(translationKey, this);
         }
 
         public Type getCategory() {
@@ -168,14 +168,14 @@ public class InputUtil {
             return OptionalInt.empty();
         }
 
-        public boolean equals(Object object) {
-            if (this == object) {
+        public boolean equals(Object other) {
+            if (this == other) {
                 return true;
             }
-            if (object == null || this.getClass() != object.getClass()) {
+            if (other == null || this.getClass() != other.getClass()) {
                 return false;
             }
-            Key lv = (Key)object;
+            Key lv = (Key)other;
             return this.code == lv.code && this.type == lv.type;
         }
 
@@ -204,24 +204,24 @@ public class InputUtil {
         private final String name;
         private final BiFunction<Integer, String, Text> textTranslator;
 
-        private static void mapKey(Type arg, String string, int i) {
-            Key lv = new Key(string, arg, i);
-            arg.map.put(i, (Object)lv);
+        private static void mapKey(Type type, String translationKey, int keyCode) {
+            Key lv = new Key(translationKey, type, keyCode);
+            type.map.put(keyCode, (Object)lv);
         }
 
-        private Type(String string2, BiFunction<Integer, String, Text> biFunction) {
-            this.name = string2;
-            this.textTranslator = biFunction;
+        private Type(String name, BiFunction<Integer, String, Text> textTranslator) {
+            this.name = name;
+            this.textTranslator = textTranslator;
         }
 
-        public Key createFromCode(int i2) {
-            return (Key)this.map.computeIfAbsent(i2, i -> {
-                int j = i;
+        public Key createFromCode(int code2) {
+            return (Key)this.map.computeIfAbsent(code2, code -> {
+                int j = code;
                 if (this == MOUSE) {
                     ++j;
                 }
                 String string = this.name + "." + j;
-                return new Key(string, this, i);
+                return new Key(string, this, code);
             });
         }
 

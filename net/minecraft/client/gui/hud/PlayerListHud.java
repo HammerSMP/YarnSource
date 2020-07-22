@@ -52,9 +52,9 @@ extends DrawableHelper {
     private long showTime;
     private boolean visible;
 
-    public PlayerListHud(MinecraftClient arg, InGameHud arg2) {
-        this.client = arg;
-        this.inGameHud = arg2;
+    public PlayerListHud(MinecraftClient client, InGameHud inGameHud) {
+        this.client = client;
+        this.inGameHud = inGameHud;
     }
 
     public Text getPlayerName(PlayerListEntry arg) {
@@ -68,11 +68,11 @@ extends DrawableHelper {
         return arg.getGameMode() == GameMode.SPECTATOR ? arg2.formatted(Formatting.ITALIC) : arg2;
     }
 
-    public void tick(boolean bl) {
-        if (bl && !this.visible) {
+    public void tick(boolean visible) {
+        if (visible && !this.visible) {
             this.showTime = Util.getMeasuringTimeMs();
         }
-        this.visible = bl;
+        this.visible = visible;
     }
 
     public void render(MatrixStack arg, int i, Scoreboard arg2, @Nullable ScoreboardObjective arg3) {
@@ -270,12 +270,12 @@ extends DrawableHelper {
         }
     }
 
-    public void setFooter(@Nullable Text arg) {
-        this.footer = arg;
+    public void setFooter(@Nullable Text footer) {
+        this.footer = footer;
     }
 
-    public void setHeader(@Nullable Text arg) {
-        this.header = arg;
+    public void setHeader(@Nullable Text header) {
+        this.header = header;
     }
 
     public void clear() {

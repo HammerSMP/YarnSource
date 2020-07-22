@@ -27,7 +27,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public class LevelSummary
 implements Comparable<LevelSummary> {
-    private final LevelInfo field_25022;
+    private final LevelInfo levelInfo;
     private final SaveVersionInfo field_25023;
     private final String name;
     private final boolean requiresConversion;
@@ -38,7 +38,7 @@ implements Comparable<LevelSummary> {
     private Text field_24191;
 
     public LevelSummary(LevelInfo arg, SaveVersionInfo arg2, String string, boolean bl, boolean bl2, File file) {
-        this.field_25022 = arg;
+        this.levelInfo = arg;
         this.field_25023 = arg2;
         this.name = string;
         this.locked = bl2;
@@ -53,7 +53,7 @@ implements Comparable<LevelSummary> {
 
     @Environment(value=EnvType.CLIENT)
     public String getDisplayName() {
-        return StringUtils.isEmpty((CharSequence)this.field_25022.getLevelName()) ? this.name : this.field_25022.getLevelName();
+        return StringUtils.isEmpty((CharSequence)this.levelInfo.getLevelName()) ? this.name : this.levelInfo.getLevelName();
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -84,17 +84,17 @@ implements Comparable<LevelSummary> {
 
     @Environment(value=EnvType.CLIENT)
     public GameMode getGameMode() {
-        return this.field_25022.getGameMode();
+        return this.levelInfo.getGameMode();
     }
 
     @Environment(value=EnvType.CLIENT)
     public boolean isHardcore() {
-        return this.field_25022.hasStructures();
+        return this.levelInfo.isHardcore();
     }
 
     @Environment(value=EnvType.CLIENT)
     public boolean hasCheats() {
-        return this.field_25022.isHardcore();
+        return this.levelInfo.areCommandsAllowed();
     }
 
     @Environment(value=EnvType.CLIENT)

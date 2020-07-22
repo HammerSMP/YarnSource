@@ -36,38 +36,38 @@ public class DamagePredicate {
         this.type = DamageSourcePredicate.EMPTY;
     }
 
-    public DamagePredicate(NumberRange.FloatRange arg, NumberRange.FloatRange arg2, EntityPredicate arg3, @Nullable Boolean boolean_, DamageSourcePredicate arg4) {
-        this.dealt = arg;
-        this.taken = arg2;
-        this.sourceEntity = arg3;
-        this.blocked = boolean_;
-        this.type = arg4;
+    public DamagePredicate(NumberRange.FloatRange dealt, NumberRange.FloatRange taken, EntityPredicate sourceEntity, @Nullable Boolean blocked, DamageSourcePredicate type) {
+        this.dealt = dealt;
+        this.taken = taken;
+        this.sourceEntity = sourceEntity;
+        this.blocked = blocked;
+        this.type = type;
     }
 
-    public boolean test(ServerPlayerEntity arg, DamageSource arg2, float f, float g, boolean bl) {
+    public boolean test(ServerPlayerEntity player, DamageSource source, float dealt, float taken, boolean blocked) {
         if (this == ANY) {
             return true;
         }
-        if (!this.dealt.test(f)) {
+        if (!this.dealt.test(dealt)) {
             return false;
         }
-        if (!this.taken.test(g)) {
+        if (!this.taken.test(taken)) {
             return false;
         }
-        if (!this.sourceEntity.test(arg, arg2.getAttacker())) {
+        if (!this.sourceEntity.test(player, source.getAttacker())) {
             return false;
         }
-        if (this.blocked != null && this.blocked != bl) {
+        if (this.blocked != null && this.blocked != blocked) {
             return false;
         }
-        return this.type.test(arg, arg2);
+        return this.type.test(player, source);
     }
 
-    public static DamagePredicate fromJson(@Nullable JsonElement jsonElement) {
-        if (jsonElement == null || jsonElement.isJsonNull()) {
+    public static DamagePredicate fromJson(@Nullable JsonElement json) {
+        if (json == null || json.isJsonNull()) {
             return ANY;
         }
-        JsonObject jsonObject = JsonHelper.asObject(jsonElement, "damage");
+        JsonObject jsonObject = JsonHelper.asObject(json, "damage");
         NumberRange.FloatRange lv = NumberRange.FloatRange.fromJson(jsonObject.get("dealt"));
         NumberRange.FloatRange lv2 = NumberRange.FloatRange.fromJson(jsonObject.get("taken"));
         Boolean boolean_ = jsonObject.has("blocked") ? Boolean.valueOf(JsonHelper.getBoolean(jsonObject, "blocked")) : null;
@@ -102,13 +102,13 @@ public class DamagePredicate {
             return new Builder();
         }
 
-        public Builder blocked(Boolean boolean_) {
-            this.blocked = boolean_;
+        public Builder blocked(Boolean blocked) {
+            this.blocked = blocked;
             return this;
         }
 
-        public Builder type(DamageSourcePredicate.Builder arg) {
-            this.type = arg.build();
+        public Builder type(DamageSourcePredicate.Builder builder) {
+            this.type = builder.build();
             return this;
         }
 

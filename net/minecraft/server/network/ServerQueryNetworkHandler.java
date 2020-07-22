@@ -20,13 +20,13 @@ implements ServerQueryPacketListener {
     private final ClientConnection connection;
     private boolean responseSent;
 
-    public ServerQueryNetworkHandler(MinecraftServer minecraftServer, ClientConnection arg) {
-        this.server = minecraftServer;
-        this.connection = arg;
+    public ServerQueryNetworkHandler(MinecraftServer server, ClientConnection connection) {
+        this.server = server;
+        this.connection = connection;
     }
 
     @Override
-    public void onDisconnected(Text arg) {
+    public void onDisconnected(Text reason) {
     }
 
     @Override
@@ -35,7 +35,7 @@ implements ServerQueryPacketListener {
     }
 
     @Override
-    public void onRequest(QueryRequestC2SPacket arg) {
+    public void onRequest(QueryRequestC2SPacket packet) {
         if (this.responseSent) {
             this.connection.disconnect(REQUEST_HANDLED);
             return;
@@ -45,8 +45,8 @@ implements ServerQueryPacketListener {
     }
 
     @Override
-    public void onPing(QueryPingC2SPacket arg) {
-        this.connection.send(new QueryPongS2CPacket(arg.getStartTime()));
+    public void onPing(QueryPingC2SPacket packet) {
+        this.connection.send(new QueryPongS2CPacket(packet.getStartTime()));
         this.connection.disconnect(REQUEST_HANDLED);
     }
 }

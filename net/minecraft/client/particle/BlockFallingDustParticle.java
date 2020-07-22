@@ -31,17 +31,17 @@ extends SpriteBillboardParticle {
     private final float field_3809;
     private final SpriteProvider spriteProvider;
 
-    private BlockFallingDustParticle(ClientWorld arg, double d, double e, double f, float g, float h, float i, SpriteProvider arg2) {
-        super(arg, d, e, f);
-        this.spriteProvider = arg2;
-        this.colorRed = g;
-        this.colorGreen = h;
-        this.colorBlue = i;
+    private BlockFallingDustParticle(ClientWorld world, double x, double y, double z, float colorRed, float colorGreen, float colorBlue, SpriteProvider spriteProvider) {
+        super(world, x, y, z);
+        this.spriteProvider = spriteProvider;
+        this.colorRed = colorRed;
+        this.colorGreen = colorGreen;
+        this.colorBlue = colorBlue;
         float j = 0.9f;
         this.scale *= 0.67499995f;
         int k = (int)(32.0 / (Math.random() * 0.8 + 0.2));
         this.maxAge = (int)Math.max((float)k * 0.9f, 1.0f);
-        this.setSpriteForAge(arg2);
+        this.setSpriteForAge(spriteProvider);
         this.field_3809 = ((float)Math.random() - 0.5f) * 0.1f;
         this.angle = (float)Math.random() * ((float)Math.PI * 2);
     }
@@ -52,8 +52,8 @@ extends SpriteBillboardParticle {
     }
 
     @Override
-    public float getSize(float f) {
-        return this.scale * MathHelper.clamp(((float)this.age + f) / (float)this.maxAge * 32.0f, 0.0f, 1.0f);
+    public float getSize(float tickDelta) {
+        return this.scale * MathHelper.clamp(((float)this.age + tickDelta) / (float)this.maxAge * 32.0f, 0.0f, 1.0f);
     }
 
     @Override
@@ -82,8 +82,8 @@ extends SpriteBillboardParticle {
     implements ParticleFactory<BlockStateParticleEffect> {
         private final SpriteProvider spriteProvider;
 
-        public Factory(SpriteProvider arg) {
-            this.spriteProvider = arg;
+        public Factory(SpriteProvider spriteProvider) {
+            this.spriteProvider = spriteProvider;
         }
 
         @Override

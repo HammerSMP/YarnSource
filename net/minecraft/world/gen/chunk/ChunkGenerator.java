@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Random;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -32,6 +33,7 @@ import net.minecraft.util.crash.CrashReportSection;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.ChunkSectionPos;
+import net.minecraft.util.registry.DynamicRegistryManager;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.ChunkRegion;
@@ -51,10 +53,11 @@ import net.minecraft.world.gen.carver.ConfiguredCarver;
 import net.minecraft.world.gen.chunk.DebugChunkGenerator;
 import net.minecraft.world.gen.chunk.FlatChunkGenerator;
 import net.minecraft.world.gen.chunk.StrongholdConfig;
+import net.minecraft.world.gen.chunk.StructureConfig;
 import net.minecraft.world.gen.chunk.StructuresConfig;
 import net.minecraft.world.gen.chunk.SurfaceChunkGenerator;
 import net.minecraft.world.gen.feature.ConfiguredStructureFeature;
-import net.minecraft.world.gen.feature.DefaultBiomeFeatures;
+import net.minecraft.world.gen.feature.ConfiguredStructureFeatures;
 import net.minecraft.world.gen.feature.StructureFeature;
 
 public abstract class ChunkGenerator {
@@ -62,22 +65,22 @@ public abstract class ChunkGenerator {
     protected final BiomeSource biomeSource;
     protected final BiomeSource field_24747;
     private final StructuresConfig config;
-    private final long field_24748;
-    private final List<ChunkPos> field_24749 = Lists.newArrayList();
+    private final long worldSeed;
+    private final List<ChunkPos> strongholds = Lists.newArrayList();
 
     public ChunkGenerator(BiomeSource arg, StructuresConfig arg2) {
         this(arg, arg, arg2, 0L);
     }
 
-    public ChunkGenerator(BiomeSource arg, BiomeSource arg2, StructuresConfig arg3, long l) {
+    public ChunkGenerator(BiomeSource arg, BiomeSource arg2, StructuresConfig arg3, long worldSeed) {
         this.biomeSource = arg;
         this.field_24747 = arg2;
         this.config = arg3;
-        this.field_24748 = l;
+        this.worldSeed = worldSeed;
     }
 
-    private void method_28509() {
-        if (!this.field_24749.isEmpty()) {
+    private void generateStrongholdPositions() {
+        if (!this.strongholds.isEmpty()) {
             return;
         }
         StrongholdConfig lv = this.config.getStronghold();
@@ -85,7 +88,7 @@ public abstract class ChunkGenerator {
             return;
         }
         ArrayList list = Lists.newArrayList();
-        for (Biome lv2 : this.biomeSource.method_28443()) {
+        for (Biome lv2 : this.biomeSource.getBiomes()) {
             if (!lv2.hasStructureFeature(StructureFeature.STRONGHOLD)) continue;
             list.add(lv2);
         }
@@ -93,7 +96,7 @@ public abstract class ChunkGenerator {
         int j = lv.getCount();
         int k = lv.getSpread();
         Random random = new Random();
-        random.setSeed(this.field_24748);
+        random.setSeed(this.worldSeed);
         double d = random.nextDouble() * Math.PI * 2.0;
         int l = 0;
         int m = 0;
@@ -106,7 +109,7 @@ public abstract class ChunkGenerator {
                 o = lv3.getX() >> 4;
                 p = lv3.getZ() >> 4;
             }
-            this.field_24749.add(new ChunkPos(o, p));
+            this.strongholds.add(new ChunkPos(o, p));
             d += Math.PI * 2 / (double)k;
             if (++l != k) continue;
             l = 0;
@@ -121,48 +124,48 @@ public abstract class ChunkGenerator {
     @Environment(value=EnvType.CLIENT)
     public abstract ChunkGenerator withSeed(long var1);
 
-    public void populateBiomes(Chunk arg) {
-        ChunkPos lv = arg.getPos();
-        ((ProtoChunk)arg).setBiomes(new BiomeArray(lv, this.field_24747));
+    public void populateBiomes(Registry<Biome> arg, Chunk arg2) {
+        ChunkPos lv = arg2.getPos();
+        ((ProtoChunk)arg2).setBiomes(new BiomeArray(arg, lv, this.field_24747));
     }
 
-    public void carve(long l, BiomeAccess arg, Chunk arg2, GenerationStep.Carver arg3) {
-        BiomeAccess lv = arg.withSource(this.biomeSource);
+    public void carve(long seed, BiomeAccess access, Chunk chunk, GenerationStep.Carver carver) {
+        BiomeAccess lv = access.withSource(this.biomeSource);
         ChunkRandom lv2 = new ChunkRandom();
         int i = 8;
-        ChunkPos lv3 = arg2.getPos();
+        ChunkPos lv3 = chunk.getPos();
         int j = lv3.x;
         int k = lv3.z;
         Biome lv4 = this.biomeSource.getBiomeForNoiseGen(lv3.x << 2, 0, lv3.z << 2);
-        BitSet bitSet = ((ProtoChunk)arg2).getOrCreateCarvingMask(arg3);
+        BitSet bitSet = ((ProtoChunk)chunk).getOrCreateCarvingMask(carver);
         for (int m = j - 8; m <= j + 8; ++m) {
             for (int n = k - 8; n <= k + 8; ++n) {
-                List<ConfiguredCarver<?>> list = lv4.getCarversForStep(arg3);
-                ListIterator<ConfiguredCarver<?>> listIterator = list.listIterator();
+                List<Supplier<ConfiguredCarver<?>>> list = lv4.getCarversForStep(carver);
+                ListIterator<Supplier<ConfiguredCarver<?>>> listIterator = list.listIterator();
                 while (listIterator.hasNext()) {
                     int o = listIterator.nextIndex();
-                    ConfiguredCarver<?> lv5 = listIterator.next();
-                    lv2.setCarverSeed(l + (long)o, m, n);
+                    ConfiguredCarver<?> lv5 = listIterator.next().get();
+                    lv2.setCarverSeed(seed + (long)o, m, n);
                     if (!lv5.shouldCarve(lv2, m, n)) continue;
-                    lv5.carve(arg2, lv::getBiome, lv2, this.getSeaLevel(), m, n, j, k, bitSet);
+                    lv5.carve(chunk, lv::getBiome, lv2, this.getSeaLevel(), m, n, j, k, bitSet);
                 }
             }
         }
     }
 
     @Nullable
-    public BlockPos locateStructure(ServerWorld arg, StructureFeature<?> arg2, BlockPos arg3, int i, boolean bl) {
-        if (!this.biomeSource.hasStructureFeature(arg2)) {
+    public BlockPos locateStructure(ServerWorld world, StructureFeature<?> feature, BlockPos center, int radius, boolean skipExistingChunks) {
+        if (!this.biomeSource.hasStructureFeature(feature)) {
             return null;
         }
-        if (arg2 == StructureFeature.STRONGHOLD) {
-            this.method_28509();
+        if (feature == StructureFeature.STRONGHOLD) {
+            this.generateStrongholdPositions();
             BlockPos lv = null;
             double d = Double.MAX_VALUE;
             BlockPos.Mutable lv2 = new BlockPos.Mutable();
-            for (ChunkPos lv3 : this.field_24749) {
+            for (ChunkPos lv3 : this.strongholds) {
                 lv2.set((lv3.x << 4) + 8, 32, (lv3.z << 4) + 8);
-                double e = lv2.getSquaredDistance(arg3);
+                double e = lv2.getSquaredDistance(center);
                 if (lv == null) {
                     lv = new BlockPos(lv2);
                     d = e;
@@ -174,33 +177,35 @@ public abstract class ChunkGenerator {
             }
             return lv;
         }
-        return arg2.locateStructure(arg, arg.getStructureAccessor(), arg3, i, bl, arg.getSeed(), this.config.method_28600(arg2));
+        StructureConfig lv4 = this.config.getForType(feature);
+        if (lv4 == null) {
+            return null;
+        }
+        return feature.locateStructure(world, world.getStructureAccessor(), center, radius, skipExistingChunks, world.getSeed(), lv4);
     }
 
-    public void generateFeatures(ChunkRegion arg, StructureAccessor arg2) {
-        int i = arg.getCenterChunkX();
-        int j = arg.getCenterChunkZ();
+    public void generateFeatures(ChunkRegion region, StructureAccessor accessor) {
+        int i = region.getCenterChunkX();
+        int j = region.getCenterChunkZ();
         int k = i * 16;
         int l = j * 16;
         BlockPos lv = new BlockPos(k, 0, l);
         Biome lv2 = this.biomeSource.getBiomeForNoiseGen((i << 2) + 2, 2, (j << 2) + 2);
         ChunkRandom lv3 = new ChunkRandom();
-        long m = lv3.setPopulationSeed(arg.getSeed(), k, l);
-        for (GenerationStep.Feature lv4 : GenerationStep.Feature.values()) {
-            try {
-                lv2.generateFeatureStep(lv4, arg2, this, arg, m, lv3, lv);
-            }
-            catch (Exception exception) {
-                CrashReport lv5 = CrashReport.create(exception, "Biome decoration");
-                lv5.addElement("Generation").add("CenterX", i).add("CenterZ", j).add("Step", lv4).add("Seed", m).add("Biome", Registry.BIOME.getId(lv2));
-                throw new CrashException(lv5);
-            }
+        long m = lv3.setPopulationSeed(region.getSeed(), k, l);
+        try {
+            lv2.generateFeatureStep(accessor, this, region, m, lv3, lv);
+        }
+        catch (Exception exception) {
+            CrashReport lv4 = CrashReport.create(exception, "Biome decoration");
+            lv4.addElement("Generation").add("CenterX", i).add("CenterZ", j).add("Seed", m).add("Biome", lv2);
+            throw new CrashException(lv4);
         }
     }
 
     public abstract void buildSurface(ChunkRegion var1, Chunk var2);
 
-    public void populateEntities(ChunkRegion arg) {
+    public void populateEntities(ChunkRegion region) {
     }
 
     public StructuresConfig getConfig() {
@@ -219,40 +224,43 @@ public abstract class ChunkGenerator {
         return 256;
     }
 
-    public List<Biome.SpawnEntry> getEntitySpawnList(Biome arg, StructureAccessor arg2, SpawnGroup arg3, BlockPos arg4) {
-        return arg.getEntitySpawnList(arg3);
+    public List<Biome.SpawnEntry> getEntitySpawnList(Biome biome, StructureAccessor accessor, SpawnGroup group, BlockPos pos) {
+        return biome.getEntitySpawnList(group);
     }
 
-    public void setStructureStarts(StructureAccessor arg, Chunk arg2, StructureManager arg3, long l) {
-        ChunkPos lv = arg2.getPos();
+    public void setStructureStarts(DynamicRegistryManager arg, StructureAccessor arg2, Chunk arg3, StructureManager arg4, long worldSeed) {
+        ChunkPos lv = arg3.getPos();
         Biome lv2 = this.biomeSource.getBiomeForNoiseGen((lv.x << 2) + 2, 0, (lv.z << 2) + 2);
-        this.method_28508(DefaultBiomeFeatures.STRONGHOLD, arg, arg2, arg3, l, lv, lv2);
-        for (ConfiguredStructureFeature<?, ?> lv3 : lv2.method_28413()) {
-            this.method_28508(lv3, arg, arg2, arg3, l, lv, lv2);
+        this.setStructureStart(ConfiguredStructureFeatures.STRONGHOLD, arg, arg2, arg3, arg4, worldSeed, lv, lv2);
+        for (Supplier<ConfiguredStructureFeature<?, ?>> supplier : lv2.getStructureFeatures()) {
+            this.setStructureStart(supplier.get(), arg, arg2, arg3, arg4, worldSeed, lv, lv2);
         }
     }
 
-    private void method_28508(ConfiguredStructureFeature<?, ?> arg, StructureAccessor arg2, Chunk arg3, StructureManager arg4, long l, ChunkPos arg5, Biome arg6) {
-        StructureStart<?> lv = arg2.getStructureStart(ChunkSectionPos.from(arg3.getPos(), 0), (StructureFeature<?>)arg.field_24835, arg3);
+    private void setStructureStart(ConfiguredStructureFeature<?, ?> arg, DynamicRegistryManager arg2, StructureAccessor arg3, Chunk arg4, StructureManager arg5, long worldSeed, ChunkPos arg6, Biome arg7) {
+        StructureStart<?> lv = arg3.getStructureStart(ChunkSectionPos.from(arg4.getPos(), 0), (StructureFeature<?>)arg.feature, arg4);
         int i = lv != null ? lv.getReferences() : 0;
-        StructureStart<?> lv2 = arg.method_28622(this, this.biomeSource, arg4, l, arg5, arg6, i, this.config.method_28600((StructureFeature<?>)arg.field_24835));
-        arg2.setStructureStart(ChunkSectionPos.from(arg3.getPos(), 0), (StructureFeature<?>)arg.field_24835, lv2, arg3);
+        StructureConfig lv2 = this.config.getForType((StructureFeature<?>)arg.feature);
+        if (lv2 != null) {
+            StructureStart<?> lv3 = arg.tryPlaceStart(arg2, this, this.biomeSource, arg5, worldSeed, arg6, arg7, i, lv2);
+            arg3.setStructureStart(ChunkSectionPos.from(arg4.getPos(), 0), (StructureFeature<?>)arg.feature, lv3, arg4);
+        }
     }
 
-    public void addStructureReferences(ServerWorldAccess arg, StructureAccessor arg2, Chunk arg3) {
+    public void addStructureReferences(ServerWorldAccess arg, StructureAccessor accessor, Chunk chunk) {
         int i = 8;
-        int j = arg3.getPos().x;
-        int k = arg3.getPos().z;
+        int j = chunk.getPos().x;
+        int k = chunk.getPos().z;
         int l = j << 4;
         int m = k << 4;
-        ChunkSectionPos lv = ChunkSectionPos.from(arg3.getPos(), 0);
+        ChunkSectionPos lv = ChunkSectionPos.from(chunk.getPos(), 0);
         for (int n = j - 8; n <= j + 8; ++n) {
             for (int o = k - 8; o <= k + 8; ++o) {
                 long p = ChunkPos.toLong(n, o);
                 for (StructureStart<?> lv2 : arg.getChunk(n, o).getStructureStarts().values()) {
                     try {
                         if (lv2 == StructureStart.DEFAULT || !lv2.getBoundingBox().intersectsXZ(l, m, l + 15, m + 15)) continue;
-                        arg2.addStructureReference(lv, lv2.getFeature(), p, arg3);
+                        accessor.addStructureReference(lv, lv2.getFeature(), p, chunk);
                         DebugInfoSender.sendStructureStart(arg, lv2);
                     }
                     catch (Exception exception) {
@@ -278,17 +286,17 @@ public abstract class ChunkGenerator {
 
     public abstract BlockView getColumnSample(int var1, int var2);
 
-    public int getHeightOnGround(int i, int j, Heightmap.Type arg) {
-        return this.getHeight(i, j, arg);
+    public int getHeightOnGround(int x, int z, Heightmap.Type heightmapType) {
+        return this.getHeight(x, z, heightmapType);
     }
 
-    public int getHeightInGround(int i, int j, Heightmap.Type arg) {
-        return this.getHeight(i, j, arg) - 1;
+    public int getHeightInGround(int x, int z, Heightmap.Type heightmapType) {
+        return this.getHeight(x, z, heightmapType) - 1;
     }
 
-    public boolean method_28507(ChunkPos arg) {
-        this.method_28509();
-        return this.field_24749.contains(arg);
+    public boolean isStrongholdStartingChunk(ChunkPos arg) {
+        this.generateStrongholdPositions();
+        return this.strongholds.contains(arg);
     }
 
     static {

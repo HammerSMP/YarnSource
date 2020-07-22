@@ -33,9 +33,9 @@ extends SkullEntityModel {
     }
 
     @Override
-    public void render(MatrixStack arg, VertexConsumer arg2, int i, int j, float f, float g, float h, float k) {
-        super.render(arg, arg2, i, j, f, g, h, k);
-        this.skullOverlay.render(arg, arg2, i, j, f, g, h, k);
+    public void render(MatrixStack matrices, VertexConsumer vertices, int light, int overlay, float red, float green, float blue, float alpha) {
+        super.render(matrices, vertices, light, overlay, red, green, blue, alpha);
+        this.skullOverlay.render(matrices, vertices, light, overlay, red, green, blue, alpha);
     }
 }
 

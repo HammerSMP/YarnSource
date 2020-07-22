@@ -51,23 +51,23 @@ public class RecipeResultCollection {
         return !this.unlockedRecipes.isEmpty();
     }
 
-    public void initialize(RecipeBook arg) {
+    public void initialize(RecipeBook recipeBook) {
         for (Recipe<?> lv : this.recipes) {
-            if (!arg.contains(lv)) continue;
+            if (!recipeBook.contains(lv)) continue;
             this.unlockedRecipes.add(lv);
         }
     }
 
-    public void computeCraftables(RecipeFinder arg, int i, int j, RecipeBook arg2) {
+    public void computeCraftables(RecipeFinder recipeFinder, int gridWidth, int gridHeight, RecipeBook recipeBook) {
         for (Recipe<?> lv : this.recipes) {
             boolean bl;
-            boolean bl2 = bl = lv.fits(i, j) && arg2.contains(lv);
+            boolean bl2 = bl = lv.fits(gridWidth, gridHeight) && recipeBook.contains(lv);
             if (bl) {
                 this.fittingRecipes.add(lv);
             } else {
                 this.fittingRecipes.remove(lv);
             }
-            if (bl && arg.findRecipe(lv, null)) {
+            if (bl && recipeFinder.findRecipe(lv, null)) {
                 this.craftableRecipes.add(lv);
                 continue;
             }
@@ -75,8 +75,8 @@ public class RecipeResultCollection {
         }
     }
 
-    public boolean isCraftable(Recipe<?> arg) {
-        return this.craftableRecipes.contains(arg);
+    public boolean isCraftable(Recipe<?> recipe) {
+        return this.craftableRecipes.contains(recipe);
     }
 
     public boolean hasCraftableRecipes() {
@@ -91,9 +91,9 @@ public class RecipeResultCollection {
         return this.recipes;
     }
 
-    public List<Recipe<?>> getResults(boolean bl) {
+    public List<Recipe<?>> getResults(boolean craftableOnly) {
         ArrayList list = Lists.newArrayList();
-        Set<Recipe<?>> set = bl ? this.craftableRecipes : this.fittingRecipes;
+        Set<Recipe<?>> set = craftableOnly ? this.craftableRecipes : this.fittingRecipes;
         for (Recipe<?> lv : this.recipes) {
             if (!set.contains(lv)) continue;
             list.add(lv);
@@ -101,10 +101,10 @@ public class RecipeResultCollection {
         return list;
     }
 
-    public List<Recipe<?>> getRecipes(boolean bl) {
+    public List<Recipe<?>> getRecipes(boolean craftable) {
         ArrayList list = Lists.newArrayList();
         for (Recipe<?> lv : this.recipes) {
-            if (!this.fittingRecipes.contains(lv) || this.craftableRecipes.contains(lv) != bl) continue;
+            if (!this.fittingRecipes.contains(lv) || this.craftableRecipes.contains(lv) != craftable) continue;
             list.add(lv);
         }
         return list;

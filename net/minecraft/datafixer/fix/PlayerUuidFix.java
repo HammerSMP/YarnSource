@@ -21,8 +21,8 @@ import net.minecraft.datafixer.fix.EntityUuidFix;
 
 public class PlayerUuidFix
 extends AbstractUuidFix {
-    public PlayerUuidFix(Schema schema) {
-        super(schema, TypeReferences.PLAYER);
+    public PlayerUuidFix(Schema outputSchema) {
+        super(outputSchema, TypeReferences.PLAYER);
     }
 
     protected TypeRewriteRule makeRule() {

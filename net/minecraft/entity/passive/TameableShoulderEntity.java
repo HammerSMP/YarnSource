@@ -17,11 +17,11 @@ extends TameableEntity {
         super((EntityType<? extends TameableEntity>)arg, arg2);
     }
 
-    public boolean mountOnto(ServerPlayerEntity arg) {
+    public boolean mountOnto(ServerPlayerEntity player) {
         CompoundTag lv = new CompoundTag();
         lv.putString("id", this.getSavedEntityId());
         this.toTag(lv);
-        if (arg.addShoulderEntity(lv)) {
+        if (player.addShoulderEntity(lv)) {
             this.remove();
             return true;
         }

@@ -23,26 +23,26 @@ public class PackedIntegerArray {
     private final int field_24081;
     private final int field_24082;
 
-    public PackedIntegerArray(int i, int j) {
-        this(i, j, null);
+    public PackedIntegerArray(int elementBits, int size) {
+        this(elementBits, size, null);
     }
 
-    public PackedIntegerArray(int i, int j, @Nullable long[] ls) {
-        Validate.inclusiveBetween((long)1L, (long)32L, (long)i);
-        this.size = j;
-        this.elementBits = i;
-        this.maxValue = (1L << i) - 1L;
-        this.field_24079 = (char)(64 / i);
+    public PackedIntegerArray(int elementBits, int size, @Nullable long[] storage) {
+        Validate.inclusiveBetween((long)1L, (long)32L, (long)elementBits);
+        this.size = size;
+        this.elementBits = elementBits;
+        this.maxValue = (1L << elementBits) - 1L;
+        this.field_24079 = (char)(64 / elementBits);
         int k = 3 * (this.field_24079 - 1);
         this.field_24080 = field_24078[k + 0];
         this.field_24081 = field_24078[k + 1];
         this.field_24082 = field_24078[k + 2];
-        int l = (j + this.field_24079 - 1) / this.field_24079;
-        if (ls != null) {
-            if (ls.length != l) {
-                throw Util.throwOrPause(new RuntimeException("Invalid length given for storage, got: " + ls.length + " but expected: " + l));
+        int l = (size + this.field_24079 - 1) / this.field_24079;
+        if (storage != null) {
+            if (storage.length != l) {
+                throw Util.throwOrPause(new RuntimeException("Invalid length given for storage, got: " + storage.length + " but expected: " + l));
             }
-            this.storage = ls;
+            this.storage = storage;
         } else {
             this.storage = new long[l];
         }
@@ -54,31 +54,31 @@ public class PackedIntegerArray {
         return (int)((long)i * l + m >> 32 >> this.field_24082);
     }
 
-    public int setAndGetOldValue(int i, int j) {
-        Validate.inclusiveBetween((long)0L, (long)(this.size - 1), (long)i);
-        Validate.inclusiveBetween((long)0L, (long)this.maxValue, (long)j);
-        int k = this.method_27284(i);
+    public int setAndGetOldValue(int index, int value) {
+        Validate.inclusiveBetween((long)0L, (long)(this.size - 1), (long)index);
+        Validate.inclusiveBetween((long)0L, (long)this.maxValue, (long)value);
+        int k = this.method_27284(index);
         long l = this.storage[k];
-        int m = (i - k * this.field_24079) * this.elementBits;
+        int m = (index - k * this.field_24079) * this.elementBits;
         int n = (int)(l >> m & this.maxValue);
-        this.storage[k] = l & (this.maxValue << m ^ 0xFFFFFFFFFFFFFFFFL) | ((long)j & this.maxValue) << m;
+        this.storage[k] = l & (this.maxValue << m ^ 0xFFFFFFFFFFFFFFFFL) | ((long)value & this.maxValue) << m;
         return n;
     }
 
-    public void set(int i, int j) {
-        Validate.inclusiveBetween((long)0L, (long)(this.size - 1), (long)i);
-        Validate.inclusiveBetween((long)0L, (long)this.maxValue, (long)j);
-        int k = this.method_27284(i);
+    public void set(int index, int value) {
+        Validate.inclusiveBetween((long)0L, (long)(this.size - 1), (long)index);
+        Validate.inclusiveBetween((long)0L, (long)this.maxValue, (long)value);
+        int k = this.method_27284(index);
         long l = this.storage[k];
-        int m = (i - k * this.field_24079) * this.elementBits;
-        this.storage[k] = l & (this.maxValue << m ^ 0xFFFFFFFFFFFFFFFFL) | ((long)j & this.maxValue) << m;
+        int m = (index - k * this.field_24079) * this.elementBits;
+        this.storage[k] = l & (this.maxValue << m ^ 0xFFFFFFFFFFFFFFFFL) | ((long)value & this.maxValue) << m;
     }
 
-    public int get(int i) {
-        Validate.inclusiveBetween((long)0L, (long)(this.size - 1), (long)i);
-        int j = this.method_27284(i);
+    public int get(int index) {
+        Validate.inclusiveBetween((long)0L, (long)(this.size - 1), (long)index);
+        int j = this.method_27284(index);
         long l = this.storage[j];
-        int k = (i - j * this.field_24079) * this.elementBits;
+        int k = (index - j * this.field_24079) * this.elementBits;
         return (int)(l >> k & this.maxValue);
     }
 
@@ -90,11 +90,11 @@ public class PackedIntegerArray {
         return this.size;
     }
 
-    public void forEach(IntConsumer intConsumer) {
+    public void forEach(IntConsumer consumer) {
         int i = 0;
         for (long l : this.storage) {
             for (int j = 0; j < this.field_24079; ++j) {
-                intConsumer.accept((int)(l & this.maxValue));
+                consumer.accept((int)(l & this.maxValue));
                 l >>= this.elementBits;
                 if (++i < this.size) continue;
                 return;

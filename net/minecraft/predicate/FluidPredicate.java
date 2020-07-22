@@ -19,8 +19,8 @@ import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.predicate.StatePredicate;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.tag.ServerTagManagerHolder;
 import net.minecraft.tag.Tag;
-import net.minecraft.tag.TagContainers;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.math.BlockPos;
@@ -34,20 +34,20 @@ public class FluidPredicate {
     private final Fluid fluid;
     private final StatePredicate state;
 
-    public FluidPredicate(@Nullable Tag<Fluid> arg, @Nullable Fluid arg2, StatePredicate arg3) {
-        this.tag = arg;
-        this.fluid = arg2;
-        this.state = arg3;
+    public FluidPredicate(@Nullable Tag<Fluid> tag, @Nullable Fluid fluid, StatePredicate state) {
+        this.tag = tag;
+        this.fluid = fluid;
+        this.state = state;
     }
 
-    public boolean test(ServerWorld arg, BlockPos arg2) {
+    public boolean test(ServerWorld world, BlockPos pos) {
         if (this == ANY) {
             return true;
         }
-        if (!arg.canSetBlock(arg2)) {
+        if (!world.canSetBlock(pos)) {
             return false;
         }
-        FluidState lv = arg.getFluidState(arg2);
+        FluidState lv = world.getFluidState(pos);
         Fluid lv2 = lv.getFluid();
         if (this.tag != null && !this.tag.contains(lv2)) {
             return false;
@@ -58,11 +58,11 @@ public class FluidPredicate {
         return this.state.test(lv);
     }
 
-    public static FluidPredicate fromJson(@Nullable JsonElement jsonElement) {
-        if (jsonElement == null || jsonElement.isJsonNull()) {
+    public static FluidPredicate fromJson(@Nullable JsonElement json) {
+        if (json == null || json.isJsonNull()) {
             return ANY;
         }
-        JsonObject jsonObject = JsonHelper.asObject(jsonElement, "fluid");
+        JsonObject jsonObject = JsonHelper.asObject(json, "fluid");
         Fluid lv = null;
         if (jsonObject.has("fluid")) {
             Identifier lv2 = new Identifier(JsonHelper.getString(jsonObject, "fluid"));
@@ -71,7 +71,7 @@ public class FluidPredicate {
         Tag<Fluid> lv3 = null;
         if (jsonObject.has("tag")) {
             Identifier lv4 = new Identifier(JsonHelper.getString(jsonObject, "tag"));
-            lv3 = TagContainers.instance().method_30220().method_30210(lv4);
+            lv3 = ServerTagManagerHolder.getTagManager().getFluids().getTag(lv4);
             if (lv3 == null) {
                 throw new JsonSyntaxException("Unknown fluid tag '" + lv4 + "'");
             }
@@ -89,7 +89,7 @@ public class FluidPredicate {
             jsonObject.addProperty("fluid", Registry.FLUID.getId(this.fluid).toString());
         }
         if (this.tag != null) {
-            jsonObject.addProperty("tag", TagContainers.instance().method_30220().method_30212(this.tag).toString());
+            jsonObject.addProperty("tag", ServerTagManagerHolder.getTagManager().getFluids().getTagId(this.tag).toString());
         }
         jsonObject.add("state", this.state.toJson());
         return jsonObject;

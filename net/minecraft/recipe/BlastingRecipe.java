@@ -19,8 +19,8 @@ import net.minecraft.util.Identifier;
 
 public class BlastingRecipe
 extends AbstractCookingRecipe {
-    public BlastingRecipe(Identifier arg, String string, Ingredient arg2, ItemStack arg3, float f, int i) {
-        super(RecipeType.BLASTING, arg, string, arg2, arg3, f, i);
+    public BlastingRecipe(Identifier id, String group, Ingredient input, ItemStack output, float experience, int cookTime) {
+        super(RecipeType.BLASTING, id, group, input, output, experience, cookTime);
     }
 
     @Override

@@ -89,8 +89,8 @@ extends EntityRenderer<EndCrystalEntity> {
         super.render(arg, f, g, arg2, arg3, i);
     }
 
-    public static float getYOffset(EndCrystalEntity arg, float f) {
-        float g = (float)arg.endCrystalAge + f;
+    public static float getYOffset(EndCrystalEntity crystal, float tickDelta) {
+        float g = (float)crystal.endCrystalAge + tickDelta;
         float h = MathHelper.sin(g * 0.2f) / 2.0f + 0.5f;
         h = (h * h + h) * 0.4f;
         return h - 1.4f;

@@ -36,29 +36,29 @@ implements Packet<ClientPlayPacketListener> {
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
+    public void read(PacketByteBuf buf) throws IOException {
         byte i;
-        this.id = arg.readVarInt();
+        this.id = buf.readVarInt();
         EquipmentSlot[] lvs = EquipmentSlot.values();
         do {
-            i = arg.readByte();
+            i = buf.readByte();
             EquipmentSlot lv = lvs[i & 0x7F];
-            ItemStack lv2 = arg.readItemStack();
+            ItemStack lv2 = buf.readItemStack();
             this.field_25721.add((Pair<EquipmentSlot, ItemStack>)Pair.of((Object)((Object)lv), (Object)lv2));
         } while ((i & 0xFFFFFF80) != 0);
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeVarInt(this.id);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeVarInt(this.id);
         int i = this.field_25721.size();
         for (int j = 0; j < i; ++j) {
             Pair<EquipmentSlot, ItemStack> pair = this.field_25721.get(j);
             EquipmentSlot lv = (EquipmentSlot)((Object)pair.getFirst());
             boolean bl = j != i - 1;
             int k = lv.ordinal();
-            arg.writeByte(bl ? k | 0xFFFFFF80 : k);
-            arg.writeItemStack((ItemStack)pair.getSecond());
+            buf.writeByte(bl ? k | 0xFFFFFF80 : k);
+            buf.writeItemStack((ItemStack)pair.getSecond());
         }
     }
 

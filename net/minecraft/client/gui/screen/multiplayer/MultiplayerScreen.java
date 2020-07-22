@@ -49,9 +49,9 @@ extends Screen {
     private LanServerQueryManager.LanServerDetector lanServerDetector;
     private boolean initialized;
 
-    public MultiplayerScreen(Screen arg) {
+    public MultiplayerScreen(Screen parent) {
         super(new TranslatableText("multiplayer.title"));
-        this.parent = arg;
+        this.parent = parent;
     }
 
     @Override
@@ -135,9 +135,9 @@ extends Screen {
         this.client.openScreen(new MultiplayerScreen(this.parent));
     }
 
-    private void removeEntry(boolean bl) {
+    private void removeEntry(boolean confirmedAction) {
         MultiplayerServerListWidget.Entry lv = (MultiplayerServerListWidget.Entry)this.serverListWidget.getSelected();
-        if (bl && lv instanceof MultiplayerServerListWidget.ServerEntry) {
+        if (confirmedAction && lv instanceof MultiplayerServerListWidget.ServerEntry) {
             this.serverList.remove(((MultiplayerServerListWidget.ServerEntry)lv).getServer());
             this.serverList.saveFile();
             this.serverListWidget.setSelected((MultiplayerServerListWidget.Entry)null);
@@ -146,9 +146,9 @@ extends Screen {
         this.client.openScreen(this);
     }
 
-    private void editEntry(boolean bl) {
+    private void editEntry(boolean confirmedAction) {
         MultiplayerServerListWidget.Entry lv = (MultiplayerServerListWidget.Entry)this.serverListWidget.getSelected();
-        if (bl && lv instanceof MultiplayerServerListWidget.ServerEntry) {
+        if (confirmedAction && lv instanceof MultiplayerServerListWidget.ServerEntry) {
             ServerInfo lv2 = ((MultiplayerServerListWidget.ServerEntry)lv).getServer();
             lv2.name = this.selectedEntry.name;
             lv2.address = this.selectedEntry.address;
@@ -159,8 +159,8 @@ extends Screen {
         this.client.openScreen(this);
     }
 
-    private void addEntry(boolean bl) {
-        if (bl) {
+    private void addEntry(boolean confirmedAction) {
+        if (confirmedAction) {
             this.serverList.add(this.selectedEntry);
             this.serverList.saveFile();
             this.serverListWidget.setSelected((MultiplayerServerListWidget.Entry)null);
@@ -169,8 +169,8 @@ extends Screen {
         this.client.openScreen(this);
     }
 
-    private void directConnect(boolean bl) {
-        if (bl) {
+    private void directConnect(boolean confirmedAction) {
+        if (confirmedAction) {
             this.connect(this.selectedEntry);
         } else {
             this.client.openScreen(this);
@@ -178,33 +178,33 @@ extends Screen {
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (super.keyPressed(i, j, k)) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (super.keyPressed(keyCode, scanCode, modifiers)) {
             return true;
         }
-        if (i == 294) {
+        if (keyCode == 294) {
             this.refresh();
             return true;
         }
         if (this.serverListWidget.getSelected() != null) {
-            if (i == 257 || i == 335) {
+            if (keyCode == 257 || keyCode == 335) {
                 this.connect();
                 return true;
             }
-            return this.serverListWidget.keyPressed(i, j, k);
+            return this.serverListWidget.keyPressed(keyCode, scanCode, modifiers);
         }
         return false;
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         this.tooltipText = null;
-        this.renderBackground(arg);
-        this.serverListWidget.render(arg, i, j, f);
-        this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 20, 0xFFFFFF);
-        super.render(arg, i, j, f);
+        this.renderBackground(matrices);
+        this.serverListWidget.render(matrices, mouseX, mouseY, delta);
+        this.drawCenteredText(matrices, this.textRenderer, this.title, this.width / 2, 20, 0xFFFFFF);
+        super.render(matrices, mouseX, mouseY, delta);
         if (this.tooltipText != null) {
-            this.renderTooltip(arg, this.tooltipText, i, j);
+            this.renderTooltip(matrices, this.tooltipText, mouseX, mouseY);
         }
     }
 
@@ -218,12 +218,12 @@ extends Screen {
         }
     }
 
-    private void connect(ServerInfo arg) {
-        this.client.openScreen(new ConnectScreen(this, this.client, arg));
+    private void connect(ServerInfo entry) {
+        this.client.openScreen(new ConnectScreen(this, this.client, entry));
     }
 
-    public void select(MultiplayerServerListWidget.Entry arg) {
-        this.serverListWidget.setSelected(arg);
+    public void select(MultiplayerServerListWidget.Entry entry) {
+        this.serverListWidget.setSelected(entry);
         this.updateButtonActivationStates();
     }
 

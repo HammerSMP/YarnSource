@@ -50,35 +50,35 @@ extends BlockWithEntity {
     }
 
     @Override
-    public ActionResult onUse(BlockState arg, World arg2, BlockPos arg3, PlayerEntity arg4, Hand arg5, BlockHitResult arg6) {
-        if (arg2.isClient) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        if (world.isClient) {
             return ActionResult.SUCCESS;
         }
-        BlockEntity lv = arg2.getBlockEntity(arg3);
+        BlockEntity lv = world.getBlockEntity(pos);
         if (lv instanceof BarrelBlockEntity) {
-            arg4.openHandledScreen((BarrelBlockEntity)lv);
-            arg4.incrementStat(Stats.OPEN_BARREL);
-            PiglinBrain.onGuardedBlockBroken(arg4, true);
+            player.openHandledScreen((BarrelBlockEntity)lv);
+            player.incrementStat(Stats.OPEN_BARREL);
+            PiglinBrain.onGuardedBlockBroken(player, true);
         }
         return ActionResult.CONSUME;
     }
 
     @Override
-    public void onStateReplaced(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
-        if (arg.isOf(arg4.getBlock())) {
+    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
+        if (state.isOf(newState.getBlock())) {
             return;
         }
-        BlockEntity lv = arg2.getBlockEntity(arg3);
+        BlockEntity lv = world.getBlockEntity(pos);
         if (lv instanceof Inventory) {
-            ItemScatterer.spawn(arg2, arg3, (Inventory)((Object)lv));
-            arg2.updateComparators(arg3, this);
+            ItemScatterer.spawn(world, pos, (Inventory)((Object)lv));
+            world.updateComparators(pos, this);
         }
-        super.onStateReplaced(arg, arg2, arg3, arg4, bl);
+        super.onStateReplaced(state, world, pos, newState, moved);
     }
 
     @Override
-    public void scheduledTick(BlockState arg, ServerWorld arg2, BlockPos arg3, Random random) {
-        BlockEntity lv = arg2.getBlockEntity(arg3);
+    public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        BlockEntity lv = world.getBlockEntity(pos);
         if (lv instanceof BarrelBlockEntity) {
             ((BarrelBlockEntity)lv).tick();
         }
@@ -86,51 +86,51 @@ extends BlockWithEntity {
 
     @Override
     @Nullable
-    public BlockEntity createBlockEntity(BlockView arg) {
+    public BlockEntity createBlockEntity(BlockView world) {
         return new BarrelBlockEntity();
     }
 
     @Override
-    public BlockRenderType getRenderType(BlockState arg) {
+    public BlockRenderType getRenderType(BlockState state) {
         return BlockRenderType.MODEL;
     }
 
     @Override
-    public void onPlaced(World arg, BlockPos arg2, BlockState arg3, @Nullable LivingEntity arg4, ItemStack arg5) {
+    public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
         BlockEntity lv;
-        if (arg5.hasCustomName() && (lv = arg.getBlockEntity(arg2)) instanceof BarrelBlockEntity) {
-            ((BarrelBlockEntity)lv).setCustomName(arg5.getName());
+        if (itemStack.hasCustomName() && (lv = world.getBlockEntity(pos)) instanceof BarrelBlockEntity) {
+            ((BarrelBlockEntity)lv).setCustomName(itemStack.getName());
         }
     }
 
     @Override
-    public boolean hasComparatorOutput(BlockState arg) {
+    public boolean hasComparatorOutput(BlockState state) {
         return true;
     }
 
     @Override
-    public int getComparatorOutput(BlockState arg, World arg2, BlockPos arg3) {
-        return ScreenHandler.calculateComparatorOutput(arg2.getBlockEntity(arg3));
+    public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
+        return ScreenHandler.calculateComparatorOutput(world.getBlockEntity(pos));
     }
 
     @Override
-    public BlockState rotate(BlockState arg, BlockRotation arg2) {
-        return (BlockState)arg.with(FACING, arg2.rotate(arg.get(FACING)));
+    public BlockState rotate(BlockState state, BlockRotation rotation) {
+        return (BlockState)state.with(FACING, rotation.rotate(state.get(FACING)));
     }
 
     @Override
-    public BlockState mirror(BlockState arg, BlockMirror arg2) {
-        return arg.rotate(arg2.getRotation(arg.get(FACING)));
+    public BlockState mirror(BlockState state, BlockMirror mirror) {
+        return state.rotate(mirror.getRotation(state.get(FACING)));
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(FACING, OPEN);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(FACING, OPEN);
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext arg) {
-        return (BlockState)this.getDefaultState().with(FACING, arg.getPlayerLookDirection().getOpposite());
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        return (BlockState)this.getDefaultState().with(FACING, ctx.getPlayerLookDirection().getOpposite());
     }
 }
 

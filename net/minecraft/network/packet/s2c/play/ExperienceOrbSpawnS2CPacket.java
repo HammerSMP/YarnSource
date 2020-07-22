@@ -35,21 +35,21 @@ implements Packet<ClientPlayPacketListener> {
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.id = arg.readVarInt();
-        this.x = arg.readDouble();
-        this.y = arg.readDouble();
-        this.z = arg.readDouble();
-        this.experience = arg.readShort();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.id = buf.readVarInt();
+        this.x = buf.readDouble();
+        this.y = buf.readDouble();
+        this.z = buf.readDouble();
+        this.experience = buf.readShort();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeVarInt(this.id);
-        arg.writeDouble(this.x);
-        arg.writeDouble(this.y);
-        arg.writeDouble(this.z);
-        arg.writeShort(this.experience);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeVarInt(this.id);
+        buf.writeDouble(this.x);
+        buf.writeDouble(this.y);
+        buf.writeDouble(this.z);
+        buf.writeShort(this.experience);
     }
 
     @Override

@@ -144,27 +144,27 @@ extends LivingEntity {
         return LivingEntity.createLivingAttributes().add(EntityAttributes.GENERIC_FOLLOW_RANGE, 16.0).add(EntityAttributes.GENERIC_ATTACK_KNOCKBACK);
     }
 
-    protected EntityNavigation createNavigation(World arg) {
-        return new MobNavigation(this, arg);
+    protected EntityNavigation createNavigation(World world) {
+        return new MobNavigation(this, world);
     }
 
     protected boolean movesIndependently() {
         return false;
     }
 
-    public float getPathfindingPenalty(PathNodeType arg) {
+    public float getPathfindingPenalty(PathNodeType nodeType) {
         MobEntity lv2;
         if (this.getVehicle() instanceof MobEntity && ((MobEntity)this.getVehicle()).movesIndependently()) {
             MobEntity lv = (MobEntity)this.getVehicle();
         } else {
             lv2 = this;
         }
-        Float float_ = lv2.pathfindingPenalties.get((Object)arg);
-        return float_ == null ? arg.getDefaultPenalty() : float_.floatValue();
+        Float float_ = lv2.pathfindingPenalties.get((Object)nodeType);
+        return float_ == null ? nodeType.getDefaultPenalty() : float_.floatValue();
     }
 
-    public void setPathfindingPenalty(PathNodeType arg, float f) {
-        this.pathfindingPenalties.put(arg, Float.valueOf(f));
+    public void setPathfindingPenalty(PathNodeType nodeType, float penalty) {
+        this.pathfindingPenalties.put(nodeType, Float.valueOf(penalty));
     }
 
     public boolean method_29244(PathNodeType arg) {
@@ -208,16 +208,16 @@ extends LivingEntity {
         return this.target;
     }
 
-    public void setTarget(@Nullable LivingEntity arg) {
-        this.target = arg;
+    public void setTarget(@Nullable LivingEntity target) {
+        this.target = target;
     }
 
     @Override
-    public boolean canTarget(EntityType<?> arg) {
-        return arg != EntityType.GHAST;
+    public boolean canTarget(EntityType<?> type) {
+        return type != EntityType.GHAST;
     }
 
-    public boolean canUseRangedWeapon(RangedWeaponItem arg) {
+    public boolean canUseRangedWeapon(RangedWeaponItem weapon) {
         return false;
     }
 
@@ -253,9 +253,9 @@ extends LivingEntity {
     }
 
     @Override
-    protected void playHurtSound(DamageSource arg) {
+    protected void playHurtSound(DamageSource source) {
         this.resetSoundDelay();
-        super.playHurtSound(arg);
+        super.playHurtSound(source);
     }
 
     private void resetSoundDelay() {
@@ -263,7 +263,7 @@ extends LivingEntity {
     }
 
     @Override
-    protected int getCurrentExperience(PlayerEntity arg) {
+    protected int getCurrentExperience(PlayerEntity player) {
         if (this.experiencePoints > 0) {
             int i = this.experiencePoints;
             for (int j = 0; j < this.armorItems.size(); ++j) {
@@ -295,11 +295,11 @@ extends LivingEntity {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void handleStatus(byte b) {
-        if (b == 20) {
+    public void handleStatus(byte status) {
+        if (status == 20) {
             this.playSpawnEffects();
         } else {
-            super.handleStatus(b);
+            super.handleStatus(status);
         }
     }
 
@@ -323,9 +323,9 @@ extends LivingEntity {
     }
 
     @Override
-    protected float turnHead(float f, float g) {
+    protected float turnHead(float bodyRotation, float headRotation) {
         this.bodyControl.tick();
-        return g;
+        return headRotation;
     }
 
     @Nullable
@@ -334,10 +334,10 @@ extends LivingEntity {
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
-        arg.putBoolean("CanPickUpLoot", this.canPickUpLoot());
-        arg.putBoolean("PersistenceRequired", this.persistent);
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
+        tag.putBoolean("CanPickUpLoot", this.canPickUpLoot());
+        tag.putBoolean("PersistenceRequired", this.persistent);
         ListTag lv = new ListTag();
         for (ItemStack itemStack : this.armorItems) {
             CompoundTag compoundTag = new CompoundTag();
@@ -346,7 +346,7 @@ extends LivingEntity {
             }
             lv.add(compoundTag);
         }
-        arg.put("ArmorItems", lv);
+        tag.put("ArmorItems", lv);
         ListTag lv4 = new ListTag();
         for (ItemStack itemStack : this.handItems) {
             CompoundTag lv6 = new CompoundTag();
@@ -355,17 +355,17 @@ extends LivingEntity {
             }
             lv4.add(lv6);
         }
-        arg.put("HandItems", lv4);
+        tag.put("HandItems", lv4);
         ListTag listTag = new ListTag();
         for (float f : this.armorDropChances) {
             listTag.add(FloatTag.of(f));
         }
-        arg.put("ArmorDropChances", listTag);
+        tag.put("ArmorDropChances", listTag);
         ListTag listTag2 = new ListTag();
         for (float g : this.handDropChances) {
             listTag2.add(FloatTag.of(g));
         }
-        arg.put("HandDropChances", listTag2);
+        tag.put("HandDropChances", listTag2);
         if (this.holdingEntity != null) {
             CompoundTag lv9 = new CompoundTag();
             if (this.holdingEntity instanceof LivingEntity) {
@@ -377,73 +377,73 @@ extends LivingEntity {
                 lv9.putInt("Y", lv10.getY());
                 lv9.putInt("Z", lv10.getZ());
             }
-            arg.put("Leash", lv9);
+            tag.put("Leash", lv9);
         } else if (this.leashTag != null) {
-            arg.put("Leash", this.leashTag.copy());
+            tag.put("Leash", this.leashTag.copy());
         }
-        arg.putBoolean("LeftHanded", this.isLeftHanded());
+        tag.putBoolean("LeftHanded", this.isLeftHanded());
         if (this.lootTable != null) {
-            arg.putString("DeathLootTable", this.lootTable.toString());
+            tag.putString("DeathLootTable", this.lootTable.toString());
             if (this.lootTableSeed != 0L) {
-                arg.putLong("DeathLootTableSeed", this.lootTableSeed);
+                tag.putLong("DeathLootTableSeed", this.lootTableSeed);
             }
         }
         if (this.isAiDisabled()) {
-            arg.putBoolean("NoAI", this.isAiDisabled());
+            tag.putBoolean("NoAI", this.isAiDisabled());
         }
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        if (arg.contains("CanPickUpLoot", 1)) {
-            this.setCanPickUpLoot(arg.getBoolean("CanPickUpLoot"));
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        if (tag.contains("CanPickUpLoot", 1)) {
+            this.setCanPickUpLoot(tag.getBoolean("CanPickUpLoot"));
         }
-        this.persistent = arg.getBoolean("PersistenceRequired");
-        if (arg.contains("ArmorItems", 9)) {
-            ListTag lv = arg.getList("ArmorItems", 10);
+        this.persistent = tag.getBoolean("PersistenceRequired");
+        if (tag.contains("ArmorItems", 9)) {
+            ListTag lv = tag.getList("ArmorItems", 10);
             for (int i = 0; i < this.armorItems.size(); ++i) {
                 this.armorItems.set(i, ItemStack.fromTag(lv.getCompound(i)));
             }
         }
-        if (arg.contains("HandItems", 9)) {
-            ListTag lv2 = arg.getList("HandItems", 10);
+        if (tag.contains("HandItems", 9)) {
+            ListTag lv2 = tag.getList("HandItems", 10);
             for (int j = 0; j < this.handItems.size(); ++j) {
                 this.handItems.set(j, ItemStack.fromTag(lv2.getCompound(j)));
             }
         }
-        if (arg.contains("ArmorDropChances", 9)) {
-            ListTag lv3 = arg.getList("ArmorDropChances", 5);
+        if (tag.contains("ArmorDropChances", 9)) {
+            ListTag lv3 = tag.getList("ArmorDropChances", 5);
             for (int k = 0; k < lv3.size(); ++k) {
                 this.armorDropChances[k] = lv3.getFloat(k);
             }
         }
-        if (arg.contains("HandDropChances", 9)) {
-            ListTag lv4 = arg.getList("HandDropChances", 5);
+        if (tag.contains("HandDropChances", 9)) {
+            ListTag lv4 = tag.getList("HandDropChances", 5);
             for (int l = 0; l < lv4.size(); ++l) {
                 this.handDropChances[l] = lv4.getFloat(l);
             }
         }
-        if (arg.contains("Leash", 10)) {
-            this.leashTag = arg.getCompound("Leash");
+        if (tag.contains("Leash", 10)) {
+            this.leashTag = tag.getCompound("Leash");
         }
-        this.setLeftHanded(arg.getBoolean("LeftHanded"));
-        if (arg.contains("DeathLootTable", 8)) {
-            this.lootTable = new Identifier(arg.getString("DeathLootTable"));
-            this.lootTableSeed = arg.getLong("DeathLootTableSeed");
+        this.setLeftHanded(tag.getBoolean("LeftHanded"));
+        if (tag.contains("DeathLootTable", 8)) {
+            this.lootTable = new Identifier(tag.getString("DeathLootTable"));
+            this.lootTableSeed = tag.getLong("DeathLootTableSeed");
         }
-        this.setAiDisabled(arg.getBoolean("NoAI"));
+        this.setAiDisabled(tag.getBoolean("NoAI"));
     }
 
     @Override
-    protected void dropLoot(DamageSource arg, boolean bl) {
-        super.dropLoot(arg, bl);
+    protected void dropLoot(DamageSource source, boolean causedByPlayer) {
+        super.dropLoot(source, causedByPlayer);
         this.lootTable = null;
     }
 
     @Override
-    protected LootContext.Builder getLootContextBuilder(boolean bl, DamageSource arg) {
-        return super.getLootContextBuilder(bl, arg).random(this.lootTableSeed, this.random);
+    protected LootContext.Builder getLootContextBuilder(boolean causedByPlayer, DamageSource source) {
+        return super.getLootContextBuilder(causedByPlayer, source).random(this.lootTableSeed, this.random);
     }
 
     @Override
@@ -455,22 +455,22 @@ extends LivingEntity {
         return super.getLootTable();
     }
 
-    public void setForwardSpeed(float f) {
-        this.forwardSpeed = f;
+    public void setForwardSpeed(float forwardSpeed) {
+        this.forwardSpeed = forwardSpeed;
     }
 
-    public void setUpwardSpeed(float f) {
-        this.upwardSpeed = f;
+    public void setUpwardSpeed(float upwardSpeed) {
+        this.upwardSpeed = upwardSpeed;
     }
 
-    public void setSidewaysSpeed(float f) {
-        this.sidewaysSpeed = f;
+    public void setSidewaysSpeed(float sidewaysMovement) {
+        this.sidewaysSpeed = sidewaysMovement;
     }
 
     @Override
-    public void setMovementSpeed(float f) {
-        super.setMovementSpeed(f);
-        this.setForwardSpeed(f);
+    public void setMovementSpeed(float movementSpeed) {
+        super.setMovementSpeed(movementSpeed);
+        this.setForwardSpeed(movementSpeed);
     }
 
     @Override
@@ -487,122 +487,122 @@ extends LivingEntity {
         this.world.getProfiler().pop();
     }
 
-    protected void loot(ItemEntity arg) {
-        ItemStack lv = arg.getStack();
+    protected void loot(ItemEntity item) {
+        ItemStack lv = item.getStack();
         if (this.tryEquip(lv)) {
-            this.method_29499(arg);
-            this.sendPickup(arg, lv.getCount());
-            arg.remove();
+            this.method_29499(item);
+            this.sendPickup(item, lv.getCount());
+            item.remove();
         }
     }
 
-    public boolean tryEquip(ItemStack arg) {
-        EquipmentSlot lv = MobEntity.getPreferredEquipmentSlot(arg);
+    public boolean tryEquip(ItemStack equipment) {
+        EquipmentSlot lv = MobEntity.getPreferredEquipmentSlot(equipment);
         ItemStack lv2 = this.getEquippedStack(lv);
-        boolean bl = this.prefersNewEquipment(arg, lv2);
-        if (bl && this.canPickupItem(arg)) {
+        boolean bl = this.prefersNewEquipment(equipment, lv2);
+        if (bl && this.canPickupItem(equipment)) {
             double d = this.getDropChance(lv);
             if (!lv2.isEmpty() && (double)Math.max(this.random.nextFloat() - 0.1f, 0.0f) < d) {
                 this.dropStack(lv2);
             }
-            this.equipLootStack(lv, arg);
-            this.onEquipStack(arg);
+            this.equipLootStack(lv, equipment);
+            this.onEquipStack(equipment);
             return true;
         }
         return false;
     }
 
-    protected void equipLootStack(EquipmentSlot arg, ItemStack arg2) {
-        this.equipStack(arg, arg2);
-        this.updateDropChances(arg);
+    protected void equipLootStack(EquipmentSlot slot, ItemStack stack) {
+        this.equipStack(slot, stack);
+        this.updateDropChances(slot);
         this.persistent = true;
     }
 
-    public void updateDropChances(EquipmentSlot arg) {
-        switch (arg.getType()) {
+    public void updateDropChances(EquipmentSlot slot) {
+        switch (slot.getType()) {
             case HAND: {
-                this.handDropChances[arg.getEntitySlotId()] = 2.0f;
+                this.handDropChances[slot.getEntitySlotId()] = 2.0f;
                 break;
             }
             case ARMOR: {
-                this.armorDropChances[arg.getEntitySlotId()] = 2.0f;
+                this.armorDropChances[slot.getEntitySlotId()] = 2.0f;
             }
         }
     }
 
-    protected boolean prefersNewEquipment(ItemStack arg, ItemStack arg2) {
-        if (arg2.isEmpty()) {
+    protected boolean prefersNewEquipment(ItemStack newStack, ItemStack oldStack) {
+        if (oldStack.isEmpty()) {
             return true;
         }
-        if (arg.getItem() instanceof SwordItem) {
-            if (!(arg2.getItem() instanceof SwordItem)) {
+        if (newStack.getItem() instanceof SwordItem) {
+            if (!(oldStack.getItem() instanceof SwordItem)) {
                 return true;
             }
-            SwordItem lv = (SwordItem)arg.getItem();
-            SwordItem lv2 = (SwordItem)arg2.getItem();
+            SwordItem lv = (SwordItem)newStack.getItem();
+            SwordItem lv2 = (SwordItem)oldStack.getItem();
             if (lv.getAttackDamage() != lv2.getAttackDamage()) {
                 return lv.getAttackDamage() > lv2.getAttackDamage();
             }
-            return this.prefersNewDamageableItem(arg, arg2);
+            return this.prefersNewDamageableItem(newStack, oldStack);
         }
-        if (arg.getItem() instanceof BowItem && arg2.getItem() instanceof BowItem) {
-            return this.prefersNewDamageableItem(arg, arg2);
+        if (newStack.getItem() instanceof BowItem && oldStack.getItem() instanceof BowItem) {
+            return this.prefersNewDamageableItem(newStack, oldStack);
         }
-        if (arg.getItem() instanceof CrossbowItem && arg2.getItem() instanceof CrossbowItem) {
-            return this.prefersNewDamageableItem(arg, arg2);
+        if (newStack.getItem() instanceof CrossbowItem && oldStack.getItem() instanceof CrossbowItem) {
+            return this.prefersNewDamageableItem(newStack, oldStack);
         }
-        if (arg.getItem() instanceof ArmorItem) {
-            if (EnchantmentHelper.hasBindingCurse(arg2)) {
+        if (newStack.getItem() instanceof ArmorItem) {
+            if (EnchantmentHelper.hasBindingCurse(oldStack)) {
                 return false;
             }
-            if (!(arg2.getItem() instanceof ArmorItem)) {
+            if (!(oldStack.getItem() instanceof ArmorItem)) {
                 return true;
             }
-            ArmorItem lv3 = (ArmorItem)arg.getItem();
-            ArmorItem lv4 = (ArmorItem)arg2.getItem();
+            ArmorItem lv3 = (ArmorItem)newStack.getItem();
+            ArmorItem lv4 = (ArmorItem)oldStack.getItem();
             if (lv3.getProtection() != lv4.getProtection()) {
                 return lv3.getProtection() > lv4.getProtection();
             }
             if (lv3.method_26353() != lv4.method_26353()) {
                 return lv3.method_26353() > lv4.method_26353();
             }
-            return this.prefersNewDamageableItem(arg, arg2);
+            return this.prefersNewDamageableItem(newStack, oldStack);
         }
-        if (arg.getItem() instanceof MiningToolItem) {
-            if (arg2.getItem() instanceof BlockItem) {
+        if (newStack.getItem() instanceof MiningToolItem) {
+            if (oldStack.getItem() instanceof BlockItem) {
                 return true;
             }
-            if (arg2.getItem() instanceof MiningToolItem) {
-                MiningToolItem lv5 = (MiningToolItem)arg.getItem();
-                MiningToolItem lv6 = (MiningToolItem)arg2.getItem();
+            if (oldStack.getItem() instanceof MiningToolItem) {
+                MiningToolItem lv5 = (MiningToolItem)newStack.getItem();
+                MiningToolItem lv6 = (MiningToolItem)oldStack.getItem();
                 if (lv5.getAttackDamage() != lv6.getAttackDamage()) {
                     return lv5.getAttackDamage() > lv6.getAttackDamage();
                 }
-                return this.prefersNewDamageableItem(arg, arg2);
+                return this.prefersNewDamageableItem(newStack, oldStack);
             }
         }
         return false;
     }
 
-    public boolean prefersNewDamageableItem(ItemStack arg, ItemStack arg2) {
-        if (arg.getDamage() < arg2.getDamage() || arg.hasTag() && !arg2.hasTag()) {
+    public boolean prefersNewDamageableItem(ItemStack newStack, ItemStack oldStack) {
+        if (newStack.getDamage() < oldStack.getDamage() || newStack.hasTag() && !oldStack.hasTag()) {
             return true;
         }
-        if (arg.hasTag() && arg2.hasTag()) {
-            return arg.getTag().getKeys().stream().anyMatch(string -> !string.equals("Damage")) && !arg2.getTag().getKeys().stream().anyMatch(string -> !string.equals("Damage"));
+        if (newStack.hasTag() && oldStack.hasTag()) {
+            return newStack.getTag().getKeys().stream().anyMatch(string -> !string.equals("Damage")) && !oldStack.getTag().getKeys().stream().anyMatch(string -> !string.equals("Damage"));
         }
         return false;
     }
 
-    public boolean canPickupItem(ItemStack arg) {
+    public boolean canPickupItem(ItemStack stack) {
         return true;
     }
 
-    public boolean canGather(ItemStack arg) {
-        return this.canPickupItem(arg);
+    public boolean canGather(ItemStack stack) {
+        return this.canPickupItem(stack);
     }
 
-    public boolean canImmediatelyDespawn(double d) {
+    public boolean canImmediatelyDespawn(double distanceSquared) {
         return true;
     }
 
@@ -691,52 +691,52 @@ extends LivingEntity {
         return 10;
     }
 
-    public void lookAtEntity(Entity arg, float f, float g) {
+    public void lookAtEntity(Entity targetEntity, float maxYawChange, float maxPitchChange) {
         double i;
-        double d = arg.getX() - this.getX();
-        double e = arg.getZ() - this.getZ();
-        if (arg instanceof LivingEntity) {
-            LivingEntity lv = (LivingEntity)arg;
+        double d = targetEntity.getX() - this.getX();
+        double e = targetEntity.getZ() - this.getZ();
+        if (targetEntity instanceof LivingEntity) {
+            LivingEntity lv = (LivingEntity)targetEntity;
             double h = lv.getEyeY() - this.getEyeY();
         } else {
-            i = (arg.getBoundingBox().minY + arg.getBoundingBox().maxY) / 2.0 - this.getEyeY();
+            i = (targetEntity.getBoundingBox().minY + targetEntity.getBoundingBox().maxY) / 2.0 - this.getEyeY();
         }
         double j = MathHelper.sqrt(d * d + e * e);
         float k = (float)(MathHelper.atan2(e, d) * 57.2957763671875) - 90.0f;
         float l = (float)(-(MathHelper.atan2(i, j) * 57.2957763671875));
-        this.pitch = this.changeAngle(this.pitch, l, g);
-        this.yaw = this.changeAngle(this.yaw, k, f);
+        this.pitch = this.changeAngle(this.pitch, l, maxPitchChange);
+        this.yaw = this.changeAngle(this.yaw, k, maxYawChange);
     }
 
-    private float changeAngle(float f, float g, float h) {
-        float i = MathHelper.wrapDegrees(g - f);
-        if (i > h) {
-            i = h;
+    private float changeAngle(float oldAngle, float newAngle, float maxChangeInAngle) {
+        float i = MathHelper.wrapDegrees(newAngle - oldAngle);
+        if (i > maxChangeInAngle) {
+            i = maxChangeInAngle;
         }
-        if (i < -h) {
-            i = -h;
+        if (i < -maxChangeInAngle) {
+            i = -maxChangeInAngle;
         }
-        return f + i;
+        return oldAngle + i;
     }
 
-    public static boolean canMobSpawn(EntityType<? extends MobEntity> arg, WorldAccess arg2, SpawnReason arg3, BlockPos arg4, Random random) {
-        BlockPos lv = arg4.down();
-        return arg3 == SpawnReason.SPAWNER || arg2.getBlockState(lv).allowsSpawning(arg2, lv, arg);
+    public static boolean canMobSpawn(EntityType<? extends MobEntity> type, WorldAccess world, SpawnReason spawnReason, BlockPos pos, Random random) {
+        BlockPos lv = pos.down();
+        return spawnReason == SpawnReason.SPAWNER || world.getBlockState(lv).allowsSpawning(world, lv, type);
     }
 
-    public boolean canSpawn(WorldAccess arg, SpawnReason arg2) {
+    public boolean canSpawn(WorldAccess world, SpawnReason spawnReason) {
         return true;
     }
 
-    public boolean canSpawn(WorldView arg) {
-        return !arg.containsFluid(this.getBoundingBox()) && arg.intersectsEntities(this);
+    public boolean canSpawn(WorldView world) {
+        return !world.containsFluid(this.getBoundingBox()) && world.intersectsEntities(this);
     }
 
     public int getLimitPerChunk() {
         return 4;
     }
 
-    public boolean spawnsTooManyForEachTry(int i) {
+    public boolean spawnsTooManyForEachTry(int count) {
         return false;
     }
 
@@ -763,40 +763,40 @@ extends LivingEntity {
     }
 
     @Override
-    public ItemStack getEquippedStack(EquipmentSlot arg) {
-        switch (arg.getType()) {
+    public ItemStack getEquippedStack(EquipmentSlot slot) {
+        switch (slot.getType()) {
             case HAND: {
-                return this.handItems.get(arg.getEntitySlotId());
+                return this.handItems.get(slot.getEntitySlotId());
             }
             case ARMOR: {
-                return this.armorItems.get(arg.getEntitySlotId());
+                return this.armorItems.get(slot.getEntitySlotId());
             }
         }
         return ItemStack.EMPTY;
     }
 
     @Override
-    public void equipStack(EquipmentSlot arg, ItemStack arg2) {
-        switch (arg.getType()) {
+    public void equipStack(EquipmentSlot slot, ItemStack stack) {
+        switch (slot.getType()) {
             case HAND: {
-                this.handItems.set(arg.getEntitySlotId(), arg2);
+                this.handItems.set(slot.getEntitySlotId(), stack);
                 break;
             }
             case ARMOR: {
-                this.armorItems.set(arg.getEntitySlotId(), arg2);
+                this.armorItems.set(slot.getEntitySlotId(), stack);
             }
         }
     }
 
     @Override
-    protected void dropEquipment(DamageSource arg, int i, boolean bl) {
-        super.dropEquipment(arg, i, bl);
+    protected void dropEquipment(DamageSource source, int lootingMultiplier, boolean allowDrops) {
+        super.dropEquipment(source, lootingMultiplier, allowDrops);
         for (EquipmentSlot lv : EquipmentSlot.values()) {
             boolean bl2;
             ItemStack lv2 = this.getEquippedStack(lv);
             float f = this.getDropChance(lv);
-            boolean bl3 = bl2 = f > 1.0f;
-            if (lv2.isEmpty() || EnchantmentHelper.hasVanishingCurse(lv2) || !bl && !bl2 || !(Math.max(this.random.nextFloat() - (float)i * 0.01f, 0.0f) < f)) continue;
+            boolean bl = bl2 = f > 1.0f;
+            if (lv2.isEmpty() || EnchantmentHelper.hasVanishingCurse(lv2) || !allowDrops && !bl2 || !(Math.max(this.random.nextFloat() - (float)lootingMultiplier * 0.01f, 0.0f) < f)) continue;
             if (!bl2 && lv2.isDamageable()) {
                 lv2.setDamage(lv2.getMaxDamage() - this.random.nextInt(1 + this.random.nextInt(Math.max(lv2.getMaxDamage() - 3, 1))));
             }
@@ -804,15 +804,15 @@ extends LivingEntity {
         }
     }
 
-    protected float getDropChance(EquipmentSlot arg) {
+    protected float getDropChance(EquipmentSlot slot) {
         float h;
-        switch (arg.getType()) {
+        switch (slot.getType()) {
             case HAND: {
-                float f = this.handDropChances[arg.getEntitySlotId()];
+                float f = this.handDropChances[slot.getEntitySlotId()];
                 break;
             }
             case ARMOR: {
-                float g = this.armorDropChances[arg.getEntitySlotId()];
+                float g = this.armorDropChances[slot.getEntitySlotId()];
                 break;
             }
             default: {
@@ -822,8 +822,8 @@ extends LivingEntity {
         return h;
     }
 
-    protected void initEquipment(LocalDifficulty arg) {
-        if (this.random.nextFloat() < 0.15f * arg.getClampedLocalDifficulty()) {
+    protected void initEquipment(LocalDifficulty difficulty) {
+        if (this.random.nextFloat() < 0.15f * difficulty.getClampedLocalDifficulty()) {
             float f;
             int i = this.random.nextInt(2);
             float f2 = f = this.world.getDifficulty() == Difficulty.HARD ? 0.1f : 0.25f;
@@ -849,8 +849,8 @@ extends LivingEntity {
         }
     }
 
-    public static EquipmentSlot getPreferredEquipmentSlot(ItemStack arg) {
-        Item lv = arg.getItem();
+    public static EquipmentSlot getPreferredEquipmentSlot(ItemStack stack) {
+        Item lv = stack.getItem();
         if (lv == Blocks.CARVED_PUMPKIN.asItem() || lv instanceof BlockItem && ((BlockItem)lv).getBlock() instanceof AbstractSkullBlock) {
             return EquipmentSlot.HEAD;
         }
@@ -867,81 +867,81 @@ extends LivingEntity {
     }
 
     @Nullable
-    public static Item getEquipmentForSlot(EquipmentSlot arg, int i) {
-        switch (arg) {
+    public static Item getEquipmentForSlot(EquipmentSlot equipmentSlot, int equipmentLevel) {
+        switch (equipmentSlot) {
             case HEAD: {
-                if (i == 0) {
+                if (equipmentLevel == 0) {
                     return Items.LEATHER_HELMET;
                 }
-                if (i == 1) {
+                if (equipmentLevel == 1) {
                     return Items.GOLDEN_HELMET;
                 }
-                if (i == 2) {
+                if (equipmentLevel == 2) {
                     return Items.CHAINMAIL_HELMET;
                 }
-                if (i == 3) {
+                if (equipmentLevel == 3) {
                     return Items.IRON_HELMET;
                 }
-                if (i == 4) {
+                if (equipmentLevel == 4) {
                     return Items.DIAMOND_HELMET;
                 }
             }
             case CHEST: {
-                if (i == 0) {
+                if (equipmentLevel == 0) {
                     return Items.LEATHER_CHESTPLATE;
                 }
-                if (i == 1) {
+                if (equipmentLevel == 1) {
                     return Items.GOLDEN_CHESTPLATE;
                 }
-                if (i == 2) {
+                if (equipmentLevel == 2) {
                     return Items.CHAINMAIL_CHESTPLATE;
                 }
-                if (i == 3) {
+                if (equipmentLevel == 3) {
                     return Items.IRON_CHESTPLATE;
                 }
-                if (i == 4) {
+                if (equipmentLevel == 4) {
                     return Items.DIAMOND_CHESTPLATE;
                 }
             }
             case LEGS: {
-                if (i == 0) {
+                if (equipmentLevel == 0) {
                     return Items.LEATHER_LEGGINGS;
                 }
-                if (i == 1) {
+                if (equipmentLevel == 1) {
                     return Items.GOLDEN_LEGGINGS;
                 }
-                if (i == 2) {
+                if (equipmentLevel == 2) {
                     return Items.CHAINMAIL_LEGGINGS;
                 }
-                if (i == 3) {
+                if (equipmentLevel == 3) {
                     return Items.IRON_LEGGINGS;
                 }
-                if (i == 4) {
+                if (equipmentLevel == 4) {
                     return Items.DIAMOND_LEGGINGS;
                 }
             }
             case FEET: {
-                if (i == 0) {
+                if (equipmentLevel == 0) {
                     return Items.LEATHER_BOOTS;
                 }
-                if (i == 1) {
+                if (equipmentLevel == 1) {
                     return Items.GOLDEN_BOOTS;
                 }
-                if (i == 2) {
+                if (equipmentLevel == 2) {
                     return Items.CHAINMAIL_BOOTS;
                 }
-                if (i == 3) {
+                if (equipmentLevel == 3) {
                     return Items.IRON_BOOTS;
                 }
-                if (i != 4) break;
+                if (equipmentLevel != 4) break;
                 return Items.DIAMOND_BOOTS;
             }
         }
         return null;
     }
 
-    protected void updateEnchantments(LocalDifficulty arg) {
-        float f = arg.getClampedLocalDifficulty();
+    protected void updateEnchantments(LocalDifficulty difficulty) {
+        float f = difficulty.getClampedLocalDifficulty();
         if (!this.getMainHandStack().isEmpty() && this.random.nextFloat() < 0.25f * f) {
             this.equipStack(EquipmentSlot.MAINHAND, EnchantmentHelper.enchant(this.random, this.getMainHandStack(), (int)(5.0f + f * (float)this.random.nextInt(18)), false));
         }
@@ -953,14 +953,14 @@ extends LivingEntity {
     }
 
     @Nullable
-    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(class_5425 arg, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable CompoundTag entityTag) {
         this.getAttributeInstance(EntityAttributes.GENERIC_FOLLOW_RANGE).addPersistentModifier(new EntityAttributeModifier("Random spawn bonus", this.random.nextGaussian() * 0.05, EntityAttributeModifier.Operation.MULTIPLY_BASE));
         if (this.random.nextFloat() < 0.05f) {
             this.setLeftHanded(true);
         } else {
             this.setLeftHanded(false);
         }
-        return arg4;
+        return entityData;
     }
 
     public boolean canBeControlledByRider() {
@@ -971,14 +971,14 @@ extends LivingEntity {
         this.persistent = true;
     }
 
-    public void setEquipmentDropChance(EquipmentSlot arg, float f) {
-        switch (arg.getType()) {
+    public void setEquipmentDropChance(EquipmentSlot slot, float chance) {
+        switch (slot.getType()) {
             case HAND: {
-                this.handDropChances[arg.getEntitySlotId()] = f;
+                this.handDropChances[slot.getEntitySlotId()] = chance;
                 break;
             }
             case ARMOR: {
-                this.armorDropChances[arg.getEntitySlotId()] = f;
+                this.armorDropChances[slot.getEntitySlotId()] = chance;
             }
         }
     }
@@ -987,13 +987,13 @@ extends LivingEntity {
         return this.pickUpLoot;
     }
 
-    public void setCanPickUpLoot(boolean bl) {
-        this.pickUpLoot = bl;
+    public void setCanPickUpLoot(boolean pickUpLoot) {
+        this.pickUpLoot = pickUpLoot;
     }
 
     @Override
-    public boolean canPickUp(ItemStack arg) {
-        EquipmentSlot lv = MobEntity.getPreferredEquipmentSlot(arg);
+    public boolean canPickUp(ItemStack stack) {
+        EquipmentSlot lv = MobEntity.getPreferredEquipmentSlot(stack);
         return this.getEquippedStack(lv).isEmpty() && this.canPickUpLoot();
     }
 
@@ -1002,23 +1002,23 @@ extends LivingEntity {
     }
 
     @Override
-    public final ActionResult interact(PlayerEntity arg, Hand arg2) {
+    public final ActionResult interact(PlayerEntity player, Hand hand) {
         if (!this.isAlive()) {
             return ActionResult.PASS;
         }
-        if (this.getHoldingEntity() == arg) {
-            this.detachLeash(true, !arg.abilities.creativeMode);
+        if (this.getHoldingEntity() == player) {
+            this.detachLeash(true, !player.abilities.creativeMode);
             return ActionResult.success(this.world.isClient);
         }
-        ActionResult lv = this.method_29506(arg, arg2);
+        ActionResult lv = this.method_29506(player, hand);
         if (lv.isAccepted()) {
             return lv;
         }
-        lv = this.interactMob(arg, arg2);
+        lv = this.interactMob(player, hand);
         if (lv.isAccepted()) {
             return lv;
         }
-        return super.interact(arg, arg2);
+        return super.interact(player, hand);
     }
 
     private ActionResult method_29506(PlayerEntity arg, Hand arg22) {
@@ -1044,10 +1044,10 @@ extends LivingEntity {
         return ActionResult.PASS;
     }
 
-    protected void onPlayerSpawnedChild(PlayerEntity arg, MobEntity arg2) {
+    protected void onPlayerSpawnedChild(PlayerEntity player, MobEntity child) {
     }
 
-    protected ActionResult interactMob(PlayerEntity arg, Hand arg2) {
+    protected ActionResult interactMob(PlayerEntity player, Hand hand) {
         return ActionResult.PASS;
     }
 
@@ -1055,16 +1055,16 @@ extends LivingEntity {
         return this.isInWalkTargetRange(this.getBlockPos());
     }
 
-    public boolean isInWalkTargetRange(BlockPos arg) {
+    public boolean isInWalkTargetRange(BlockPos pos) {
         if (this.positionTargetRange == -1.0f) {
             return true;
         }
-        return this.positionTarget.getSquaredDistance(arg) < (double)(this.positionTargetRange * this.positionTargetRange);
+        return this.positionTarget.getSquaredDistance(pos) < (double)(this.positionTargetRange * this.positionTargetRange);
     }
 
-    public void setPositionTarget(BlockPos arg, int i) {
-        this.positionTarget = arg;
-        this.positionTargetRange = i;
+    public void setPositionTarget(BlockPos target, int range) {
+        this.positionTarget = target;
+        this.positionTargetRange = range;
     }
 
     public BlockPos getPositionTarget() {
@@ -1121,7 +1121,7 @@ extends LivingEntity {
         }
     }
 
-    public void detachLeash(boolean bl, boolean bl2) {
+    public void detachLeash(boolean sendPacket, boolean dropItem) {
         if (this.holdingEntity != null) {
             this.teleporting = false;
             if (!(this.holdingEntity instanceof PlayerEntity)) {
@@ -1129,16 +1129,16 @@ extends LivingEntity {
             }
             this.holdingEntity = null;
             this.leashTag = null;
-            if (!this.world.isClient && bl2) {
+            if (!this.world.isClient && dropItem) {
                 this.dropItem(Items.LEAD);
             }
-            if (!this.world.isClient && bl && this.world instanceof ServerWorld) {
+            if (!this.world.isClient && sendPacket && this.world instanceof ServerWorld) {
                 ((ServerWorld)this.world).getChunkManager().sendToOtherNearbyPlayers(this, new EntityAttachS2CPacket(this, null));
             }
         }
     }
 
-    public boolean canBeLeashedBy(PlayerEntity arg) {
+    public boolean canBeLeashedBy(PlayerEntity player) {
         return !this.isLeashed() && !(this instanceof Monster);
     }
 
@@ -1154,14 +1154,14 @@ extends LivingEntity {
         return this.holdingEntity;
     }
 
-    public void attachLeash(Entity arg, boolean bl) {
-        this.holdingEntity = arg;
+    public void attachLeash(Entity entity, boolean sendPacket) {
+        this.holdingEntity = entity;
         this.leashTag = null;
         this.teleporting = true;
         if (!(this.holdingEntity instanceof PlayerEntity)) {
             this.holdingEntity.teleporting = true;
         }
-        if (!this.world.isClient && bl && this.world instanceof ServerWorld) {
+        if (!this.world.isClient && sendPacket && this.world instanceof ServerWorld) {
             ((ServerWorld)this.world).getChunkManager().sendToOtherNearbyPlayers(this, new EntityAttachS2CPacket(this, this.holdingEntity));
         }
         if (this.hasVehicle()) {
@@ -1170,14 +1170,14 @@ extends LivingEntity {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public void setHoldingEntityId(int i) {
-        this.holdingEntityId = i;
+    public void setHoldingEntityId(int id) {
+        this.holdingEntityId = id;
         this.detachLeash(false, false);
     }
 
     @Override
-    public boolean startRiding(Entity arg, boolean bl) {
-        boolean bl2 = super.startRiding(arg, bl);
+    public boolean startRiding(Entity entity, boolean force) {
+        boolean bl2 = super.startRiding(entity, force);
         if (bl2 && this.isLeashed()) {
             this.detachLeash(true, true);
         }
@@ -1209,25 +1209,25 @@ extends LivingEntity {
      * WARNING - void declaration
      */
     @Override
-    public boolean equip(int i, ItemStack arg) {
+    public boolean equip(int slot, ItemStack item) {
         void lv7;
-        if (i == 98) {
+        if (slot == 98) {
             EquipmentSlot lv = EquipmentSlot.MAINHAND;
-        } else if (i == 99) {
+        } else if (slot == 99) {
             EquipmentSlot lv2 = EquipmentSlot.OFFHAND;
-        } else if (i == 100 + EquipmentSlot.HEAD.getEntitySlotId()) {
+        } else if (slot == 100 + EquipmentSlot.HEAD.getEntitySlotId()) {
             EquipmentSlot lv3 = EquipmentSlot.HEAD;
-        } else if (i == 100 + EquipmentSlot.CHEST.getEntitySlotId()) {
+        } else if (slot == 100 + EquipmentSlot.CHEST.getEntitySlotId()) {
             EquipmentSlot lv4 = EquipmentSlot.CHEST;
-        } else if (i == 100 + EquipmentSlot.LEGS.getEntitySlotId()) {
+        } else if (slot == 100 + EquipmentSlot.LEGS.getEntitySlotId()) {
             EquipmentSlot lv5 = EquipmentSlot.LEGS;
-        } else if (i == 100 + EquipmentSlot.FEET.getEntitySlotId()) {
+        } else if (slot == 100 + EquipmentSlot.FEET.getEntitySlotId()) {
             EquipmentSlot lv6 = EquipmentSlot.FEET;
         } else {
             return false;
         }
-        if (arg.isEmpty() || MobEntity.canEquipmentSlotContain((EquipmentSlot)lv7, arg) || lv7 == EquipmentSlot.HEAD) {
-            this.equipStack((EquipmentSlot)lv7, arg);
+        if (item.isEmpty() || MobEntity.canEquipmentSlotContain((EquipmentSlot)lv7, item) || lv7 == EquipmentSlot.HEAD) {
+            this.equipStack((EquipmentSlot)lv7, item);
             return true;
         }
         return false;
@@ -1238,9 +1238,9 @@ extends LivingEntity {
         return this.canBeControlledByRider() && super.isLogicalSideForUpdatingMovement();
     }
 
-    public static boolean canEquipmentSlotContain(EquipmentSlot arg, ItemStack arg2) {
-        EquipmentSlot lv = MobEntity.getPreferredEquipmentSlot(arg2);
-        return lv == arg || lv == EquipmentSlot.MAINHAND && arg == EquipmentSlot.OFFHAND || lv == EquipmentSlot.OFFHAND && arg == EquipmentSlot.MAINHAND;
+    public static boolean canEquipmentSlotContain(EquipmentSlot slot, ItemStack item) {
+        EquipmentSlot lv = MobEntity.getPreferredEquipmentSlot(item);
+        return lv == slot || lv == EquipmentSlot.MAINHAND && slot == EquipmentSlot.OFFHAND || lv == EquipmentSlot.OFFHAND && slot == EquipmentSlot.MAINHAND;
     }
 
     @Override
@@ -1248,19 +1248,19 @@ extends LivingEntity {
         return super.canMoveVoluntarily() && !this.isAiDisabled();
     }
 
-    public void setAiDisabled(boolean bl) {
+    public void setAiDisabled(boolean aiDisabled) {
         byte b = this.dataTracker.get(MOB_FLAGS);
-        this.dataTracker.set(MOB_FLAGS, bl ? (byte)(b | 1) : (byte)(b & 0xFFFFFFFE));
+        this.dataTracker.set(MOB_FLAGS, aiDisabled ? (byte)(b | 1) : (byte)(b & 0xFFFFFFFE));
     }
 
-    public void setLeftHanded(boolean bl) {
+    public void setLeftHanded(boolean leftHanded) {
         byte b = this.dataTracker.get(MOB_FLAGS);
-        this.dataTracker.set(MOB_FLAGS, bl ? (byte)(b | 2) : (byte)(b & 0xFFFFFFFD));
+        this.dataTracker.set(MOB_FLAGS, leftHanded ? (byte)(b | 2) : (byte)(b & 0xFFFFFFFD));
     }
 
-    public void setAttacking(boolean bl) {
+    public void setAttacking(boolean attacking) {
         byte b = this.dataTracker.get(MOB_FLAGS);
-        this.dataTracker.set(MOB_FLAGS, bl ? (byte)(b | 4) : (byte)(b & 0xFFFFFFFB));
+        this.dataTracker.set(MOB_FLAGS, attacking ? (byte)(b | 4) : (byte)(b & 0xFFFFFFFB));
     }
 
     public boolean isAiDisabled() {
@@ -1275,7 +1275,7 @@ extends LivingEntity {
         return (this.dataTracker.get(MOB_FLAGS) & 4) != 0;
     }
 
-    public void setBaby(boolean bl) {
+    public void setBaby(boolean baby) {
     }
 
     @Override
@@ -1284,47 +1284,47 @@ extends LivingEntity {
     }
 
     @Override
-    public boolean canTarget(LivingEntity arg) {
-        if (arg.getType() == EntityType.PLAYER && ((PlayerEntity)arg).abilities.invulnerable) {
+    public boolean canTarget(LivingEntity target) {
+        if (target.getType() == EntityType.PLAYER && ((PlayerEntity)target).abilities.invulnerable) {
             return false;
         }
-        return super.canTarget(arg);
+        return super.canTarget(target);
     }
 
     @Override
-    public boolean tryAttack(Entity arg) {
+    public boolean tryAttack(Entity target) {
         boolean bl;
         int i;
         float f = (float)this.getAttributeValue(EntityAttributes.GENERIC_ATTACK_DAMAGE);
         float g = (float)this.getAttributeValue(EntityAttributes.GENERIC_ATTACK_KNOCKBACK);
-        if (arg instanceof LivingEntity) {
-            f += EnchantmentHelper.getAttackDamage(this.getMainHandStack(), ((LivingEntity)arg).getGroup());
+        if (target instanceof LivingEntity) {
+            f += EnchantmentHelper.getAttackDamage(this.getMainHandStack(), ((LivingEntity)target).getGroup());
             g += (float)EnchantmentHelper.getKnockback(this);
         }
         if ((i = EnchantmentHelper.getFireAspect(this)) > 0) {
-            arg.setOnFireFor(i * 4);
+            target.setOnFireFor(i * 4);
         }
-        if (bl = arg.damage(DamageSource.mob(this), f)) {
-            if (g > 0.0f && arg instanceof LivingEntity) {
-                ((LivingEntity)arg).takeKnockback(g * 0.5f, MathHelper.sin(this.yaw * ((float)Math.PI / 180)), -MathHelper.cos(this.yaw * ((float)Math.PI / 180)));
+        if (bl = target.damage(DamageSource.mob(this), f)) {
+            if (g > 0.0f && target instanceof LivingEntity) {
+                ((LivingEntity)target).takeKnockback(g * 0.5f, MathHelper.sin(this.yaw * ((float)Math.PI / 180)), -MathHelper.cos(this.yaw * ((float)Math.PI / 180)));
                 this.setVelocity(this.getVelocity().multiply(0.6, 1.0, 0.6));
             }
-            if (arg instanceof PlayerEntity) {
+            if (target instanceof PlayerEntity) {
                 PlayerEntity lv;
-                this.disablePlayerShield(lv, this.getMainHandStack(), (lv = (PlayerEntity)arg).isUsingItem() ? lv.getActiveItem() : ItemStack.EMPTY);
+                this.disablePlayerShield(lv, this.getMainHandStack(), (lv = (PlayerEntity)target).isUsingItem() ? lv.getActiveItem() : ItemStack.EMPTY);
             }
-            this.dealDamage(this, arg);
-            this.onAttacking(arg);
+            this.dealDamage(this, target);
+            this.onAttacking(target);
         }
         return bl;
     }
 
-    private void disablePlayerShield(PlayerEntity arg, ItemStack arg2, ItemStack arg3) {
-        if (!arg2.isEmpty() && !arg3.isEmpty() && arg2.getItem() instanceof AxeItem && arg3.getItem() == Items.SHIELD) {
+    private void disablePlayerShield(PlayerEntity player, ItemStack mobStack, ItemStack playerStack) {
+        if (!mobStack.isEmpty() && !playerStack.isEmpty() && mobStack.getItem() instanceof AxeItem && playerStack.getItem() == Items.SHIELD) {
             float f = 0.25f + (float)EnchantmentHelper.getEfficiency(this) * 0.05f;
             if (this.random.nextFloat() < f) {
-                arg.getItemCooldownManager().set(Items.SHIELD, 100);
-                this.world.sendEntityStatus(arg, (byte)30);
+                player.getItemCooldownManager().set(Items.SHIELD, 100);
+                this.world.sendEntityStatus(player, (byte)30);
             }
         }
     }
@@ -1342,9 +1342,9 @@ extends LivingEntity {
     }
 
     @Override
-    protected void swimUpward(Tag<Fluid> arg) {
+    protected void swimUpward(Tag<Fluid> fluid) {
         if (this.getNavigation().canSwim()) {
-            super.swimUpward(arg);
+            super.swimUpward(fluid);
         } else {
             this.setVelocity(this.getVelocity().add(0.0, 0.3, 0.0));
         }

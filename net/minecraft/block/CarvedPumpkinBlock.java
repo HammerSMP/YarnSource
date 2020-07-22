@@ -53,75 +53,75 @@ implements Wearable {
     }
 
     @Override
-    public void onBlockAdded(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
-        if (arg4.isOf(arg.getBlock())) {
+    public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
+        if (oldState.isOf(state.getBlock())) {
             return;
         }
-        this.trySpawnEntity(arg2, arg3);
+        this.trySpawnEntity(world, pos);
     }
 
-    public boolean canDispense(WorldView arg, BlockPos arg2) {
-        return this.getSnowGolemDispenserPattern().searchAround(arg, arg2) != null || this.getIronGolemDispenserPattern().searchAround(arg, arg2) != null;
+    public boolean canDispense(WorldView arg, BlockPos pos) {
+        return this.getSnowGolemDispenserPattern().searchAround(arg, pos) != null || this.getIronGolemDispenserPattern().searchAround(arg, pos) != null;
     }
 
-    private void trySpawnEntity(World arg, BlockPos arg2) {
+    private void trySpawnEntity(World world, BlockPos pos) {
         block9: {
             BlockPattern.Result lv;
             block8: {
-                lv = this.getSnowGolemPattern().searchAround(arg, arg2);
+                lv = this.getSnowGolemPattern().searchAround(world, pos);
                 if (lv == null) break block8;
                 for (int i = 0; i < this.getSnowGolemPattern().getHeight(); ++i) {
                     CachedBlockPosition lv2 = lv.translate(0, i, 0);
-                    arg.setBlockState(lv2.getBlockPos(), Blocks.AIR.getDefaultState(), 2);
-                    arg.syncWorldEvent(2001, lv2.getBlockPos(), Block.getRawIdFromState(lv2.getBlockState()));
+                    world.setBlockState(lv2.getBlockPos(), Blocks.AIR.getDefaultState(), 2);
+                    world.syncWorldEvent(2001, lv2.getBlockPos(), Block.getRawIdFromState(lv2.getBlockState()));
                 }
-                SnowGolemEntity lv3 = EntityType.SNOW_GOLEM.create(arg);
+                SnowGolemEntity lv3 = EntityType.SNOW_GOLEM.create(world);
                 BlockPos lv4 = lv.translate(0, 2, 0).getBlockPos();
                 lv3.refreshPositionAndAngles((double)lv4.getX() + 0.5, (double)lv4.getY() + 0.05, (double)lv4.getZ() + 0.5, 0.0f, 0.0f);
-                arg.spawnEntity(lv3);
-                for (ServerPlayerEntity lv5 : arg.getNonSpectatingEntities(ServerPlayerEntity.class, lv3.getBoundingBox().expand(5.0))) {
+                world.spawnEntity(lv3);
+                for (ServerPlayerEntity lv5 : world.getNonSpectatingEntities(ServerPlayerEntity.class, lv3.getBoundingBox().expand(5.0))) {
                     Criteria.SUMMONED_ENTITY.trigger(lv5, lv3);
                 }
                 for (int j = 0; j < this.getSnowGolemPattern().getHeight(); ++j) {
                     CachedBlockPosition lv6 = lv.translate(0, j, 0);
-                    arg.updateNeighbors(lv6.getBlockPos(), Blocks.AIR);
+                    world.updateNeighbors(lv6.getBlockPos(), Blocks.AIR);
                 }
                 break block9;
             }
-            lv = this.getIronGolemPattern().searchAround(arg, arg2);
+            lv = this.getIronGolemPattern().searchAround(world, pos);
             if (lv == null) break block9;
             for (int k = 0; k < this.getIronGolemPattern().getWidth(); ++k) {
                 for (int l = 0; l < this.getIronGolemPattern().getHeight(); ++l) {
                     CachedBlockPosition lv7 = lv.translate(k, l, 0);
-                    arg.setBlockState(lv7.getBlockPos(), Blocks.AIR.getDefaultState(), 2);
-                    arg.syncWorldEvent(2001, lv7.getBlockPos(), Block.getRawIdFromState(lv7.getBlockState()));
+                    world.setBlockState(lv7.getBlockPos(), Blocks.AIR.getDefaultState(), 2);
+                    world.syncWorldEvent(2001, lv7.getBlockPos(), Block.getRawIdFromState(lv7.getBlockState()));
                 }
             }
             BlockPos lv8 = lv.translate(1, 2, 0).getBlockPos();
-            IronGolemEntity lv9 = EntityType.IRON_GOLEM.create(arg);
+            IronGolemEntity lv9 = EntityType.IRON_GOLEM.create(world);
             lv9.setPlayerCreated(true);
             lv9.refreshPositionAndAngles((double)lv8.getX() + 0.5, (double)lv8.getY() + 0.05, (double)lv8.getZ() + 0.5, 0.0f, 0.0f);
-            arg.spawnEntity(lv9);
-            for (ServerPlayerEntity lv10 : arg.getNonSpectatingEntities(ServerPlayerEntity.class, lv9.getBoundingBox().expand(5.0))) {
+            world.spawnEntity(lv9);
+            for (ServerPlayerEntity lv10 : world.getNonSpectatingEntities(ServerPlayerEntity.class, lv9.getBoundingBox().expand(5.0))) {
                 Criteria.SUMMONED_ENTITY.trigger(lv10, lv9);
             }
             for (int m = 0; m < this.getIronGolemPattern().getWidth(); ++m) {
                 for (int n = 0; n < this.getIronGolemPattern().getHeight(); ++n) {
                     CachedBlockPosition lv11 = lv.translate(m, n, 0);
-                    arg.updateNeighbors(lv11.getBlockPos(), Blocks.AIR);
+                    world.updateNeighbors(lv11.getBlockPos(), Blocks.AIR);
                 }
             }
         }
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext arg) {
-        return (BlockState)this.getDefaultState().with(FACING, arg.getPlayerFacing().getOpposite());
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        return (BlockState)this.getDefaultState().with(FACING, ctx.getPlayerFacing().getOpposite());
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(FACING);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(FACING);
     }
 
     private BlockPattern getSnowGolemDispenserPattern() {

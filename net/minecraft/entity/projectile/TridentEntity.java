@@ -46,16 +46,16 @@ extends PersistentProjectileEntity {
         super((EntityType<? extends PersistentProjectileEntity>)arg, arg2);
     }
 
-    public TridentEntity(World arg, LivingEntity arg2, ItemStack arg3) {
-        super(EntityType.TRIDENT, arg2, arg);
-        this.tridentStack = arg3.copy();
-        this.dataTracker.set(LOYALTY, (byte)EnchantmentHelper.getLoyalty(arg3));
-        this.dataTracker.set(ENCHANTED, arg3.hasGlint());
+    public TridentEntity(World world, LivingEntity owner, ItemStack stack) {
+        super(EntityType.TRIDENT, owner, world);
+        this.tridentStack = stack.copy();
+        this.dataTracker.set(LOYALTY, (byte)EnchantmentHelper.getLoyalty(stack));
+        this.dataTracker.set(ENCHANTED, stack.hasGlint());
     }
 
     @Environment(value=EnvType.CLIENT)
-    public TridentEntity(World arg, double d, double e, double f) {
-        super(EntityType.TRIDENT, d, e, f, arg);
+    public TridentEntity(World world, double x, double y, double z) {
+        super(EntityType.TRIDENT, x, y, z, world);
     }
 
     @Override
@@ -116,18 +116,18 @@ extends PersistentProjectileEntity {
 
     @Override
     @Nullable
-    protected EntityHitResult getEntityCollision(Vec3d arg, Vec3d arg2) {
+    protected EntityHitResult getEntityCollision(Vec3d currentPosition, Vec3d nextPosition) {
         if (this.dealtDamage) {
             return null;
         }
-        return super.getEntityCollision(arg, arg2);
+        return super.getEntityCollision(currentPosition, nextPosition);
     }
 
     @Override
-    protected void onEntityHit(EntityHitResult arg) {
+    protected void onEntityHit(EntityHitResult entityHitResult) {
         BlockPos lv7;
         Entity lv3;
-        Entity lv = arg.getEntity();
+        Entity lv = entityHitResult.getEntity();
         float f = 8.0f;
         if (lv instanceof LivingEntity) {
             LivingEntity lv2 = (LivingEntity)lv;
@@ -168,29 +168,29 @@ extends PersistentProjectileEntity {
     }
 
     @Override
-    public void onPlayerCollision(PlayerEntity arg) {
+    public void onPlayerCollision(PlayerEntity player) {
         Entity lv = this.getOwner();
-        if (lv != null && lv.getUuid() != arg.getUuid()) {
+        if (lv != null && lv.getUuid() != player.getUuid()) {
             return;
         }
-        super.onPlayerCollision(arg);
+        super.onPlayerCollision(player);
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        if (arg.contains("Trident", 10)) {
-            this.tridentStack = ItemStack.fromTag(arg.getCompound("Trident"));
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        if (tag.contains("Trident", 10)) {
+            this.tridentStack = ItemStack.fromTag(tag.getCompound("Trident"));
         }
-        this.dealtDamage = arg.getBoolean("DealtDamage");
+        this.dealtDamage = tag.getBoolean("DealtDamage");
         this.dataTracker.set(LOYALTY, (byte)EnchantmentHelper.getLoyalty(this.tridentStack));
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
-        arg.put("Trident", this.tridentStack.toTag(new CompoundTag()));
-        arg.putBoolean("DealtDamage", this.dealtDamage);
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
+        tag.put("Trident", this.tridentStack.toTag(new CompoundTag()));
+        tag.putBoolean("DealtDamage", this.dealtDamage);
     }
 
     @Override
@@ -208,7 +208,7 @@ extends PersistentProjectileEntity {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public boolean shouldRender(double d, double e, double f) {
+    public boolean shouldRender(double cameraX, double cameraY, double cameraZ) {
         return true;
     }
 }

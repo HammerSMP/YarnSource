@@ -13,9 +13,9 @@ extends AbstractGlassBlock
 implements Stainable {
     private final DyeColor color;
 
-    public StainedGlassBlock(DyeColor arg, AbstractBlock.Settings arg2) {
-        super(arg2);
-        this.color = arg;
+    public StainedGlassBlock(DyeColor color, AbstractBlock.Settings settings) {
+        super(settings);
+        this.color = color;
     }
 
     @Override

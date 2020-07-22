@@ -37,10 +37,10 @@ implements AutoCloseable {
     private final List<Integer> samplerHeights = Lists.newArrayList();
     private Matrix4f projectionMatrix;
 
-    public PostProcessShader(ResourceManager arg, String string, Framebuffer arg2, Framebuffer arg3) throws IOException {
-        this.program = new JsonGlProgram(arg, string);
-        this.input = arg2;
-        this.output = arg3;
+    public PostProcessShader(ResourceManager resourceManager, String programName, Framebuffer input, Framebuffer output) throws IOException {
+        this.program = new JsonGlProgram(resourceManager, programName);
+        this.input = input;
+        this.output = output;
     }
 
     @Override
@@ -48,18 +48,18 @@ implements AutoCloseable {
         this.program.close();
     }
 
-    public void addAuxTarget(String string, IntSupplier intSupplier, int i, int j) {
-        this.samplerNames.add(this.samplerNames.size(), string);
+    public void addAuxTarget(String name, IntSupplier intSupplier, int width, int height) {
+        this.samplerNames.add(this.samplerNames.size(), name);
         this.samplerValues.add(this.samplerValues.size(), intSupplier);
-        this.samplerWidths.add(this.samplerWidths.size(), i);
-        this.samplerHeights.add(this.samplerHeights.size(), j);
+        this.samplerWidths.add(this.samplerWidths.size(), width);
+        this.samplerHeights.add(this.samplerHeights.size(), height);
     }
 
-    public void setProjectionMatrix(Matrix4f arg) {
-        this.projectionMatrix = arg;
+    public void setProjectionMatrix(Matrix4f projectionMatrix) {
+        this.projectionMatrix = projectionMatrix;
     }
 
-    public void render(float f) {
+    public void render(float time) {
         this.input.endWrite();
         float g = this.output.textureWidth;
         float h = this.output.textureHeight;
@@ -72,13 +72,13 @@ implements AutoCloseable {
         this.program.getUniformByNameOrDummy("ProjMat").set(this.projectionMatrix);
         this.program.getUniformByNameOrDummy("InSize").set(this.input.textureWidth, this.input.textureHeight);
         this.program.getUniformByNameOrDummy("OutSize").set(g, h);
-        this.program.getUniformByNameOrDummy("Time").set(f);
+        this.program.getUniformByNameOrDummy("Time").set(time);
         MinecraftClient lv = MinecraftClient.getInstance();
         this.program.getUniformByNameOrDummy("ScreenSize").set(lv.getWindow().getFramebufferWidth(), lv.getWindow().getFramebufferHeight());
         this.program.enable();
         this.output.clear(MinecraftClient.IS_SYSTEM_MAC);
         this.output.beginWrite(false);
-        RenderSystem.depthMask(false);
+        RenderSystem.depthFunc(519);
         BufferBuilder lv2 = Tessellator.getInstance().getBuffer();
         lv2.begin(7, VertexFormats.POSITION_COLOR);
         lv2.vertex(0.0, 0.0, 500.0).color(255, 255, 255, 255).next();
@@ -87,7 +87,7 @@ implements AutoCloseable {
         lv2.vertex(0.0, h, 500.0).color(255, 255, 255, 255).next();
         lv2.end();
         BufferRenderer.draw(lv2);
-        RenderSystem.depthMask(true);
+        RenderSystem.depthFunc(515);
         this.program.disable();
         this.output.endWrite();
         this.input.endRead();

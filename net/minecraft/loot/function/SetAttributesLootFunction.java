@@ -48,9 +48,9 @@ public class SetAttributesLootFunction
 extends ConditionalLootFunction {
     private final List<Attribute> attributes;
 
-    private SetAttributesLootFunction(LootCondition[] args, List<Attribute> list) {
-        super(args);
-        this.attributes = ImmutableList.copyOf(list);
+    private SetAttributesLootFunction(LootCondition[] conditions, List<Attribute> attributes) {
+        super(conditions);
+        this.attributes = ImmutableList.copyOf(attributes);
     }
 
     @Override
@@ -59,17 +59,17 @@ extends ConditionalLootFunction {
     }
 
     @Override
-    public ItemStack process(ItemStack arg, LootContext arg2) {
-        Random random = arg2.getRandom();
+    public ItemStack process(ItemStack stack, LootContext context) {
+        Random random = context.getRandom();
         for (Attribute lv : this.attributes) {
             UUID uUID = lv.id;
             if (uUID == null) {
                 uUID = UUID.randomUUID();
             }
             EquipmentSlot lv2 = Util.getRandom(lv.slots, random);
-            arg.addAttributeModifier(lv.attribute, new EntityAttributeModifier(uUID, lv.name, (double)lv.amountRange.nextFloat(random), lv.operation), lv2);
+            stack.addAttributeModifier(lv.attribute, new EntityAttributeModifier(uUID, lv.name, (double)lv.amountRange.nextFloat(random), lv.operation), lv2);
         }
-        return arg;
+        return stack;
     }
 
     static class Attribute {
@@ -81,21 +81,21 @@ extends ConditionalLootFunction {
         private final UUID id;
         private final EquipmentSlot[] slots;
 
-        private Attribute(String string, EntityAttribute arg, EntityAttributeModifier.Operation arg2, UniformLootTableRange arg3, EquipmentSlot[] args, @Nullable UUID uUID) {
-            this.name = string;
+        private Attribute(String name, EntityAttribute arg, EntityAttributeModifier.Operation operation, UniformLootTableRange amountRange, EquipmentSlot[] slots, @Nullable UUID id) {
+            this.name = name;
             this.attribute = arg;
-            this.operation = arg2;
-            this.amountRange = arg3;
-            this.id = uUID;
-            this.slots = args;
+            this.operation = operation;
+            this.amountRange = amountRange;
+            this.id = id;
+            this.slots = slots;
         }
 
-        public JsonObject serialize(JsonSerializationContext jsonSerializationContext) {
+        public JsonObject serialize(JsonSerializationContext context) {
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("name", this.name);
             jsonObject.addProperty("attribute", Registry.ATTRIBUTE.getId(this.attribute).toString());
             jsonObject.addProperty("operation", Attribute.getName(this.operation));
-            jsonObject.add("amount", jsonSerializationContext.serialize((Object)this.amountRange));
+            jsonObject.add("amount", context.serialize((Object)this.amountRange));
             if (this.id != null) {
                 jsonObject.addProperty("id", this.id.toString());
             }
@@ -114,21 +114,21 @@ extends ConditionalLootFunction {
         /*
          * WARNING - void declaration
          */
-        public static Attribute deserialize(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext) {
+        public static Attribute deserialize(JsonObject json, JsonDeserializationContext context) {
             void lvs3;
-            String string = JsonHelper.getString(jsonObject, "name");
-            Identifier lv = new Identifier(JsonHelper.getString(jsonObject, "attribute"));
+            String string = JsonHelper.getString(json, "name");
+            Identifier lv = new Identifier(JsonHelper.getString(json, "attribute"));
             EntityAttribute lv2 = Registry.ATTRIBUTE.get(lv);
             if (lv2 == null) {
                 throw new JsonSyntaxException("Unknown attribute: " + lv);
             }
-            EntityAttributeModifier.Operation lv3 = Attribute.fromName(JsonHelper.getString(jsonObject, "operation"));
-            UniformLootTableRange lv4 = JsonHelper.deserialize(jsonObject, "amount", jsonDeserializationContext, UniformLootTableRange.class);
+            EntityAttributeModifier.Operation lv3 = Attribute.fromName(JsonHelper.getString(json, "operation"));
+            UniformLootTableRange lv4 = JsonHelper.deserialize(json, "amount", context, UniformLootTableRange.class);
             UUID uUID = null;
-            if (JsonHelper.hasString(jsonObject, "slot")) {
-                EquipmentSlot[] lvs = new EquipmentSlot[]{EquipmentSlot.byName(JsonHelper.getString(jsonObject, "slot"))};
-            } else if (JsonHelper.hasArray(jsonObject, "slot")) {
-                JsonArray jsonArray = JsonHelper.getArray(jsonObject, "slot");
+            if (JsonHelper.hasString(json, "slot")) {
+                EquipmentSlot[] lvs = new EquipmentSlot[]{EquipmentSlot.byName(JsonHelper.getString(json, "slot"))};
+            } else if (JsonHelper.hasArray(json, "slot")) {
+                JsonArray jsonArray = JsonHelper.getArray(json, "slot");
                 EquipmentSlot[] lvs2 = new EquipmentSlot[jsonArray.size()];
                 int i = 0;
                 for (JsonElement jsonElement : jsonArray) {
@@ -140,8 +140,8 @@ extends ConditionalLootFunction {
             } else {
                 throw new JsonSyntaxException("Invalid or missing attribute modifier slot; must be either string or array of strings.");
             }
-            if (jsonObject.has("id")) {
-                String string2 = JsonHelper.getString(jsonObject, "id");
+            if (json.has("id")) {
+                String string2 = JsonHelper.getString(json, "id");
                 try {
                     uUID = UUID.fromString(string2);
                 }
@@ -152,8 +152,8 @@ extends ConditionalLootFunction {
             return new Attribute(string, lv2, lv3, lv4, (EquipmentSlot[])lvs3, uUID);
         }
 
-        private static String getName(EntityAttributeModifier.Operation arg) {
-            switch (arg) {
+        private static String getName(EntityAttributeModifier.Operation operation) {
+            switch (operation) {
                 case ADDITION: {
                     return "addition";
                 }
@@ -164,11 +164,11 @@ extends ConditionalLootFunction {
                     return "multiply_total";
                 }
             }
-            throw new IllegalArgumentException("Unknown operation " + (Object)((Object)arg));
+            throw new IllegalArgumentException("Unknown operation " + (Object)((Object)operation));
         }
 
-        private static EntityAttributeModifier.Operation fromName(String string) {
-            switch (string) {
+        private static EntityAttributeModifier.Operation fromName(String name) {
+            switch (name) {
                 case "addition": {
                     return EntityAttributeModifier.Operation.ADDITION;
                 }
@@ -179,7 +179,7 @@ extends ConditionalLootFunction {
                     return EntityAttributeModifier.Operation.MULTIPLY_TOTAL;
                 }
             }
-            throw new JsonSyntaxException("Unknown attribute modifier operation " + string);
+            throw new JsonSyntaxException("Unknown attribute modifier operation " + name);
         }
     }
 
@@ -209,8 +209,8 @@ extends ConditionalLootFunction {
         }
 
         @Override
-        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
-            return this.fromJson(jsonObject, jsonDeserializationContext, args);
+        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject json, JsonDeserializationContext context, LootCondition[] conditions) {
+            return this.fromJson(json, context, conditions);
         }
     }
 }

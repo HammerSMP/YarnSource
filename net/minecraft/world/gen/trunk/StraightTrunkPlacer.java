@@ -38,12 +38,12 @@ extends TrunkPlacer {
     }
 
     @Override
-    public List<FoliagePlacer.TreeNode> generate(ModifiableTestableWorld arg, Random random, int i, BlockPos arg2, Set<BlockPos> set, BlockBox arg3, TreeFeatureConfig arg4) {
-        StraightTrunkPlacer.method_27400(arg, arg2.down());
-        for (int j = 0; j < i; ++j) {
-            StraightTrunkPlacer.method_27402(arg, random, arg2.up(j), set, arg3, arg4);
+    public List<FoliagePlacer.TreeNode> generate(ModifiableTestableWorld world, Random random, int trunkHeight, BlockPos pos, Set<BlockPos> set, BlockBox arg3, TreeFeatureConfig arg4) {
+        StraightTrunkPlacer.method_27400(world, pos.down());
+        for (int j = 0; j < trunkHeight; ++j) {
+            StraightTrunkPlacer.method_27402(world, random, pos.up(j), set, arg3, arg4);
         }
-        return ImmutableList.of((Object)new FoliagePlacer.TreeNode(arg2.up(i), 0, false));
+        return ImmutableList.of((Object)new FoliagePlacer.TreeNode(pos.up(trunkHeight), 0, false));
     }
 }
 

@@ -22,9 +22,9 @@ implements FeatureConfig {
     public final BlockState target;
     public final BlockState state;
 
-    public EmeraldOreFeatureConfig(BlockState arg, BlockState arg2) {
-        this.target = arg;
-        this.state = arg2;
+    public EmeraldOreFeatureConfig(BlockState target, BlockState state) {
+        this.target = target;
+        this.state = state;
     }
 }
 

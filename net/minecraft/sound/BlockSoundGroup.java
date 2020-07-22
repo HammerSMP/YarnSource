@@ -68,14 +68,14 @@ public class BlockSoundGroup {
     private final SoundEvent hitSound;
     private final SoundEvent fallSound;
 
-    public BlockSoundGroup(float f, float g, SoundEvent arg, SoundEvent arg2, SoundEvent arg3, SoundEvent arg4, SoundEvent arg5) {
-        this.volume = f;
-        this.pitch = g;
-        this.breakSound = arg;
-        this.stepSound = arg2;
-        this.placeSound = arg3;
-        this.hitSound = arg4;
-        this.fallSound = arg5;
+    public BlockSoundGroup(float volume, float pitch, SoundEvent breakSound, SoundEvent stepSound, SoundEvent placeSound, SoundEvent hitSound, SoundEvent fallSound) {
+        this.volume = volume;
+        this.pitch = pitch;
+        this.breakSound = breakSound;
+        this.stepSound = stepSound;
+        this.placeSound = placeSound;
+        this.hitSound = hitSound;
+        this.fallSound = fallSound;
     }
 
     public float getVolume() {

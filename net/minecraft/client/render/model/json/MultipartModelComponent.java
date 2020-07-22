@@ -44,27 +44,27 @@ public class MultipartModelComponent {
     private final MultipartModelSelector selector;
     private final WeightedUnbakedModel model;
 
-    public MultipartModelComponent(MultipartModelSelector arg, WeightedUnbakedModel arg2) {
-        if (arg == null) {
+    public MultipartModelComponent(MultipartModelSelector selector, WeightedUnbakedModel model) {
+        if (selector == null) {
             throw new IllegalArgumentException("Missing condition for selector");
         }
-        if (arg2 == null) {
+        if (model == null) {
             throw new IllegalArgumentException("Missing variant for selector");
         }
-        this.selector = arg;
-        this.model = arg2;
+        this.selector = selector;
+        this.model = model;
     }
 
     public WeightedUnbakedModel getModel() {
         return this.model;
     }
 
-    public Predicate<BlockState> getPredicate(StateManager<Block, BlockState> arg) {
-        return this.selector.getPredicate(arg);
+    public Predicate<BlockState> getPredicate(StateManager<Block, BlockState> stateFactory) {
+        return this.selector.getPredicate(stateFactory);
     }
 
-    public boolean equals(Object object) {
-        return this == object;
+    public boolean equals(Object o) {
+        return this == o;
     }
 
     public int hashCode() {
@@ -79,26 +79,26 @@ public class MultipartModelComponent {
             return new MultipartModelComponent(this.deserializeSelectorOrDefault(jsonObject), (WeightedUnbakedModel)jsonDeserializationContext.deserialize(jsonObject.get("apply"), WeightedUnbakedModel.class));
         }
 
-        private MultipartModelSelector deserializeSelectorOrDefault(JsonObject jsonObject) {
-            if (jsonObject.has("when")) {
-                return Deserializer.deserializeSelector(JsonHelper.getObject(jsonObject, "when"));
+        private MultipartModelSelector deserializeSelectorOrDefault(JsonObject object) {
+            if (object.has("when")) {
+                return Deserializer.deserializeSelector(JsonHelper.getObject(object, "when"));
             }
             return MultipartModelSelector.TRUE;
         }
 
         @VisibleForTesting
-        static MultipartModelSelector deserializeSelector(JsonObject jsonObject) {
-            Set set = jsonObject.entrySet();
+        static MultipartModelSelector deserializeSelector(JsonObject object) {
+            Set set = object.entrySet();
             if (set.isEmpty()) {
                 throw new JsonParseException("No elements found in selector");
             }
             if (set.size() == 1) {
-                if (jsonObject.has("OR")) {
-                    List list = Streams.stream((Iterable)JsonHelper.getArray(jsonObject, "OR")).map(jsonElement -> Deserializer.deserializeSelector(jsonElement.getAsJsonObject())).collect(Collectors.toList());
+                if (object.has("OR")) {
+                    List list = Streams.stream((Iterable)JsonHelper.getArray(object, "OR")).map(jsonElement -> Deserializer.deserializeSelector(jsonElement.getAsJsonObject())).collect(Collectors.toList());
                     return new OrMultipartModelSelector(list);
                 }
-                if (jsonObject.has("AND")) {
-                    List list2 = Streams.stream((Iterable)JsonHelper.getArray(jsonObject, "AND")).map(jsonElement -> Deserializer.deserializeSelector(jsonElement.getAsJsonObject())).collect(Collectors.toList());
+                if (object.has("AND")) {
+                    List list2 = Streams.stream((Iterable)JsonHelper.getArray(object, "AND")).map(jsonElement -> Deserializer.deserializeSelector(jsonElement.getAsJsonObject())).collect(Collectors.toList());
                     return new AndMultipartModelSelector(list2);
                 }
                 return Deserializer.createStatePropertySelector((Map.Entry)set.iterator().next());

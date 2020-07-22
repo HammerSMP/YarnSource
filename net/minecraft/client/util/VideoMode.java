@@ -80,14 +80,14 @@ public final class VideoMode {
         return this.refreshRate;
     }
 
-    public boolean equals(Object object) {
-        if (this == object) {
+    public boolean equals(Object o) {
+        if (this == o) {
             return true;
         }
-        if (object == null || this.getClass() != object.getClass()) {
+        if (o == null || this.getClass() != o.getClass()) {
             return false;
         }
-        VideoMode lv = (VideoMode)object;
+        VideoMode lv = (VideoMode)o;
         return this.width == lv.width && this.height == lv.height && this.redBits == lv.redBits && this.greenBits == lv.greenBits && this.blueBits == lv.blueBits && this.refreshRate == lv.refreshRate;
     }
 

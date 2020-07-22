@@ -56,8 +56,8 @@ extends Entity {
         return SoundCategory.WEATHER;
     }
 
-    public void setChanneler(@Nullable ServerPlayerEntity arg) {
-        this.channeler = arg;
+    public void setChanneler(@Nullable ServerPlayerEntity channeler) {
+        this.channeler = channeler;
     }
 
     @Override
@@ -87,7 +87,7 @@ extends Entity {
                 this.world.setLightningTicksLeft(2);
             } else if (!this.cosmetic) {
                 double d = 3.0;
-                List<Entity> list = this.world.getEntities(this, new Box(this.getX() - 3.0, this.getY() - 3.0, this.getZ() - 3.0, this.getX() + 3.0, this.getY() + 6.0 + 3.0, this.getZ() + 3.0), Entity::isAlive);
+                List<Entity> list = this.world.getOtherEntities(this, new Box(this.getX() - 3.0, this.getY() - 3.0, this.getZ() - 3.0, this.getX() + 3.0, this.getY() + 6.0 + 3.0, this.getZ() + 3.0), Entity::isAlive);
                 for (Entity lv2 : list) {
                     lv2.onStruckByLightning((ServerWorld)this.world, this);
                 }
@@ -98,7 +98,7 @@ extends Entity {
         }
     }
 
-    private void spawnFire(int i) {
+    private void spawnFire(int spreadAttempts) {
         if (this.cosmetic || this.world.isClient || !this.world.getGameRules().getBoolean(GameRules.DO_FIRE_TICK)) {
             return;
         }
@@ -107,7 +107,7 @@ extends Entity {
         if (this.world.getBlockState(lv).isAir() && lv2.canPlaceAt(this.world, lv)) {
             this.world.setBlockState(lv, lv2);
         }
-        for (int j = 0; j < i; ++j) {
+        for (int j = 0; j < spreadAttempts; ++j) {
             BlockPos lv3 = lv.add(this.random.nextInt(3) - 1, this.random.nextInt(3) - 1, this.random.nextInt(3) - 1);
             lv2 = AbstractFireBlock.getState(this.world, lv3);
             if (!this.world.getBlockState(lv3).isAir() || !lv2.canPlaceAt(this.world, lv3)) continue;
@@ -117,9 +117,9 @@ extends Entity {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public boolean shouldRender(double d) {
+    public boolean shouldRender(double distance) {
         double e = 64.0 * LightningEntity.getRenderDistanceMultiplier();
-        return d < e * e;
+        return distance < e * e;
     }
 
     @Override
@@ -127,11 +127,11 @@ extends Entity {
     }
 
     @Override
-    protected void readCustomDataFromTag(CompoundTag arg) {
+    protected void readCustomDataFromTag(CompoundTag tag) {
     }
 
     @Override
-    protected void writeCustomDataToTag(CompoundTag arg) {
+    protected void writeCustomDataToTag(CompoundTag tag) {
     }
 
     @Override

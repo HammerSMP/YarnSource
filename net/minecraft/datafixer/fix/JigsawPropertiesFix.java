@@ -18,8 +18,8 @@ import net.minecraft.datafixer.fix.ChoiceFix;
 
 public class JigsawPropertiesFix
 extends ChoiceFix {
-    public JigsawPropertiesFix(Schema schema, boolean bl) {
-        super(schema, bl, "JigsawPropertiesFix", TypeReferences.BLOCK_ENTITY, "minecraft:jigsaw");
+    public JigsawPropertiesFix(Schema outputSchema, boolean changesType) {
+        super(outputSchema, changesType, "JigsawPropertiesFix", TypeReferences.BLOCK_ENTITY, "minecraft:jigsaw");
     }
 
     private static Dynamic<?> renameProperties(Dynamic<?> dynamic) {
@@ -29,8 +29,8 @@ extends ChoiceFix {
     }
 
     @Override
-    protected Typed<?> transform(Typed<?> typed) {
-        return typed.update(DSL.remainderFinder(), JigsawPropertiesFix::renameProperties);
+    protected Typed<?> transform(Typed<?> inputType) {
+        return inputType.update(DSL.remainderFinder(), JigsawPropertiesFix::renameProperties);
     }
 }
 

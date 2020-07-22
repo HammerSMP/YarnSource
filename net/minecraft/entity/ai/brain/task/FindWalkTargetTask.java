@@ -27,15 +27,15 @@ extends Task<PathAwareEntity> {
     private final int maxHorizontalDistance;
     private final int maxVerticalDistance;
 
-    public FindWalkTargetTask(float f) {
-        this(f, 10, 7);
+    public FindWalkTargetTask(float walkSpeed) {
+        this(walkSpeed, 10, 7);
     }
 
-    public FindWalkTargetTask(float f, int i, int j) {
+    public FindWalkTargetTask(float walkSpeed, int maxHorizontalDistance, int maxVerticalDistance) {
         super((Map<MemoryModuleType<?>, MemoryModuleState>)ImmutableMap.of(MemoryModuleType.WALK_TARGET, (Object)((Object)MemoryModuleState.VALUE_ABSENT)));
-        this.walkSpeed = f;
-        this.maxHorizontalDistance = i;
-        this.maxVerticalDistance = j;
+        this.walkSpeed = walkSpeed;
+        this.maxHorizontalDistance = maxHorizontalDistance;
+        this.maxVerticalDistance = maxVerticalDistance;
     }
 
     @Override
@@ -54,14 +54,14 @@ extends Task<PathAwareEntity> {
         }
     }
 
-    private void updateWalkTarget(PathAwareEntity arg2, ChunkSectionPos arg22) {
-        Optional<Vec3d> optional = Optional.ofNullable(TargetFinder.findTargetTowards(arg2, this.maxHorizontalDistance, this.maxVerticalDistance, Vec3d.ofBottomCenter(arg22.getCenterPos())));
-        arg2.getBrain().remember(MemoryModuleType.WALK_TARGET, optional.map(arg -> new WalkTarget((Vec3d)arg, this.walkSpeed, 0)));
+    private void updateWalkTarget(PathAwareEntity entity, ChunkSectionPos pos) {
+        Optional<Vec3d> optional = Optional.ofNullable(TargetFinder.findTargetTowards(entity, this.maxHorizontalDistance, this.maxVerticalDistance, Vec3d.ofBottomCenter(pos.getCenterPos())));
+        entity.getBrain().remember(MemoryModuleType.WALK_TARGET, optional.map(arg -> new WalkTarget((Vec3d)arg, this.walkSpeed, 0)));
     }
 
-    private void updateWalkTarget(PathAwareEntity arg2) {
-        Optional<Vec3d> optional = Optional.ofNullable(TargetFinder.findGroundTarget(arg2, this.maxHorizontalDistance, this.maxVerticalDistance));
-        arg2.getBrain().remember(MemoryModuleType.WALK_TARGET, optional.map(arg -> new WalkTarget((Vec3d)arg, this.walkSpeed, 0)));
+    private void updateWalkTarget(PathAwareEntity entity) {
+        Optional<Vec3d> optional = Optional.ofNullable(TargetFinder.findGroundTarget(entity, this.maxHorizontalDistance, this.maxVerticalDistance));
+        entity.getBrain().remember(MemoryModuleType.WALK_TARGET, optional.map(arg -> new WalkTarget((Vec3d)arg, this.walkSpeed, 0)));
     }
 }
 

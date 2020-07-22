@@ -27,8 +27,8 @@ import net.minecraft.text.TranslatableText;
 
 public class ItemCustomNameToComponentFix
 extends DataFix {
-    public ItemCustomNameToComponentFix(Schema schema, boolean bl) {
-        super(schema, bl);
+    public ItemCustomNameToComponentFix(Schema outputSchema, boolean changesType) {
+        super(outputSchema, changesType);
     }
 
     private Dynamic<?> fixCustomName(Dynamic<?> dynamic) {

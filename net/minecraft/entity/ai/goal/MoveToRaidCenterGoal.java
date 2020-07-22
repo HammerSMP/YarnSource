@@ -25,8 +25,8 @@ public class MoveToRaidCenterGoal<T extends RaiderEntity>
 extends Goal {
     private final T actor;
 
-    public MoveToRaidCenterGoal(T arg) {
-        this.actor = arg;
+    public MoveToRaidCenterGoal(T actor) {
+        this.actor = actor;
         this.setControls(EnumSet.of(Goal.Control.MOVE));
     }
 
@@ -54,13 +54,13 @@ extends Goal {
         }
     }
 
-    private void includeFreeRaiders(Raid arg) {
-        if (arg.isActive()) {
+    private void includeFreeRaiders(Raid raid) {
+        if (raid.isActive()) {
             HashSet set = Sets.newHashSet();
-            List<RaiderEntity> list = ((RaiderEntity)this.actor).world.getEntities(RaiderEntity.class, ((Entity)this.actor).getBoundingBox().expand(16.0), arg2 -> !arg2.hasActiveRaid() && RaidManager.isValidRaiderFor(arg2, arg));
+            List<RaiderEntity> list = ((RaiderEntity)this.actor).world.getEntitiesByClass(RaiderEntity.class, ((Entity)this.actor).getBoundingBox().expand(16.0), arg2 -> !arg2.hasActiveRaid() && RaidManager.isValidRaiderFor(arg2, raid));
             set.addAll(list);
             for (RaiderEntity lv : set) {
-                arg.addRaider(arg.getGroupsSpawned(), lv, null, true);
+                raid.addRaider(raid.getGroupsSpawned(), lv, null, true);
             }
         }
     }

@@ -49,8 +49,8 @@ public class StructureProcessorRule {
         this.tag = optional.orElse(null);
     }
 
-    public boolean test(BlockState arg, BlockState arg2, BlockPos arg3, BlockPos arg4, BlockPos arg5, Random random) {
-        return this.inputPredicate.test(arg, random) && this.locationPredicate.test(arg2, random) && this.positionPredicate.test(arg3, arg4, arg5, random);
+    public boolean test(BlockState input, BlockState location, BlockPos arg3, BlockPos arg4, BlockPos arg5, Random random) {
+        return this.inputPredicate.test(input, random) && this.locationPredicate.test(location, random) && this.positionPredicate.test(arg3, arg4, arg5, random);
     }
 
     public BlockState getOutputState() {

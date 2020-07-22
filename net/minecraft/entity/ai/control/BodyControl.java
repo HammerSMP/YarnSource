@@ -11,8 +11,8 @@ public class BodyControl {
     private int activeTicks;
     private float lastHeadYaw;
 
-    public BodyControl(MobEntity arg) {
-        this.entity = arg;
+    public BodyControl(MobEntity entity) {
+        this.entity = entity;
     }
 
     public void tick() {

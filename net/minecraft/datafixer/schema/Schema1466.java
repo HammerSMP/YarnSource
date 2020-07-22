@@ -22,8 +22,8 @@ extends IdentifierNormalizingSchema {
         super(i, schema);
     }
 
-    public void registerTypes(Schema schema, Map<String, Supplier<TypeTemplate>> map, Map<String, Supplier<TypeTemplate>> map2) {
-        super.registerTypes(schema, map, map2);
+    public void registerTypes(Schema schema, Map<String, Supplier<TypeTemplate>> entityTypes, Map<String, Supplier<TypeTemplate>> blockEntityTypes) {
+        super.registerTypes(schema, entityTypes, blockEntityTypes);
         schema.registerType(false, TypeReferences.CHUNK, () -> DSL.fields((String)"Level", (TypeTemplate)DSL.optionalFields((String)"Entities", (TypeTemplate)DSL.list((TypeTemplate)TypeReferences.ENTITY_TREE.in(schema)), (String)"TileEntities", (TypeTemplate)DSL.list((TypeTemplate)TypeReferences.BLOCK_ENTITY.in(schema)), (String)"TileTicks", (TypeTemplate)DSL.list((TypeTemplate)DSL.fields((String)"i", (TypeTemplate)TypeReferences.BLOCK_NAME.in(schema))), (String)"Sections", (TypeTemplate)DSL.list((TypeTemplate)DSL.optionalFields((String)"Palette", (TypeTemplate)DSL.list((TypeTemplate)TypeReferences.BLOCK_STATE.in(schema)))), (String)"Structures", (TypeTemplate)DSL.optionalFields((String)"Starts", (TypeTemplate)DSL.compoundList((TypeTemplate)TypeReferences.STRUCTURE_FEATURE.in(schema))))));
         schema.registerType(false, TypeReferences.STRUCTURE_FEATURE, () -> DSL.optionalFields((String)"Children", (TypeTemplate)DSL.list((TypeTemplate)DSL.optionalFields((String)"CA", (TypeTemplate)TypeReferences.BLOCK_STATE.in(schema), (String)"CB", (TypeTemplate)TypeReferences.BLOCK_STATE.in(schema), (String)"CC", (TypeTemplate)TypeReferences.BLOCK_STATE.in(schema), (String)"CD", (TypeTemplate)TypeReferences.BLOCK_STATE.in(schema))), (String)"biome", (TypeTemplate)TypeReferences.BIOME.in(schema)));
     }

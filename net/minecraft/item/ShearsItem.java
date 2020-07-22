@@ -20,30 +20,30 @@ extends Item {
     }
 
     @Override
-    public boolean postMine(ItemStack arg2, World arg22, BlockState arg3, BlockPos arg4, LivingEntity arg5) {
-        if (!arg22.isClient && !arg3.getBlock().isIn(BlockTags.FIRE)) {
-            arg2.damage(1, arg5, arg -> arg.sendEquipmentBreakStatus(EquipmentSlot.MAINHAND));
+    public boolean postMine(ItemStack stack, World world, BlockState state, BlockPos pos, LivingEntity miner) {
+        if (!world.isClient && !state.getBlock().isIn(BlockTags.FIRE)) {
+            stack.damage(1, miner, e -> e.sendEquipmentBreakStatus(EquipmentSlot.MAINHAND));
         }
-        if (arg3.isIn(BlockTags.LEAVES) || arg3.isOf(Blocks.COBWEB) || arg3.isOf(Blocks.GRASS) || arg3.isOf(Blocks.FERN) || arg3.isOf(Blocks.DEAD_BUSH) || arg3.isOf(Blocks.VINE) || arg3.isOf(Blocks.TRIPWIRE) || arg3.isIn(BlockTags.WOOL)) {
+        if (state.isIn(BlockTags.LEAVES) || state.isOf(Blocks.COBWEB) || state.isOf(Blocks.GRASS) || state.isOf(Blocks.FERN) || state.isOf(Blocks.DEAD_BUSH) || state.isOf(Blocks.VINE) || state.isOf(Blocks.TRIPWIRE) || state.isIn(BlockTags.WOOL)) {
             return true;
         }
-        return super.postMine(arg2, arg22, arg3, arg4, arg5);
+        return super.postMine(stack, world, state, pos, miner);
     }
 
     @Override
-    public boolean isEffectiveOn(BlockState arg) {
-        return arg.isOf(Blocks.COBWEB) || arg.isOf(Blocks.REDSTONE_WIRE) || arg.isOf(Blocks.TRIPWIRE);
+    public boolean isEffectiveOn(BlockState state) {
+        return state.isOf(Blocks.COBWEB) || state.isOf(Blocks.REDSTONE_WIRE) || state.isOf(Blocks.TRIPWIRE);
     }
 
     @Override
-    public float getMiningSpeedMultiplier(ItemStack arg, BlockState arg2) {
-        if (arg2.isOf(Blocks.COBWEB) || arg2.isIn(BlockTags.LEAVES)) {
+    public float getMiningSpeedMultiplier(ItemStack stack, BlockState state) {
+        if (state.isOf(Blocks.COBWEB) || state.isIn(BlockTags.LEAVES)) {
             return 15.0f;
         }
-        if (arg2.isIn(BlockTags.WOOL)) {
+        if (state.isIn(BlockTags.WOOL)) {
             return 5.0f;
         }
-        return super.getMiningSpeedMultiplier(arg, arg2);
+        return super.getMiningSpeedMultiplier(stack, state);
     }
 }
 

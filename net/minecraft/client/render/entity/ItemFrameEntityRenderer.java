@@ -41,9 +41,9 @@ extends EntityRenderer<ItemFrameEntity> {
     private final MinecraftClient client = MinecraftClient.getInstance();
     private final ItemRenderer itemRenderer;
 
-    public ItemFrameEntityRenderer(EntityRenderDispatcher arg, ItemRenderer arg2) {
-        super(arg);
-        this.itemRenderer = arg2;
+    public ItemFrameEntityRenderer(EntityRenderDispatcher dispatcher, ItemRenderer itemRenderer) {
+        super(dispatcher);
+        this.itemRenderer = itemRenderer;
     }
 
     @Override

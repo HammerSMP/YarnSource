@@ -24,27 +24,27 @@ implements TickScheduler<T> {
     private final List<Tick<T>> scheduledTicks;
     private final Function<T, Identifier> identifierProvider;
 
-    public SimpleTickScheduler(Function<T, Identifier> function, List<ScheduledTick<T>> list, long l) {
-        this(function, list.stream().map(arg -> new Tick(arg.getObject(), arg.pos, (int)(arg.time - l), arg.priority)).collect(Collectors.toList()));
+    public SimpleTickScheduler(Function<T, Identifier> identifierProvider, List<ScheduledTick<T>> scheduledTicks, long startTime) {
+        this(identifierProvider, scheduledTicks.stream().map(arg -> new Tick(arg.getObject(), arg.pos, (int)(arg.time - startTime), arg.priority)).collect(Collectors.toList()));
     }
 
-    private SimpleTickScheduler(Function<T, Identifier> function, List<Tick<T>> list) {
-        this.scheduledTicks = list;
-        this.identifierProvider = function;
+    private SimpleTickScheduler(Function<T, Identifier> identifierProvider, List<Tick<T>> scheduledTicks) {
+        this.scheduledTicks = scheduledTicks;
+        this.identifierProvider = identifierProvider;
     }
 
     @Override
-    public boolean isScheduled(BlockPos arg, T object) {
+    public boolean isScheduled(BlockPos pos, T object) {
         return false;
     }
 
     @Override
-    public void schedule(BlockPos arg, T object, int i, TickPriority arg2) {
-        this.scheduledTicks.add(new Tick(object, arg, i, arg2));
+    public void schedule(BlockPos pos, T object, int delay, TickPriority priority) {
+        this.scheduledTicks.add(new Tick(object, pos, delay, priority));
     }
 
     @Override
-    public boolean isTicking(BlockPos arg, T object) {
+    public boolean isTicking(BlockPos pos, T object) {
         return false;
     }
 
@@ -63,10 +63,10 @@ implements TickScheduler<T> {
         return lv;
     }
 
-    public static <T> SimpleTickScheduler<T> fromNbt(ListTag arg, Function<T, Identifier> function, Function<Identifier, T> function2) {
+    public static <T> SimpleTickScheduler<T> fromNbt(ListTag ticks, Function<T, Identifier> function, Function<Identifier, T> function2) {
         ArrayList list = Lists.newArrayList();
-        for (int i = 0; i < arg.size(); ++i) {
-            CompoundTag lv = arg.getCompound(i);
+        for (int i = 0; i < ticks.size(); ++i) {
+            CompoundTag lv = ticks.getCompound(i);
             T object = function2.apply(new Identifier(lv.getString("i")));
             if (object == null) continue;
             BlockPos lv2 = new BlockPos(lv.getInt("x"), lv.getInt("y"), lv.getInt("z"));
@@ -75,8 +75,8 @@ implements TickScheduler<T> {
         return new SimpleTickScheduler<T>(function, list);
     }
 
-    public void scheduleTo(TickScheduler<T> arg) {
-        this.scheduledTicks.forEach(arg2 -> arg.schedule(arg2.pos, ((Tick)arg2).object, arg2.delay, arg2.priority));
+    public void scheduleTo(TickScheduler<T> scheduler) {
+        this.scheduledTicks.forEach(arg2 -> scheduler.schedule(arg2.pos, ((Tick)arg2).object, arg2.delay, arg2.priority));
     }
 
     static class Tick<T> {
@@ -85,11 +85,11 @@ implements TickScheduler<T> {
         public final int delay;
         public final TickPriority priority;
 
-        private Tick(T object, BlockPos arg, int i, TickPriority arg2) {
+        private Tick(T object, BlockPos pos, int delay, TickPriority priority) {
             this.object = object;
-            this.pos = arg;
-            this.delay = i;
-            this.priority = arg2;
+            this.pos = pos;
+            this.delay = delay;
+            this.priority = priority;
         }
 
         public String toString() {

@@ -40,15 +40,15 @@ extends AbstractDecorationEntity {
         super((EntityType<? extends AbstractDecorationEntity>)arg, arg2);
     }
 
-    public PaintingEntity(World arg, BlockPos arg2, Direction arg3) {
-        super(EntityType.PAINTING, arg, arg2);
+    public PaintingEntity(World world, BlockPos pos, Direction direction) {
+        super(EntityType.PAINTING, world, pos);
         ArrayList list = Lists.newArrayList();
         int i = 0;
         Iterator iterator = Registry.PAINTING_MOTIVE.iterator();
         while (iterator.hasNext()) {
             PaintingMotive lv;
             this.motive = lv = (PaintingMotive)iterator.next();
-            this.setFacing(arg3);
+            this.setFacing(direction);
             if (!this.canStayAttached()) continue;
             list.add(lv);
             int j = lv.getWidth() * lv.getHeight();
@@ -64,26 +64,26 @@ extends AbstractDecorationEntity {
             }
             this.motive = (PaintingMotive)list.get(this.random.nextInt(list.size()));
         }
-        this.setFacing(arg3);
+        this.setFacing(direction);
     }
 
     @Environment(value=EnvType.CLIENT)
-    public PaintingEntity(World arg, BlockPos arg2, Direction arg3, PaintingMotive arg4) {
-        this(arg, arg2, arg3);
-        this.motive = arg4;
-        this.setFacing(arg3);
+    public PaintingEntity(World world, BlockPos pos, Direction direction, PaintingMotive motive) {
+        this(world, pos, direction);
+        this.motive = motive;
+        this.setFacing(direction);
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        arg.putString("Motive", Registry.PAINTING_MOTIVE.getId(this.motive).toString());
-        super.writeCustomDataToTag(arg);
+    public void writeCustomDataToTag(CompoundTag tag) {
+        tag.putString("Motive", Registry.PAINTING_MOTIVE.getId(this.motive).toString());
+        super.writeCustomDataToTag(tag);
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        this.motive = Registry.PAINTING_MOTIVE.get(Identifier.tryParse(arg.getString("Motive")));
-        super.readCustomDataFromTag(arg);
+    public void readCustomDataFromTag(CompoundTag tag) {
+        this.motive = Registry.PAINTING_MOTIVE.get(Identifier.tryParse(tag.getString("Motive")));
+        super.readCustomDataFromTag(tag);
     }
 
     @Override
@@ -103,13 +103,13 @@ extends AbstractDecorationEntity {
     }
 
     @Override
-    public void onBreak(@Nullable Entity arg) {
+    public void onBreak(@Nullable Entity entity) {
         if (!this.world.getGameRules().getBoolean(GameRules.DO_ENTITY_DROPS)) {
             return;
         }
         this.playSound(SoundEvents.ENTITY_PAINTING_BREAK, 1.0f, 1.0f);
-        if (arg instanceof PlayerEntity) {
-            PlayerEntity lv = (PlayerEntity)arg;
+        if (entity instanceof PlayerEntity) {
+            PlayerEntity lv = (PlayerEntity)entity;
             if (lv.abilities.creativeMode) {
                 return;
             }
@@ -123,14 +123,14 @@ extends AbstractDecorationEntity {
     }
 
     @Override
-    public void refreshPositionAndAngles(double d, double e, double f, float g, float h) {
-        this.updatePosition(d, e, f);
+    public void refreshPositionAndAngles(double x, double y, double z, float yaw, float pitch) {
+        this.updatePosition(x, y, z);
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void updateTrackedPositionAndAngles(double d, double e, double f, float g, float h, int i, boolean bl) {
-        BlockPos lv = this.attachmentPos.add(d - this.getX(), e - this.getY(), f - this.getZ());
+    public void updateTrackedPositionAndAngles(double x, double y, double z, float yaw, float pitch, int interpolationSteps, boolean interpolate) {
+        BlockPos lv = this.attachmentPos.add(x - this.getX(), y - this.getY(), z - this.getZ());
         this.updatePosition(lv.getX(), lv.getY(), lv.getZ());
     }
 

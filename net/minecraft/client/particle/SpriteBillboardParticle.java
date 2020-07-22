@@ -27,8 +27,8 @@ extends BillboardParticle {
         super(arg, d, e, f, g, h, i);
     }
 
-    protected void setSprite(Sprite arg) {
-        this.sprite = arg;
+    protected void setSprite(Sprite sprite) {
+        this.sprite = sprite;
     }
 
     @Override
@@ -51,12 +51,12 @@ extends BillboardParticle {
         return this.sprite.getMaxV();
     }
 
-    public void setSprite(SpriteProvider arg) {
-        this.setSprite(arg.getSprite(this.random));
+    public void setSprite(SpriteProvider spriteProvider) {
+        this.setSprite(spriteProvider.getSprite(this.random));
     }
 
-    public void setSpriteForAge(SpriteProvider arg) {
-        this.setSprite(arg.getSprite(this.age, this.maxAge));
+    public void setSpriteForAge(SpriteProvider spriteProvider) {
+        this.setSprite(spriteProvider.getSprite(this.age, this.maxAge));
     }
 }
 

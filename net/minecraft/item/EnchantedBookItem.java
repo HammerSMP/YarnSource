@@ -34,17 +34,17 @@ extends Item {
     }
 
     @Override
-    public boolean hasGlint(ItemStack arg) {
+    public boolean hasGlint(ItemStack stack) {
         return true;
     }
 
     @Override
-    public boolean isEnchantable(ItemStack arg) {
+    public boolean isEnchantable(ItemStack stack) {
         return false;
     }
 
-    public static ListTag getEnchantmentTag(ItemStack arg) {
-        CompoundTag lv = arg.getTag();
+    public static ListTag getEnchantmentTag(ItemStack stack) {
+        CompoundTag lv = stack.getTag();
         if (lv != null) {
             return lv.getList("StoredEnchantments", 10);
         }
@@ -53,21 +53,21 @@ extends Item {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void appendTooltip(ItemStack arg, @Nullable World arg2, List<Text> list, TooltipContext arg3) {
-        super.appendTooltip(arg, arg2, list, arg3);
-        ItemStack.appendEnchantments(list, EnchantedBookItem.getEnchantmentTag(arg));
+    public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
+        super.appendTooltip(stack, world, tooltip, context);
+        ItemStack.appendEnchantments(tooltip, EnchantedBookItem.getEnchantmentTag(stack));
     }
 
-    public static void addEnchantment(ItemStack arg, EnchantmentLevelEntry arg2) {
-        ListTag lv = EnchantedBookItem.getEnchantmentTag(arg);
+    public static void addEnchantment(ItemStack stack, EnchantmentLevelEntry entry) {
+        ListTag lv = EnchantedBookItem.getEnchantmentTag(stack);
         boolean bl = true;
-        Identifier lv2 = Registry.ENCHANTMENT.getId(arg2.enchantment);
+        Identifier lv2 = Registry.ENCHANTMENT.getId(entry.enchantment);
         for (int i = 0; i < lv.size(); ++i) {
             CompoundTag lv3 = lv.getCompound(i);
             Identifier lv4 = Identifier.tryParse(lv3.getString("id"));
             if (lv4 == null || !lv4.equals(lv2)) continue;
-            if (lv3.getInt("lvl") < arg2.level) {
-                lv3.putShort("lvl", (short)arg2.level);
+            if (lv3.getInt("lvl") < entry.level) {
+                lv3.putShort("lvl", (short)entry.level);
             }
             bl = false;
             break;
@@ -75,35 +75,35 @@ extends Item {
         if (bl) {
             CompoundTag lv5 = new CompoundTag();
             lv5.putString("id", String.valueOf(lv2));
-            lv5.putShort("lvl", (short)arg2.level);
+            lv5.putShort("lvl", (short)entry.level);
             lv.add(lv5);
         }
-        arg.getOrCreateTag().put("StoredEnchantments", lv);
+        stack.getOrCreateTag().put("StoredEnchantments", lv);
     }
 
-    public static ItemStack forEnchantment(EnchantmentLevelEntry arg) {
+    public static ItemStack forEnchantment(EnchantmentLevelEntry info) {
         ItemStack lv = new ItemStack(Items.ENCHANTED_BOOK);
-        EnchantedBookItem.addEnchantment(lv, arg);
+        EnchantedBookItem.addEnchantment(lv, info);
         return lv;
     }
 
     @Override
-    public void appendStacks(ItemGroup arg, DefaultedList<ItemStack> arg2) {
+    public void appendStacks(ItemGroup group, DefaultedList<ItemStack> stacks) {
         block4: {
             block3: {
-                if (arg != ItemGroup.SEARCH) break block3;
+                if (group != ItemGroup.SEARCH) break block3;
                 for (Enchantment lv : Registry.ENCHANTMENT) {
                     if (lv.type == null) continue;
                     for (int i = lv.getMinLevel(); i <= lv.getMaxLevel(); ++i) {
-                        arg2.add(EnchantedBookItem.forEnchantment(new EnchantmentLevelEntry(lv, i)));
+                        stacks.add(EnchantedBookItem.forEnchantment(new EnchantmentLevelEntry(lv, i)));
                     }
                 }
                 break block4;
             }
-            if (arg.getEnchantments().length == 0) break block4;
+            if (group.getEnchantments().length == 0) break block4;
             for (Enchantment lv2 : Registry.ENCHANTMENT) {
-                if (!arg.containsEnchantments(lv2.type)) continue;
-                arg2.add(EnchantedBookItem.forEnchantment(new EnchantmentLevelEntry(lv2, lv2.getMaxLevel())));
+                if (!group.containsEnchantments(lv2.type)) continue;
+                stacks.add(EnchantedBookItem.forEnchantment(new EnchantmentLevelEntry(lv2, lv2.getMaxLevel())));
             }
         }
     }

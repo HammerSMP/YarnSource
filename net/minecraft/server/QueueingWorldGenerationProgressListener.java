@@ -23,19 +23,19 @@ implements WorldGenerationProgressListener {
     private final WorldGenerationProgressListener progressListener;
     private final TaskExecutor<Runnable> queue;
 
-    public QueueingWorldGenerationProgressListener(WorldGenerationProgressListener arg, Executor executor) {
-        this.progressListener = arg;
+    public QueueingWorldGenerationProgressListener(WorldGenerationProgressListener progressListener, Executor executor) {
+        this.progressListener = progressListener;
         this.queue = TaskExecutor.create(executor, "progressListener");
     }
 
     @Override
-    public void start(ChunkPos arg) {
-        this.queue.send(() -> this.progressListener.start(arg));
+    public void start(ChunkPos spawnPos) {
+        this.queue.send(() -> this.progressListener.start(spawnPos));
     }
 
     @Override
-    public void setChunkStatus(ChunkPos arg, @Nullable ChunkStatus arg2) {
-        this.queue.send(() -> this.progressListener.setChunkStatus(arg, arg2));
+    public void setChunkStatus(ChunkPos pos, @Nullable ChunkStatus status) {
+        this.queue.send(() -> this.progressListener.setChunkStatus(pos, status));
     }
 
     @Override

@@ -29,34 +29,34 @@ implements Packet<ClientPlayPacketListener> {
     public ScoreboardPlayerUpdateS2CPacket() {
     }
 
-    public ScoreboardPlayerUpdateS2CPacket(ServerScoreboard.UpdateMode arg, @Nullable String string, String string2, int i) {
-        if (arg != ServerScoreboard.UpdateMode.REMOVE && string == null) {
+    public ScoreboardPlayerUpdateS2CPacket(ServerScoreboard.UpdateMode mode, @Nullable String objectiveName, String playerName, int score) {
+        if (mode != ServerScoreboard.UpdateMode.REMOVE && objectiveName == null) {
             throw new IllegalArgumentException("Need an objective name");
         }
-        this.playerName = string2;
-        this.objectiveName = string;
-        this.score = i;
-        this.mode = arg;
+        this.playerName = playerName;
+        this.objectiveName = objectiveName;
+        this.score = score;
+        this.mode = mode;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.playerName = arg.readString(40);
-        this.mode = arg.readEnumConstant(ServerScoreboard.UpdateMode.class);
-        String string = arg.readString(16);
+    public void read(PacketByteBuf buf) throws IOException {
+        this.playerName = buf.readString(40);
+        this.mode = buf.readEnumConstant(ServerScoreboard.UpdateMode.class);
+        String string = buf.readString(16);
         String string2 = this.objectiveName = Objects.equals(string, "") ? null : string;
         if (this.mode != ServerScoreboard.UpdateMode.REMOVE) {
-            this.score = arg.readVarInt();
+            this.score = buf.readVarInt();
         }
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeString(this.playerName);
-        arg.writeEnumConstant(this.mode);
-        arg.writeString(this.objectiveName == null ? "" : this.objectiveName);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeString(this.playerName);
+        buf.writeEnumConstant(this.mode);
+        buf.writeString(this.objectiveName == null ? "" : this.objectiveName);
         if (this.mode != ServerScoreboard.UpdateMode.REMOVE) {
-            arg.writeVarInt(this.score);
+            buf.writeVarInt(this.score);
         }
     }
 

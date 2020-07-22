@@ -31,8 +31,8 @@ public class FoliagePlacerType<P extends FoliagePlacer> {
     public static final FoliagePlacerType<DarkOakFoliagePlacer> DARK_OAK_FOLIAGE_PLACER = FoliagePlacerType.register("dark_oak_foliage_placer", DarkOakFoliagePlacer.CODEC);
     private final Codec<P> codec;
 
-    private static <P extends FoliagePlacer> FoliagePlacerType<P> register(String string, Codec<P> codec) {
-        return Registry.register(Registry.FOLIAGE_PLACER_TYPE, string, new FoliagePlacerType<P>(codec));
+    private static <P extends FoliagePlacer> FoliagePlacerType<P> register(String id, Codec<P> codec) {
+        return Registry.register(Registry.FOLIAGE_PLACER_TYPE, id, new FoliagePlacerType<P>(codec));
     }
 
     private FoliagePlacerType(Codec<P> codec) {

@@ -25,18 +25,18 @@ public class PointOfInterest {
     private final Runnable updateListener;
 
     public static Codec<PointOfInterest> method_28359(Runnable runnable) {
-        return RecordCodecBuilder.create(instance -> instance.group((App)BlockPos.field_25064.fieldOf("pos").forGetter(arg -> arg.pos), (App)Registry.POINT_OF_INTEREST_TYPE.fieldOf("type").forGetter(arg -> arg.type), (App)Codec.INT.fieldOf("free_tickets").withDefault((Object)0).forGetter(arg -> arg.freeTickets), (App)RecordCodecBuilder.point((Object)runnable)).apply((Applicative)instance, PointOfInterest::new));
+        return RecordCodecBuilder.create(instance -> instance.group((App)BlockPos.field_25064.fieldOf("pos").forGetter(arg -> arg.pos), (App)Registry.POINT_OF_INTEREST_TYPE.fieldOf("type").forGetter(arg -> arg.type), (App)Codec.INT.fieldOf("free_tickets").orElse((Object)0).forGetter(arg -> arg.freeTickets), (App)RecordCodecBuilder.point((Object)runnable)).apply((Applicative)instance, PointOfInterest::new));
     }
 
-    private PointOfInterest(BlockPos arg, PointOfInterestType arg2, int i, Runnable runnable) {
-        this.pos = arg.toImmutable();
-        this.type = arg2;
-        this.freeTickets = i;
-        this.updateListener = runnable;
+    private PointOfInterest(BlockPos pos, PointOfInterestType type, int freeTickets, Runnable updateListener) {
+        this.pos = pos.toImmutable();
+        this.type = type;
+        this.freeTickets = freeTickets;
+        this.updateListener = updateListener;
     }
 
-    public PointOfInterest(BlockPos arg, PointOfInterestType arg2, Runnable runnable) {
-        this(arg, arg2, arg2.getTicketCount(), runnable);
+    public PointOfInterest(BlockPos pos, PointOfInterestType type, Runnable updateListener) {
+        this(pos, type, type.getTicketCount(), updateListener);
     }
 
     protected boolean reserveTicket() {
@@ -73,14 +73,14 @@ public class PointOfInterest {
         return this.type;
     }
 
-    public boolean equals(Object object) {
-        if (this == object) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
         }
-        if (object == null || this.getClass() != object.getClass()) {
+        if (obj == null || this.getClass() != obj.getClass()) {
             return false;
         }
-        return Objects.equals(this.pos, ((PointOfInterest)object).pos);
+        return Objects.equals(this.pos, ((PointOfInterest)obj).pos);
     }
 
     public int hashCode() {

@@ -21,26 +21,26 @@ extends SpriteBillboardParticle {
     private final SpriteProvider spriteProvider;
     private final double ascendingAcceleration;
 
-    protected AscendingParticle(ClientWorld arg, double d, double e, double f, float g, float h, float i, double j, double k, double l, float m, SpriteProvider arg2, float n, int o, double p, boolean bl) {
-        super(arg, d, e, f, 0.0, 0.0, 0.0);
+    protected AscendingParticle(ClientWorld world, double x, double y, double z, float randomVelocityXMultiplier, float randomVelocityYMultiplier, float randomVelocityZMultiplier, double velocityX, double velocityY, double velocityZ, float scaleMultiplier, SpriteProvider spriteProvider, float colorMultiplier, int baseMaxAge, double ascendingAcceleration, boolean collidesWithWorld) {
+        super(world, x, y, z, 0.0, 0.0, 0.0);
         float q;
-        this.ascendingAcceleration = p;
-        this.spriteProvider = arg2;
-        this.velocityX *= (double)g;
-        this.velocityY *= (double)h;
-        this.velocityZ *= (double)i;
-        this.velocityX += j;
-        this.velocityY += k;
-        this.velocityZ += l;
-        this.colorRed = q = arg.random.nextFloat() * n;
+        this.ascendingAcceleration = ascendingAcceleration;
+        this.spriteProvider = spriteProvider;
+        this.velocityX *= (double)randomVelocityXMultiplier;
+        this.velocityY *= (double)randomVelocityYMultiplier;
+        this.velocityZ *= (double)randomVelocityZMultiplier;
+        this.velocityX += velocityX;
+        this.velocityY += velocityY;
+        this.velocityZ += velocityZ;
+        this.colorRed = q = world.random.nextFloat() * colorMultiplier;
         this.colorGreen = q;
         this.colorBlue = q;
-        this.scale *= 0.75f * m;
-        this.maxAge = (int)((double)o / ((double)arg.random.nextFloat() * 0.8 + 0.2));
-        this.maxAge = (int)((float)this.maxAge * m);
+        this.scale *= 0.75f * scaleMultiplier;
+        this.maxAge = (int)((double)baseMaxAge / ((double)world.random.nextFloat() * 0.8 + 0.2));
+        this.maxAge = (int)((float)this.maxAge * scaleMultiplier);
         this.maxAge = Math.max(this.maxAge, 1);
-        this.setSpriteForAge(arg2);
-        this.collidesWithWorld = bl;
+        this.setSpriteForAge(spriteProvider);
+        this.collidesWithWorld = collidesWithWorld;
     }
 
     @Override
@@ -49,8 +49,8 @@ extends SpriteBillboardParticle {
     }
 
     @Override
-    public float getSize(float f) {
-        return this.scale * MathHelper.clamp(((float)this.age + f) / (float)this.maxAge * 32.0f, 0.0f, 1.0f);
+    public float getSize(float tickDelta) {
+        return this.scale * MathHelper.clamp(((float)this.age + tickDelta) / (float)this.maxAge * 32.0f, 0.0f, 1.0f);
     }
 
     @Override

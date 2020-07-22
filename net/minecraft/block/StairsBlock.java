@@ -70,62 +70,62 @@ implements Waterloggable {
     private final Block baseBlock;
     private final BlockState baseBlockState;
 
-    private static VoxelShape[] composeShapes(VoxelShape arg, VoxelShape arg2, VoxelShape arg3, VoxelShape arg4, VoxelShape arg5) {
-        return (VoxelShape[])IntStream.range(0, 16).mapToObj(i -> StairsBlock.composeShape(i, arg, arg2, arg3, arg4, arg5)).toArray(VoxelShape[]::new);
+    private static VoxelShape[] composeShapes(VoxelShape base, VoxelShape northWest, VoxelShape northEast, VoxelShape southWest, VoxelShape southEast) {
+        return (VoxelShape[])IntStream.range(0, 16).mapToObj(i -> StairsBlock.composeShape(i, base, northWest, northEast, southWest, southEast)).toArray(VoxelShape[]::new);
     }
 
-    private static VoxelShape composeShape(int i, VoxelShape arg, VoxelShape arg2, VoxelShape arg3, VoxelShape arg4, VoxelShape arg5) {
-        VoxelShape lv = arg;
+    private static VoxelShape composeShape(int i, VoxelShape base, VoxelShape northWest, VoxelShape northEast, VoxelShape southWest, VoxelShape southEast) {
+        VoxelShape lv = base;
         if ((i & 1) != 0) {
-            lv = VoxelShapes.union(lv, arg2);
+            lv = VoxelShapes.union(lv, northWest);
         }
         if ((i & 2) != 0) {
-            lv = VoxelShapes.union(lv, arg3);
+            lv = VoxelShapes.union(lv, northEast);
         }
         if ((i & 4) != 0) {
-            lv = VoxelShapes.union(lv, arg4);
+            lv = VoxelShapes.union(lv, southWest);
         }
         if ((i & 8) != 0) {
-            lv = VoxelShapes.union(lv, arg5);
+            lv = VoxelShapes.union(lv, southEast);
         }
         return lv;
     }
 
-    protected StairsBlock(BlockState arg, AbstractBlock.Settings arg2) {
-        super(arg2);
+    protected StairsBlock(BlockState baseBlockState, AbstractBlock.Settings settings) {
+        super(settings);
         this.setDefaultState((BlockState)((BlockState)((BlockState)((BlockState)((BlockState)this.stateManager.getDefaultState()).with(FACING, Direction.NORTH)).with(HALF, BlockHalf.BOTTOM)).with(SHAPE, StairShape.STRAIGHT)).with(WATERLOGGED, false));
-        this.baseBlock = arg.getBlock();
-        this.baseBlockState = arg;
+        this.baseBlock = baseBlockState.getBlock();
+        this.baseBlockState = baseBlockState;
     }
 
     @Override
-    public boolean hasSidedTransparency(BlockState arg) {
+    public boolean hasSidedTransparency(BlockState state) {
         return true;
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
-        return (arg.get(HALF) == BlockHalf.TOP ? TOP_SHAPES : BOTTOM_SHAPES)[SHAPE_INDICES[this.getShapeIndexIndex(arg)]];
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        return (state.get(HALF) == BlockHalf.TOP ? TOP_SHAPES : BOTTOM_SHAPES)[SHAPE_INDICES[this.getShapeIndexIndex(state)]];
     }
 
-    private int getShapeIndexIndex(BlockState arg) {
-        return arg.get(SHAPE).ordinal() * 4 + arg.get(FACING).getHorizontal();
+    private int getShapeIndexIndex(BlockState state) {
+        return state.get(SHAPE).ordinal() * 4 + state.get(FACING).getHorizontal();
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void randomDisplayTick(BlockState arg, World arg2, BlockPos arg3, Random random) {
-        this.baseBlock.randomDisplayTick(arg, arg2, arg3, random);
+    public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
+        this.baseBlock.randomDisplayTick(state, world, pos, random);
     }
 
     @Override
-    public void onBlockBreakStart(BlockState arg, World arg2, BlockPos arg3, PlayerEntity arg4) {
-        this.baseBlockState.onBlockBreakStart(arg2, arg3, arg4);
+    public void onBlockBreakStart(BlockState state, World world, BlockPos pos, PlayerEntity player) {
+        this.baseBlockState.onBlockBreakStart(world, pos, player);
     }
 
     @Override
-    public void onBroken(WorldAccess arg, BlockPos arg2, BlockState arg3) {
-        this.baseBlock.onBroken(arg, arg2, arg3);
+    public void onBroken(WorldAccess world, BlockPos pos, BlockState state) {
+        this.baseBlock.onBroken(world, pos, state);
     }
 
     @Override
@@ -134,85 +134,85 @@ implements Waterloggable {
     }
 
     @Override
-    public void onBlockAdded(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
-        if (arg.isOf(arg.getBlock())) {
+    public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
+        if (state.isOf(state.getBlock())) {
             return;
         }
-        this.baseBlockState.neighborUpdate(arg2, arg3, Blocks.AIR, arg3, false);
-        this.baseBlock.onBlockAdded(this.baseBlockState, arg2, arg3, arg4, false);
+        this.baseBlockState.neighborUpdate(world, pos, Blocks.AIR, pos, false);
+        this.baseBlock.onBlockAdded(this.baseBlockState, world, pos, oldState, false);
     }
 
     @Override
-    public void onStateReplaced(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
-        if (arg.isOf(arg4.getBlock())) {
+    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
+        if (state.isOf(newState.getBlock())) {
             return;
         }
-        this.baseBlockState.onStateReplaced(arg2, arg3, arg4, bl);
+        this.baseBlockState.onStateReplaced(world, pos, newState, moved);
     }
 
     @Override
-    public void onSteppedOn(World arg, BlockPos arg2, Entity arg3) {
-        this.baseBlock.onSteppedOn(arg, arg2, arg3);
+    public void onSteppedOn(World world, BlockPos pos, Entity entity) {
+        this.baseBlock.onSteppedOn(world, pos, entity);
     }
 
     @Override
-    public boolean hasRandomTicks(BlockState arg) {
-        return this.baseBlock.hasRandomTicks(arg);
+    public boolean hasRandomTicks(BlockState state) {
+        return this.baseBlock.hasRandomTicks(state);
     }
 
     @Override
-    public void randomTick(BlockState arg, ServerWorld arg2, BlockPos arg3, Random random) {
-        this.baseBlock.randomTick(arg, arg2, arg3, random);
+    public void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        this.baseBlock.randomTick(state, world, pos, random);
     }
 
     @Override
-    public void scheduledTick(BlockState arg, ServerWorld arg2, BlockPos arg3, Random random) {
-        this.baseBlock.scheduledTick(arg, arg2, arg3, random);
+    public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        this.baseBlock.scheduledTick(state, world, pos, random);
     }
 
     @Override
-    public ActionResult onUse(BlockState arg, World arg2, BlockPos arg3, PlayerEntity arg4, Hand arg5, BlockHitResult arg6) {
-        return this.baseBlockState.onUse(arg2, arg4, arg5, arg6);
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        return this.baseBlockState.onUse(world, player, hand, hit);
     }
 
     @Override
-    public void onDestroyedByExplosion(World arg, BlockPos arg2, Explosion arg3) {
-        this.baseBlock.onDestroyedByExplosion(arg, arg2, arg3);
+    public void onDestroyedByExplosion(World world, BlockPos pos, Explosion explosion) {
+        this.baseBlock.onDestroyedByExplosion(world, pos, explosion);
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext arg) {
-        Direction lv = arg.getSide();
-        BlockPos lv2 = arg.getBlockPos();
-        FluidState lv3 = arg.getWorld().getFluidState(lv2);
-        BlockState lv4 = (BlockState)((BlockState)((BlockState)this.getDefaultState().with(FACING, arg.getPlayerFacing())).with(HALF, lv == Direction.DOWN || lv != Direction.UP && arg.getHitPos().y - (double)lv2.getY() > 0.5 ? BlockHalf.TOP : BlockHalf.BOTTOM)).with(WATERLOGGED, lv3.getFluid() == Fluids.WATER);
-        return (BlockState)lv4.with(SHAPE, StairsBlock.getStairShape(lv4, arg.getWorld(), lv2));
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        Direction lv = ctx.getSide();
+        BlockPos lv2 = ctx.getBlockPos();
+        FluidState lv3 = ctx.getWorld().getFluidState(lv2);
+        BlockState lv4 = (BlockState)((BlockState)((BlockState)this.getDefaultState().with(FACING, ctx.getPlayerFacing())).with(HALF, lv == Direction.DOWN || lv != Direction.UP && ctx.getHitPos().y - (double)lv2.getY() > 0.5 ? BlockHalf.TOP : BlockHalf.BOTTOM)).with(WATERLOGGED, lv3.getFluid() == Fluids.WATER);
+        return (BlockState)lv4.with(SHAPE, StairsBlock.getStairShape(lv4, ctx.getWorld(), lv2));
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
-        if (arg.get(WATERLOGGED).booleanValue()) {
-            arg4.getFluidTickScheduler().schedule(arg5, Fluids.WATER, Fluids.WATER.getTickRate(arg4));
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
+        if (state.get(WATERLOGGED).booleanValue()) {
+            world.getFluidTickScheduler().schedule(pos, Fluids.WATER, Fluids.WATER.getTickRate(world));
         }
-        if (arg2.getAxis().isHorizontal()) {
-            return (BlockState)arg.with(SHAPE, StairsBlock.getStairShape(arg, arg4, arg5));
+        if (direction.getAxis().isHorizontal()) {
+            return (BlockState)state.with(SHAPE, StairsBlock.getStairShape(state, world, pos));
         }
-        return super.getStateForNeighborUpdate(arg, arg2, arg3, arg4, arg5, arg6);
+        return super.getStateForNeighborUpdate(state, direction, newState, world, pos, posFrom);
     }
 
-    private static StairShape getStairShape(BlockState arg, BlockView arg2, BlockPos arg3) {
+    private static StairShape getStairShape(BlockState state, BlockView world, BlockPos pos) {
         Direction lv5;
         Direction lv3;
-        Direction lv = arg.get(FACING);
-        BlockState lv2 = arg2.getBlockState(arg3.offset(lv));
-        if (StairsBlock.isStairs(lv2) && arg.get(HALF) == lv2.get(HALF) && (lv3 = lv2.get(FACING)).getAxis() != arg.get(FACING).getAxis() && StairsBlock.method_10678(arg, arg2, arg3, lv3.getOpposite())) {
+        Direction lv = state.get(FACING);
+        BlockState lv2 = world.getBlockState(pos.offset(lv));
+        if (StairsBlock.isStairs(lv2) && state.get(HALF) == lv2.get(HALF) && (lv3 = lv2.get(FACING)).getAxis() != state.get(FACING).getAxis() && StairsBlock.method_10678(state, world, pos, lv3.getOpposite())) {
             if (lv3 == lv.rotateYCounterclockwise()) {
                 return StairShape.OUTER_LEFT;
             }
             return StairShape.OUTER_RIGHT;
         }
-        BlockState lv4 = arg2.getBlockState(arg3.offset(lv.getOpposite()));
-        if (StairsBlock.isStairs(lv4) && arg.get(HALF) == lv4.get(HALF) && (lv5 = lv4.get(FACING)).getAxis() != arg.get(FACING).getAxis() && StairsBlock.method_10678(arg, arg2, arg3, lv5)) {
+        BlockState lv4 = world.getBlockState(pos.offset(lv.getOpposite()));
+        if (StairsBlock.isStairs(lv4) && state.get(HALF) == lv4.get(HALF) && (lv5 = lv4.get(FACING)).getAxis() != state.get(FACING).getAxis() && StairsBlock.method_10678(state, world, pos, lv5)) {
             if (lv5 == lv.rotateYCounterclockwise()) {
                 return StairShape.INNER_LEFT;
             }
@@ -221,83 +221,83 @@ implements Waterloggable {
         return StairShape.STRAIGHT;
     }
 
-    private static boolean method_10678(BlockState arg, BlockView arg2, BlockPos arg3, Direction arg4) {
-        BlockState lv = arg2.getBlockState(arg3.offset(arg4));
-        return !StairsBlock.isStairs(lv) || lv.get(FACING) != arg.get(FACING) || lv.get(HALF) != arg.get(HALF);
+    private static boolean method_10678(BlockState state, BlockView world, BlockPos pos, Direction dir) {
+        BlockState lv = world.getBlockState(pos.offset(dir));
+        return !StairsBlock.isStairs(lv) || lv.get(FACING) != state.get(FACING) || lv.get(HALF) != state.get(HALF);
     }
 
-    public static boolean isStairs(BlockState arg) {
-        return arg.getBlock() instanceof StairsBlock;
-    }
-
-    @Override
-    public BlockState rotate(BlockState arg, BlockRotation arg2) {
-        return (BlockState)arg.with(FACING, arg2.rotate(arg.get(FACING)));
+    public static boolean isStairs(BlockState state) {
+        return state.getBlock() instanceof StairsBlock;
     }
 
     @Override
-    public BlockState mirror(BlockState arg, BlockMirror arg2) {
-        Direction lv = arg.get(FACING);
-        StairShape lv2 = arg.get(SHAPE);
-        switch (arg2) {
+    public BlockState rotate(BlockState state, BlockRotation rotation) {
+        return (BlockState)state.with(FACING, rotation.rotate(state.get(FACING)));
+    }
+
+    @Override
+    public BlockState mirror(BlockState state, BlockMirror mirror) {
+        Direction lv = state.get(FACING);
+        StairShape lv2 = state.get(SHAPE);
+        switch (mirror) {
             case LEFT_RIGHT: {
                 if (lv.getAxis() != Direction.Axis.Z) break;
                 switch (lv2) {
                     case INNER_LEFT: {
-                        return (BlockState)arg.rotate(BlockRotation.CLOCKWISE_180).with(SHAPE, StairShape.INNER_RIGHT);
+                        return (BlockState)state.rotate(BlockRotation.CLOCKWISE_180).with(SHAPE, StairShape.INNER_RIGHT);
                     }
                     case INNER_RIGHT: {
-                        return (BlockState)arg.rotate(BlockRotation.CLOCKWISE_180).with(SHAPE, StairShape.INNER_LEFT);
+                        return (BlockState)state.rotate(BlockRotation.CLOCKWISE_180).with(SHAPE, StairShape.INNER_LEFT);
                     }
                     case OUTER_LEFT: {
-                        return (BlockState)arg.rotate(BlockRotation.CLOCKWISE_180).with(SHAPE, StairShape.OUTER_RIGHT);
+                        return (BlockState)state.rotate(BlockRotation.CLOCKWISE_180).with(SHAPE, StairShape.OUTER_RIGHT);
                     }
                     case OUTER_RIGHT: {
-                        return (BlockState)arg.rotate(BlockRotation.CLOCKWISE_180).with(SHAPE, StairShape.OUTER_LEFT);
+                        return (BlockState)state.rotate(BlockRotation.CLOCKWISE_180).with(SHAPE, StairShape.OUTER_LEFT);
                     }
                 }
-                return arg.rotate(BlockRotation.CLOCKWISE_180);
+                return state.rotate(BlockRotation.CLOCKWISE_180);
             }
             case FRONT_BACK: {
                 if (lv.getAxis() != Direction.Axis.X) break;
                 switch (lv2) {
                     case INNER_LEFT: {
-                        return (BlockState)arg.rotate(BlockRotation.CLOCKWISE_180).with(SHAPE, StairShape.INNER_LEFT);
+                        return (BlockState)state.rotate(BlockRotation.CLOCKWISE_180).with(SHAPE, StairShape.INNER_LEFT);
                     }
                     case INNER_RIGHT: {
-                        return (BlockState)arg.rotate(BlockRotation.CLOCKWISE_180).with(SHAPE, StairShape.INNER_RIGHT);
+                        return (BlockState)state.rotate(BlockRotation.CLOCKWISE_180).with(SHAPE, StairShape.INNER_RIGHT);
                     }
                     case OUTER_LEFT: {
-                        return (BlockState)arg.rotate(BlockRotation.CLOCKWISE_180).with(SHAPE, StairShape.OUTER_RIGHT);
+                        return (BlockState)state.rotate(BlockRotation.CLOCKWISE_180).with(SHAPE, StairShape.OUTER_RIGHT);
                     }
                     case OUTER_RIGHT: {
-                        return (BlockState)arg.rotate(BlockRotation.CLOCKWISE_180).with(SHAPE, StairShape.OUTER_LEFT);
+                        return (BlockState)state.rotate(BlockRotation.CLOCKWISE_180).with(SHAPE, StairShape.OUTER_LEFT);
                     }
                     case STRAIGHT: {
-                        return arg.rotate(BlockRotation.CLOCKWISE_180);
+                        return state.rotate(BlockRotation.CLOCKWISE_180);
                     }
                 }
                 break;
             }
         }
-        return super.mirror(arg, arg2);
+        return super.mirror(state, mirror);
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(FACING, HALF, SHAPE, WATERLOGGED);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(FACING, HALF, SHAPE, WATERLOGGED);
     }
 
     @Override
-    public FluidState getFluidState(BlockState arg) {
-        if (arg.get(WATERLOGGED).booleanValue()) {
+    public FluidState getFluidState(BlockState state) {
+        if (state.get(WATERLOGGED).booleanValue()) {
             return Fluids.WATER.getStill(false);
         }
-        return super.getFluidState(arg);
+        return super.getFluidState(state);
     }
 
     @Override
-    public boolean canPathfindThrough(BlockState arg, BlockView arg2, BlockPos arg3, NavigationType arg4) {
+    public boolean canPathfindThrough(BlockState state, BlockView world, BlockPos pos, NavigationType type) {
         return false;
     }
 }

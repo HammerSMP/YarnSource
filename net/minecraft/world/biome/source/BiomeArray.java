@@ -3,16 +3,19 @@
  * 
  * Could not load the following classes:
  *  javax.annotation.Nullable
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
  *  org.apache.logging.log4j.LogManager
  *  org.apache.logging.log4j.Logger
  */
 package net.minecraft.world.biome.source;
 
 import javax.annotation.Nullable;
-import net.minecraft.network.PacketByteBuf;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.util.collection.IndexedIterable;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.biome.source.BiomeAccess;
@@ -28,21 +31,24 @@ implements BiomeAccess.Storage {
     public static final int DEFAULT_LENGTH = 1 << HORIZONTAL_SECTION_COUNT + HORIZONTAL_SECTION_COUNT + VERTICAL_SECTION_COUNT;
     public static final int HORIZONTAL_BIT_MASK = (1 << HORIZONTAL_SECTION_COUNT) - 1;
     public static final int VERTICAL_BIT_MASK = (1 << VERTICAL_SECTION_COUNT) - 1;
+    private final IndexedIterable<Biome> field_25831;
     private final Biome[] data;
 
-    public BiomeArray(Biome[] args) {
+    public BiomeArray(IndexedIterable<Biome> arg, Biome[] args) {
+        this.field_25831 = arg;
         this.data = args;
     }
 
-    private BiomeArray() {
-        this(new Biome[DEFAULT_LENGTH]);
+    private BiomeArray(IndexedIterable<Biome> arg) {
+        this(arg, new Biome[DEFAULT_LENGTH]);
     }
 
-    public BiomeArray(PacketByteBuf arg) {
-        this();
+    @Environment(value=EnvType.CLIENT)
+    public BiomeArray(IndexedIterable<Biome> arg, int[] is) {
+        this(arg);
         for (int i = 0; i < this.data.length; ++i) {
-            int j = arg.readInt();
-            Biome lv = (Biome)Registry.BIOME.get(j);
+            int j = is[i];
+            Biome lv = arg.get(j);
             if (lv == null) {
                 LOGGER.warn("Received invalid biome id: " + j);
                 this.data[i] = Biomes.PLAINS;
@@ -52,37 +58,37 @@ implements BiomeAccess.Storage {
         }
     }
 
-    public BiomeArray(ChunkPos arg, BiomeSource arg2) {
-        this();
-        int i = arg.getStartX() >> 2;
-        int j = arg.getStartZ() >> 2;
+    public BiomeArray(IndexedIterable<Biome> arg, ChunkPos arg2, BiomeSource arg3) {
+        this(arg);
+        int i = arg2.getStartX() >> 2;
+        int j = arg2.getStartZ() >> 2;
         for (int k = 0; k < this.data.length; ++k) {
             int l = k & HORIZONTAL_BIT_MASK;
             int m = k >> HORIZONTAL_SECTION_COUNT + HORIZONTAL_SECTION_COUNT & VERTICAL_BIT_MASK;
             int n = k >> HORIZONTAL_SECTION_COUNT & HORIZONTAL_BIT_MASK;
-            this.data[k] = arg2.getBiomeForNoiseGen(i + l, m, j + n);
+            this.data[k] = arg3.getBiomeForNoiseGen(i + l, m, j + n);
         }
     }
 
-    public BiomeArray(ChunkPos arg, BiomeSource arg2, @Nullable int[] is) {
-        this();
-        int i = arg.getStartX() >> 2;
-        int j = arg.getStartZ() >> 2;
+    public BiomeArray(IndexedIterable<Biome> arg, ChunkPos arg2, BiomeSource arg3, @Nullable int[] is) {
+        this(arg);
+        int i = arg2.getStartX() >> 2;
+        int j = arg2.getStartZ() >> 2;
         if (is != null) {
             for (int k = 0; k < is.length; ++k) {
-                this.data[k] = (Biome)Registry.BIOME.get(is[k]);
+                this.data[k] = arg.get(is[k]);
                 if (this.data[k] != null) continue;
                 int l = k & HORIZONTAL_BIT_MASK;
                 int m = k >> HORIZONTAL_SECTION_COUNT + HORIZONTAL_SECTION_COUNT & VERTICAL_BIT_MASK;
                 int n = k >> HORIZONTAL_SECTION_COUNT & HORIZONTAL_BIT_MASK;
-                this.data[k] = arg2.getBiomeForNoiseGen(i + l, m, j + n);
+                this.data[k] = arg3.getBiomeForNoiseGen(i + l, m, j + n);
             }
         } else {
             for (int o = 0; o < this.data.length; ++o) {
                 int p = o & HORIZONTAL_BIT_MASK;
                 int q = o >> HORIZONTAL_SECTION_COUNT + HORIZONTAL_SECTION_COUNT & VERTICAL_BIT_MASK;
                 int r = o >> HORIZONTAL_SECTION_COUNT & HORIZONTAL_BIT_MASK;
-                this.data[o] = arg2.getBiomeForNoiseGen(i + p, q, j + r);
+                this.data[o] = arg3.getBiomeForNoiseGen(i + p, q, j + r);
             }
         }
     }
@@ -90,26 +96,16 @@ implements BiomeAccess.Storage {
     public int[] toIntArray() {
         int[] is = new int[this.data.length];
         for (int i = 0; i < this.data.length; ++i) {
-            is[i] = Registry.BIOME.getRawId(this.data[i]);
+            is[i] = this.field_25831.getRawId(this.data[i]);
         }
         return is;
     }
 
-    public void toPacket(PacketByteBuf arg) {
-        for (Biome lv : this.data) {
-            arg.writeInt(Registry.BIOME.getRawId(lv));
-        }
-    }
-
-    public BiomeArray copy() {
-        return new BiomeArray((Biome[])this.data.clone());
-    }
-
     @Override
-    public Biome getBiomeForNoiseGen(int i, int j, int k) {
-        int l = i & HORIZONTAL_BIT_MASK;
-        int m = MathHelper.clamp(j, 0, VERTICAL_BIT_MASK);
-        int n = k & HORIZONTAL_BIT_MASK;
+    public Biome getBiomeForNoiseGen(int biomeX, int biomeY, int biomeZ) {
+        int l = biomeX & HORIZONTAL_BIT_MASK;
+        int m = MathHelper.clamp(biomeY, 0, VERTICAL_BIT_MASK);
+        int n = biomeZ & HORIZONTAL_BIT_MASK;
         return this.data[m << HORIZONTAL_SECTION_COUNT + HORIZONTAL_SECTION_COUNT | n << HORIZONTAL_SECTION_COUNT | l];
     }
 }

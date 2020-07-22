@@ -35,8 +35,8 @@ import net.minecraft.potion.PotionUtil;
 import net.minecraft.predicate.NbtPredicate;
 import net.minecraft.predicate.NumberRange;
 import net.minecraft.predicate.item.EnchantmentPredicate;
+import net.minecraft.tag.ServerTagManagerHolder;
 import net.minecraft.tag.Tag;
-import net.minecraft.tag.TagContainers;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.registry.Registry;
@@ -66,62 +66,62 @@ public class ItemPredicate {
         this.nbt = NbtPredicate.ANY;
     }
 
-    public ItemPredicate(@Nullable Tag<Item> arg, @Nullable Item arg2, NumberRange.IntRange arg3, NumberRange.IntRange arg4, EnchantmentPredicate[] args, EnchantmentPredicate[] args2, @Nullable Potion arg5, NbtPredicate arg6) {
-        this.tag = arg;
-        this.item = arg2;
-        this.count = arg3;
-        this.durability = arg4;
-        this.enchantments = args;
-        this.storedEnchantments = args2;
-        this.potion = arg5;
-        this.nbt = arg6;
+    public ItemPredicate(@Nullable Tag<Item> tag, @Nullable Item item, NumberRange.IntRange count, NumberRange.IntRange durability, EnchantmentPredicate[] enchantments, EnchantmentPredicate[] storedEnchantments, @Nullable Potion potion, NbtPredicate nbt) {
+        this.tag = tag;
+        this.item = item;
+        this.count = count;
+        this.durability = durability;
+        this.enchantments = enchantments;
+        this.storedEnchantments = storedEnchantments;
+        this.potion = potion;
+        this.nbt = nbt;
     }
 
-    public boolean test(ItemStack arg) {
+    public boolean test(ItemStack stack) {
         if (this == ANY) {
             return true;
         }
-        if (this.tag != null && !this.tag.contains(arg.getItem())) {
+        if (this.tag != null && !this.tag.contains(stack.getItem())) {
             return false;
         }
-        if (this.item != null && arg.getItem() != this.item) {
+        if (this.item != null && stack.getItem() != this.item) {
             return false;
         }
-        if (!this.count.test(arg.getCount())) {
+        if (!this.count.test(stack.getCount())) {
             return false;
         }
-        if (!this.durability.isDummy() && !arg.isDamageable()) {
+        if (!this.durability.isDummy() && !stack.isDamageable()) {
             return false;
         }
-        if (!this.durability.test(arg.getMaxDamage() - arg.getDamage())) {
+        if (!this.durability.test(stack.getMaxDamage() - stack.getDamage())) {
             return false;
         }
-        if (!this.nbt.test(arg)) {
+        if (!this.nbt.test(stack)) {
             return false;
         }
         if (this.enchantments.length > 0) {
-            Map<Enchantment, Integer> map = EnchantmentHelper.fromTag(arg.getEnchantments());
+            Map<Enchantment, Integer> map = EnchantmentHelper.fromTag(stack.getEnchantments());
             for (EnchantmentPredicate lv : this.enchantments) {
                 if (lv.test(map)) continue;
                 return false;
             }
         }
         if (this.storedEnchantments.length > 0) {
-            Map<Enchantment, Integer> map2 = EnchantmentHelper.fromTag(EnchantedBookItem.getEnchantmentTag(arg));
+            Map<Enchantment, Integer> map2 = EnchantmentHelper.fromTag(EnchantedBookItem.getEnchantmentTag(stack));
             for (EnchantmentPredicate lv2 : this.storedEnchantments) {
                 if (lv2.test(map2)) continue;
                 return false;
             }
         }
-        Potion lv3 = PotionUtil.getPotion(arg);
+        Potion lv3 = PotionUtil.getPotion(stack);
         return this.potion == null || this.potion == lv3;
     }
 
-    public static ItemPredicate fromJson(@Nullable JsonElement jsonElement) {
-        if (jsonElement == null || jsonElement.isJsonNull()) {
+    public static ItemPredicate fromJson(@Nullable JsonElement el) {
+        if (el == null || el.isJsonNull()) {
             return ANY;
         }
-        JsonObject jsonObject = JsonHelper.asObject(jsonElement, "item");
+        JsonObject jsonObject = JsonHelper.asObject(el, "item");
         NumberRange.IntRange lv = NumberRange.IntRange.fromJson(jsonObject.get("count"));
         NumberRange.IntRange lv2 = NumberRange.IntRange.fromJson(jsonObject.get("durability"));
         if (jsonObject.has("data")) {
@@ -131,12 +131,12 @@ public class ItemPredicate {
         Item lv4 = null;
         if (jsonObject.has("item")) {
             Identifier lv5 = new Identifier(JsonHelper.getString(jsonObject, "item"));
-            lv4 = (Item)Registry.ITEM.getOrEmpty(lv5).orElseThrow(() -> new JsonSyntaxException("Unknown item id '" + lv5 + "'"));
+            lv4 = Registry.ITEM.getOrEmpty(lv5).orElseThrow(() -> new JsonSyntaxException("Unknown item id '" + lv5 + "'"));
         }
         Tag<Item> lv6 = null;
         if (jsonObject.has("tag")) {
             Identifier lv7 = new Identifier(JsonHelper.getString(jsonObject, "tag"));
-            lv6 = TagContainers.instance().method_30218().method_30210(lv7);
+            lv6 = ServerTagManagerHolder.getTagManager().getItems().getTag(lv7);
             if (lv6 == null) {
                 throw new JsonSyntaxException("Unknown item tag '" + lv7 + "'");
             }
@@ -144,7 +144,7 @@ public class ItemPredicate {
         Potion lv8 = null;
         if (jsonObject.has("potion")) {
             Identifier lv9 = new Identifier(JsonHelper.getString(jsonObject, "potion"));
-            lv8 = (Potion)Registry.POTION.getOrEmpty(lv9).orElseThrow(() -> new JsonSyntaxException("Unknown potion '" + lv9 + "'"));
+            lv8 = Registry.POTION.getOrEmpty(lv9).orElseThrow(() -> new JsonSyntaxException("Unknown potion '" + lv9 + "'"));
         }
         EnchantmentPredicate[] lvs = EnchantmentPredicate.deserializeAll(jsonObject.get("enchantments"));
         EnchantmentPredicate[] lvs2 = EnchantmentPredicate.deserializeAll(jsonObject.get("stored_enchantments"));
@@ -160,7 +160,7 @@ public class ItemPredicate {
             jsonObject.addProperty("item", Registry.ITEM.getId(this.item).toString());
         }
         if (this.tag != null) {
-            jsonObject.addProperty("tag", TagContainers.instance().method_30218().method_30212(this.tag).toString());
+            jsonObject.addProperty("tag", ServerTagManagerHolder.getTagManager().getItems().getTagId(this.tag).toString());
         }
         jsonObject.add("count", this.count.toJson());
         jsonObject.add("durability", this.durability.toJson());
@@ -185,11 +185,11 @@ public class ItemPredicate {
         return jsonObject;
     }
 
-    public static ItemPredicate[] deserializeAll(@Nullable JsonElement jsonElement) {
-        if (jsonElement == null || jsonElement.isJsonNull()) {
+    public static ItemPredicate[] deserializeAll(@Nullable JsonElement el) {
+        if (el == null || el.isJsonNull()) {
             return new ItemPredicate[0];
         }
-        JsonArray jsonArray = JsonHelper.asArray(jsonElement, "items");
+        JsonArray jsonArray = JsonHelper.asArray(el, "items");
         ItemPredicate[] lvs = new ItemPredicate[jsonArray.size()];
         for (int i = 0; i < lvs.length; ++i) {
             lvs[i] = ItemPredicate.fromJson(jsonArray.get(i));
@@ -217,23 +217,23 @@ public class ItemPredicate {
             return new Builder();
         }
 
-        public Builder item(ItemConvertible arg) {
-            this.item = arg.asItem();
+        public Builder item(ItemConvertible item) {
+            this.item = item.asItem();
             return this;
         }
 
-        public Builder tag(Tag<Item> arg) {
-            this.tag = arg;
+        public Builder tag(Tag<Item> tag) {
+            this.tag = tag;
             return this;
         }
 
-        public Builder nbt(CompoundTag arg) {
-            this.nbt = new NbtPredicate(arg);
+        public Builder nbt(CompoundTag nbt) {
+            this.nbt = new NbtPredicate(nbt);
             return this;
         }
 
-        public Builder enchantment(EnchantmentPredicate arg) {
-            this.enchantments.add(arg);
+        public Builder enchantment(EnchantmentPredicate enchantment) {
+            this.enchantments.add(enchantment);
             return this;
         }
 

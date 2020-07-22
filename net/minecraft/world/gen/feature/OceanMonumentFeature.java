@@ -19,6 +19,7 @@ import net.minecraft.structure.StructureStart;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.registry.DynamicRegistryManager;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.source.BiomeSource;
@@ -37,7 +38,7 @@ extends StructureFeature<DefaultFeatureConfig> {
     }
 
     @Override
-    protected boolean method_27219() {
+    protected boolean isUniformDistribution() {
         return false;
     }
 
@@ -75,13 +76,13 @@ extends StructureFeature<DefaultFeatureConfig> {
         }
 
         @Override
-        public void init(ChunkGenerator arg, StructureManager arg2, int i, int j, Biome arg3, DefaultFeatureConfig arg4) {
+        public void init(DynamicRegistryManager arg, ChunkGenerator arg2, StructureManager arg3, int i, int j, Biome arg4, DefaultFeatureConfig arg5) {
             this.method_16588(i, j);
         }
 
-        private void method_16588(int i, int j) {
-            int k = i * 16 - 29;
-            int l = j * 16 - 29;
+        private void method_16588(int chunkX, int chunkZ) {
+            int k = chunkX * 16 - 29;
+            int l = chunkZ * 16 - 29;
             Direction lv = Direction.Type.HORIZONTAL.random(this.random);
             this.children.add(new OceanMonumentGenerator.Base(this.random, k, l, lv));
             this.setBoundingBoxFromChildren();

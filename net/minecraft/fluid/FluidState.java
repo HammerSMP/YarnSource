@@ -36,8 +36,8 @@ public final class FluidState
 extends State<Fluid, FluidState> {
     public static final Codec<FluidState> CODEC = FluidState.createCodec(Registry.FLUID, Fluid::getDefaultState).stable();
 
-    public FluidState(Fluid arg, ImmutableMap<Property<?>, Comparable<?>> immutableMap, MapCodec<FluidState> mapCodec) {
-        super(arg, immutableMap, mapCodec);
+    public FluidState(Fluid fluid, ImmutableMap<Property<?>, Comparable<?>> propertiesMap, MapCodec<FluidState> mapCodec) {
+        super(fluid, propertiesMap, mapCodec);
     }
 
     public Fluid getFluid() {
@@ -52,8 +52,8 @@ extends State<Fluid, FluidState> {
         return this.getFluid().isEmpty();
     }
 
-    public float getHeight(BlockView arg, BlockPos arg2) {
-        return this.getFluid().getHeight(this, arg, arg2);
+    public float getHeight(BlockView world, BlockPos pos) {
+        return this.getFluid().getHeight(this, world, pos);
     }
 
     public float getHeight() {
@@ -65,37 +65,37 @@ extends State<Fluid, FluidState> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public boolean method_15756(BlockView arg, BlockPos arg2) {
+    public boolean method_15756(BlockView world, BlockPos pos) {
         for (int i = -1; i <= 1; ++i) {
             for (int j = -1; j <= 1; ++j) {
-                BlockPos lv = arg2.add(i, 0, j);
-                FluidState lv2 = arg.getFluidState(lv);
-                if (lv2.getFluid().matchesType(this.getFluid()) || arg.getBlockState(lv).isOpaqueFullCube(arg, lv)) continue;
+                BlockPos lv = pos.add(i, 0, j);
+                FluidState lv2 = world.getFluidState(lv);
+                if (lv2.getFluid().matchesType(this.getFluid()) || world.getBlockState(lv).isOpaqueFullCube(world, lv)) continue;
                 return true;
             }
         }
         return false;
     }
 
-    public void onScheduledTick(World arg, BlockPos arg2) {
-        this.getFluid().onScheduledTick(arg, arg2, this);
+    public void onScheduledTick(World world, BlockPos pos) {
+        this.getFluid().onScheduledTick(world, pos, this);
     }
 
     @Environment(value=EnvType.CLIENT)
-    public void randomDisplayTick(World arg, BlockPos arg2, Random random) {
-        this.getFluid().randomDisplayTick(arg, arg2, this, random);
+    public void randomDisplayTick(World world, BlockPos pos, Random random) {
+        this.getFluid().randomDisplayTick(world, pos, this, random);
     }
 
     public boolean hasRandomTicks() {
         return this.getFluid().hasRandomTicks();
     }
 
-    public void onRandomTick(World arg, BlockPos arg2, Random random) {
-        this.getFluid().onRandomTick(arg, arg2, this, random);
+    public void onRandomTick(World world, BlockPos pos, Random random) {
+        this.getFluid().onRandomTick(world, pos, this, random);
     }
 
-    public Vec3d getVelocity(BlockView arg, BlockPos arg2) {
-        return this.getFluid().getVelocity(arg, arg2, this);
+    public Vec3d getVelocity(BlockView world, BlockPos pos) {
+        return this.getFluid().getVelocity(world, pos, this);
     }
 
     public BlockState getBlockState() {
@@ -108,20 +108,20 @@ extends State<Fluid, FluidState> {
         return this.getFluid().getParticle();
     }
 
-    public boolean isIn(Tag<Fluid> arg) {
-        return this.getFluid().isIn(arg);
+    public boolean isIn(Tag<Fluid> tag) {
+        return this.getFluid().isIn(tag);
     }
 
     public float getBlastResistance() {
         return this.getFluid().getBlastResistance();
     }
 
-    public boolean canBeReplacedWith(BlockView arg, BlockPos arg2, Fluid arg3, Direction arg4) {
-        return this.getFluid().canBeReplacedWith(this, arg, arg2, arg3, arg4);
+    public boolean canBeReplacedWith(BlockView world, BlockPos pos, Fluid fluid, Direction direction) {
+        return this.getFluid().canBeReplacedWith(this, world, pos, fluid, direction);
     }
 
-    public VoxelShape getShape(BlockView arg, BlockPos arg2) {
-        return this.getFluid().getShape(this, arg, arg2);
+    public VoxelShape getShape(BlockView world, BlockPos pos) {
+        return this.getFluid().getShape(this, world, pos);
     }
 }
 

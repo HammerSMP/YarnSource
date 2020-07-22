@@ -22,15 +22,15 @@ extends Task<LivingEntity> {
     private final float speed;
     private final int completionRange;
 
-    public GoTowardsLookTarget(float f, int i) {
+    public GoTowardsLookTarget(float speed, int completionRange) {
         super((Map<MemoryModuleType<?>, MemoryModuleState>)ImmutableMap.of(MemoryModuleType.WALK_TARGET, (Object)((Object)MemoryModuleState.VALUE_ABSENT), MemoryModuleType.LOOK_TARGET, (Object)((Object)MemoryModuleState.VALUE_PRESENT)));
-        this.speed = f;
-        this.completionRange = i;
+        this.speed = speed;
+        this.completionRange = completionRange;
     }
 
     @Override
-    protected void run(ServerWorld arg, LivingEntity arg2, long l) {
-        Brain<?> lv = arg2.getBrain();
+    protected void run(ServerWorld world, LivingEntity entity, long time) {
+        Brain<?> lv = entity.getBrain();
         LookTarget lv2 = lv.getOptionalMemory(MemoryModuleType.LOOK_TARGET).get();
         lv.remember(MemoryModuleType.WALK_TARGET, new WalkTarget(lv2, this.speed, this.completionRange));
     }

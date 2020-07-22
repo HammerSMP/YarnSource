@@ -26,18 +26,18 @@ import net.minecraft.world.WorldView;
 
 public class GravityStructureProcessor
 extends StructureProcessor {
-    public static final Codec<GravityStructureProcessor> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Heightmap.Type.field_24772.fieldOf("heightmap").withDefault((Object)Heightmap.Type.WORLD_SURFACE_WG).forGetter(arg -> arg.heightmap), (App)Codec.INT.fieldOf("offset").withDefault((Object)0).forGetter(arg -> arg.offset)).apply((Applicative)instance, GravityStructureProcessor::new));
+    public static final Codec<GravityStructureProcessor> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Heightmap.Type.field_24772.fieldOf("heightmap").orElse((Object)Heightmap.Type.WORLD_SURFACE_WG).forGetter(arg -> arg.heightmap), (App)Codec.INT.fieldOf("offset").orElse((Object)0).forGetter(arg -> arg.offset)).apply((Applicative)instance, GravityStructureProcessor::new));
     private final Heightmap.Type heightmap;
     private final int offset;
 
-    public GravityStructureProcessor(Heightmap.Type arg, int i) {
-        this.heightmap = arg;
-        this.offset = i;
+    public GravityStructureProcessor(Heightmap.Type heightmap, int offset) {
+        this.heightmap = heightmap;
+        this.offset = offset;
     }
 
     @Override
     @Nullable
-    public Structure.StructureBlockInfo process(WorldView arg, BlockPos arg2, BlockPos arg3, Structure.StructureBlockInfo arg4, Structure.StructureBlockInfo arg5, StructurePlacementData arg6) {
+    public Structure.StructureBlockInfo process(WorldView arg, BlockPos pos, BlockPos arg3, Structure.StructureBlockInfo arg4, Structure.StructureBlockInfo arg5, StructurePlacementData arg6) {
         Heightmap.Type lv4;
         if (arg instanceof ServerWorld) {
             if (this.heightmap == Heightmap.Type.WORLD_SURFACE_WG) {

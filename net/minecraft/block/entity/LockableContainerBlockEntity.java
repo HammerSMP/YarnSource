@@ -36,26 +36,26 @@ Nameable {
     }
 
     @Override
-    public void fromTag(BlockState arg, CompoundTag arg2) {
-        super.fromTag(arg, arg2);
-        this.lock = ContainerLock.fromTag(arg2);
-        if (arg2.contains("CustomName", 8)) {
-            this.customName = Text.Serializer.fromJson(arg2.getString("CustomName"));
+    public void fromTag(BlockState state, CompoundTag tag) {
+        super.fromTag(state, tag);
+        this.lock = ContainerLock.fromTag(tag);
+        if (tag.contains("CustomName", 8)) {
+            this.customName = Text.Serializer.fromJson(tag.getString("CustomName"));
         }
     }
 
     @Override
-    public CompoundTag toTag(CompoundTag arg) {
-        super.toTag(arg);
-        this.lock.toTag(arg);
+    public CompoundTag toTag(CompoundTag tag) {
+        super.toTag(tag);
+        this.lock.toTag(tag);
         if (this.customName != null) {
-            arg.putString("CustomName", Text.Serializer.toJson(this.customName));
+            tag.putString("CustomName", Text.Serializer.toJson(this.customName));
         }
-        return arg;
+        return tag;
     }
 
-    public void setCustomName(Text arg) {
-        this.customName = arg;
+    public void setCustomName(Text customName) {
+        this.customName = customName;
     }
 
     @Override
@@ -79,16 +79,16 @@ Nameable {
 
     protected abstract Text getContainerName();
 
-    public boolean checkUnlocked(PlayerEntity arg) {
-        return LockableContainerBlockEntity.checkUnlocked(arg, this.lock, this.getDisplayName());
+    public boolean checkUnlocked(PlayerEntity player) {
+        return LockableContainerBlockEntity.checkUnlocked(player, this.lock, this.getDisplayName());
     }
 
-    public static boolean checkUnlocked(PlayerEntity arg, ContainerLock arg2, Text arg3) {
-        if (arg.isSpectator() || arg2.canOpen(arg.getMainHandStack())) {
+    public static boolean checkUnlocked(PlayerEntity player, ContainerLock lock, Text containerName) {
+        if (player.isSpectator() || lock.canOpen(player.getMainHandStack())) {
             return true;
         }
-        arg.sendMessage(new TranslatableText("container.isLocked", arg3), true);
-        arg.playSound(SoundEvents.BLOCK_CHEST_LOCKED, SoundCategory.BLOCKS, 1.0f, 1.0f);
+        player.sendMessage(new TranslatableText("container.isLocked", containerName), true);
+        player.playSound(SoundEvents.BLOCK_CHEST_LOCKED, SoundCategory.BLOCKS, 1.0f, 1.0f);
         return false;
     }
 

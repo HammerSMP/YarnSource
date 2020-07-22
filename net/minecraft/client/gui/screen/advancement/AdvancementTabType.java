@@ -27,12 +27,12 @@ enum AdvancementTabType {
     private final int height;
     private final int tabCount;
 
-    private AdvancementTabType(int j, int k, int l, int m, int n) {
-        this.u = j;
-        this.v = k;
-        this.width = l;
-        this.height = m;
-        this.tabCount = n;
+    private AdvancementTabType(int u, int v, int width, int height, int tabCount) {
+        this.u = u;
+        this.v = v;
+        this.width = width;
+        this.height = height;
+        this.tabCount = tabCount;
     }
 
     public int getTabCount() {
@@ -51,9 +51,9 @@ enum AdvancementTabType {
         arg2.drawTexture(arg, i + this.getTabX(k), j + this.getTabY(k), l, m, this.width, this.height);
     }
 
-    public void drawIcon(int i, int j, int k, ItemRenderer arg, ItemStack arg2) {
-        int l = i + this.getTabX(k);
-        int m = j + this.getTabY(k);
+    public void drawIcon(int x, int y, int index, ItemRenderer itemRenderer, ItemStack icon) {
+        int l = x + this.getTabX(index);
+        int m = y + this.getTabY(index);
         switch (this) {
             case ABOVE: {
                 l += 6;
@@ -75,16 +75,16 @@ enum AdvancementTabType {
                 m += 5;
             }
         }
-        arg.renderInGui(arg2, l, m);
+        itemRenderer.renderInGui(icon, l, m);
     }
 
-    public int getTabX(int i) {
+    public int getTabX(int index) {
         switch (this) {
             case ABOVE: {
-                return (this.width + 4) * i;
+                return (this.width + 4) * index;
             }
             case BELOW: {
-                return (this.width + 4) * i;
+                return (this.width + 4) * index;
             }
             case LEFT: {
                 return -this.width + 4;
@@ -96,7 +96,7 @@ enum AdvancementTabType {
         throw new UnsupportedOperationException("Don't know what this tab type is!" + (Object)((Object)this));
     }
 
-    public int getTabY(int i) {
+    public int getTabY(int index) {
         switch (this) {
             case ABOVE: {
                 return -this.height + 4;
@@ -105,19 +105,19 @@ enum AdvancementTabType {
                 return 136;
             }
             case LEFT: {
-                return this.height * i;
+                return this.height * index;
             }
             case RIGHT: {
-                return this.height * i;
+                return this.height * index;
             }
         }
         throw new UnsupportedOperationException("Don't know what this tab type is!" + (Object)((Object)this));
     }
 
-    public boolean isClickOnTab(int i, int j, int k, double d, double e) {
-        int l = i + this.getTabX(k);
-        int m = j + this.getTabY(k);
-        return d > (double)l && d < (double)(l + this.width) && e > (double)m && e < (double)(m + this.height);
+    public boolean isClickOnTab(int screenX, int screenY, int index, double mouseX, double mouseY) {
+        int l = screenX + this.getTabX(index);
+        int m = screenY + this.getTabY(index);
+        return mouseX > (double)l && mouseX < (double)(l + this.width) && mouseY > (double)m && mouseY < (double)(m + this.height);
     }
 }
 

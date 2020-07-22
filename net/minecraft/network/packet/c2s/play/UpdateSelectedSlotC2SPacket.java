@@ -22,18 +22,18 @@ implements Packet<ServerPlayPacketListener> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public UpdateSelectedSlotC2SPacket(int i) {
-        this.selectedSlot = i;
+    public UpdateSelectedSlotC2SPacket(int selectedSlot) {
+        this.selectedSlot = selectedSlot;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.selectedSlot = arg.readShort();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.selectedSlot = buf.readShort();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeShort(this.selectedSlot);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeShort(this.selectedSlot);
     }
 
     @Override

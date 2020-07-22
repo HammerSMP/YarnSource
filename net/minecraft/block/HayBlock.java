@@ -19,8 +19,8 @@ extends PillarBlock {
     }
 
     @Override
-    public void onLandedUpon(World arg, BlockPos arg2, Entity arg3, float f) {
-        arg3.handleFallDamage(f, 0.2f);
+    public void onLandedUpon(World world, BlockPos pos, Entity entity, float distance) {
+        entity.handleFallDamage(distance, 0.2f);
     }
 }
 

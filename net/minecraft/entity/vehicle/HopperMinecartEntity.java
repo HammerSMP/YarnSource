@@ -34,8 +34,8 @@ implements Hopper {
         super(arg, arg2);
     }
 
-    public HopperMinecartEntity(World arg, double d, double e, double f) {
-        super(EntityType.HOPPER_MINECART, d, e, f, arg);
+    public HopperMinecartEntity(World world, double x, double y, double z) {
+        super(EntityType.HOPPER_MINECART, x, y, z, world);
     }
 
     @Override
@@ -59,9 +59,9 @@ implements Hopper {
     }
 
     @Override
-    public void onActivatorRail(int i, int j, int k, boolean bl) {
+    public void onActivatorRail(int x, int y, int z, boolean powered) {
         boolean bl2;
-        boolean bl3 = bl2 = !bl;
+        boolean bl = bl2 = !powered;
         if (bl2 != this.isEnabled()) {
             this.setEnabled(bl2);
         }
@@ -71,8 +71,8 @@ implements Hopper {
         return this.enabled;
     }
 
-    public void setEnabled(boolean bl) {
-        this.enabled = bl;
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     @Override
@@ -119,7 +119,7 @@ implements Hopper {
         if (HopperBlockEntity.extract(this)) {
             return true;
         }
-        List<Entity> list = this.world.getEntities(ItemEntity.class, this.getBoundingBox().expand(0.25, 0.0, 0.25), EntityPredicates.VALID_ENTITY);
+        List<Entity> list = this.world.getEntitiesByClass(ItemEntity.class, this.getBoundingBox().expand(0.25, 0.0, 0.25), EntityPredicates.VALID_ENTITY);
         if (!list.isEmpty()) {
             HopperBlockEntity.extract(this, (ItemEntity)list.get(0));
         }
@@ -127,29 +127,29 @@ implements Hopper {
     }
 
     @Override
-    public void dropItems(DamageSource arg) {
-        super.dropItems(arg);
+    public void dropItems(DamageSource damageSource) {
+        super.dropItems(damageSource);
         if (this.world.getGameRules().getBoolean(GameRules.DO_ENTITY_DROPS)) {
             this.dropItem(Blocks.HOPPER);
         }
     }
 
     @Override
-    protected void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
-        arg.putInt("TransferCooldown", this.transferCooldown);
-        arg.putBoolean("Enabled", this.enabled);
+    protected void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
+        tag.putInt("TransferCooldown", this.transferCooldown);
+        tag.putBoolean("Enabled", this.enabled);
     }
 
     @Override
-    protected void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        this.transferCooldown = arg.getInt("TransferCooldown");
-        this.enabled = arg.contains("Enabled") ? arg.getBoolean("Enabled") : true;
+    protected void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        this.transferCooldown = tag.getInt("TransferCooldown");
+        this.enabled = tag.contains("Enabled") ? tag.getBoolean("Enabled") : true;
     }
 
-    public void setTransferCooldown(int i) {
-        this.transferCooldown = i;
+    public void setTransferCooldown(int cooldown) {
+        this.transferCooldown = cooldown;
     }
 
     public boolean isCoolingDown() {
@@ -157,8 +157,8 @@ implements Hopper {
     }
 
     @Override
-    public ScreenHandler getScreenHandler(int i, PlayerInventory arg) {
-        return new HopperScreenHandler(i, arg, this);
+    public ScreenHandler getScreenHandler(int syncId, PlayerInventory playerInventory) {
+        return new HopperScreenHandler(syncId, playerInventory, this);
     }
 }
 

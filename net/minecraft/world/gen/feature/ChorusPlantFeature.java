@@ -24,8 +24,8 @@ extends Feature<DefaultFeatureConfig> {
 
     @Override
     public boolean generate(ServerWorldAccess arg, ChunkGenerator arg2, Random random, BlockPos arg3, DefaultFeatureConfig arg4) {
-        if (arg.isAir(arg3.up()) && arg.getBlockState(arg3).isOf(Blocks.END_STONE)) {
-            ChorusFlowerBlock.generate(arg, arg3.up(), random, 8);
+        if (arg.isAir(arg3) && arg.getBlockState(arg3.down()).isOf(Blocks.END_STONE)) {
+            ChorusFlowerBlock.generate(arg, arg3, random, 8);
             return true;
         }
         return false;

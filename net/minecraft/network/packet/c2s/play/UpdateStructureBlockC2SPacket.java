@@ -41,59 +41,61 @@ implements Packet<ServerPlayPacketListener> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public UpdateStructureBlockC2SPacket(BlockPos arg, StructureBlockBlockEntity.Action arg2, StructureBlockMode arg3, String string, BlockPos arg4, BlockPos arg5, BlockMirror arg6, BlockRotation arg7, String string2, boolean bl, boolean bl2, boolean bl3, float f, long l) {
-        this.pos = arg;
-        this.action = arg2;
-        this.mode = arg3;
-        this.structureName = string;
-        this.offset = arg4;
-        this.size = arg5;
-        this.mirror = arg6;
-        this.rotation = arg7;
-        this.metadata = string2;
-        this.ignoreEntities = bl;
-        this.showAir = bl2;
-        this.showBoundingBox = bl3;
-        this.integrity = f;
-        this.seed = l;
+    public UpdateStructureBlockC2SPacket(BlockPos pos, StructureBlockBlockEntity.Action action, StructureBlockMode mode, String structureName, BlockPos offset, BlockPos size, BlockMirror mirror, BlockRotation rotation, String metadata, boolean ignoreEntities, boolean showAir, boolean showBoundingBox, float integrity, long seed) {
+        this.pos = pos;
+        this.action = action;
+        this.mode = mode;
+        this.structureName = structureName;
+        this.offset = offset;
+        this.size = size;
+        this.mirror = mirror;
+        this.rotation = rotation;
+        this.metadata = metadata;
+        this.ignoreEntities = ignoreEntities;
+        this.showAir = showAir;
+        this.showBoundingBox = showBoundingBox;
+        this.integrity = integrity;
+        this.seed = seed;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.pos = arg.readBlockPos();
-        this.action = arg.readEnumConstant(StructureBlockBlockEntity.Action.class);
-        this.mode = arg.readEnumConstant(StructureBlockMode.class);
-        this.structureName = arg.readString(32767);
-        this.offset = new BlockPos(MathHelper.clamp(arg.readByte(), -32, 32), MathHelper.clamp(arg.readByte(), -32, 32), MathHelper.clamp(arg.readByte(), -32, 32));
-        this.size = new BlockPos(MathHelper.clamp(arg.readByte(), 0, 32), MathHelper.clamp(arg.readByte(), 0, 32), MathHelper.clamp(arg.readByte(), 0, 32));
-        this.mirror = arg.readEnumConstant(BlockMirror.class);
-        this.rotation = arg.readEnumConstant(BlockRotation.class);
-        this.metadata = arg.readString(12);
-        this.integrity = MathHelper.clamp(arg.readFloat(), 0.0f, 1.0f);
-        this.seed = arg.readVarLong();
-        byte i = arg.readByte();
-        this.ignoreEntities = (i & 1) != 0;
-        this.showAir = (i & 2) != 0;
-        this.showBoundingBox = (i & 4) != 0;
+    public void read(PacketByteBuf buf) throws IOException {
+        this.pos = buf.readBlockPos();
+        this.action = buf.readEnumConstant(StructureBlockBlockEntity.Action.class);
+        this.mode = buf.readEnumConstant(StructureBlockMode.class);
+        this.structureName = buf.readString(32767);
+        int i = 48;
+        this.offset = new BlockPos(MathHelper.clamp(buf.readByte(), -48, 48), MathHelper.clamp(buf.readByte(), -48, 48), MathHelper.clamp(buf.readByte(), -48, 48));
+        int j = 48;
+        this.size = new BlockPos(MathHelper.clamp(buf.readByte(), 0, 48), MathHelper.clamp(buf.readByte(), 0, 48), MathHelper.clamp(buf.readByte(), 0, 48));
+        this.mirror = buf.readEnumConstant(BlockMirror.class);
+        this.rotation = buf.readEnumConstant(BlockRotation.class);
+        this.metadata = buf.readString(12);
+        this.integrity = MathHelper.clamp(buf.readFloat(), 0.0f, 1.0f);
+        this.seed = buf.readVarLong();
+        byte k = buf.readByte();
+        this.ignoreEntities = (k & 1) != 0;
+        this.showAir = (k & 2) != 0;
+        this.showBoundingBox = (k & 4) != 0;
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeBlockPos(this.pos);
-        arg.writeEnumConstant(this.action);
-        arg.writeEnumConstant(this.mode);
-        arg.writeString(this.structureName);
-        arg.writeByte(this.offset.getX());
-        arg.writeByte(this.offset.getY());
-        arg.writeByte(this.offset.getZ());
-        arg.writeByte(this.size.getX());
-        arg.writeByte(this.size.getY());
-        arg.writeByte(this.size.getZ());
-        arg.writeEnumConstant(this.mirror);
-        arg.writeEnumConstant(this.rotation);
-        arg.writeString(this.metadata);
-        arg.writeFloat(this.integrity);
-        arg.writeVarLong(this.seed);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeBlockPos(this.pos);
+        buf.writeEnumConstant(this.action);
+        buf.writeEnumConstant(this.mode);
+        buf.writeString(this.structureName);
+        buf.writeByte(this.offset.getX());
+        buf.writeByte(this.offset.getY());
+        buf.writeByte(this.offset.getZ());
+        buf.writeByte(this.size.getX());
+        buf.writeByte(this.size.getY());
+        buf.writeByte(this.size.getZ());
+        buf.writeEnumConstant(this.mirror);
+        buf.writeEnumConstant(this.rotation);
+        buf.writeString(this.metadata);
+        buf.writeFloat(this.integrity);
+        buf.writeVarLong(this.seed);
         int i = 0;
         if (this.ignoreEntities) {
             i |= 1;
@@ -104,7 +106,7 @@ implements Packet<ServerPlayPacketListener> {
         if (this.showBoundingBox) {
             i |= 4;
         }
-        arg.writeByte(i);
+        buf.writeByte(i);
     }
 
     @Override

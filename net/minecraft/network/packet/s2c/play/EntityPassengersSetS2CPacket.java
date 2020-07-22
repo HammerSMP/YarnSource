@@ -24,9 +24,9 @@ implements Packet<ClientPlayPacketListener> {
     public EntityPassengersSetS2CPacket() {
     }
 
-    public EntityPassengersSetS2CPacket(Entity arg) {
-        this.id = arg.getEntityId();
-        List<Entity> list = arg.getPassengerList();
+    public EntityPassengersSetS2CPacket(Entity entity) {
+        this.id = entity.getEntityId();
+        List<Entity> list = entity.getPassengerList();
         this.passengerIds = new int[list.size()];
         for (int i = 0; i < list.size(); ++i) {
             this.passengerIds[i] = list.get(i).getEntityId();
@@ -34,15 +34,15 @@ implements Packet<ClientPlayPacketListener> {
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.id = arg.readVarInt();
-        this.passengerIds = arg.readIntArray();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.id = buf.readVarInt();
+        this.passengerIds = buf.readIntArray();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeVarInt(this.id);
-        arg.writeIntArray(this.passengerIds);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeVarInt(this.id);
+        buf.writeIntArray(this.passengerIds);
     }
 
     @Override

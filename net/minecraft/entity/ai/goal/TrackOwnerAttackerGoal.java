@@ -16,9 +16,9 @@ extends TrackTargetGoal {
     private LivingEntity attacker;
     private int lastAttackedTime;
 
-    public TrackOwnerAttackerGoal(TameableEntity arg) {
-        super(arg, false);
-        this.tameable = arg;
+    public TrackOwnerAttackerGoal(TameableEntity tameable) {
+        super(tameable, false);
+        this.tameable = tameable;
         this.setControls(EnumSet.of(Goal.Control.TARGET));
     }
 

@@ -16,23 +16,22 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.function.Function;
-import net.minecraft.util.dynamic.NumberCodecs;
 
 public class StructureConfig {
-    public static final Codec<StructureConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)NumberCodecs.rangedInt(0, 4096).fieldOf("spacing").forGetter(arg -> arg.spacing), (App)NumberCodecs.rangedInt(0, 4096).fieldOf("separation").forGetter(arg -> arg.separation), (App)NumberCodecs.rangedInt(0, Integer.MAX_VALUE).fieldOf("salt").forGetter(arg -> arg.salt)).apply((Applicative)instance, StructureConfig::new)).comapFlatMap(arg -> {
-        if (arg.spacing <= arg.separation) {
+    public static final Codec<StructureConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Codec.intRange((int)0, (int)4096).fieldOf("spacing").forGetter(config -> config.spacing), (App)Codec.intRange((int)0, (int)4096).fieldOf("separation").forGetter(config -> config.separation), (App)Codec.intRange((int)0, (int)Integer.MAX_VALUE).fieldOf("salt").forGetter(config -> config.salt)).apply((Applicative)instance, StructureConfig::new)).comapFlatMap(config -> {
+        if (config.spacing <= config.separation) {
             return DataResult.error((String)"Spacing has to be smaller than separation");
         }
-        return DataResult.success((Object)arg);
+        return DataResult.success((Object)config);
     }, Function.identity());
     private final int spacing;
     private final int separation;
     private final int salt;
 
-    public StructureConfig(int i, int j, int k) {
-        this.spacing = i;
-        this.separation = j;
-        this.salt = k;
+    public StructureConfig(int spacing, int separation, int salt) {
+        this.spacing = spacing;
+        this.separation = separation;
+        this.salt = salt;
     }
 
     public int getSpacing() {

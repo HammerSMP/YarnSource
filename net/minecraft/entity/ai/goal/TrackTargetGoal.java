@@ -29,14 +29,14 @@ extends Goal {
     protected LivingEntity target;
     protected int maxTimeWithoutVisibility = 60;
 
-    public TrackTargetGoal(MobEntity arg, boolean bl) {
-        this(arg, bl, false);
+    public TrackTargetGoal(MobEntity mob, boolean checkVisibility) {
+        this(mob, checkVisibility, false);
     }
 
-    public TrackTargetGoal(MobEntity arg, boolean bl, boolean bl2) {
-        this.mob = arg;
-        this.checkVisibility = bl;
-        this.checkCanNavigate = bl2;
+    public TrackTargetGoal(MobEntity mob, boolean checkVisibility, boolean checkNavigable) {
+        this.mob = mob;
+        this.checkVisibility = checkVisibility;
+        this.checkCanNavigate = checkNavigable;
     }
 
     @Override
@@ -91,14 +91,14 @@ extends Goal {
         this.target = null;
     }
 
-    protected boolean canTrack(@Nullable LivingEntity arg, TargetPredicate arg2) {
-        if (arg == null) {
+    protected boolean canTrack(@Nullable LivingEntity target, TargetPredicate targetPredicate) {
+        if (target == null) {
             return false;
         }
-        if (!arg2.test(this.mob, arg)) {
+        if (!targetPredicate.test(this.mob, target)) {
             return false;
         }
-        if (!this.mob.isInWalkTargetRange(arg.getBlockPos())) {
+        if (!this.mob.isInWalkTargetRange(target.getBlockPos())) {
             return false;
         }
         if (this.checkCanNavigate) {
@@ -106,7 +106,7 @@ extends Goal {
                 this.canNavigateFlag = 0;
             }
             if (this.canNavigateFlag == 0) {
-                int n = this.canNavigateFlag = this.canNavigateToEntity(arg) ? 1 : 2;
+                int n = this.canNavigateFlag = this.canNavigateToEntity(target) ? 1 : 2;
             }
             if (this.canNavigateFlag == 2) {
                 return false;
@@ -115,10 +115,10 @@ extends Goal {
         return true;
     }
 
-    private boolean canNavigateToEntity(LivingEntity arg) {
+    private boolean canNavigateToEntity(LivingEntity entity) {
         int j;
         this.checkCanNavigateCooldown = 10 + this.mob.getRandom().nextInt(5);
-        Path lv = this.mob.getNavigation().findPathTo(arg, 0);
+        Path lv = this.mob.getNavigation().findPathTo(entity, 0);
         if (lv == null) {
             return false;
         }
@@ -126,12 +126,12 @@ extends Goal {
         if (lv2 == null) {
             return false;
         }
-        int i = lv2.x - MathHelper.floor(arg.getX());
-        return (double)(i * i + (j = lv2.z - MathHelper.floor(arg.getZ())) * j) <= 2.25;
+        int i = lv2.x - MathHelper.floor(entity.getX());
+        return (double)(i * i + (j = lv2.z - MathHelper.floor(entity.getZ())) * j) <= 2.25;
     }
 
-    public TrackTargetGoal setMaxTimeWithoutVisibility(int i) {
-        this.maxTimeWithoutVisibility = i;
+    public TrackTargetGoal setMaxTimeWithoutVisibility(int time) {
+        this.maxTimeWithoutVisibility = time;
         return this;
     }
 }

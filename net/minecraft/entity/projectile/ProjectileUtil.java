@@ -54,7 +54,7 @@ public final class ProjectileUtil {
         double e = d;
         Entity lv2 = null;
         Vec3d lv3 = null;
-        for (Entity lv4 : lv.getEntities(arg, arg4, predicate)) {
+        for (Entity lv4 : lv.getOtherEntities(arg, arg4, predicate)) {
             Vec3d lv6;
             double f;
             Box lv5 = lv4.getBoundingBox().expand(lv4.getTargetingMargin());
@@ -87,7 +87,7 @@ public final class ProjectileUtil {
     public static EntityHitResult getEntityCollision(World arg, Entity arg2, Vec3d arg3, Vec3d arg4, Box arg5, Predicate<Entity> predicate) {
         double d = Double.MAX_VALUE;
         Entity lv = null;
-        for (Entity lv2 : arg.getEntities(arg2, arg5, predicate)) {
+        for (Entity lv2 : arg.getOtherEntities(arg2, arg5, predicate)) {
             double e;
             Box lv3 = lv2.getBoundingBox().expand(0.3f);
             Optional<Vec3d> optional = lv3.rayTrace(arg3, arg4);
@@ -125,16 +125,16 @@ public final class ProjectileUtil {
         arg.yaw = MathHelper.lerp(f, arg.prevYaw, arg.yaw);
     }
 
-    public static Hand getHandPossiblyHolding(LivingEntity arg, Item arg2) {
-        return arg.getMainHandStack().getItem() == arg2 ? Hand.MAIN_HAND : Hand.OFF_HAND;
+    public static Hand getHandPossiblyHolding(LivingEntity entity, Item item) {
+        return entity.getMainHandStack().getItem() == item ? Hand.MAIN_HAND : Hand.OFF_HAND;
     }
 
-    public static PersistentProjectileEntity createArrowProjectile(LivingEntity arg, ItemStack arg2, float f) {
-        ArrowItem lv = (ArrowItem)(arg2.getItem() instanceof ArrowItem ? arg2.getItem() : Items.ARROW);
-        PersistentProjectileEntity lv2 = lv.createArrow(arg.world, arg2, arg);
-        lv2.applyEnchantmentEffects(arg, f);
-        if (arg2.getItem() == Items.TIPPED_ARROW && lv2 instanceof ArrowEntity) {
-            ((ArrowEntity)lv2).initFromStack(arg2);
+    public static PersistentProjectileEntity createArrowProjectile(LivingEntity entity, ItemStack stack, float damageModifier) {
+        ArrowItem lv = (ArrowItem)(stack.getItem() instanceof ArrowItem ? stack.getItem() : Items.ARROW);
+        PersistentProjectileEntity lv2 = lv.createArrow(entity.world, stack, entity);
+        lv2.applyEnchantmentEffects(entity, damageModifier);
+        if (stack.getItem() == Items.TIPPED_ARROW && lv2 instanceof ArrowEntity) {
+            ((ArrowEntity)lv2).initFromStack(stack);
         }
         return lv2;
     }

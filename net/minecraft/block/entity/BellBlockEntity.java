@@ -42,16 +42,16 @@ implements Tickable {
     }
 
     @Override
-    public boolean onSyncedBlockEvent(int i, int j) {
-        if (i == 1) {
+    public boolean onSyncedBlockEvent(int type, int data) {
+        if (type == 1) {
             this.notifyMemoriesOfBell();
             this.field_19158 = 0;
-            this.lastSideHit = Direction.byId(j);
+            this.lastSideHit = Direction.byId(data);
             this.ringTicks = 0;
             this.ringing = true;
             return true;
         }
-        return super.onSyncedBlockEvent(i, j);
+        return super.onSyncedBlockEvent(type, data);
     }
 
     @Override
@@ -82,15 +82,15 @@ implements Tickable {
         this.world.playSound(null, this.getPos(), SoundEvents.BLOCK_BELL_RESONATE, SoundCategory.BLOCKS, 1.0f, 1.0f);
     }
 
-    public void activate(Direction arg) {
+    public void activate(Direction direction) {
         BlockPos lv = this.getPos();
-        this.lastSideHit = arg;
+        this.lastSideHit = direction;
         if (this.ringing) {
             this.ringTicks = 0;
         } else {
             this.ringing = true;
         }
-        this.world.addSyncedBlockEvent(lv, this.getCachedState().getBlock(), 1, arg.getId());
+        this.world.addSyncedBlockEvent(lv, this.getCachedState().getBlock(), 1, direction.getId());
     }
 
     private void notifyMemoriesOfBell() {
@@ -117,15 +117,15 @@ implements Tickable {
         return false;
     }
 
-    private void applyGlowToRaiders(World arg) {
-        if (arg.isClient) {
+    private void applyGlowToRaiders(World world) {
+        if (world.isClient) {
             return;
         }
         this.hearingEntities.stream().filter(this::isRaiderEntity).forEach(this::glowEntity);
     }
 
-    private void applyParticlesToRaiders(World arg) {
-        if (!arg.isClient) {
+    private void applyParticlesToRaiders(World world) {
+        if (!world.isClient) {
             return;
         }
         BlockPos lv = this.getPos();
@@ -142,17 +142,17 @@ implements Tickable {
                 double h = (double)BackgroundHelper.ColorMixer.getRed(l) / 255.0;
                 double m = (double)BackgroundHelper.ColorMixer.getGreen(l) / 255.0;
                 double n = (double)BackgroundHelper.ColorMixer.getBlue(l) / 255.0;
-                arg.addParticle(ParticleTypes.ENTITY_EFFECT, d, (float)lv.getY() + 0.5f, e, h, m, n);
+                world.addParticle(ParticleTypes.ENTITY_EFFECT, d, (float)lv.getY() + 0.5f, e, h, m, n);
             }
         });
     }
 
-    private boolean isRaiderEntity(LivingEntity arg) {
-        return arg.isAlive() && !arg.removed && this.getPos().isWithinDistance(arg.getPos(), 48.0) && arg.getType().isIn(EntityTypeTags.RAIDERS);
+    private boolean isRaiderEntity(LivingEntity entity) {
+        return entity.isAlive() && !entity.removed && this.getPos().isWithinDistance(entity.getPos(), 48.0) && entity.getType().isIn(EntityTypeTags.RAIDERS);
     }
 
-    private void glowEntity(LivingEntity arg) {
-        arg.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 60));
+    private void glowEntity(LivingEntity entity) {
+        entity.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 60));
     }
 }
 

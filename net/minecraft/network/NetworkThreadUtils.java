@@ -18,17 +18,17 @@ import org.apache.logging.log4j.Logger;
 public class NetworkThreadUtils {
     private static final Logger LOGGER = LogManager.getLogger();
 
-    public static <T extends PacketListener> void forceMainThread(Packet<T> arg, T arg2, ServerWorld arg3) throws OffThreadException {
-        NetworkThreadUtils.forceMainThread(arg, arg2, arg3.getServer());
+    public static <T extends PacketListener> void forceMainThread(Packet<T> packet, T listener, ServerWorld world) throws OffThreadException {
+        NetworkThreadUtils.forceMainThread(packet, listener, world.getServer());
     }
 
-    public static <T extends PacketListener> void forceMainThread(Packet<T> arg, T arg2, ThreadExecutor<?> arg3) throws OffThreadException {
-        if (!arg3.isOnThread()) {
-            arg3.execute(() -> {
-                if (arg2.getConnection().isOpen()) {
-                    arg.apply(arg2);
+    public static <T extends PacketListener> void forceMainThread(Packet<T> packet, T listener, ThreadExecutor<?> engine) throws OffThreadException {
+        if (!engine.isOnThread()) {
+            engine.execute(() -> {
+                if (listener.getConnection().isOpen()) {
+                    packet.apply(listener);
                 } else {
-                    LOGGER.debug("Ignoring packet due to disconnection: " + arg);
+                    LOGGER.debug("Ignoring packet due to disconnection: " + packet);
                 }
             });
             throw OffThreadException.INSTANCE;

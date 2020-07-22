@@ -41,18 +41,18 @@ extends PersistentState {
     }
 
     @Override
-    public void fromTag(CompoundTag arg) {
+    public void fromTag(CompoundTag tag) {
         if (this.scoreboard == null) {
-            this.tag = arg;
+            this.tag = tag;
             return;
         }
-        this.deserializeObjectives(arg.getList("Objectives", 10));
-        this.scoreboard.fromTag(arg.getList("PlayerScores", 10));
-        if (arg.contains("DisplaySlots", 10)) {
-            this.deserializeDisplaySlots(arg.getCompound("DisplaySlots"));
+        this.deserializeObjectives(tag.getList("Objectives", 10));
+        this.scoreboard.fromTag(tag.getList("PlayerScores", 10));
+        if (tag.contains("DisplaySlots", 10)) {
+            this.deserializeDisplaySlots(tag.getCompound("DisplaySlots"));
         }
-        if (arg.contains("Teams", 9)) {
-            this.deserializeTeams(arg.getList("Teams", 10));
+        if (tag.contains("Teams", 9)) {
+            this.deserializeTeams(tag.getList("Teams", 10));
         }
     }
 
@@ -101,9 +101,9 @@ extends PersistentState {
         }
     }
 
-    protected void deserializeTeamPlayers(Team arg, ListTag arg2) {
+    protected void deserializeTeamPlayers(Team team, ListTag arg2) {
         for (int i = 0; i < arg2.size(); ++i) {
-            this.scoreboard.addPlayerToTeam(arg2.getString(i), arg);
+            this.scoreboard.addPlayerToTeam(arg2.getString(i), team);
         }
     }
 
@@ -132,16 +132,16 @@ extends PersistentState {
     }
 
     @Override
-    public CompoundTag toTag(CompoundTag arg) {
+    public CompoundTag toTag(CompoundTag tag) {
         if (this.scoreboard == null) {
             LOGGER.warn("Tried to save scoreboard without having a scoreboard...");
-            return arg;
+            return tag;
         }
-        arg.put("Objectives", this.serializeObjectives());
-        arg.put("PlayerScores", this.scoreboard.toTag());
-        arg.put("Teams", this.serializeTeams());
-        this.serializeSlots(arg);
-        return arg;
+        tag.put("Objectives", this.serializeObjectives());
+        tag.put("PlayerScores", this.scoreboard.toTag());
+        tag.put("Teams", this.serializeTeams());
+        this.serializeSlots(tag);
+        return tag;
     }
 
     protected ListTag serializeTeams() {

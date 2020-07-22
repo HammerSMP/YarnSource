@@ -24,18 +24,18 @@ extends SpriteBillboardParticle {
     private static final Random RANDOM = new Random();
     private final SpriteProvider spriteProvider;
 
-    private SpellParticle(ClientWorld arg, double d, double e, double f, double g, double h, double i, SpriteProvider arg2) {
-        super(arg, d, e, f, 0.5 - RANDOM.nextDouble(), h, 0.5 - RANDOM.nextDouble());
-        this.spriteProvider = arg2;
+    private SpellParticle(ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ, SpriteProvider spriteProvider) {
+        super(world, x, y, z, 0.5 - RANDOM.nextDouble(), velocityY, 0.5 - RANDOM.nextDouble());
+        this.spriteProvider = spriteProvider;
         this.velocityY *= (double)0.2f;
-        if (g == 0.0 && i == 0.0) {
+        if (velocityX == 0.0 && velocityZ == 0.0) {
             this.velocityX *= (double)0.1f;
             this.velocityZ *= (double)0.1f;
         }
         this.scale *= 0.75f;
         this.maxAge = (int)(8.0 / (Math.random() * 0.8 + 0.2));
         this.collidesWithWorld = false;
-        this.setSpriteForAge(arg2);
+        this.setSpriteForAge(spriteProvider);
     }
 
     @Override
@@ -106,8 +106,8 @@ extends SpriteBillboardParticle {
     implements ParticleFactory<DefaultParticleType> {
         private final SpriteProvider spriteProvider;
 
-        public EntityAmbientFactory(SpriteProvider arg) {
-            this.spriteProvider = arg;
+        public EntityAmbientFactory(SpriteProvider spriteProvider) {
+            this.spriteProvider = spriteProvider;
         }
 
         @Override

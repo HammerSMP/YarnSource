@@ -9,8 +9,8 @@ public class ScoreboardSynchronizer
 implements Runnable {
     private final PersistentState compound;
 
-    public ScoreboardSynchronizer(PersistentState arg) {
-        this.compound = arg;
+    public ScoreboardSynchronizer(PersistentState compound) {
+        this.compound = compound;
     }
 
     @Override

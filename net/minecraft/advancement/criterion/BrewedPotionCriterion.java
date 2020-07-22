@@ -36,40 +36,40 @@ extends AbstractCriterion<Conditions> {
         Potion lv = null;
         if (jsonObject.has("potion")) {
             Identifier lv2 = new Identifier(JsonHelper.getString(jsonObject, "potion"));
-            lv = (Potion)Registry.POTION.getOrEmpty(lv2).orElseThrow(() -> new JsonSyntaxException("Unknown potion '" + lv2 + "'"));
+            lv = Registry.POTION.getOrEmpty(lv2).orElseThrow(() -> new JsonSyntaxException("Unknown potion '" + lv2 + "'"));
         }
         return new Conditions(arg, lv);
     }
 
-    public void trigger(ServerPlayerEntity arg, Potion arg22) {
-        this.test(arg, arg2 -> arg2.matches(arg22));
+    public void trigger(ServerPlayerEntity player, Potion potion) {
+        this.test(player, arg2 -> arg2.matches(potion));
     }
 
     @Override
-    public /* synthetic */ AbstractCriterionConditions conditionsFromJson(JsonObject jsonObject, EntityPredicate.Extended arg, AdvancementEntityPredicateDeserializer arg2) {
-        return this.conditionsFromJson(jsonObject, arg, arg2);
+    public /* synthetic */ AbstractCriterionConditions conditionsFromJson(JsonObject obj, EntityPredicate.Extended playerPredicate, AdvancementEntityPredicateDeserializer predicateDeserializer) {
+        return this.conditionsFromJson(obj, playerPredicate, predicateDeserializer);
     }
 
     public static class Conditions
     extends AbstractCriterionConditions {
         private final Potion potion;
 
-        public Conditions(EntityPredicate.Extended arg, @Nullable Potion arg2) {
-            super(ID, arg);
-            this.potion = arg2;
+        public Conditions(EntityPredicate.Extended player, @Nullable Potion potion) {
+            super(ID, player);
+            this.potion = potion;
         }
 
         public static Conditions any() {
             return new Conditions(EntityPredicate.Extended.EMPTY, null);
         }
 
-        public boolean matches(Potion arg) {
-            return this.potion == null || this.potion == arg;
+        public boolean matches(Potion potion) {
+            return this.potion == null || this.potion == potion;
         }
 
         @Override
-        public JsonObject toJson(AdvancementEntityPredicateSerializer arg) {
-            JsonObject jsonObject = super.toJson(arg);
+        public JsonObject toJson(AdvancementEntityPredicateSerializer predicateSerializer) {
+            JsonObject jsonObject = super.toJson(predicateSerializer);
             if (this.potion != null) {
                 jsonObject.addProperty("potion", Registry.POTION.getId(this.potion).toString());
             }

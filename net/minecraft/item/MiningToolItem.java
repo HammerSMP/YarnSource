@@ -34,42 +34,42 @@ implements Vanishable {
     private final float attackDamage;
     private final Multimap<EntityAttribute, EntityAttributeModifier> attributeModifiers;
 
-    protected MiningToolItem(float f, float g, ToolMaterial arg, Set<Block> set, Item.Settings arg2) {
-        super(arg, arg2);
-        this.effectiveBlocks = set;
-        this.miningSpeed = arg.getMiningSpeedMultiplier();
-        this.attackDamage = f + arg.getAttackDamage();
+    protected MiningToolItem(float attackDamage, float attackSpeed, ToolMaterial material, Set<Block> effectiveBlocks, Item.Settings settings) {
+        super(material, settings);
+        this.effectiveBlocks = effectiveBlocks;
+        this.miningSpeed = material.getMiningSpeedMultiplier();
+        this.attackDamage = attackDamage + material.getAttackDamage();
         ImmutableMultimap.Builder builder = ImmutableMultimap.builder();
         builder.put((Object)EntityAttributes.GENERIC_ATTACK_DAMAGE, (Object)new EntityAttributeModifier(ATTACK_DAMAGE_MODIFIER_ID, "Tool modifier", (double)this.attackDamage, EntityAttributeModifier.Operation.ADDITION));
-        builder.put((Object)EntityAttributes.GENERIC_ATTACK_SPEED, (Object)new EntityAttributeModifier(ATTACK_SPEED_MODIFIER_ID, "Tool modifier", (double)g, EntityAttributeModifier.Operation.ADDITION));
+        builder.put((Object)EntityAttributes.GENERIC_ATTACK_SPEED, (Object)new EntityAttributeModifier(ATTACK_SPEED_MODIFIER_ID, "Tool modifier", (double)attackSpeed, EntityAttributeModifier.Operation.ADDITION));
         this.attributeModifiers = builder.build();
     }
 
     @Override
-    public float getMiningSpeedMultiplier(ItemStack arg, BlockState arg2) {
-        return this.effectiveBlocks.contains(arg2.getBlock()) ? this.miningSpeed : 1.0f;
+    public float getMiningSpeedMultiplier(ItemStack stack, BlockState state) {
+        return this.effectiveBlocks.contains(state.getBlock()) ? this.miningSpeed : 1.0f;
     }
 
     @Override
-    public boolean postHit(ItemStack arg2, LivingEntity arg22, LivingEntity arg3) {
-        arg2.damage(2, arg3, arg -> arg.sendEquipmentBreakStatus(EquipmentSlot.MAINHAND));
+    public boolean postHit(ItemStack stack, LivingEntity target, LivingEntity attacker) {
+        stack.damage(2, attacker, e -> e.sendEquipmentBreakStatus(EquipmentSlot.MAINHAND));
         return true;
     }
 
     @Override
-    public boolean postMine(ItemStack arg2, World arg22, BlockState arg3, BlockPos arg4, LivingEntity arg5) {
-        if (!arg22.isClient && arg3.getHardness(arg22, arg4) != 0.0f) {
-            arg2.damage(1, arg5, arg -> arg.sendEquipmentBreakStatus(EquipmentSlot.MAINHAND));
+    public boolean postMine(ItemStack stack, World world, BlockState state, BlockPos pos, LivingEntity miner) {
+        if (!world.isClient && state.getHardness(world, pos) != 0.0f) {
+            stack.damage(1, miner, e -> e.sendEquipmentBreakStatus(EquipmentSlot.MAINHAND));
         }
         return true;
     }
 
     @Override
-    public Multimap<EntityAttribute, EntityAttributeModifier> getAttributeModifiers(EquipmentSlot arg) {
-        if (arg == EquipmentSlot.MAINHAND) {
+    public Multimap<EntityAttribute, EntityAttributeModifier> getAttributeModifiers(EquipmentSlot slot) {
+        if (slot == EquipmentSlot.MAINHAND) {
             return this.attributeModifiers;
         }
-        return super.getAttributeModifiers(arg);
+        return super.getAttributeModifiers(slot);
     }
 
     public float getAttackDamage() {

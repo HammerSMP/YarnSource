@@ -31,24 +31,24 @@ implements Criterion<T> {
     private final Map<PlayerAdvancementTracker, Set<Criterion.ConditionsContainer<T>>> progressions = Maps.newIdentityHashMap();
 
     @Override
-    public final void beginTrackingCondition(PlayerAdvancementTracker arg2, Criterion.ConditionsContainer<T> arg22) {
-        this.progressions.computeIfAbsent(arg2, arg -> Sets.newHashSet()).add(arg22);
+    public final void beginTrackingCondition(PlayerAdvancementTracker manager, Criterion.ConditionsContainer<T> arg2) {
+        this.progressions.computeIfAbsent(manager, arg -> Sets.newHashSet()).add(arg2);
     }
 
     @Override
-    public final void endTrackingCondition(PlayerAdvancementTracker arg, Criterion.ConditionsContainer<T> arg2) {
-        Set<Criterion.ConditionsContainer<T>> set = this.progressions.get(arg);
+    public final void endTrackingCondition(PlayerAdvancementTracker manager, Criterion.ConditionsContainer<T> arg2) {
+        Set<Criterion.ConditionsContainer<T>> set = this.progressions.get(manager);
         if (set != null) {
             set.remove(arg2);
             if (set.isEmpty()) {
-                this.progressions.remove(arg);
+                this.progressions.remove(manager);
             }
         }
     }
 
     @Override
-    public final void endTracking(PlayerAdvancementTracker arg) {
-        this.progressions.remove(arg);
+    public final void endTracking(PlayerAdvancementTracker tracker) {
+        this.progressions.remove(tracker);
     }
 
     protected abstract T conditionsFromJson(JsonObject var1, EntityPredicate.Extended var2, AdvancementEntityPredicateDeserializer var3);
@@ -59,17 +59,17 @@ implements Criterion<T> {
         return this.conditionsFromJson(jsonObject, lv, arg);
     }
 
-    protected void test(ServerPlayerEntity arg, Predicate<T> predicate) {
-        PlayerAdvancementTracker lv = arg.getAdvancementTracker();
+    protected void test(ServerPlayerEntity player, Predicate<T> tester) {
+        PlayerAdvancementTracker lv = player.getAdvancementTracker();
         Set<Criterion.ConditionsContainer<T>> set = this.progressions.get(lv);
         if (set == null || set.isEmpty()) {
             return;
         }
-        LootContext lv2 = EntityPredicate.createAdvancementEntityLootContext(arg, arg);
+        LootContext lv2 = EntityPredicate.createAdvancementEntityLootContext(player, player);
         List list = null;
         for (Criterion.ConditionsContainer<T> lv3 : set) {
             AbstractCriterionConditions lv4 = (AbstractCriterionConditions)lv3.getConditions();
-            if (!lv4.getPlayerPredicate().test(lv2) || !predicate.test(lv4)) continue;
+            if (!lv4.getPlayerPredicate().test(lv2) || !tester.test(lv4)) continue;
             if (list == null) {
                 list = Lists.newArrayList();
             }
@@ -83,8 +83,8 @@ implements Criterion<T> {
     }
 
     @Override
-    public /* synthetic */ CriterionConditions conditionsFromJson(JsonObject jsonObject, AdvancementEntityPredicateDeserializer arg) {
-        return this.conditionsFromJson(jsonObject, arg);
+    public /* synthetic */ CriterionConditions conditionsFromJson(JsonObject obj, AdvancementEntityPredicateDeserializer predicateDeserializer) {
+        return this.conditionsFromJson(obj, predicateDeserializer);
     }
 }
 

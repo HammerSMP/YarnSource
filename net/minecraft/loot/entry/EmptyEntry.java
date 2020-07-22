@@ -20,8 +20,8 @@ import net.minecraft.loot.function.LootFunction;
 
 public class EmptyEntry
 extends LeafEntry {
-    private EmptyEntry(int i, int j, LootCondition[] args, LootFunction[] args2) {
-        super(i, j, args, args2);
+    private EmptyEntry(int weight, int quality, LootCondition[] conditions, LootFunction[] functions) {
+        super(weight, quality, conditions, functions);
     }
 
     @Override
@@ -30,7 +30,7 @@ extends LeafEntry {
     }
 
     @Override
-    public void generateLoot(Consumer<ItemStack> consumer, LootContext arg) {
+    public void generateLoot(Consumer<ItemStack> lootConsumer, LootContext context) {
     }
 
     public static LeafEntry.Builder<?> Serializer() {
@@ -45,8 +45,8 @@ extends LeafEntry {
         }
 
         @Override
-        public /* synthetic */ LeafEntry fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, int i, int j, LootCondition[] args, LootFunction[] args2) {
-            return this.fromJson(jsonObject, jsonDeserializationContext, i, j, args, args2);
+        public /* synthetic */ LeafEntry fromJson(JsonObject entryJson, JsonDeserializationContext context, int weight, int quality, LootCondition[] conditions, LootFunction[] functions) {
+            return this.fromJson(entryJson, context, weight, quality, conditions, functions);
         }
     }
 }

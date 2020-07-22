@@ -25,33 +25,33 @@ implements Packet<ServerLoginPacketListener> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public LoginQueryResponseC2SPacket(int i, @Nullable PacketByteBuf arg) {
-        this.queryId = i;
-        this.response = arg;
+    public LoginQueryResponseC2SPacket(int queryId, @Nullable PacketByteBuf response) {
+        this.queryId = queryId;
+        this.response = response;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.queryId = arg.readVarInt();
-        if (arg.readBoolean()) {
-            int i = arg.readableBytes();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.queryId = buf.readVarInt();
+        if (buf.readBoolean()) {
+            int i = buf.readableBytes();
             if (i < 0 || i > 0x100000) {
                 throw new IOException("Payload may not be larger than 1048576 bytes");
             }
-            this.response = new PacketByteBuf(arg.readBytes(i));
+            this.response = new PacketByteBuf(buf.readBytes(i));
         } else {
             this.response = null;
         }
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeVarInt(this.queryId);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeVarInt(this.queryId);
         if (this.response != null) {
-            arg.writeBoolean(true);
-            arg.writeBytes(this.response.copy());
+            buf.writeBoolean(true);
+            buf.writeBytes(this.response.copy());
         } else {
-            arg.writeBoolean(false);
+            buf.writeBoolean(false);
         }
     }
 

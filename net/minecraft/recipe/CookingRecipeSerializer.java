@@ -11,7 +11,6 @@ package net.minecraft.recipe;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.recipe.AbstractCookingRecipe;
@@ -27,9 +26,9 @@ implements RecipeSerializer<T> {
     private final int cookingTime;
     private final RecipeFactory<T> recipeFactory;
 
-    public CookingRecipeSerializer(RecipeFactory<T> arg, int i) {
-        this.cookingTime = i;
-        this.recipeFactory = arg;
+    public CookingRecipeSerializer(RecipeFactory<T> recipeFactory, int cookingTime) {
+        this.cookingTime = cookingTime;
+        this.recipeFactory = recipeFactory;
     }
 
     @Override
@@ -39,7 +38,7 @@ implements RecipeSerializer<T> {
         Ingredient lv = Ingredient.fromJson((JsonElement)jsonElement);
         String string2 = JsonHelper.getString(jsonObject, "result");
         Identifier lv2 = new Identifier(string2);
-        ItemStack lv3 = new ItemStack((ItemConvertible)Registry.ITEM.getOrEmpty(lv2).orElseThrow(() -> new IllegalStateException("Item: " + string2 + " does not exist")));
+        ItemStack lv3 = new ItemStack(Registry.ITEM.getOrEmpty(lv2).orElseThrow(() -> new IllegalStateException("Item: " + string2 + " does not exist")));
         float f = JsonHelper.getFloat(jsonObject, "experience", 0.0f);
         int i = JsonHelper.getInt(jsonObject, "cookingtime", this.cookingTime);
         return this.recipeFactory.create(arg, string, lv, lv3, f, i);
@@ -65,13 +64,13 @@ implements RecipeSerializer<T> {
     }
 
     @Override
-    public /* synthetic */ Recipe read(Identifier arg, PacketByteBuf arg2) {
-        return this.read(arg, arg2);
+    public /* synthetic */ Recipe read(Identifier id, PacketByteBuf buf) {
+        return this.read(id, buf);
     }
 
     @Override
-    public /* synthetic */ Recipe read(Identifier arg, JsonObject jsonObject) {
-        return this.read(arg, jsonObject);
+    public /* synthetic */ Recipe read(Identifier id, JsonObject json) {
+        return this.read(id, json);
     }
 
     static interface RecipeFactory<T extends AbstractCookingRecipe> {

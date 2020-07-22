@@ -68,28 +68,28 @@ extends Screen {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         if (this.checkForClose()) {
             return;
         }
-        arg.push();
+        matrices.push();
         RenderSystem.enableBlend();
         this.client.getTextureManager().bindTexture(TEXTURE);
         int k = this.width / 2 - 62;
         int l = this.height / 2 - 30 - 27;
-        GameModeSelectionScreen.drawTexture(arg, k, l, 0.0f, 0.0f, 125, 75, 128, 128);
-        arg.pop();
-        super.render(arg, i, j, f);
-        this.gameMode.ifPresent(arg2 -> this.drawCenteredText(arg, this.textRenderer, ((GameMode)arg2).getText(), this.width / 2, this.height / 2 - 30 - 20, -1));
-        this.drawCenteredText(arg, this.textRenderer, field_25454, this.width / 2, this.height / 2 + 5, 0xFFFFFF);
+        GameModeSelectionScreen.drawTexture(matrices, k, l, 0.0f, 0.0f, 125, 75, 128, 128);
+        matrices.pop();
+        super.render(matrices, mouseX, mouseY, delta);
+        this.gameMode.ifPresent(arg2 -> this.drawCenteredText(matrices, this.textRenderer, ((GameMode)arg2).getText(), this.width / 2, this.height / 2 - 30 - 20, -1));
+        this.drawCenteredText(matrices, this.textRenderer, field_25454, this.width / 2, this.height / 2 + 5, 0xFFFFFF);
         if (!this.mouseUsedForSelection) {
-            this.lastMouseX = i;
-            this.lastMouseY = j;
+            this.lastMouseX = mouseX;
+            this.lastMouseY = mouseY;
             this.mouseUsedForSelection = true;
         }
-        boolean bl = this.lastMouseX == i && this.lastMouseY == j;
+        boolean bl = this.lastMouseX == mouseX && this.lastMouseY == mouseY;
         for (ButtonWidget lv : this.gameModeButtons) {
-            lv.render(arg, i, j, f);
+            lv.render(matrices, mouseX, mouseY, delta);
             this.gameMode.ifPresent(arg2 -> lv.setSelected(arg2 == lv.gameMode));
             if (bl || !lv.isHovered()) continue;
             this.gameMode = Optional.of(lv.gameMode);
@@ -100,14 +100,14 @@ extends Screen {
         GameModeSelectionScreen.apply(this.client, this.gameMode);
     }
 
-    private static void apply(MinecraftClient arg, Optional<GameMode> optional) {
-        if (arg.interactionManager == null || arg.player == null || !optional.isPresent()) {
+    private static void apply(MinecraftClient client, Optional<GameMode> gameMode) {
+        if (client.interactionManager == null || client.player == null || !gameMode.isPresent()) {
             return;
         }
-        Optional optional2 = GameMode.of(arg.interactionManager.getCurrentGameMode());
-        GameMode lv = optional.get();
-        if (optional2.isPresent() && arg.player.hasPermissionLevel(2) && lv != optional2.get()) {
-            arg.player.sendChatMessage(lv.getCommand());
+        Optional optional2 = GameMode.of(client.interactionManager.getCurrentGameMode());
+        GameMode lv = gameMode.get();
+        if (optional2.isPresent() && client.player.hasPermissionLevel(2) && lv != optional2.get()) {
+            client.player.sendChatMessage(lv.getCommand());
         }
     }
 
@@ -121,13 +121,13 @@ extends Screen {
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (i == 293 && this.gameMode.isPresent()) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (keyCode == 293 && this.gameMode.isPresent()) {
             this.mouseUsedForSelection = false;
             this.gameMode = this.gameMode.get().next();
             return true;
         }
-        return super.keyPressed(i, j, k);
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
@@ -141,18 +141,18 @@ extends Screen {
         private final GameMode gameMode;
         private boolean selected;
 
-        public ButtonWidget(GameMode arg2, int i, int j) {
-            super(i, j, 25, 25, arg2.getText());
+        public ButtonWidget(GameMode arg2, int x, int y) {
+            super(x, y, 25, 25, arg2.getText());
             this.gameMode = arg2;
         }
 
         @Override
-        public void renderButton(MatrixStack arg, int i, int j, float f) {
+        public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
             MinecraftClient lv = MinecraftClient.getInstance();
-            this.drawBackground(arg, lv.getTextureManager());
+            this.drawBackground(matrices, lv.getTextureManager());
             this.gameMode.renderIcon(GameModeSelectionScreen.this.itemRenderer, this.x + 5, this.y + 5);
             if (this.selected) {
-                this.drawSelectionBox(arg, lv.getTextureManager());
+                this.drawSelectionBox(matrices, lv.getTextureManager());
             }
         }
 
@@ -161,25 +161,25 @@ extends Screen {
             return super.isHovered() || this.selected;
         }
 
-        public void setSelected(boolean bl) {
-            this.selected = bl;
+        public void setSelected(boolean selected) {
+            this.selected = selected;
             this.narrate();
         }
 
-        private void drawBackground(MatrixStack arg, TextureManager arg2) {
+        private void drawBackground(MatrixStack matrices, TextureManager arg2) {
             arg2.bindTexture(TEXTURE);
-            arg.push();
-            arg.translate(this.x, this.y, 0.0);
-            ButtonWidget.drawTexture(arg, 0, 0, 0.0f, 75.0f, 25, 25, 128, 128);
-            arg.pop();
+            matrices.push();
+            matrices.translate(this.x, this.y, 0.0);
+            ButtonWidget.drawTexture(matrices, 0, 0, 0.0f, 75.0f, 25, 25, 128, 128);
+            matrices.pop();
         }
 
-        private void drawSelectionBox(MatrixStack arg, TextureManager arg2) {
+        private void drawSelectionBox(MatrixStack matrices, TextureManager arg2) {
             arg2.bindTexture(TEXTURE);
-            arg.push();
-            arg.translate(this.x, this.y, 0.0);
-            ButtonWidget.drawTexture(arg, 0, 0, 25.0f, 75.0f, 25, 25, 128, 128);
-            arg.pop();
+            matrices.push();
+            matrices.translate(this.x, this.y, 0.0);
+            ButtonWidget.drawTexture(matrices, 0, 0, 25.0f, 75.0f, 25, 25, 128, 128);
+            matrices.pop();
         }
     }
 
@@ -195,14 +195,14 @@ extends Screen {
         final String command;
         final ItemStack icon;
 
-        private GameMode(Text arg, String string2, ItemStack arg2) {
+        private GameMode(Text arg, String command, ItemStack icon) {
             this.text = arg;
-            this.command = string2;
-            this.icon = arg2;
+            this.command = command;
+            this.icon = icon;
         }
 
-        private void renderIcon(ItemRenderer arg, int i, int j) {
-            arg.renderInGuiWithOverrides(this.icon, i, j);
+        private void renderIcon(ItemRenderer arg, int x, int y) {
+            arg.renderInGuiWithOverrides(this.icon, x, y);
         }
 
         private Text getText() {

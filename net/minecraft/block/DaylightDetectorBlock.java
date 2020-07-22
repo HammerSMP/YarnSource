@@ -39,27 +39,27 @@ extends BlockWithEntity {
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
         return SHAPE;
     }
 
     @Override
-    public boolean hasSidedTransparency(BlockState arg) {
+    public boolean hasSidedTransparency(BlockState state) {
         return true;
     }
 
     @Override
-    public int getWeakRedstonePower(BlockState arg, BlockView arg2, BlockPos arg3, Direction arg4) {
-        return arg.get(POWER);
+    public int getWeakRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction direction) {
+        return state.get(POWER);
     }
 
-    public static void updateState(BlockState arg, World arg2, BlockPos arg3) {
-        if (!arg2.getDimension().hasSkyLight()) {
+    public static void updateState(BlockState state, World world, BlockPos pos) {
+        if (!world.getDimension().hasSkyLight()) {
             return;
         }
-        int i = arg2.getLightLevel(LightType.SKY, arg3) - arg2.getAmbientDarkness();
-        float f = arg2.getSkyAngleRadians(1.0f);
-        boolean bl = arg.get(INVERTED);
+        int i = world.getLightLevel(LightType.SKY, pos) - world.getAmbientDarkness();
+        float f = world.getSkyAngleRadians(1.0f);
+        boolean bl = state.get(INVERTED);
         if (bl) {
             i = 15 - i;
         } else if (i > 0) {
@@ -68,43 +68,43 @@ extends BlockWithEntity {
             i = Math.round((float)i * MathHelper.cos(f));
         }
         i = MathHelper.clamp(i, 0, 15);
-        if (arg.get(POWER) != i) {
-            arg2.setBlockState(arg3, (BlockState)arg.with(POWER, i), 3);
+        if (state.get(POWER) != i) {
+            world.setBlockState(pos, (BlockState)state.with(POWER, i), 3);
         }
     }
 
     @Override
-    public ActionResult onUse(BlockState arg, World arg2, BlockPos arg3, PlayerEntity arg4, Hand arg5, BlockHitResult arg6) {
-        if (arg4.canModifyBlocks()) {
-            if (arg2.isClient) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        if (player.canModifyBlocks()) {
+            if (world.isClient) {
                 return ActionResult.SUCCESS;
             }
-            BlockState lv = (BlockState)arg.cycle(INVERTED);
-            arg2.setBlockState(arg3, lv, 4);
-            DaylightDetectorBlock.updateState(lv, arg2, arg3);
+            BlockState lv = (BlockState)state.cycle(INVERTED);
+            world.setBlockState(pos, lv, 4);
+            DaylightDetectorBlock.updateState(lv, world, pos);
             return ActionResult.CONSUME;
         }
-        return super.onUse(arg, arg2, arg3, arg4, arg5, arg6);
+        return super.onUse(state, world, pos, player, hand, hit);
     }
 
     @Override
-    public BlockRenderType getRenderType(BlockState arg) {
+    public BlockRenderType getRenderType(BlockState state) {
         return BlockRenderType.MODEL;
     }
 
     @Override
-    public boolean emitsRedstonePower(BlockState arg) {
+    public boolean emitsRedstonePower(BlockState state) {
         return true;
     }
 
     @Override
-    public BlockEntity createBlockEntity(BlockView arg) {
+    public BlockEntity createBlockEntity(BlockView world) {
         return new DaylightDetectorBlockEntity();
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(POWER, INVERTED);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(POWER, INVERTED);
     }
 }
 

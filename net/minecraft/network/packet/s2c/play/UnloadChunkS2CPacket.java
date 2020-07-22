@@ -22,21 +22,21 @@ implements Packet<ClientPlayPacketListener> {
     public UnloadChunkS2CPacket() {
     }
 
-    public UnloadChunkS2CPacket(int i, int j) {
-        this.x = i;
-        this.z = j;
+    public UnloadChunkS2CPacket(int x, int z) {
+        this.x = x;
+        this.z = z;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.x = arg.readInt();
-        this.z = arg.readInt();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.x = buf.readInt();
+        this.z = buf.readInt();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeInt(this.x);
-        arg.writeInt(this.z);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeInt(this.x);
+        buf.writeInt(this.z);
     }
 
     @Override

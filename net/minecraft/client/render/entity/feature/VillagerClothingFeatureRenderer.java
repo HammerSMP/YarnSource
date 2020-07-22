@@ -57,11 +57,11 @@ implements SynchronousResourceReloadListener {
     private final ReloadableResourceManager resourceManager;
     private final String entityType;
 
-    public VillagerClothingFeatureRenderer(FeatureRendererContext<T, M> arg, ReloadableResourceManager arg2, String string) {
-        super(arg);
-        this.resourceManager = arg2;
-        this.entityType = string;
-        arg2.registerListener(this);
+    public VillagerClothingFeatureRenderer(FeatureRendererContext<T, M> context, ReloadableResourceManager resourceManager, String entityType) {
+        super(context);
+        this.resourceManager = resourceManager;
+        this.entityType = entityType;
+        resourceManager.registerListener(this);
     }
 
     @Override
@@ -89,13 +89,13 @@ implements SynchronousResourceReloadListener {
         }
     }
 
-    private Identifier findTexture(String string, Identifier arg) {
-        return new Identifier(arg.getNamespace(), "textures/entity/" + this.entityType + "/" + string + "/" + arg.getPath() + ".png");
+    private Identifier findTexture(String keyType, Identifier keyId) {
+        return new Identifier(keyId.getNamespace(), "textures/entity/" + this.entityType + "/" + keyType + "/" + keyId.getPath() + ".png");
     }
 
-    public <K> VillagerResourceMetadata.HatType getHatType(Object2ObjectMap<K, VillagerResourceMetadata.HatType> object2ObjectMap, String string, DefaultedRegistry<K> arg, K object) {
-        return (VillagerResourceMetadata.HatType)((Object)object2ObjectMap.computeIfAbsent(object, object2 -> {
-            try (Resource lv = this.resourceManager.getResource(this.findTexture(string, arg.getId(object)));){
+    public <K> VillagerResourceMetadata.HatType getHatType(Object2ObjectMap<K, VillagerResourceMetadata.HatType> hatLookUp, String keyType, DefaultedRegistry<K> registry, K key) {
+        return (VillagerResourceMetadata.HatType)((Object)hatLookUp.computeIfAbsent(key, object2 -> {
+            try (Resource lv = this.resourceManager.getResource(this.findTexture(keyType, registry.getId(key)));){
                 VillagerResourceMetadata lv2 = lv.getMetadata(VillagerResourceMetadata.READER);
                 if (lv2 == null) return VillagerResourceMetadata.HatType.NONE;
                 VillagerResourceMetadata.HatType hatType = lv2.getHatType();
@@ -109,7 +109,7 @@ implements SynchronousResourceReloadListener {
     }
 
     @Override
-    public void apply(ResourceManager arg) {
+    public void apply(ResourceManager manager) {
         this.professionToHat.clear();
         this.villagerTypeToHat.clear();
     }

@@ -18,16 +18,16 @@ import java.util.Set;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.CampfireBlock;
-import net.minecraft.class_5418;
-import net.minecraft.class_5419;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.brain.Brain;
 import net.minecraft.entity.ai.brain.MemoryModuleType;
 import net.minecraft.entity.ai.brain.sensor.Sensor;
 import net.minecraft.entity.boss.WitherEntity;
+import net.minecraft.entity.mob.AbstractPiglinEntity;
 import net.minecraft.entity.mob.HoglinEntity;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.mob.PiglinBrain;
+import net.minecraft.entity.mob.PiglinBruteEntity;
 import net.minecraft.entity.mob.PiglinEntity;
 import net.minecraft.entity.mob.WitherSkeletonEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -44,9 +44,9 @@ extends Sensor<LivingEntity> {
     }
 
     @Override
-    protected void sense(ServerWorld arg, LivingEntity arg2) {
-        Brain<?> lv = arg2.getBrain();
-        lv.remember(MemoryModuleType.NEAREST_REPELLENT, PiglinSpecificSensor.findSoulFire(arg, arg2));
+    protected void sense(ServerWorld world, LivingEntity entity) {
+        Brain<?> lv = entity.getBrain();
+        lv.remember(MemoryModuleType.NEAREST_REPELLENT, PiglinSpecificSensor.findSoulFire(world, entity));
         Optional<Object> optional = Optional.empty();
         Optional<Object> optional2 = Optional.empty();
         Optional<Object> optional3 = Optional.empty();
@@ -71,8 +71,8 @@ extends Sensor<LivingEntity> {
                 optional2 = Optional.of(lv3);
                 continue;
             }
-            if (lv2 instanceof class_5419) {
-                list.add((class_5419)lv2);
+            if (lv2 instanceof PiglinBruteEntity) {
+                list.add((PiglinBruteEntity)lv2);
                 continue;
             }
             if (lv2 instanceof PiglinEntity) {
@@ -81,7 +81,7 @@ extends Sensor<LivingEntity> {
                     optional4 = Optional.of(lv4);
                     continue;
                 }
-                if (!lv4.method_30236()) continue;
+                if (!lv4.isAdult()) continue;
                 list.add(lv4);
                 continue;
             }
@@ -103,8 +103,8 @@ extends Sensor<LivingEntity> {
         }
         List<LivingEntity> list4 = lv.getOptionalMemory(MemoryModuleType.MOBS).orElse((List<LivingEntity>)ImmutableList.of());
         for (LivingEntity lv6 : list4) {
-            if (!(lv6 instanceof class_5418) || !((class_5418)lv6).method_30236()) continue;
-            list2.add((class_5418)lv6);
+            if (!(lv6 instanceof AbstractPiglinEntity) || !((AbstractPiglinEntity)lv6).isAdult()) continue;
+            list2.add((AbstractPiglinEntity)lv6);
         }
         lv.remember(MemoryModuleType.NEAREST_VISIBLE_NEMESIS, optional);
         lv.remember(MemoryModuleType.NEAREST_VISIBLE_HUNTABLE_HOGLIN, optional2);
@@ -118,8 +118,8 @@ extends Sensor<LivingEntity> {
         lv.remember(MemoryModuleType.VISIBLE_ADULT_HOGLIN_COUNT, i);
     }
 
-    private static Optional<BlockPos> findSoulFire(ServerWorld arg, LivingEntity arg22) {
-        return BlockPos.findClosest(arg22.getBlockPos(), 8, 4, arg2 -> PiglinSpecificSensor.method_24648(arg, arg2));
+    private static Optional<BlockPos> findSoulFire(ServerWorld world, LivingEntity entity) {
+        return BlockPos.findClosest(entity.getBlockPos(), 8, 4, arg2 -> PiglinSpecificSensor.method_24648(world, arg2));
     }
 
     private static boolean method_24648(ServerWorld arg, BlockPos arg2) {

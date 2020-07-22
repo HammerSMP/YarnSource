@@ -14,60 +14,24 @@ import com.mojang.datafixers.kinds.Applicative;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.world.gen.UniformIntDistribution;
 import net.minecraft.world.gen.feature.FeatureConfig;
 
 public class NetherrackReplaceBlobsFeatureConfig
 implements FeatureConfig {
-    public static final Codec<NetherrackReplaceBlobsFeatureConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)BlockState.CODEC.fieldOf("target").forGetter(arg -> arg.target), (App)BlockState.CODEC.fieldOf("state").forGetter(arg -> arg.state), (App)Vec3i.field_25123.fieldOf("minimum_reach").forGetter(arg -> arg.minReachPos), (App)Vec3i.field_25123.fieldOf("maximum_reach").forGetter(arg -> arg.maxReachPos)).apply((Applicative)instance, NetherrackReplaceBlobsFeatureConfig::new));
-    public final BlockState target;
-    public final BlockState state;
-    public final Vec3i minReachPos;
-    public final Vec3i maxReachPos;
+    public static final Codec<NetherrackReplaceBlobsFeatureConfig> field_25848 = RecordCodecBuilder.create(instance -> instance.group((App)BlockState.CODEC.fieldOf("target").forGetter(arg -> arg.field_25849), (App)BlockState.CODEC.fieldOf("state").forGetter(arg -> arg.field_25850), (App)UniformIntDistribution.CODEC.fieldOf("radius").forGetter(arg -> arg.field_25851)).apply((Applicative)instance, NetherrackReplaceBlobsFeatureConfig::new));
+    public final BlockState field_25849;
+    public final BlockState field_25850;
+    private final UniformIntDistribution field_25851;
 
-    public NetherrackReplaceBlobsFeatureConfig(BlockState arg, BlockState arg2, Vec3i arg3, Vec3i arg4) {
-        this.target = arg;
-        this.state = arg2;
-        this.minReachPos = arg3;
-        this.maxReachPos = arg4;
+    public NetherrackReplaceBlobsFeatureConfig(BlockState arg, BlockState arg2, UniformIntDistribution arg3) {
+        this.field_25849 = arg;
+        this.field_25850 = arg2;
+        this.field_25851 = arg3;
     }
 
-    public static class Builder {
-        private BlockState target = Blocks.AIR.getDefaultState();
-        private BlockState state = Blocks.AIR.getDefaultState();
-        private Vec3i minReachPos = Vec3i.ZERO;
-        private Vec3i maxReachPos = Vec3i.ZERO;
-
-        public Builder target(BlockState arg) {
-            this.target = arg;
-            return this;
-        }
-
-        public Builder state(BlockState arg) {
-            this.state = arg;
-            return this;
-        }
-
-        public Builder minReachPos(Vec3i arg) {
-            this.minReachPos = arg;
-            return this;
-        }
-
-        public Builder maxReachPos(Vec3i arg) {
-            this.maxReachPos = arg;
-            return this;
-        }
-
-        public NetherrackReplaceBlobsFeatureConfig build() {
-            if (this.minReachPos.getX() < 0 || this.minReachPos.getY() < 0 || this.minReachPos.getZ() < 0) {
-                throw new IllegalArgumentException("Minimum reach cannot be less than zero");
-            }
-            if (this.minReachPos.getX() > this.maxReachPos.getX() || this.minReachPos.getY() > this.maxReachPos.getY() || this.minReachPos.getZ() > this.maxReachPos.getZ()) {
-                throw new IllegalArgumentException("Maximum reach must be greater than minimum reach for each axis");
-            }
-            return new NetherrackReplaceBlobsFeatureConfig(this.target, this.state, this.minReachPos, this.maxReachPos);
-        }
+    public UniformIntDistribution method_30405() {
+        return this.field_25851;
     }
 }
 

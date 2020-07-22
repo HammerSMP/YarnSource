@@ -30,36 +30,36 @@ implements Packet<ClientPlayPacketListener> {
     public PlaySoundIdS2CPacket() {
     }
 
-    public PlaySoundIdS2CPacket(Identifier arg, SoundCategory arg2, Vec3d arg3, float f, float g) {
-        this.id = arg;
-        this.category = arg2;
-        this.fixedX = (int)(arg3.x * 8.0);
-        this.fixedY = (int)(arg3.y * 8.0);
-        this.fixedZ = (int)(arg3.z * 8.0);
-        this.volume = f;
-        this.pitch = g;
+    public PlaySoundIdS2CPacket(Identifier sound, SoundCategory category, Vec3d pos, float volume, float pitch) {
+        this.id = sound;
+        this.category = category;
+        this.fixedX = (int)(pos.x * 8.0);
+        this.fixedY = (int)(pos.y * 8.0);
+        this.fixedZ = (int)(pos.z * 8.0);
+        this.volume = volume;
+        this.pitch = pitch;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.id = arg.readIdentifier();
-        this.category = arg.readEnumConstant(SoundCategory.class);
-        this.fixedX = arg.readInt();
-        this.fixedY = arg.readInt();
-        this.fixedZ = arg.readInt();
-        this.volume = arg.readFloat();
-        this.pitch = arg.readFloat();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.id = buf.readIdentifier();
+        this.category = buf.readEnumConstant(SoundCategory.class);
+        this.fixedX = buf.readInt();
+        this.fixedY = buf.readInt();
+        this.fixedZ = buf.readInt();
+        this.volume = buf.readFloat();
+        this.pitch = buf.readFloat();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeIdentifier(this.id);
-        arg.writeEnumConstant(this.category);
-        arg.writeInt(this.fixedX);
-        arg.writeInt(this.fixedY);
-        arg.writeInt(this.fixedZ);
-        arg.writeFloat(this.volume);
-        arg.writeFloat(this.pitch);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeIdentifier(this.id);
+        buf.writeEnumConstant(this.category);
+        buf.writeInt(this.fixedX);
+        buf.writeInt(this.fixedY);
+        buf.writeInt(this.fixedZ);
+        buf.writeFloat(this.volume);
+        buf.writeFloat(this.pitch);
     }
 
     @Environment(value=EnvType.CLIENT)

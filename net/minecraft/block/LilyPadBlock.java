@@ -28,23 +28,23 @@ extends PlantBlock {
     }
 
     @Override
-    public void onEntityCollision(BlockState arg, World arg2, BlockPos arg3, Entity arg4) {
-        super.onEntityCollision(arg, arg2, arg3, arg4);
-        if (arg2 instanceof ServerWorld && arg4 instanceof BoatEntity) {
-            arg2.breakBlock(new BlockPos(arg3), true, arg4);
+    public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
+        super.onEntityCollision(state, world, pos, entity);
+        if (world instanceof ServerWorld && entity instanceof BoatEntity) {
+            world.breakBlock(new BlockPos(pos), true, entity);
         }
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
         return SHAPE;
     }
 
     @Override
-    protected boolean canPlantOnTop(BlockState arg, BlockView arg2, BlockPos arg3) {
-        FluidState lv = arg2.getFluidState(arg3);
-        FluidState lv2 = arg2.getFluidState(arg3.up());
-        return (lv.getFluid() == Fluids.WATER || arg.getMaterial() == Material.ICE) && lv2.getFluid() == Fluids.EMPTY;
+    protected boolean canPlantOnTop(BlockState floor, BlockView world, BlockPos pos) {
+        FluidState lv = world.getFluidState(pos);
+        FluidState lv2 = world.getFluidState(pos.up());
+        return (lv.getFluid() == Fluids.WATER || floor.getMaterial() == Material.ICE) && lv2.getFluid() == Fluids.EMPTY;
     }
 }
 

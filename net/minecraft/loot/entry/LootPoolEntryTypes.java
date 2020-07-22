@@ -29,8 +29,8 @@ public class LootPoolEntryTypes {
     public static final LootPoolEntryType SEQUENCE = LootPoolEntryTypes.register("sequence", CombinedEntry.createSerializer(GroupEntry::new));
     public static final LootPoolEntryType GROUP = LootPoolEntryTypes.register("group", CombinedEntry.createSerializer(SequenceEntry::new));
 
-    private static LootPoolEntryType register(String string, JsonSerializer<? extends LootPoolEntry> arg) {
-        return Registry.register(Registry.LOOT_POOL_ENTRY_TYPE, new Identifier(string), new LootPoolEntryType(arg));
+    private static LootPoolEntryType register(String id, JsonSerializer<? extends LootPoolEntry> arg) {
+        return Registry.register(Registry.LOOT_POOL_ENTRY_TYPE, new Identifier(id), new LootPoolEntryType(arg));
     }
 
     public static Object createGsonSerializer() {

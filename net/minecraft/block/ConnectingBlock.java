@@ -40,19 +40,19 @@ extends Block {
     });
     protected final VoxelShape[] CONNECTIONS_TO_SHAPE;
 
-    protected ConnectingBlock(float f, AbstractBlock.Settings arg) {
-        super(arg);
-        this.CONNECTIONS_TO_SHAPE = this.generateFacingsToShapeMap(f);
+    protected ConnectingBlock(float radius, AbstractBlock.Settings settings) {
+        super(settings);
+        this.CONNECTIONS_TO_SHAPE = this.generateFacingsToShapeMap(radius);
     }
 
-    private VoxelShape[] generateFacingsToShapeMap(float f) {
-        float g = 0.5f - f;
-        float h = 0.5f + f;
+    private VoxelShape[] generateFacingsToShapeMap(float radius) {
+        float g = 0.5f - radius;
+        float h = 0.5f + radius;
         VoxelShape lv = Block.createCuboidShape(g * 16.0f, g * 16.0f, g * 16.0f, h * 16.0f, h * 16.0f, h * 16.0f);
         VoxelShape[] lvs = new VoxelShape[FACINGS.length];
         for (int i = 0; i < FACINGS.length; ++i) {
             Direction lv2 = FACINGS[i];
-            lvs[i] = VoxelShapes.cuboid(0.5 + Math.min((double)(-f), (double)lv2.getOffsetX() * 0.5), 0.5 + Math.min((double)(-f), (double)lv2.getOffsetY() * 0.5), 0.5 + Math.min((double)(-f), (double)lv2.getOffsetZ() * 0.5), 0.5 + Math.max((double)f, (double)lv2.getOffsetX() * 0.5), 0.5 + Math.max((double)f, (double)lv2.getOffsetY() * 0.5), 0.5 + Math.max((double)f, (double)lv2.getOffsetZ() * 0.5));
+            lvs[i] = VoxelShapes.cuboid(0.5 + Math.min((double)(-radius), (double)lv2.getOffsetX() * 0.5), 0.5 + Math.min((double)(-radius), (double)lv2.getOffsetY() * 0.5), 0.5 + Math.min((double)(-radius), (double)lv2.getOffsetZ() * 0.5), 0.5 + Math.max((double)radius, (double)lv2.getOffsetX() * 0.5), 0.5 + Math.max((double)radius, (double)lv2.getOffsetY() * 0.5), 0.5 + Math.max((double)radius, (double)lv2.getOffsetZ() * 0.5));
         }
         VoxelShape[] lvs2 = new VoxelShape[64];
         for (int j = 0; j < 64; ++j) {
@@ -67,19 +67,19 @@ extends Block {
     }
 
     @Override
-    public boolean isTranslucent(BlockState arg, BlockView arg2, BlockPos arg3) {
+    public boolean isTranslucent(BlockState state, BlockView world, BlockPos pos) {
         return false;
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
-        return this.CONNECTIONS_TO_SHAPE[this.getConnectionMask(arg)];
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        return this.CONNECTIONS_TO_SHAPE[this.getConnectionMask(state)];
     }
 
-    protected int getConnectionMask(BlockState arg) {
+    protected int getConnectionMask(BlockState state) {
         int i = 0;
         for (int j = 0; j < FACINGS.length; ++j) {
-            if (!((Boolean)arg.get(FACING_PROPERTIES.get(FACINGS[j]))).booleanValue()) continue;
+            if (!((Boolean)state.get(FACING_PROPERTIES.get(FACINGS[j]))).booleanValue()) continue;
             i |= 1 << j;
         }
         return i;

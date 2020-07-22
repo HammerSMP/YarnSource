@@ -18,9 +18,9 @@ public abstract class OptionSliderWidget
 extends SliderWidget {
     protected final GameOptions options;
 
-    protected OptionSliderWidget(GameOptions arg, int i, int j, int k, int l, double d) {
-        super(i, j, k, l, LiteralText.EMPTY, d);
-        this.options = arg;
+    protected OptionSliderWidget(GameOptions options, int x, int y, int width, int height, double value) {
+        super(x, y, width, height, LiteralText.EMPTY, value);
+        this.options = options;
     }
 }
 

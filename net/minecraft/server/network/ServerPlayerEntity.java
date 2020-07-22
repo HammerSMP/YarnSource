@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Random;
 import java.util.UUID;
@@ -31,12 +32,15 @@ import javax.annotation.Nullable;
 import net.minecraft.advancement.PlayerAdvancementTracker;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.HorizontalFacingBlock;
+import net.minecraft.block.NetherPortalBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.CommandBlockBlockEntity;
 import net.minecraft.block.entity.SignBlockEntity;
+import net.minecraft.class_5459;
 import net.minecraft.client.options.ChatVisibility;
-import net.minecraft.command.arguments.EntityAnchorArgumentType;
+import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.datafixer.NbtOps;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
@@ -142,10 +146,10 @@ import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.village.TraderOfferList;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
+import net.minecraft.world.TeleportTarget;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProperties;
 import net.minecraft.world.biome.source.BiomeAccess;
-import net.minecraft.world.dimension.DimensionType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -187,29 +191,30 @@ implements ScreenHandlerListener {
     @Nullable
     private BlockPos spawnPointPosition;
     private boolean spawnPointSet;
+    private float spawnAngle;
     private int screenHandlerSyncId;
     public boolean skipPacketSlotUpdates;
     public int pingMilliseconds;
     public boolean notInAnyWorld;
 
-    public ServerPlayerEntity(MinecraftServer minecraftServer, ServerWorld arg, GameProfile gameProfile, ServerPlayerInteractionManager arg2) {
-        super(arg, arg.getSpawnPos(), gameProfile);
-        arg2.player = this;
-        this.interactionManager = arg2;
-        this.server = minecraftServer;
-        this.statHandler = minecraftServer.getPlayerManager().createStatHandler(this);
-        this.advancementTracker = minecraftServer.getPlayerManager().getAdvancementTracker(this);
+    public ServerPlayerEntity(MinecraftServer server, ServerWorld world, GameProfile profile, ServerPlayerInteractionManager interactionManager) {
+        super(world, world.getSpawnPos(), world.method_30630(), profile);
+        interactionManager.player = this;
+        this.interactionManager = interactionManager;
+        this.server = server;
+        this.statHandler = server.getPlayerManager().createStatHandler(this);
+        this.advancementTracker = server.getPlayerManager().getAdvancementTracker(this);
         this.stepHeight = 1.0f;
-        this.moveToSpawn(arg);
+        this.moveToSpawn(world);
     }
 
-    private void moveToSpawn(ServerWorld arg) {
-        BlockPos lv = arg.getSpawnPos();
-        if (arg.getDimension().hasSkyLight() && arg.getServer().getSaveProperties().getGameMode() != GameMode.ADVENTURE) {
+    private void moveToSpawn(ServerWorld world) {
+        BlockPos lv = world.getSpawnPos();
+        if (world.getDimension().hasSkyLight() && world.getServer().getSaveProperties().getGameMode() != GameMode.ADVENTURE) {
             long l;
             long m;
-            int i = Math.max(0, this.server.getSpawnRadius(arg));
-            int j = MathHelper.floor(arg.getWorldBorder().getDistanceInsideBorder(lv.getX(), lv.getZ()));
+            int i = Math.max(0, this.server.getSpawnRadius(world));
+            int j = MathHelper.floor(world.getWorldBorder().getDistanceInsideBorder(lv.getX(), lv.getZ()));
             if (j < i) {
                 i = j;
             }
@@ -223,68 +228,69 @@ implements ScreenHandlerListener {
                 int q = (o + n * p) % k;
                 int r = q % (i * 2 + 1);
                 int s = q / (i * 2 + 1);
-                BlockPos lv2 = SpawnLocating.findOverworldSpawn(arg, lv.getX() + r - i, lv.getZ() + s - i, false);
+                BlockPos lv2 = SpawnLocating.findOverworldSpawn(world, lv.getX() + r - i, lv.getZ() + s - i, false);
                 if (lv2 == null) continue;
                 this.refreshPositionAndAngles(lv2, 0.0f, 0.0f);
-                if (!arg.doesNotCollide(this)) {
+                if (!world.doesNotCollide(this)) {
                     continue;
                 }
                 break;
             }
         } else {
             this.refreshPositionAndAngles(lv, 0.0f, 0.0f);
-            while (!arg.doesNotCollide(this) && this.getY() < 255.0) {
+            while (!world.doesNotCollide(this) && this.getY() < 255.0) {
                 this.updatePosition(this.getX(), this.getY() + 1.0, this.getZ());
             }
         }
     }
 
-    private int calculateSpawnOffsetMultiplier(int i) {
-        return i <= 16 ? i - 1 : 17;
+    private int calculateSpawnOffsetMultiplier(int horizontalSpawnArea) {
+        return horizontalSpawnArea <= 16 ? horizontalSpawnArea - 1 : 17;
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        if (arg.contains("playerGameType", 99)) {
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        if (tag.contains("playerGameType", 99)) {
             if (this.getServer().shouldForceGameMode()) {
                 this.interactionManager.setGameMode(this.getServer().getDefaultGameMode(), GameMode.NOT_SET);
             } else {
-                this.interactionManager.setGameMode(GameMode.byId(arg.getInt("playerGameType")), arg.contains("previousPlayerGameType", 3) ? GameMode.byId(arg.getInt("previousPlayerGameType")) : GameMode.NOT_SET);
+                this.interactionManager.setGameMode(GameMode.byId(tag.getInt("playerGameType")), tag.contains("previousPlayerGameType", 3) ? GameMode.byId(tag.getInt("previousPlayerGameType")) : GameMode.NOT_SET);
             }
         }
-        if (arg.contains("enteredNetherPosition", 10)) {
-            CompoundTag lv = arg.getCompound("enteredNetherPosition");
+        if (tag.contains("enteredNetherPosition", 10)) {
+            CompoundTag lv = tag.getCompound("enteredNetherPosition");
             this.enteredNetherPos = new Vec3d(lv.getDouble("x"), lv.getDouble("y"), lv.getDouble("z"));
         }
-        this.seenCredits = arg.getBoolean("seenCredits");
-        if (arg.contains("recipeBook", 10)) {
-            this.recipeBook.fromTag(arg.getCompound("recipeBook"), this.server.getRecipeManager());
+        this.seenCredits = tag.getBoolean("seenCredits");
+        if (tag.contains("recipeBook", 10)) {
+            this.recipeBook.fromTag(tag.getCompound("recipeBook"), this.server.getRecipeManager());
         }
         if (this.isSleeping()) {
             this.wakeUp();
         }
-        if (arg.contains("SpawnX", 99) && arg.contains("SpawnY", 99) && arg.contains("SpawnZ", 99)) {
-            this.spawnPointPosition = new BlockPos(arg.getInt("SpawnX"), arg.getInt("SpawnY"), arg.getInt("SpawnZ"));
-            this.spawnPointSet = arg.getBoolean("SpawnForced");
-            if (arg.contains("SpawnDimension")) {
-                this.spawnPointDimension = World.CODEC.parse((DynamicOps)NbtOps.INSTANCE, (Object)arg.get("SpawnDimension")).resultOrPartial(((Logger)LOGGER)::error).orElse(World.OVERWORLD);
+        if (tag.contains("SpawnX", 99) && tag.contains("SpawnY", 99) && tag.contains("SpawnZ", 99)) {
+            this.spawnPointPosition = new BlockPos(tag.getInt("SpawnX"), tag.getInt("SpawnY"), tag.getInt("SpawnZ"));
+            this.spawnPointSet = tag.getBoolean("SpawnForced");
+            this.spawnAngle = tag.getFloat("SpawnAngle");
+            if (tag.contains("SpawnDimension")) {
+                this.spawnPointDimension = World.CODEC.parse((DynamicOps)NbtOps.INSTANCE, (Object)tag.get("SpawnDimension")).resultOrPartial(((Logger)LOGGER)::error).orElse(World.OVERWORLD);
             }
         }
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
-        arg.putInt("playerGameType", this.interactionManager.getGameMode().getId());
-        arg.putInt("previousPlayerGameType", this.interactionManager.method_30119().getId());
-        arg.putBoolean("seenCredits", this.seenCredits);
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
+        tag.putInt("playerGameType", this.interactionManager.getGameMode().getId());
+        tag.putInt("previousPlayerGameType", this.interactionManager.method_30119().getId());
+        tag.putBoolean("seenCredits", this.seenCredits);
         if (this.enteredNetherPos != null) {
             CompoundTag lv = new CompoundTag();
             lv.putDouble("x", this.enteredNetherPos.x);
             lv.putDouble("y", this.enteredNetherPos.y);
             lv.putDouble("z", this.enteredNetherPos.z);
-            arg.put("enteredNetherPosition", lv);
+            tag.put("enteredNetherPosition", lv);
         }
         Entity lv2 = this.getRootVehicle();
         Entity lv3 = this.getVehicle();
@@ -294,16 +300,17 @@ implements ScreenHandlerListener {
             lv2.saveToTag(lv5);
             lv4.putUuid("Attach", lv3.getUuid());
             lv4.put("Entity", lv5);
-            arg.put("RootVehicle", lv4);
+            tag.put("RootVehicle", lv4);
         }
-        arg.put("recipeBook", this.recipeBook.toTag());
-        arg.putString("Dimension", this.world.getRegistryKey().getValue().toString());
+        tag.put("recipeBook", this.recipeBook.toTag());
+        tag.putString("Dimension", this.world.getRegistryKey().getValue().toString());
         if (this.spawnPointPosition != null) {
-            arg.putInt("SpawnX", this.spawnPointPosition.getX());
-            arg.putInt("SpawnY", this.spawnPointPosition.getY());
-            arg.putInt("SpawnZ", this.spawnPointPosition.getZ());
-            arg.putBoolean("SpawnForced", this.spawnPointSet);
-            Identifier.CODEC.encodeStart((DynamicOps)NbtOps.INSTANCE, (Object)this.spawnPointDimension.getValue()).resultOrPartial(((Logger)LOGGER)::error).ifPresent(arg2 -> arg.put("SpawnDimension", (Tag)arg2));
+            tag.putInt("SpawnX", this.spawnPointPosition.getX());
+            tag.putInt("SpawnY", this.spawnPointPosition.getY());
+            tag.putInt("SpawnZ", this.spawnPointPosition.getZ());
+            tag.putBoolean("SpawnForced", this.spawnPointSet);
+            tag.putFloat("SpawnAngle", this.spawnAngle);
+            Identifier.CODEC.encodeStart((DynamicOps)NbtOps.INSTANCE, (Object)this.spawnPointDimension.getValue()).resultOrPartial(((Logger)LOGGER)::error).ifPresent(arg2 -> tag.put("SpawnDimension", (Tag)arg2));
         }
     }
 
@@ -314,20 +321,20 @@ implements ScreenHandlerListener {
         this.syncedExperience = -1;
     }
 
-    public void setExperienceLevel(int i) {
-        this.experienceLevel = i;
+    public void setExperienceLevel(int level) {
+        this.experienceLevel = level;
         this.syncedExperience = -1;
     }
 
     @Override
-    public void addExperienceLevels(int i) {
-        super.addExperienceLevels(i);
+    public void addExperienceLevels(int levels) {
+        super.addExperienceLevels(levels);
         this.syncedExperience = -1;
     }
 
     @Override
-    public void applyEnchantmentCosts(ItemStack arg, int i) {
-        super.applyEnchantmentCosts(arg, i);
+    public void applyEnchantmentCosts(ItemStack enchantedItem, int experienceLevels) {
+        super.applyEnchantmentCosts(enchantedItem, experienceLevels);
         this.syncedExperience = -1;
     }
 
@@ -348,8 +355,8 @@ implements ScreenHandlerListener {
     }
 
     @Override
-    protected void onBlockCollision(BlockState arg) {
-        Criteria.ENTER_BLOCK.trigger(this, arg);
+    protected void onBlockCollision(BlockState state) {
+        Criteria.ENTER_BLOCK.trigger(this, state);
     }
 
     @Override
@@ -456,12 +463,12 @@ implements ScreenHandlerListener {
         }
     }
 
-    private void updateScores(ScoreboardCriterion arg2, int i) {
-        this.getScoreboard().forEachScore(arg2, this.getEntityName(), arg -> arg.setScore(i));
+    private void updateScores(ScoreboardCriterion criterion, int score) {
+        this.getScoreboard().forEachScore(criterion, this.getEntityName(), arg -> arg.setScore(score));
     }
 
     @Override
-    public void onDeath(DamageSource arg) {
+    public void onDeath(DamageSource source) {
         boolean bl = this.world.getGameRules().getBoolean(GameRules.SHOW_DEATH_MESSAGES);
         if (bl) {
             Text lv = this.getDamageTracker().getDeathMessage();
@@ -470,7 +477,7 @@ implements ScreenHandlerListener {
                     int i = 256;
                     String string = lv.asTruncatedString(256);
                     TranslatableText lv = new TranslatableText("death.attack.message_too_long", new LiteralText(string).formatted(Formatting.YELLOW));
-                    MutableText lv2 = new TranslatableText("death.attack.even_more_magic", this.getDisplayName()).styled(arg2 -> arg2.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, lv)));
+                    MutableText lv2 = new TranslatableText("death.attack.even_more_magic", this.getDisplayName()).styled(arg2 -> arg2.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, lv)));
                     this.networkHandler.sendPacket(new CombatEventS2CPacket(this.getDamageTracker(), CombatEventS2CPacket.Type.ENTITY_DIED, lv2));
                 }
             }));
@@ -490,13 +497,13 @@ implements ScreenHandlerListener {
             this.forgiveMobAnger();
         }
         if (!this.isSpectator()) {
-            this.drop(arg);
+            this.drop(source);
         }
         this.getScoreboard().forEachScore(ScoreboardCriterion.DEATH_COUNT, this.getEntityName(), ScoreboardPlayerScore::incrementScore);
         LivingEntity lv3 = this.getPrimeAdversary();
         if (lv3 != null) {
             this.incrementStat(Stats.KILLED_BY.getOrCreateStat(lv3.getType()));
-            lv3.updateKilledAdvancementCriterion(this, this.scoreAmount, arg);
+            lv3.updateKilledAdvancementCriterion(this, this.scoreAmount, source);
             this.onKilledBy(lv3);
         }
         this.world.sendEntityStatus(this, (byte)3);
@@ -514,16 +521,16 @@ implements ScreenHandlerListener {
     }
 
     @Override
-    public void updateKilledAdvancementCriterion(Entity arg, int i, DamageSource arg2) {
-        if (arg == this) {
+    public void updateKilledAdvancementCriterion(Entity killer, int score, DamageSource damageSource) {
+        if (killer == this) {
             return;
         }
-        super.updateKilledAdvancementCriterion(arg, i, arg2);
-        this.addScore(i);
+        super.updateKilledAdvancementCriterion(killer, score, damageSource);
+        this.addScore(score);
         String string = this.getEntityName();
-        String string2 = arg.getEntityName();
+        String string2 = killer.getEntityName();
         this.getScoreboard().forEachScore(ScoreboardCriterion.TOTAL_KILL_COUNT, string, ScoreboardPlayerScore::incrementScore);
-        if (arg instanceof PlayerEntity) {
+        if (killer instanceof PlayerEntity) {
             this.incrementStat(Stats.PLAYER_KILLS);
             this.getScoreboard().forEachScore(ScoreboardCriterion.PLAYER_KILL_COUNT, string, ScoreboardPlayerScore::incrementScore);
         } else {
@@ -531,31 +538,31 @@ implements ScreenHandlerListener {
         }
         this.updateScoreboardScore(string, string2, ScoreboardCriterion.TEAM_KILLS);
         this.updateScoreboardScore(string2, string, ScoreboardCriterion.KILLED_BY_TEAMS);
-        Criteria.PLAYER_KILLED_ENTITY.trigger(this, arg, arg2);
+        Criteria.PLAYER_KILLED_ENTITY.trigger(this, killer, damageSource);
     }
 
-    private void updateScoreboardScore(String string, String string2, ScoreboardCriterion[] args) {
+    private void updateScoreboardScore(String playerName, String team, ScoreboardCriterion[] args) {
         int i;
-        Team lv = this.getScoreboard().getPlayerTeam(string2);
+        Team lv = this.getScoreboard().getPlayerTeam(team);
         if (lv != null && (i = lv.getColor().getColorIndex()) >= 0 && i < args.length) {
-            this.getScoreboard().forEachScore(args[i], string, ScoreboardPlayerScore::incrementScore);
+            this.getScoreboard().forEachScore(args[i], playerName, ScoreboardPlayerScore::incrementScore);
         }
     }
 
     @Override
-    public boolean damage(DamageSource arg, float f) {
+    public boolean damage(DamageSource source, float amount) {
         boolean bl;
-        if (this.isInvulnerableTo(arg)) {
+        if (this.isInvulnerableTo(source)) {
             return false;
         }
-        boolean bl2 = bl = this.server.isDedicated() && this.isPvpEnabled() && "fall".equals(arg.name);
-        if (!bl && this.joinInvulnerabilityTicks > 0 && arg != DamageSource.OUT_OF_WORLD) {
+        boolean bl2 = bl = this.server.isDedicated() && this.isPvpEnabled() && "fall".equals(source.name);
+        if (!bl && this.joinInvulnerabilityTicks > 0 && source != DamageSource.OUT_OF_WORLD) {
             return false;
         }
-        if (arg instanceof EntityDamageSource) {
+        if (source instanceof EntityDamageSource) {
             PersistentProjectileEntity lv2;
             Entity lv3;
-            Entity lv = arg.getAttacker();
+            Entity lv = source.getAttacker();
             if (lv instanceof PlayerEntity && !this.shouldDamagePlayer((PlayerEntity)lv)) {
                 return false;
             }
@@ -563,15 +570,15 @@ implements ScreenHandlerListener {
                 return false;
             }
         }
-        return super.damage(arg, f);
+        return super.damage(source, amount);
     }
 
     @Override
-    public boolean shouldDamagePlayer(PlayerEntity arg) {
+    public boolean shouldDamagePlayer(PlayerEntity player) {
         if (!this.isPvpEnabled()) {
             return false;
         }
-        return super.shouldDamagePlayer(arg);
+        return super.shouldDamagePlayer(player);
     }
 
     private boolean isPvpEnabled() {
@@ -580,12 +587,22 @@ implements ScreenHandlerListener {
 
     @Override
     @Nullable
-    public Entity changeDimension(ServerWorld arg) {
-        float h;
+    protected TeleportTarget getTeleportTarget(ServerWorld destination) {
+        TeleportTarget lv = super.getTeleportTarget(destination);
+        if (lv != null && this.world.getRegistryKey() == World.OVERWORLD && destination.getRegistryKey() == World.END) {
+            Vec3d lv2 = lv.position.add(0.0, -1.0, 0.0);
+            return new TeleportTarget(lv2, Vec3d.ZERO, 90.0f, 0.0f);
+        }
+        return lv;
+    }
+
+    @Override
+    @Nullable
+    public Entity moveToWorld(ServerWorld destination) {
         this.inTeleportationState = true;
         ServerWorld lv = this.getServerWorld();
         RegistryKey<World> lv2 = lv.getRegistryKey();
-        if (lv2 == World.END && arg.getRegistryKey() == World.OVERWORLD) {
+        if (lv2 == World.END && destination.getRegistryKey() == World.OVERWORLD) {
             this.detach();
             this.getServerWorld().removePlayer(this);
             if (!this.notInAnyWorld) {
@@ -595,83 +612,72 @@ implements ScreenHandlerListener {
             }
             return this;
         }
-        WorldProperties lv3 = arg.getLevelProperties();
-        this.networkHandler.sendPacket(new PlayerRespawnS2CPacket(arg.getDimensionRegistryKey(), arg.getRegistryKey(), BiomeAccess.hashSeed(arg.getSeed()), this.interactionManager.getGameMode(), this.interactionManager.method_30119(), arg.isDebugWorld(), arg.isFlat(), true));
+        WorldProperties lv3 = destination.getLevelProperties();
+        this.networkHandler.sendPacket(new PlayerRespawnS2CPacket(destination.getDimensionRegistryKey(), destination.getRegistryKey(), BiomeAccess.hashSeed(destination.getSeed()), this.interactionManager.getGameMode(), this.interactionManager.method_30119(), destination.isDebugWorld(), destination.isFlat(), true));
         this.networkHandler.sendPacket(new DifficultyS2CPacket(lv3.getDifficulty(), lv3.isDifficultyLocked()));
         PlayerManager lv4 = this.server.getPlayerManager();
         lv4.sendCommandTree(this);
         lv.removePlayer(this);
         this.removed = false;
-        double d = this.getX();
-        double e = this.getY();
-        double f = this.getZ();
-        float g = this.pitch;
-        float i = h = this.yaw;
-        lv.getProfiler().push("moving");
-        if (arg.getRegistryKey() == World.END) {
-            BlockPos lv5 = ServerWorld.END_SPAWN_POS;
-            d = lv5.getX();
-            e = lv5.getY();
-            f = lv5.getZ();
-            h = 90.0f;
-            g = 0.0f;
-        } else {
-            if (lv2 == World.OVERWORLD && arg.getRegistryKey() == World.NETHER) {
+        TeleportTarget lv5 = this.getTeleportTarget(destination);
+        if (lv5 != null) {
+            lv.getProfiler().push("moving");
+            if (lv2 == World.OVERWORLD && destination.getRegistryKey() == World.NETHER) {
                 this.enteredNetherPos = this.getPos();
+            } else if (destination.getRegistryKey() == World.END) {
+                this.createEndSpawnPlatform(destination, new BlockPos(lv5.position));
             }
-            DimensionType lv6 = lv.getDimension();
-            DimensionType lv7 = arg.getDimension();
-            double j = 8.0;
-            if (!lv6.isShrunk() && lv7.isShrunk()) {
-                d /= 8.0;
-                f /= 8.0;
-            } else if (lv6.isShrunk() && !lv7.isShrunk()) {
-                d *= 8.0;
-                f *= 8.0;
+            lv.getProfiler().pop();
+            lv.getProfiler().push("placing");
+            this.setWorld(destination);
+            destination.onPlayerChangeDimension(this);
+            this.worldChanged(lv);
+            this.setRotation(lv5.yaw, lv5.pitch);
+            this.refreshPositionAfterTeleport(lv5.position.x, lv5.position.y, lv5.position.z);
+            lv.getProfiler().pop();
+            this.interactionManager.setWorld(destination);
+            this.networkHandler.sendPacket(new PlayerAbilitiesS2CPacket(this.abilities));
+            lv4.sendWorldInfo(this, destination);
+            lv4.sendPlayerStatus(this);
+            for (StatusEffectInstance lv6 : this.getStatusEffects()) {
+                this.networkHandler.sendPacket(new EntityStatusEffectS2CPacket(this.getEntityId(), lv6));
             }
+            this.networkHandler.sendPacket(new WorldEventS2CPacket(1032, BlockPos.ORIGIN, 0, false));
+            this.syncedExperience = -1;
+            this.syncedHealth = -1.0f;
+            this.syncedFoodLevel = -1;
         }
-        this.refreshPositionAndAngles(d, e, f, h, g);
-        lv.getProfiler().pop();
-        lv.getProfiler().push("placing");
-        double k = Math.min(-2.9999872E7, arg.getWorldBorder().getBoundWest() + 16.0);
-        double l = Math.min(-2.9999872E7, arg.getWorldBorder().getBoundNorth() + 16.0);
-        double m = Math.min(2.9999872E7, arg.getWorldBorder().getBoundEast() - 16.0);
-        double n = Math.min(2.9999872E7, arg.getWorldBorder().getBoundSouth() - 16.0);
-        d = MathHelper.clamp(d, k, m);
-        f = MathHelper.clamp(f, l, n);
-        this.refreshPositionAndAngles(d, e, f, h, g);
-        if (arg.getRegistryKey() == World.END) {
-            int o = MathHelper.floor(this.getX());
-            int p = MathHelper.floor(this.getY()) - 1;
-            int q = MathHelper.floor(this.getZ());
-            ServerWorld.createEndSpawnPlatform(arg);
-            this.refreshPositionAndAngles(o, p, q, h, 0.0f);
-            this.setVelocity(Vec3d.ZERO);
-        } else if (!arg.getPortalForcer().usePortal(this, i)) {
-            arg.getPortalForcer().createPortal(this);
-            arg.getPortalForcer().usePortal(this, i);
-        }
-        lv.getProfiler().pop();
-        this.setWorld(arg);
-        arg.onPlayerChangeDimension(this);
-        this.dimensionChanged(lv);
-        this.networkHandler.requestTeleport(this.getX(), this.getY(), this.getZ(), h, g);
-        this.interactionManager.setWorld(arg);
-        this.networkHandler.sendPacket(new PlayerAbilitiesS2CPacket(this.abilities));
-        lv4.sendWorldInfo(this, arg);
-        lv4.sendPlayerStatus(this);
-        for (StatusEffectInstance lv8 : this.getStatusEffects()) {
-            this.networkHandler.sendPacket(new EntityStatusEffectS2CPacket(this.getEntityId(), lv8));
-        }
-        this.networkHandler.sendPacket(new WorldEventS2CPacket(1032, BlockPos.ORIGIN, 0, false));
-        this.syncedExperience = -1;
-        this.syncedHealth = -1.0f;
-        this.syncedFoodLevel = -1;
         return this;
     }
 
-    private void dimensionChanged(ServerWorld arg) {
-        RegistryKey<World> lv = arg.getRegistryKey();
+    private void createEndSpawnPlatform(ServerWorld world, BlockPos centerPos) {
+        BlockPos.Mutable lv = centerPos.mutableCopy();
+        for (int i = -2; i <= 2; ++i) {
+            for (int j = -2; j <= 2; ++j) {
+                for (int k = -1; k < 3; ++k) {
+                    BlockState lv2 = k == -1 ? Blocks.OBSIDIAN.getDefaultState() : Blocks.AIR.getDefaultState();
+                    world.setBlockState(lv.set(centerPos).move(j, k, i), lv2);
+                }
+            }
+        }
+    }
+
+    @Override
+    protected Optional<class_5459.class_5460> method_30330(ServerWorld arg, BlockPos arg2, boolean bl) {
+        Optional<class_5459.class_5460> optional = super.method_30330(arg, arg2, bl);
+        if (optional.isPresent()) {
+            return optional;
+        }
+        Direction.Axis lv = this.world.getBlockState(this.lastNetherPortalPosition).method_28500(NetherPortalBlock.AXIS).orElse(Direction.Axis.X);
+        Optional<class_5459.class_5460> optional2 = arg.getPortalForcer().method_30482(arg2, lv);
+        if (!optional2.isPresent()) {
+            LOGGER.error("Unable to create a portal, likely target out of worldborder");
+        }
+        return optional2;
+    }
+
+    private void worldChanged(ServerWorld targetWorld) {
+        RegistryKey<World> lv = targetWorld.getRegistryKey();
         RegistryKey<World> lv2 = this.world.getRegistryKey();
         Criteria.CHANGED_DIMENSION.trigger(this, lv, lv2);
         if (lv == World.NETHER && lv2 == World.OVERWORLD && this.enteredNetherPos != null) {
@@ -683,58 +689,58 @@ implements ScreenHandlerListener {
     }
 
     @Override
-    public boolean canBeSpectated(ServerPlayerEntity arg) {
-        if (arg.isSpectator()) {
+    public boolean canBeSpectated(ServerPlayerEntity spectator) {
+        if (spectator.isSpectator()) {
             return this.getCameraEntity() == this;
         }
         if (this.isSpectator()) {
             return false;
         }
-        return super.canBeSpectated(arg);
+        return super.canBeSpectated(spectator);
     }
 
-    private void sendBlockEntityUpdate(BlockEntity arg) {
+    private void sendBlockEntityUpdate(BlockEntity blockEntity) {
         BlockEntityUpdateS2CPacket lv;
-        if (arg != null && (lv = arg.toUpdatePacket()) != null) {
+        if (blockEntity != null && (lv = blockEntity.toUpdatePacket()) != null) {
             this.networkHandler.sendPacket(lv);
         }
     }
 
     @Override
-    public void sendPickup(Entity arg, int i) {
-        super.sendPickup(arg, i);
+    public void sendPickup(Entity item, int count) {
+        super.sendPickup(item, count);
         this.currentScreenHandler.sendContentUpdates();
     }
 
     @Override
-    public Either<PlayerEntity.SleepFailureReason, Unit> trySleep(BlockPos arg2) {
-        Direction lv = this.world.getBlockState(arg2).get(HorizontalFacingBlock.FACING);
+    public Either<PlayerEntity.SleepFailureReason, Unit> trySleep(BlockPos pos) {
+        Direction lv = this.world.getBlockState(pos).get(HorizontalFacingBlock.FACING);
         if (this.isSleeping() || !this.isAlive()) {
             return Either.left((Object)((Object)PlayerEntity.SleepFailureReason.OTHER_PROBLEM));
         }
         if (!this.world.getDimension().isNatural()) {
             return Either.left((Object)((Object)PlayerEntity.SleepFailureReason.NOT_POSSIBLE_HERE));
         }
-        if (!this.isBedTooFarAway(arg2, lv)) {
+        if (!this.isBedTooFarAway(pos, lv)) {
             return Either.left((Object)((Object)PlayerEntity.SleepFailureReason.TOO_FAR_AWAY));
         }
-        if (this.isBedObstructed(arg2, lv)) {
+        if (this.isBedObstructed(pos, lv)) {
             return Either.left((Object)((Object)PlayerEntity.SleepFailureReason.OBSTRUCTED));
         }
-        this.setSpawnPoint(this.world.getRegistryKey(), arg2, false, true);
+        this.setSpawnPoint(this.world.getRegistryKey(), pos, 0.0f, false, true);
         if (this.world.isDay()) {
             return Either.left((Object)((Object)PlayerEntity.SleepFailureReason.NOT_POSSIBLE_NOW));
         }
         if (!this.isCreative()) {
             double d = 8.0;
             double e = 5.0;
-            Vec3d lv2 = Vec3d.ofBottomCenter(arg2);
-            List<HostileEntity> list = this.world.getEntities(HostileEntity.class, new Box(lv2.getX() - 8.0, lv2.getY() - 5.0, lv2.getZ() - 8.0, lv2.getX() + 8.0, lv2.getY() + 5.0, lv2.getZ() + 8.0), arg -> arg.isAngryAt(this));
+            Vec3d lv2 = Vec3d.ofBottomCenter(pos);
+            List<HostileEntity> list = this.world.getEntitiesByClass(HostileEntity.class, new Box(lv2.getX() - 8.0, lv2.getY() - 5.0, lv2.getZ() - 8.0, lv2.getX() + 8.0, lv2.getY() + 5.0, lv2.getZ() + 8.0), arg -> arg.isAngryAt(this));
             if (!list.isEmpty()) {
                 return Either.left((Object)((Object)PlayerEntity.SleepFailureReason.NOT_SAFE));
             }
         }
-        Either either = super.trySleep(arg2).ifRight(arg -> {
+        Either either = super.trySleep(pos).ifRight(arg -> {
             this.incrementStat(Stats.SLEEP_IN_BED);
             Criteria.SLEPT_IN_BED.trigger(this);
         });
@@ -743,40 +749,40 @@ implements ScreenHandlerListener {
     }
 
     @Override
-    public void sleep(BlockPos arg) {
+    public void sleep(BlockPos pos) {
         this.resetStat(Stats.CUSTOM.getOrCreateStat(Stats.TIME_SINCE_REST));
-        super.sleep(arg);
+        super.sleep(pos);
     }
 
-    private boolean isBedTooFarAway(BlockPos arg, Direction arg2) {
-        return this.isBedTooFarAway(arg) || this.isBedTooFarAway(arg.offset(arg2.getOpposite()));
+    private boolean isBedTooFarAway(BlockPos pos, Direction direction) {
+        return this.isBedTooFarAway(pos) || this.isBedTooFarAway(pos.offset(direction.getOpposite()));
     }
 
-    private boolean isBedTooFarAway(BlockPos arg) {
-        Vec3d lv = Vec3d.ofBottomCenter(arg);
+    private boolean isBedTooFarAway(BlockPos pos) {
+        Vec3d lv = Vec3d.ofBottomCenter(pos);
         return Math.abs(this.getX() - lv.getX()) <= 3.0 && Math.abs(this.getY() - lv.getY()) <= 2.0 && Math.abs(this.getZ() - lv.getZ()) <= 3.0;
     }
 
-    private boolean isBedObstructed(BlockPos arg, Direction arg2) {
-        BlockPos lv = arg.up();
-        return !this.doesNotSuffocate(lv) || !this.doesNotSuffocate(lv.offset(arg2.getOpposite()));
+    private boolean isBedObstructed(BlockPos pos, Direction direction) {
+        BlockPos lv = pos.up();
+        return !this.doesNotSuffocate(lv) || !this.doesNotSuffocate(lv.offset(direction.getOpposite()));
     }
 
     @Override
-    public void wakeUp(boolean bl, boolean bl2) {
+    public void wakeUp(boolean bl, boolean updateSleepingPlayers) {
         if (this.isSleeping()) {
             this.getServerWorld().getChunkManager().sendToNearbyPlayers(this, new EntityAnimationS2CPacket(this, 2));
         }
-        super.wakeUp(bl, bl2);
+        super.wakeUp(bl, updateSleepingPlayers);
         if (this.networkHandler != null) {
             this.networkHandler.requestTeleport(this.getX(), this.getY(), this.getZ(), this.yaw, this.pitch);
         }
     }
 
     @Override
-    public boolean startRiding(Entity arg, boolean bl) {
+    public boolean startRiding(Entity entity, boolean force) {
         Entity lv = this.getVehicle();
-        if (!super.startRiding(arg, bl)) {
+        if (!super.startRiding(entity, force)) {
             return false;
         }
         Entity lv2 = this.getVehicle();
@@ -797,33 +803,33 @@ implements ScreenHandlerListener {
     }
 
     @Override
-    public boolean isInvulnerableTo(DamageSource arg) {
-        return super.isInvulnerableTo(arg) || this.isInTeleportationState() || this.abilities.invulnerable && arg == DamageSource.WITHER;
+    public boolean isInvulnerableTo(DamageSource damageSource) {
+        return super.isInvulnerableTo(damageSource) || this.isInTeleportationState() || this.abilities.invulnerable && damageSource == DamageSource.WITHER;
     }
 
     @Override
-    protected void fall(double d, boolean bl, BlockState arg, BlockPos arg2) {
+    protected void fall(double heightDifference, boolean onGround, BlockState landedState, BlockPos landedPosition) {
     }
 
     @Override
-    protected void applyMovementEffects(BlockPos arg) {
+    protected void applyMovementEffects(BlockPos pos) {
         if (!this.isSpectator()) {
-            super.applyMovementEffects(arg);
+            super.applyMovementEffects(pos);
         }
     }
 
-    public void handleFall(double d, boolean bl) {
+    public void handleFall(double heightDifference, boolean onGround) {
         BlockPos lv = this.getLandingPos();
         if (!this.world.isChunkLoaded(lv)) {
             return;
         }
-        super.fall(d, bl, this.world.getBlockState(lv), lv);
+        super.fall(heightDifference, onGround, this.world.getBlockState(lv), lv);
     }
 
     @Override
-    public void openEditSignScreen(SignBlockEntity arg) {
-        arg.setEditor(this);
-        this.networkHandler.sendPacket(new SignEditorOpenS2CPacket(arg.getPos()));
+    public void openEditSignScreen(SignBlockEntity sign) {
+        sign.setEditor(this);
+        this.networkHandler.sendPacket(new SignEditorOpenS2CPacket(sign.getPos()));
     }
 
     private void incrementScreenHandlerSyncId() {
@@ -831,87 +837,87 @@ implements ScreenHandlerListener {
     }
 
     @Override
-    public OptionalInt openHandledScreen(@Nullable NamedScreenHandlerFactory arg) {
-        if (arg == null) {
+    public OptionalInt openHandledScreen(@Nullable NamedScreenHandlerFactory factory) {
+        if (factory == null) {
             return OptionalInt.empty();
         }
         if (this.currentScreenHandler != this.playerScreenHandler) {
             this.closeHandledScreen();
         }
         this.incrementScreenHandlerSyncId();
-        ScreenHandler lv = arg.createMenu(this.screenHandlerSyncId, this.inventory, this);
+        ScreenHandler lv = factory.createMenu(this.screenHandlerSyncId, this.inventory, this);
         if (lv == null) {
             if (this.isSpectator()) {
                 this.sendMessage(new TranslatableText("container.spectatorCantOpen").formatted(Formatting.RED), true);
             }
             return OptionalInt.empty();
         }
-        this.networkHandler.sendPacket(new OpenScreenS2CPacket(lv.syncId, lv.getType(), arg.getDisplayName()));
+        this.networkHandler.sendPacket(new OpenScreenS2CPacket(lv.syncId, lv.getType(), factory.getDisplayName()));
         lv.addListener(this);
         this.currentScreenHandler = lv;
         return OptionalInt.of(this.screenHandlerSyncId);
     }
 
     @Override
-    public void sendTradeOffers(int i, TraderOfferList arg, int j, int k, boolean bl, boolean bl2) {
-        this.networkHandler.sendPacket(new SetTradeOffersS2CPacket(i, arg, j, k, bl, bl2));
+    public void sendTradeOffers(int syncId, TraderOfferList offers, int levelProgress, int experience, boolean leveled, boolean refreshable) {
+        this.networkHandler.sendPacket(new SetTradeOffersS2CPacket(syncId, offers, levelProgress, experience, leveled, refreshable));
     }
 
     @Override
-    public void openHorseInventory(HorseBaseEntity arg, Inventory arg2) {
+    public void openHorseInventory(HorseBaseEntity horse, Inventory inventory) {
         if (this.currentScreenHandler != this.playerScreenHandler) {
             this.closeHandledScreen();
         }
         this.incrementScreenHandlerSyncId();
-        this.networkHandler.sendPacket(new OpenHorseScreenS2CPacket(this.screenHandlerSyncId, arg2.size(), arg.getEntityId()));
-        this.currentScreenHandler = new HorseScreenHandler(this.screenHandlerSyncId, this.inventory, arg2, arg);
+        this.networkHandler.sendPacket(new OpenHorseScreenS2CPacket(this.screenHandlerSyncId, inventory.size(), horse.getEntityId()));
+        this.currentScreenHandler = new HorseScreenHandler(this.screenHandlerSyncId, this.inventory, inventory, horse);
         this.currentScreenHandler.addListener(this);
     }
 
     @Override
-    public void openEditBookScreen(ItemStack arg, Hand arg2) {
-        Item lv = arg.getItem();
+    public void openEditBookScreen(ItemStack book, Hand hand) {
+        Item lv = book.getItem();
         if (lv == Items.WRITTEN_BOOK) {
-            if (WrittenBookItem.resolve(arg, this.getCommandSource(), this)) {
+            if (WrittenBookItem.resolve(book, this.getCommandSource(), this)) {
                 this.currentScreenHandler.sendContentUpdates();
             }
-            this.networkHandler.sendPacket(new OpenWrittenBookS2CPacket(arg2));
+            this.networkHandler.sendPacket(new OpenWrittenBookS2CPacket(hand));
         }
     }
 
     @Override
-    public void openCommandBlockScreen(CommandBlockBlockEntity arg) {
-        arg.setNeedsUpdatePacket(true);
-        this.sendBlockEntityUpdate(arg);
+    public void openCommandBlockScreen(CommandBlockBlockEntity commandBlock) {
+        commandBlock.setNeedsUpdatePacket(true);
+        this.sendBlockEntityUpdate(commandBlock);
     }
 
     @Override
-    public void onSlotUpdate(ScreenHandler arg, int i, ItemStack arg2) {
-        if (arg.getSlot(i) instanceof CraftingResultSlot) {
+    public void onSlotUpdate(ScreenHandler handler, int slotId, ItemStack stack) {
+        if (handler.getSlot(slotId) instanceof CraftingResultSlot) {
             return;
         }
-        if (arg == this.playerScreenHandler) {
-            Criteria.INVENTORY_CHANGED.trigger(this, this.inventory, arg2);
+        if (handler == this.playerScreenHandler) {
+            Criteria.INVENTORY_CHANGED.trigger(this, this.inventory, stack);
         }
         if (this.skipPacketSlotUpdates) {
             return;
         }
-        this.networkHandler.sendPacket(new ScreenHandlerSlotUpdateS2CPacket(arg.syncId, i, arg2));
+        this.networkHandler.sendPacket(new ScreenHandlerSlotUpdateS2CPacket(handler.syncId, slotId, stack));
     }
 
-    public void openHandledScreen(ScreenHandler arg) {
-        this.onHandlerRegistered(arg, arg.getStacks());
+    public void openHandledScreen(ScreenHandler handler) {
+        this.onHandlerRegistered(handler, handler.getStacks());
     }
 
     @Override
-    public void onHandlerRegistered(ScreenHandler arg, DefaultedList<ItemStack> arg2) {
-        this.networkHandler.sendPacket(new InventoryS2CPacket(arg.syncId, arg2));
+    public void onHandlerRegistered(ScreenHandler handler, DefaultedList<ItemStack> stacks) {
+        this.networkHandler.sendPacket(new InventoryS2CPacket(handler.syncId, stacks));
         this.networkHandler.sendPacket(new ScreenHandlerSlotUpdateS2CPacket(-1, -1, this.inventory.getCursorStack()));
     }
 
     @Override
-    public void onPropertyUpdate(ScreenHandler arg, int i, int j) {
-        this.networkHandler.sendPacket(new ScreenHandlerPropertyUpdateS2CPacket(arg.syncId, i, j));
+    public void onPropertyUpdate(ScreenHandler handler, int property, int value) {
+        this.networkHandler.sendPacket(new ScreenHandlerPropertyUpdateS2CPacket(handler.syncId, property, value));
     }
 
     @Override
@@ -946,39 +952,39 @@ implements ScreenHandlerListener {
     }
 
     @Override
-    public void increaseStat(Stat<?> arg2, int i) {
-        this.statHandler.increaseStat(this, arg2, i);
-        this.getScoreboard().forEachScore(arg2, this.getEntityName(), arg -> arg.incrementScore(i));
+    public void increaseStat(Stat<?> stat, int amount) {
+        this.statHandler.increaseStat(this, stat, amount);
+        this.getScoreboard().forEachScore(stat, this.getEntityName(), arg -> arg.incrementScore(amount));
     }
 
     @Override
-    public void resetStat(Stat<?> arg) {
-        this.statHandler.setStat(this, arg, 0);
-        this.getScoreboard().forEachScore(arg, this.getEntityName(), ScoreboardPlayerScore::clearScore);
+    public void resetStat(Stat<?> stat) {
+        this.statHandler.setStat(this, stat, 0);
+        this.getScoreboard().forEachScore(stat, this.getEntityName(), ScoreboardPlayerScore::clearScore);
     }
 
     @Override
-    public int unlockRecipes(Collection<Recipe<?>> collection) {
-        return this.recipeBook.unlockRecipes(collection, this);
+    public int unlockRecipes(Collection<Recipe<?>> recipes) {
+        return this.recipeBook.unlockRecipes(recipes, this);
     }
 
     @Override
-    public void unlockRecipes(Identifier[] args) {
+    public void unlockRecipes(Identifier[] ids) {
         ArrayList list = Lists.newArrayList();
-        for (Identifier lv : args) {
+        for (Identifier lv : ids) {
             this.server.getRecipeManager().get(lv).ifPresent(list::add);
         }
         this.unlockRecipes(list);
     }
 
     @Override
-    public int lockRecipes(Collection<Recipe<?>> collection) {
-        return this.recipeBook.lockRecipes(collection, this);
+    public int lockRecipes(Collection<Recipe<?>> recipes) {
+        return this.recipeBook.lockRecipes(recipes, this);
     }
 
     @Override
-    public void addExperience(int i) {
-        super.addExperience(i);
+    public void addExperience(int experience) {
+        super.addExperience(experience);
         this.syncedExperience = -1;
     }
 
@@ -999,8 +1005,8 @@ implements ScreenHandlerListener {
     }
 
     @Override
-    public void sendMessage(Text arg, boolean bl) {
-        this.networkHandler.sendPacket(new GameMessageS2CPacket(arg, bl ? MessageType.GAME_INFO : MessageType.CHAT, Util.NIL_UUID));
+    public void sendMessage(Text message, boolean actionBar) {
+        this.networkHandler.sendPacket(new GameMessageS2CPacket(message, actionBar ? MessageType.GAME_INFO : MessageType.CHAT, Util.NIL_UUID));
     }
 
     @Override
@@ -1012,9 +1018,9 @@ implements ScreenHandlerListener {
     }
 
     @Override
-    public void lookAt(EntityAnchorArgumentType.EntityAnchor arg, Vec3d arg2) {
-        super.lookAt(arg, arg2);
-        this.networkHandler.sendPacket(new LookAtS2CPacket(arg, arg2.x, arg2.y, arg2.z));
+    public void lookAt(EntityAnchorArgumentType.EntityAnchor anchorPoint, Vec3d target) {
+        super.lookAt(anchorPoint, target);
+        this.networkHandler.sendPacket(new LookAtS2CPacket(anchorPoint, target.x, target.y, target.z));
     }
 
     public void method_14222(EntityAnchorArgumentType.EntityAnchor arg, Entity arg2, EntityAnchorArgumentType.EntityAnchor arg3) {
@@ -1023,44 +1029,42 @@ implements ScreenHandlerListener {
         this.networkHandler.sendPacket(new LookAtS2CPacket(arg, arg2, arg3));
     }
 
-    public void copyFrom(ServerPlayerEntity arg, boolean bl) {
-        if (bl) {
-            this.inventory.clone(arg.inventory);
-            this.setHealth(arg.getHealth());
-            this.hungerManager = arg.hungerManager;
-            this.experienceLevel = arg.experienceLevel;
-            this.totalExperience = arg.totalExperience;
-            this.experienceProgress = arg.experienceProgress;
-            this.setScore(arg.getScore());
-            this.lastNetherPortalPosition = arg.lastNetherPortalPosition;
-            this.lastNetherPortalDirectionVector = arg.lastNetherPortalDirectionVector;
-            this.lastNetherPortalDirection = arg.lastNetherPortalDirection;
-        } else if (this.world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY) || arg.isSpectator()) {
-            this.inventory.clone(arg.inventory);
-            this.experienceLevel = arg.experienceLevel;
-            this.totalExperience = arg.totalExperience;
-            this.experienceProgress = arg.experienceProgress;
-            this.setScore(arg.getScore());
+    public void copyFrom(ServerPlayerEntity oldPlayer, boolean alive) {
+        if (alive) {
+            this.inventory.clone(oldPlayer.inventory);
+            this.setHealth(oldPlayer.getHealth());
+            this.hungerManager = oldPlayer.hungerManager;
+            this.experienceLevel = oldPlayer.experienceLevel;
+            this.totalExperience = oldPlayer.totalExperience;
+            this.experienceProgress = oldPlayer.experienceProgress;
+            this.setScore(oldPlayer.getScore());
+            this.lastNetherPortalPosition = oldPlayer.lastNetherPortalPosition;
+        } else if (this.world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY) || oldPlayer.isSpectator()) {
+            this.inventory.clone(oldPlayer.inventory);
+            this.experienceLevel = oldPlayer.experienceLevel;
+            this.totalExperience = oldPlayer.totalExperience;
+            this.experienceProgress = oldPlayer.experienceProgress;
+            this.setScore(oldPlayer.getScore());
         }
-        this.enchantmentTableSeed = arg.enchantmentTableSeed;
-        this.enderChestInventory = arg.enderChestInventory;
-        this.getDataTracker().set(PLAYER_MODEL_PARTS, arg.getDataTracker().get(PLAYER_MODEL_PARTS));
+        this.enchantmentTableSeed = oldPlayer.enchantmentTableSeed;
+        this.enderChestInventory = oldPlayer.enderChestInventory;
+        this.getDataTracker().set(PLAYER_MODEL_PARTS, oldPlayer.getDataTracker().get(PLAYER_MODEL_PARTS));
         this.syncedExperience = -1;
         this.syncedHealth = -1.0f;
         this.syncedFoodLevel = -1;
-        this.recipeBook.copyFrom(arg.recipeBook);
-        this.removedEntities.addAll(arg.removedEntities);
-        this.seenCredits = arg.seenCredits;
-        this.enteredNetherPos = arg.enteredNetherPos;
-        this.setShoulderEntityLeft(arg.getShoulderEntityLeft());
-        this.setShoulderEntityRight(arg.getShoulderEntityRight());
+        this.recipeBook.copyFrom(oldPlayer.recipeBook);
+        this.removedEntities.addAll(oldPlayer.removedEntities);
+        this.seenCredits = oldPlayer.seenCredits;
+        this.enteredNetherPos = oldPlayer.enteredNetherPos;
+        this.setShoulderEntityLeft(oldPlayer.getShoulderEntityLeft());
+        this.setShoulderEntityRight(oldPlayer.getShoulderEntityRight());
     }
 
     @Override
-    protected void onStatusEffectApplied(StatusEffectInstance arg) {
-        super.onStatusEffectApplied(arg);
-        this.networkHandler.sendPacket(new EntityStatusEffectS2CPacket(this.getEntityId(), arg));
-        if (arg.getEffectType() == StatusEffects.LEVITATION) {
+    protected void onStatusEffectApplied(StatusEffectInstance effect) {
+        super.onStatusEffectApplied(effect);
+        this.networkHandler.sendPacket(new EntityStatusEffectS2CPacket(this.getEntityId(), effect));
+        if (effect.getEffectType() == StatusEffects.LEVITATION) {
             this.levitationStartTick = this.age;
             this.levitationStartPos = this.getPos();
         }
@@ -1068,41 +1072,41 @@ implements ScreenHandlerListener {
     }
 
     @Override
-    protected void onStatusEffectUpgraded(StatusEffectInstance arg, boolean bl) {
-        super.onStatusEffectUpgraded(arg, bl);
-        this.networkHandler.sendPacket(new EntityStatusEffectS2CPacket(this.getEntityId(), arg));
+    protected void onStatusEffectUpgraded(StatusEffectInstance effect, boolean reapplyEffect) {
+        super.onStatusEffectUpgraded(effect, reapplyEffect);
+        this.networkHandler.sendPacket(new EntityStatusEffectS2CPacket(this.getEntityId(), effect));
         Criteria.EFFECTS_CHANGED.trigger(this);
     }
 
     @Override
-    protected void onStatusEffectRemoved(StatusEffectInstance arg) {
-        super.onStatusEffectRemoved(arg);
-        this.networkHandler.sendPacket(new RemoveEntityStatusEffectS2CPacket(this.getEntityId(), arg.getEffectType()));
-        if (arg.getEffectType() == StatusEffects.LEVITATION) {
+    protected void onStatusEffectRemoved(StatusEffectInstance effect) {
+        super.onStatusEffectRemoved(effect);
+        this.networkHandler.sendPacket(new RemoveEntityStatusEffectS2CPacket(this.getEntityId(), effect.getEffectType()));
+        if (effect.getEffectType() == StatusEffects.LEVITATION) {
             this.levitationStartPos = null;
         }
         Criteria.EFFECTS_CHANGED.trigger(this);
     }
 
     @Override
-    public void requestTeleport(double d, double e, double f) {
-        this.networkHandler.requestTeleport(d, e, f, this.yaw, this.pitch);
+    public void requestTeleport(double destX, double destY, double destZ) {
+        this.networkHandler.requestTeleport(destX, destY, destZ, this.yaw, this.pitch);
     }
 
     @Override
-    public void refreshPositionAfterTeleport(double d, double e, double f) {
-        this.networkHandler.requestTeleport(d, e, f, this.yaw, this.pitch);
+    public void refreshPositionAfterTeleport(double x, double y, double z) {
+        this.requestTeleport(x, y, z);
         this.networkHandler.syncWithPlayerPosition();
     }
 
     @Override
-    public void addCritParticles(Entity arg) {
-        this.getServerWorld().getChunkManager().sendToNearbyPlayers(this, new EntityAnimationS2CPacket(arg, 4));
+    public void addCritParticles(Entity target) {
+        this.getServerWorld().getChunkManager().sendToNearbyPlayers(this, new EntityAnimationS2CPacket(target, 4));
     }
 
     @Override
-    public void addEnchantedHitParticles(Entity arg) {
-        this.getServerWorld().getChunkManager().sendToNearbyPlayers(this, new EntityAnimationS2CPacket(arg, 5));
+    public void addEnchantedHitParticles(Entity target) {
+        this.getServerWorld().getChunkManager().sendToNearbyPlayers(this, new EntityAnimationS2CPacket(target, 5));
     }
 
     @Override
@@ -1119,10 +1123,10 @@ implements ScreenHandlerListener {
     }
 
     @Override
-    public void setGameMode(GameMode arg) {
-        this.interactionManager.method_30118(arg);
-        this.networkHandler.sendPacket(new GameStateChangeS2CPacket(GameStateChangeS2CPacket.GAME_MODE_CHANGED, arg.getId()));
-        if (arg == GameMode.SPECTATOR) {
+    public void setGameMode(GameMode gameMode) {
+        this.interactionManager.method_30118(gameMode);
+        this.networkHandler.sendPacket(new GameStateChangeS2CPacket(GameStateChangeS2CPacket.GAME_MODE_CHANGED, gameMode.getId()));
+        if (gameMode == GameMode.SPECTATOR) {
             this.dropShoulderEntities();
             this.stopRiding();
         } else {
@@ -1143,17 +1147,17 @@ implements ScreenHandlerListener {
     }
 
     @Override
-    public void sendSystemMessage(Text arg, UUID uUID) {
-        this.sendMessage(arg, MessageType.SYSTEM, uUID);
+    public void sendSystemMessage(Text message, UUID senderUuid) {
+        this.sendMessage(message, MessageType.SYSTEM, senderUuid);
     }
 
-    public void sendMessage(Text arg, MessageType arg2, UUID uUID) {
-        this.networkHandler.sendPacket(new GameMessageS2CPacket(arg, arg2, uUID), (GenericFutureListener<? extends Future<? super Void>>)((GenericFutureListener)future -> {
-            if (!(future.isSuccess() || arg2 != MessageType.GAME_INFO && arg2 != MessageType.SYSTEM)) {
+    public void sendMessage(Text message, MessageType type, UUID senderUuid) {
+        this.networkHandler.sendPacket(new GameMessageS2CPacket(message, type, senderUuid), (GenericFutureListener<? extends Future<? super Void>>)((GenericFutureListener)future -> {
+            if (!(future.isSuccess() || type != MessageType.GAME_INFO && type != MessageType.SYSTEM)) {
                 int i = 256;
-                String string = arg.asTruncatedString(256);
+                String string = message.asTruncatedString(256);
                 MutableText lv = new LiteralText(string).formatted(Formatting.YELLOW);
-                this.networkHandler.sendPacket(new GameMessageS2CPacket(new TranslatableText("multiplayer.message_not_delivered", lv).formatted(Formatting.RED), MessageType.SYSTEM, uUID));
+                this.networkHandler.sendPacket(new GameMessageS2CPacket(new TranslatableText("multiplayer.message_not_delivered", lv).formatted(Formatting.RED), MessageType.SYSTEM, senderUuid));
             }
         }));
     }
@@ -1165,19 +1169,19 @@ implements ScreenHandlerListener {
         return string;
     }
 
-    public void setClientSettings(ClientSettingsC2SPacket arg) {
-        this.clientChatVisibility = arg.getChatVisibility();
-        this.clientChatColorsEnabled = arg.hasChatColors();
-        this.getDataTracker().set(PLAYER_MODEL_PARTS, (byte)arg.getPlayerModelBitMask());
-        this.getDataTracker().set(MAIN_ARM, (byte)(arg.getMainArm() != Arm.LEFT ? 1 : 0));
+    public void setClientSettings(ClientSettingsC2SPacket packet) {
+        this.clientChatVisibility = packet.getChatVisibility();
+        this.clientChatColorsEnabled = packet.hasChatColors();
+        this.getDataTracker().set(PLAYER_MODEL_PARTS, (byte)packet.getPlayerModelBitMask());
+        this.getDataTracker().set(MAIN_ARM, (byte)(packet.getMainArm() != Arm.LEFT ? 1 : 0));
     }
 
     public ChatVisibility getClientChatVisibility() {
         return this.clientChatVisibility;
     }
 
-    public void sendResourcePackUrl(String string, String string2) {
-        this.networkHandler.sendPacket(new ResourcePackSendS2CPacket(string, string2));
+    public void sendResourcePackUrl(String url, String hash) {
+        this.networkHandler.sendPacket(new ResourcePackSendS2CPacket(url, hash));
     }
 
     @Override
@@ -1197,16 +1201,16 @@ implements ScreenHandlerListener {
         return this.recipeBook;
     }
 
-    public void onStoppedTracking(Entity arg) {
-        if (arg instanceof PlayerEntity) {
-            this.networkHandler.sendPacket(new EntitiesDestroyS2CPacket(arg.getEntityId()));
+    public void onStoppedTracking(Entity entity) {
+        if (entity instanceof PlayerEntity) {
+            this.networkHandler.sendPacket(new EntitiesDestroyS2CPacket(entity.getEntityId()));
         } else {
-            this.removedEntities.add(arg.getEntityId());
+            this.removedEntities.add(entity.getEntityId());
         }
     }
 
-    public void onStartedTracking(Entity arg) {
-        this.removedEntities.remove((Object)arg.getEntityId());
+    public void onStartedTracking(Entity entity) {
+        this.removedEntities.remove((Object)entity.getEntityId());
     }
 
     @Override
@@ -1223,9 +1227,9 @@ implements ScreenHandlerListener {
         return this.cameraEntity == null ? this : this.cameraEntity;
     }
 
-    public void setCameraEntity(Entity arg) {
+    public void setCameraEntity(Entity entity) {
         Entity lv = this.getCameraEntity();
-        Entity entity = this.cameraEntity = arg == null ? this : arg;
+        Entity entity2 = this.cameraEntity = entity == null ? this : entity;
         if (lv != this.cameraEntity) {
             this.networkHandler.sendPacket(new SetCameraEntityS2CPacket(this.cameraEntity));
             this.requestTeleport(this.cameraEntity.getX(), this.cameraEntity.getY(), this.cameraEntity.getZ());
@@ -1240,11 +1244,11 @@ implements ScreenHandlerListener {
     }
 
     @Override
-    public void attack(Entity arg) {
+    public void attack(Entity target) {
         if (this.interactionManager.getGameMode() == GameMode.SPECTATOR) {
-            this.setCameraEntity(arg);
+            this.setCameraEntity(target);
         } else {
-            super.attack(arg);
+            super.attack(target);
         }
     }
 
@@ -1258,8 +1262,8 @@ implements ScreenHandlerListener {
     }
 
     @Override
-    public void swingHand(Hand arg) {
-        super.swingHand(arg);
+    public void swingHand(Hand hand) {
+        super.swingHand(hand);
         this.resetLastAttackedTicks();
     }
 
@@ -1275,26 +1279,26 @@ implements ScreenHandlerListener {
         return this.advancementTracker;
     }
 
-    public void teleport(ServerWorld arg, double d, double e, double f, float g, float h) {
+    public void teleport(ServerWorld targetWorld, double x, double y, double z, float yaw, float pitch) {
         this.setCameraEntity(this);
         this.stopRiding();
-        if (arg == this.world) {
-            this.networkHandler.requestTeleport(d, e, f, g, h);
+        if (targetWorld == this.world) {
+            this.networkHandler.requestTeleport(x, y, z, yaw, pitch);
         } else {
             ServerWorld lv = this.getServerWorld();
-            WorldProperties lv2 = arg.getLevelProperties();
-            this.networkHandler.sendPacket(new PlayerRespawnS2CPacket(arg.getDimensionRegistryKey(), arg.getRegistryKey(), BiomeAccess.hashSeed(arg.getSeed()), this.interactionManager.getGameMode(), this.interactionManager.method_30119(), arg.isDebugWorld(), arg.isFlat(), true));
+            WorldProperties lv2 = targetWorld.getLevelProperties();
+            this.networkHandler.sendPacket(new PlayerRespawnS2CPacket(targetWorld.getDimensionRegistryKey(), targetWorld.getRegistryKey(), BiomeAccess.hashSeed(targetWorld.getSeed()), this.interactionManager.getGameMode(), this.interactionManager.method_30119(), targetWorld.isDebugWorld(), targetWorld.isFlat(), true));
             this.networkHandler.sendPacket(new DifficultyS2CPacket(lv2.getDifficulty(), lv2.isDifficultyLocked()));
             this.server.getPlayerManager().sendCommandTree(this);
             lv.removePlayer(this);
             this.removed = false;
-            this.refreshPositionAndAngles(d, e, f, g, h);
-            this.setWorld(arg);
-            arg.onPlayerTeleport(this);
-            this.dimensionChanged(lv);
-            this.networkHandler.requestTeleport(d, e, f, g, h);
-            this.interactionManager.setWorld(arg);
-            this.server.getPlayerManager().sendWorldInfo(this, arg);
+            this.refreshPositionAndAngles(x, y, z, yaw, pitch);
+            this.setWorld(targetWorld);
+            targetWorld.onPlayerTeleport(this);
+            this.worldChanged(lv);
+            this.networkHandler.requestTeleport(x, y, z, yaw, pitch);
+            this.interactionManager.setWorld(targetWorld);
+            this.server.getPlayerManager().sendWorldInfo(this, targetWorld);
             this.server.getPlayerManager().sendPlayerStatus(this);
         }
     }
@@ -1302,6 +1306,10 @@ implements ScreenHandlerListener {
     @Nullable
     public BlockPos getSpawnPointPosition() {
         return this.spawnPointPosition;
+    }
+
+    public float getSpawnAngle() {
+        return this.spawnAngle;
     }
 
     public RegistryKey<World> getSpawnPointDimension() {
@@ -1312,19 +1320,21 @@ implements ScreenHandlerListener {
         return this.spawnPointSet;
     }
 
-    public void setSpawnPoint(RegistryKey<World> arg, @Nullable BlockPos arg2, boolean bl, boolean bl2) {
-        if (arg2 != null) {
+    public void setSpawnPoint(RegistryKey<World> dimension, @Nullable BlockPos pos, float angle, boolean spawnPointSet, boolean bl2) {
+        if (pos != null) {
             boolean bl3;
-            boolean bl4 = bl3 = arg2.equals(this.spawnPointPosition) && arg.equals(this.spawnPointDimension);
+            boolean bl = bl3 = pos.equals(this.spawnPointPosition) && dimension.equals(this.spawnPointDimension);
             if (bl2 && !bl3) {
                 this.sendSystemMessage(new TranslatableText("block.minecraft.set_spawn"), Util.NIL_UUID);
             }
-            this.spawnPointPosition = arg2;
-            this.spawnPointDimension = arg;
-            this.spawnPointSet = bl;
+            this.spawnPointPosition = pos;
+            this.spawnPointDimension = dimension;
+            this.spawnAngle = angle;
+            this.spawnPointSet = spawnPointSet;
         } else {
             this.spawnPointPosition = null;
             this.spawnPointDimension = World.OVERWORLD;
+            this.spawnAngle = 0.0f;
             this.spawnPointSet = false;
         }
     }
@@ -1344,13 +1354,13 @@ implements ScreenHandlerListener {
         return this.cameraPosition;
     }
 
-    public void setCameraPosition(ChunkSectionPos arg) {
-        this.cameraPosition = arg;
+    public void setCameraPosition(ChunkSectionPos cameraPosition) {
+        this.cameraPosition = cameraPosition;
     }
 
     @Override
-    public void playSound(SoundEvent arg, SoundCategory arg2, float f, float g) {
-        this.networkHandler.sendPacket(new PlaySoundS2CPacket(arg, arg2, this.getX(), this.getY(), this.getZ(), f, g));
+    public void playSound(SoundEvent event, SoundCategory category, float volume, float pitch) {
+        this.networkHandler.sendPacket(new PlaySoundS2CPacket(event, category, this.getX(), this.getY(), this.getZ(), volume, pitch));
     }
 
     @Override
@@ -1359,16 +1369,16 @@ implements ScreenHandlerListener {
     }
 
     @Override
-    public ItemEntity dropItem(ItemStack arg, boolean bl, boolean bl2) {
-        ItemEntity lv = super.dropItem(arg, bl, bl2);
+    public ItemEntity dropItem(ItemStack stack, boolean throwRandomly, boolean retainOwnership) {
+        ItemEntity lv = super.dropItem(stack, throwRandomly, retainOwnership);
         if (lv == null) {
             return null;
         }
         this.world.spawnEntity(lv);
         ItemStack lv2 = lv.getStack();
-        if (bl2) {
+        if (retainOwnership) {
             if (!lv2.isEmpty()) {
-                this.increaseStat(Stats.DROPPED.getOrCreateStat(lv2.getItem()), arg.getCount());
+                this.increaseStat(Stats.DROPPED.getOrCreateStat(lv2.getItem()), stack.getCount());
             }
             this.incrementStat(Stats.DROP);
         }

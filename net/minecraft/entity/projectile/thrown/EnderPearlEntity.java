@@ -34,13 +34,13 @@ extends ThrownItemEntity {
         super((EntityType<? extends ThrownItemEntity>)arg, arg2);
     }
 
-    public EnderPearlEntity(World arg, LivingEntity arg2) {
-        super((EntityType<? extends ThrownItemEntity>)EntityType.ENDER_PEARL, arg2, arg);
+    public EnderPearlEntity(World world, LivingEntity owner) {
+        super((EntityType<? extends ThrownItemEntity>)EntityType.ENDER_PEARL, owner, world);
     }
 
     @Environment(value=EnvType.CLIENT)
-    public EnderPearlEntity(World arg, double d, double e, double f) {
-        super((EntityType<? extends ThrownItemEntity>)EntityType.ENDER_PEARL, d, e, f, arg);
+    public EnderPearlEntity(World world, double x, double y, double z) {
+        super((EntityType<? extends ThrownItemEntity>)EntityType.ENDER_PEARL, x, y, z, world);
     }
 
     @Override
@@ -49,14 +49,14 @@ extends ThrownItemEntity {
     }
 
     @Override
-    protected void onEntityHit(EntityHitResult arg) {
-        super.onEntityHit(arg);
-        arg.getEntity().damage(DamageSource.thrownProjectile(this, this.getOwner()), 0.0f);
+    protected void onEntityHit(EntityHitResult entityHitResult) {
+        super.onEntityHit(entityHitResult);
+        entityHitResult.getEntity().damage(DamageSource.thrownProjectile(this, this.getOwner()), 0.0f);
     }
 
     @Override
-    protected void onCollision(HitResult arg) {
-        super.onCollision(arg);
+    protected void onCollision(HitResult hitResult) {
+        super.onCollision(hitResult);
         Entity lv = this.getOwner();
         for (int i = 0; i < 32; ++i) {
             this.world.addParticle(ParticleTypes.PORTAL, this.getX(), this.getY() + this.random.nextDouble() * 2.0, this.getZ(), this.random.nextGaussian(), 0.0, this.random.nextGaussian());
@@ -98,12 +98,12 @@ extends ThrownItemEntity {
 
     @Override
     @Nullable
-    public Entity changeDimension(ServerWorld arg) {
+    public Entity moveToWorld(ServerWorld destination) {
         Entity lv = this.getOwner();
-        if (lv != null && lv.world.getRegistryKey() != arg.getRegistryKey()) {
+        if (lv != null && lv.world.getRegistryKey() != destination.getRegistryKey()) {
             this.setOwner(null);
         }
-        return super.changeDimension(arg);
+        return super.moveToWorld(destination);
     }
 }
 

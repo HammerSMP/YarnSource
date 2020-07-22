@@ -34,21 +34,21 @@ extends ProjectileEntity {
         super((EntityType<? extends ProjectileEntity>)arg, arg2);
     }
 
-    public LlamaSpitEntity(World arg, LlamaEntity arg2) {
-        this((EntityType<? extends LlamaSpitEntity>)EntityType.LLAMA_SPIT, arg);
-        super.setOwner(arg2);
-        this.updatePosition(arg2.getX() - (double)(arg2.getWidth() + 1.0f) * 0.5 * (double)MathHelper.sin(arg2.bodyYaw * ((float)Math.PI / 180)), arg2.getEyeY() - (double)0.1f, arg2.getZ() + (double)(arg2.getWidth() + 1.0f) * 0.5 * (double)MathHelper.cos(arg2.bodyYaw * ((float)Math.PI / 180)));
+    public LlamaSpitEntity(World world, LlamaEntity owner) {
+        this((EntityType<? extends LlamaSpitEntity>)EntityType.LLAMA_SPIT, world);
+        super.setOwner(owner);
+        this.updatePosition(owner.getX() - (double)(owner.getWidth() + 1.0f) * 0.5 * (double)MathHelper.sin(owner.bodyYaw * ((float)Math.PI / 180)), owner.getEyeY() - (double)0.1f, owner.getZ() + (double)(owner.getWidth() + 1.0f) * 0.5 * (double)MathHelper.cos(owner.bodyYaw * ((float)Math.PI / 180)));
     }
 
     @Environment(value=EnvType.CLIENT)
-    public LlamaSpitEntity(World arg, double d, double e, double f, double g, double h, double i) {
-        this((EntityType<? extends LlamaSpitEntity>)EntityType.LLAMA_SPIT, arg);
-        this.updatePosition(d, e, f);
+    public LlamaSpitEntity(World world, double x, double y, double z, double velocityX, double velocityY, double velocityZ) {
+        this((EntityType<? extends LlamaSpitEntity>)EntityType.LLAMA_SPIT, world);
+        this.updatePosition(x, y, z);
         for (int j = 0; j < 7; ++j) {
             double k = 0.4 + 0.1 * (double)j;
-            arg.addParticle(ParticleTypes.SPIT, d, e, f, g * k, h, i * k);
+            world.addParticle(ParticleTypes.SPIT, x, y, z, velocityX * k, velocityY, velocityZ * k);
         }
-        this.setVelocity(g, h, i);
+        this.setVelocity(velocityX, velocityY, velocityZ);
     }
 
     @Override
@@ -81,17 +81,17 @@ extends ProjectileEntity {
     }
 
     @Override
-    protected void onEntityHit(EntityHitResult arg) {
-        super.onEntityHit(arg);
+    protected void onEntityHit(EntityHitResult entityHitResult) {
+        super.onEntityHit(entityHitResult);
         Entity lv = this.getOwner();
         if (lv instanceof LivingEntity) {
-            arg.getEntity().damage(DamageSource.mobProjectile(this, (LivingEntity)lv).setProjectile(), 1.0f);
+            entityHitResult.getEntity().damage(DamageSource.mobProjectile(this, (LivingEntity)lv).setProjectile(), 1.0f);
         }
     }
 
     @Override
-    protected void onBlockHit(BlockHitResult arg) {
-        super.onBlockHit(arg);
+    protected void onBlockHit(BlockHitResult blockHitResult) {
+        super.onBlockHit(blockHitResult);
         if (!this.world.isClient) {
             this.remove();
         }

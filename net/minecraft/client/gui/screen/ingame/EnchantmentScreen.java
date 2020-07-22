@@ -53,8 +53,8 @@ extends HandledScreen<EnchantmentScreenHandler> {
     public float pageTurningSpeed;
     private ItemStack stack = ItemStack.EMPTY;
 
-    public EnchantmentScreen(EnchantmentScreenHandler arg, PlayerInventory arg2, Text arg3) {
-        super(arg, arg2, arg3);
+    public EnchantmentScreen(EnchantmentScreenHandler handler, PlayerInventory inventory, Text title) {
+        super(handler, inventory, title);
     }
 
     @Override
@@ -64,27 +64,27 @@ extends HandledScreen<EnchantmentScreenHandler> {
     }
 
     @Override
-    public boolean mouseClicked(double d, double e, int i) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
         int j = (this.width - this.backgroundWidth) / 2;
         int k = (this.height - this.backgroundHeight) / 2;
         for (int l = 0; l < 3; ++l) {
-            double f = d - (double)(j + 60);
-            double g = e - (double)(k + 14 + 19 * l);
+            double f = mouseX - (double)(j + 60);
+            double g = mouseY - (double)(k + 14 + 19 * l);
             if (!(f >= 0.0) || !(g >= 0.0) || !(f < 108.0) || !(g < 19.0) || !((EnchantmentScreenHandler)this.handler).onButtonClick(this.client.player, l)) continue;
             this.client.interactionManager.clickButton(((EnchantmentScreenHandler)this.handler).syncId, l);
             return true;
         }
-        return super.mouseClicked(d, e, i);
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
-    protected void drawBackground(MatrixStack arg, float f, int i, int j) {
+    protected void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY) {
         DiffuseLighting.disableGuiDepthLighting();
         RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
         this.client.getTextureManager().bindTexture(TEXTURE);
         int k = (this.width - this.backgroundWidth) / 2;
         int l = (this.height - this.backgroundHeight) / 2;
-        this.drawTexture(arg, k, l, 0, 0, this.backgroundWidth, this.backgroundHeight);
+        this.drawTexture(matrices, k, l, 0, 0, this.backgroundWidth, this.backgroundHeight);
         RenderSystem.matrixMode(5889);
         RenderSystem.pushMatrix();
         RenderSystem.loadIdentity();
@@ -93,22 +93,22 @@ extends HandledScreen<EnchantmentScreenHandler> {
         RenderSystem.translatef(-0.34f, 0.23f, 0.0f);
         RenderSystem.multMatrix(Matrix4f.viewboxMatrix(90.0, 1.3333334f, 9.0f, 80.0f));
         RenderSystem.matrixMode(5888);
-        arg.push();
-        MatrixStack.Entry lv = arg.peek();
+        matrices.push();
+        MatrixStack.Entry lv = matrices.peek();
         lv.getModel().loadIdentity();
         lv.getNormal().loadIdentity();
-        arg.translate(0.0, 3.3f, 1984.0);
+        matrices.translate(0.0, 3.3f, 1984.0);
         float g = 5.0f;
-        arg.scale(5.0f, 5.0f, 5.0f);
-        arg.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(180.0f));
-        arg.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(20.0f));
-        float h = MathHelper.lerp(f, this.pageTurningSpeed, this.nextPageTurningSpeed);
-        arg.translate((1.0f - h) * 0.2f, (1.0f - h) * 0.1f, (1.0f - h) * 0.25f);
+        matrices.scale(5.0f, 5.0f, 5.0f);
+        matrices.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(180.0f));
+        matrices.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(20.0f));
+        float h = MathHelper.lerp(delta, this.pageTurningSpeed, this.nextPageTurningSpeed);
+        matrices.translate((1.0f - h) * 0.2f, (1.0f - h) * 0.1f, (1.0f - h) * 0.25f);
         float n = -(1.0f - h) * 90.0f - 90.0f;
-        arg.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(n));
-        arg.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(180.0f));
-        float o = MathHelper.lerp(f, this.pageAngle, this.nextPageAngle) + 0.25f;
-        float p = MathHelper.lerp(f, this.pageAngle, this.nextPageAngle) + 0.75f;
+        matrices.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(n));
+        matrices.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(180.0f));
+        float o = MathHelper.lerp(delta, this.pageAngle, this.nextPageAngle) + 0.25f;
+        float p = MathHelper.lerp(delta, this.pageAngle, this.nextPageAngle) + 0.75f;
         o = (o - (float)MathHelper.fastFloor(o)) * 1.6f - 0.3f;
         p = (p - (float)MathHelper.fastFloor(p)) * 1.6f - 0.3f;
         if (o < 0.0f) {
@@ -127,9 +127,9 @@ extends HandledScreen<EnchantmentScreenHandler> {
         BOOK_MODEL.setPageAngles(0.0f, o, p, h);
         VertexConsumerProvider.Immediate lv2 = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
         VertexConsumer lv3 = lv2.getBuffer(BOOK_MODEL.getLayer(BOOK_TEXTURE));
-        BOOK_MODEL.render(arg, lv3, 0xF000F0, OverlayTexture.DEFAULT_UV, 1.0f, 1.0f, 1.0f, 1.0f);
+        BOOK_MODEL.render(matrices, lv3, 0xF000F0, OverlayTexture.DEFAULT_UV, 1.0f, 1.0f, 1.0f, 1.0f);
         lv2.draw();
-        arg.pop();
+        matrices.pop();
         RenderSystem.matrixMode(5889);
         RenderSystem.viewport(0, 0, this.client.getWindow().getFramebufferWidth(), this.client.getWindow().getFramebufferHeight());
         RenderSystem.popMatrix();
@@ -146,7 +146,7 @@ extends HandledScreen<EnchantmentScreenHandler> {
             int u = ((EnchantmentScreenHandler)this.handler).enchantmentPower[r];
             RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
             if (u == 0) {
-                this.drawTexture(arg, s, l + 14 + 19 * r, 0, 185, 108, 19);
+                this.drawTexture(matrices, s, l + 14 + 19 * r, 0, 185, 108, 19);
                 continue;
             }
             String string = "" + u;
@@ -154,33 +154,33 @@ extends HandledScreen<EnchantmentScreenHandler> {
             StringRenderable lv4 = EnchantingPhrases.getInstance().generatePhrase(this.textRenderer, v);
             int w = 6839882;
             if (!(q >= r + 1 && this.client.player.experienceLevel >= u || this.client.player.abilities.creativeMode)) {
-                this.drawTexture(arg, s, l + 14 + 19 * r, 0, 185, 108, 19);
-                this.drawTexture(arg, s + 1, l + 15 + 19 * r, 16 * r, 239, 16, 16);
+                this.drawTexture(matrices, s, l + 14 + 19 * r, 0, 185, 108, 19);
+                this.drawTexture(matrices, s + 1, l + 15 + 19 * r, 16 * r, 239, 16, 16);
                 this.textRenderer.drawTrimmed(lv4, t, l + 16 + 19 * r, v, (w & 0xFEFEFE) >> 1);
                 w = 4226832;
             } else {
-                int x = i - (k + 60);
-                int y = j - (l + 14 + 19 * r);
+                int x = mouseX - (k + 60);
+                int y = mouseY - (l + 14 + 19 * r);
                 if (x >= 0 && y >= 0 && x < 108 && y < 19) {
-                    this.drawTexture(arg, s, l + 14 + 19 * r, 0, 204, 108, 19);
+                    this.drawTexture(matrices, s, l + 14 + 19 * r, 0, 204, 108, 19);
                     w = 0xFFFF80;
                 } else {
-                    this.drawTexture(arg, s, l + 14 + 19 * r, 0, 166, 108, 19);
+                    this.drawTexture(matrices, s, l + 14 + 19 * r, 0, 166, 108, 19);
                 }
-                this.drawTexture(arg, s + 1, l + 15 + 19 * r, 16 * r, 223, 16, 16);
+                this.drawTexture(matrices, s + 1, l + 15 + 19 * r, 16 * r, 223, 16, 16);
                 this.textRenderer.drawTrimmed(lv4, t, l + 16 + 19 * r, v, w);
                 w = 8453920;
             }
-            this.textRenderer.drawWithShadow(arg, string, (float)(t + 86 - this.textRenderer.getWidth(string)), (float)(l + 16 + 19 * r + 7), w);
+            this.textRenderer.drawWithShadow(matrices, string, (float)(t + 86 - this.textRenderer.getWidth(string)), (float)(l + 16 + 19 * r + 7), w);
         }
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        f = this.client.getTickDelta();
-        this.renderBackground(arg);
-        super.render(arg, i, j, f);
-        this.drawMouseoverTooltip(arg, i, j);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        delta = this.client.getTickDelta();
+        this.renderBackground(matrices);
+        super.render(matrices, mouseX, mouseY, delta);
+        this.drawMouseoverTooltip(matrices, mouseX, mouseY);
         boolean bl = this.client.player.abilities.creativeMode;
         int k = ((EnchantmentScreenHandler)this.handler).getLapisCount();
         for (int l = 0; l < 3; ++l) {
@@ -188,7 +188,7 @@ extends HandledScreen<EnchantmentScreenHandler> {
             Enchantment lv = Enchantment.byRawId(((EnchantmentScreenHandler)this.handler).enchantmentId[l]);
             int n = ((EnchantmentScreenHandler)this.handler).enchantmentLevel[l];
             int o = l + 1;
-            if (!this.isPointWithinBounds(60, 14 + 19 * l, 108, 17, i, j) || m <= 0 || n < 0 || lv == null) continue;
+            if (!this.isPointWithinBounds(60, 14 + 19 * l, 108, 17, mouseX, mouseY) || m <= 0 || n < 0 || lv == null) continue;
             ArrayList list = Lists.newArrayList();
             list.add(new TranslatableText("container.enchant.clue", lv.getName(n)).formatted(Formatting.WHITE));
             if (!bl) {
@@ -212,7 +212,7 @@ extends HandledScreen<EnchantmentScreenHandler> {
                     list.add(lv5.formatted(Formatting.GRAY));
                 }
             }
-            this.renderTooltip(arg, list, i, j);
+            this.renderTooltip(matrices, list, mouseX, mouseY);
             break;
         }
     }

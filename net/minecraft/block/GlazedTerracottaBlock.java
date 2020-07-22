@@ -18,17 +18,17 @@ extends HorizontalFacingBlock {
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(FACING);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(FACING);
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext arg) {
-        return (BlockState)this.getDefaultState().with(FACING, arg.getPlayerFacing().getOpposite());
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        return (BlockState)this.getDefaultState().with(FACING, ctx.getPlayerFacing().getOpposite());
     }
 
     @Override
-    public PistonBehavior getPistonBehavior(BlockState arg) {
+    public PistonBehavior getPistonBehavior(BlockState state) {
         return PistonBehavior.PUSH_ONLY;
     }
 }

@@ -21,8 +21,8 @@ public class EntityZombieVillagerTypeFix
 extends ChoiceFix {
     private static final Random RANDOM = new Random();
 
-    public EntityZombieVillagerTypeFix(Schema schema, boolean bl) {
-        super(schema, bl, "EntityZombieVillagerTypeFix", TypeReferences.ENTITY, "Zombie");
+    public EntityZombieVillagerTypeFix(Schema outputSchema, boolean changesType) {
+        super(outputSchema, changesType, "EntityZombieVillagerTypeFix", TypeReferences.ENTITY, "Zombie");
     }
 
     public Dynamic<?> fixZombieType(Dynamic<?> dynamic) {
@@ -39,16 +39,16 @@ extends ChoiceFix {
         return dynamic;
     }
 
-    private int clampType(int i) {
-        if (i < 0 || i >= 6) {
+    private int clampType(int type) {
+        if (type < 0 || type >= 6) {
             return -1;
         }
-        return i;
+        return type;
     }
 
     @Override
-    protected Typed<?> transform(Typed<?> typed) {
-        return typed.update(DSL.remainderFinder(), this::fixZombieType);
+    protected Typed<?> transform(Typed<?> inputType) {
+        return inputType.update(DSL.remainderFinder(), this::fixZombieType);
     }
 }
 

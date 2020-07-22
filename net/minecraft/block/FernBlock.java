@@ -28,25 +28,25 @@ implements Fertilizable {
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
         return SHAPE;
     }
 
     @Override
-    public boolean isFertilizable(BlockView arg, BlockPos arg2, BlockState arg3, boolean bl) {
+    public boolean isFertilizable(BlockView world, BlockPos pos, BlockState state, boolean isClient) {
         return true;
     }
 
     @Override
-    public boolean canGrow(World arg, Random random, BlockPos arg2, BlockState arg3) {
+    public boolean canGrow(World world, Random random, BlockPos pos, BlockState state) {
         return true;
     }
 
     @Override
-    public void grow(ServerWorld arg, Random random, BlockPos arg2, BlockState arg3) {
+    public void grow(ServerWorld world, Random random, BlockPos pos, BlockState state) {
         TallPlantBlock lv = (TallPlantBlock)(this == Blocks.FERN ? Blocks.LARGE_FERN : Blocks.TALL_GRASS);
-        if (lv.getDefaultState().canPlaceAt(arg, arg2) && arg.isAir(arg2.up())) {
-            lv.placeAt(arg, arg2, 2);
+        if (lv.getDefaultState().canPlaceAt(world, pos) && world.isAir(pos.up())) {
+            lv.placeAt(world, pos, 2);
         }
     }
 

@@ -44,38 +44,38 @@ public interface VertexConsumer {
 
     public void next();
 
-    default public void vertex(float f, float g, float h, float i, float j, float k, float l, float m, float n, int o, int p, float q, float r, float s) {
-        this.vertex(f, g, h);
-        this.color(i, j, k, l);
-        this.texture(m, n);
-        this.overlay(o);
-        this.light(p);
-        this.normal(q, r, s);
+    default public void vertex(float x, float y, float z, float red, float green, float blue, float alpha, float u, float v, int overlay, int light, float normalX, float normalY, float normalZ) {
+        this.vertex(x, y, z);
+        this.color(red, green, blue, alpha);
+        this.texture(u, v);
+        this.overlay(overlay);
+        this.light(light);
+        this.normal(normalX, normalY, normalZ);
         this.next();
     }
 
-    default public VertexConsumer color(float f, float g, float h, float i) {
-        return this.color((int)(f * 255.0f), (int)(g * 255.0f), (int)(h * 255.0f), (int)(i * 255.0f));
+    default public VertexConsumer color(float red, float green, float blue, float alpha) {
+        return this.color((int)(red * 255.0f), (int)(green * 255.0f), (int)(blue * 255.0f), (int)(alpha * 255.0f));
     }
 
-    default public VertexConsumer light(int i) {
-        return this.light(i & 0xFFFF, i >> 16 & 0xFFFF);
+    default public VertexConsumer light(int uv) {
+        return this.light(uv & 0xFFFF, uv >> 16 & 0xFFFF);
     }
 
-    default public VertexConsumer overlay(int i) {
-        return this.overlay(i & 0xFFFF, i >> 16 & 0xFFFF);
+    default public VertexConsumer overlay(int uv) {
+        return this.overlay(uv & 0xFFFF, uv >> 16 & 0xFFFF);
     }
 
-    default public void quad(MatrixStack.Entry arg, BakedQuad arg2, float f, float g, float h, int i, int j) {
-        this.quad(arg, arg2, new float[]{1.0f, 1.0f, 1.0f, 1.0f}, f, g, h, new int[]{i, i, i, i}, j, false);
+    default public void quad(MatrixStack.Entry matrixEntry, BakedQuad quad, float red, float green, float blue, int light, int overlay) {
+        this.quad(matrixEntry, quad, new float[]{1.0f, 1.0f, 1.0f, 1.0f}, red, green, blue, new int[]{light, light, light, light}, overlay, false);
     }
 
-    default public void quad(MatrixStack.Entry arg, BakedQuad arg2, float[] fs, float f, float g, float h, int[] is, int i, boolean bl) {
-        int[] js = arg2.getVertexData();
-        Vec3i lv = arg2.getFace().getVector();
+    default public void quad(MatrixStack.Entry matrixEntry, BakedQuad quad, float[] brightnesses, float red, float green, float blue, int[] lights, int overlay, boolean useQuadColorData) {
+        int[] js = quad.getVertexData();
+        Vec3i lv = quad.getFace().getVector();
         Vector3f lv2 = new Vector3f(lv.getX(), lv.getY(), lv.getZ());
-        Matrix4f lv3 = arg.getModel();
-        lv2.transform(arg.getNormal());
+        Matrix4f lv3 = matrixEntry.getModel();
+        lv2.transform(matrixEntry.getNormal());
         int j = 8;
         int k = js.length / 8;
         try (MemoryStack memoryStack = MemoryStack.stackPush();){
@@ -90,37 +90,37 @@ public interface VertexConsumer {
                 float m = byteBuffer.getFloat(0);
                 float n = byteBuffer.getFloat(4);
                 float o = byteBuffer.getFloat(8);
-                if (bl) {
+                if (useQuadColorData) {
                     float p = (float)(byteBuffer.get(12) & 0xFF) / 255.0f;
                     float q = (float)(byteBuffer.get(13) & 0xFF) / 255.0f;
                     float r = (float)(byteBuffer.get(14) & 0xFF) / 255.0f;
-                    float s = p * fs[l] * f;
-                    float t = q * fs[l] * g;
-                    float u = r * fs[l] * h;
+                    float s = p * brightnesses[l] * red;
+                    float t = q * brightnesses[l] * green;
+                    float u = r * brightnesses[l] * blue;
                 } else {
-                    v = fs[l] * f;
-                    w = fs[l] * g;
-                    x = fs[l] * h;
+                    v = brightnesses[l] * red;
+                    w = brightnesses[l] * green;
+                    x = brightnesses[l] * blue;
                 }
-                int y = is[l];
+                int y = lights[l];
                 float z = byteBuffer.getFloat(16);
                 float aa = byteBuffer.getFloat(20);
                 Vector4f lv4 = new Vector4f(m, n, o, 1.0f);
                 lv4.transform(lv3);
-                this.vertex(lv4.getX(), lv4.getY(), lv4.getZ(), v, w, x, 1.0f, z, aa, i, y, lv2.getX(), lv2.getY(), lv2.getZ());
+                this.vertex(lv4.getX(), lv4.getY(), lv4.getZ(), v, w, x, 1.0f, z, aa, overlay, y, lv2.getX(), lv2.getY(), lv2.getZ());
             }
         }
     }
 
-    default public VertexConsumer vertex(Matrix4f arg, float f, float g, float h) {
-        Vector4f lv = new Vector4f(f, g, h, 1.0f);
-        lv.transform(arg);
+    default public VertexConsumer vertex(Matrix4f matrix, float x, float y, float z) {
+        Vector4f lv = new Vector4f(x, y, z, 1.0f);
+        lv.transform(matrix);
         return this.vertex(lv.getX(), lv.getY(), lv.getZ());
     }
 
-    default public VertexConsumer normal(Matrix3f arg, float f, float g, float h) {
-        Vector3f lv = new Vector3f(f, g, h);
-        lv.transform(arg);
+    default public VertexConsumer normal(Matrix3f matrix, float x, float y, float z) {
+        Vector3f lv = new Vector3f(x, y, z);
+        lv.transform(matrix);
         return this.normal(lv.getX(), lv.getY(), lv.getZ());
     }
 }

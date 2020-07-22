@@ -110,11 +110,11 @@ Saddleable {
     }
 
     @Override
-    public void onTrackedDataSet(TrackedData<?> arg) {
-        if (BOOST_TIME.equals(arg) && this.world.isClient) {
+    public void onTrackedDataSet(TrackedData<?> data) {
+        if (BOOST_TIME.equals(data) && this.world.isClient) {
             this.saddledComponent.boost();
         }
-        super.onTrackedDataSet(arg);
+        super.onTrackedDataSet(data);
     }
 
     @Override
@@ -125,15 +125,15 @@ Saddleable {
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
-        this.saddledComponent.toTag(arg);
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
+        this.saddledComponent.toTag(tag);
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        this.saddledComponent.fromTag(arg);
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        this.saddledComponent.fromTag(tag);
     }
 
     @Override
@@ -142,7 +142,7 @@ Saddleable {
     }
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource arg) {
+    protected SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.ENTITY_PIG_HURT;
     }
 
@@ -152,24 +152,24 @@ Saddleable {
     }
 
     @Override
-    protected void playStepSound(BlockPos arg, BlockState arg2) {
+    protected void playStepSound(BlockPos pos, BlockState state) {
         this.playSound(SoundEvents.ENTITY_PIG_STEP, 0.15f, 1.0f);
     }
 
     @Override
-    public ActionResult interactMob(PlayerEntity arg, Hand arg2) {
-        boolean bl = this.isBreedingItem(arg.getStackInHand(arg2));
-        if (!bl && this.isSaddled() && !this.hasPassengers() && !arg.shouldCancelInteraction()) {
+    public ActionResult interactMob(PlayerEntity player, Hand hand) {
+        boolean bl = this.isBreedingItem(player.getStackInHand(hand));
+        if (!bl && this.isSaddled() && !this.hasPassengers() && !player.shouldCancelInteraction()) {
             if (!this.world.isClient) {
-                arg.startRiding(this);
+                player.startRiding(this);
             }
             return ActionResult.success(this.world.isClient);
         }
-        ActionResult lv = super.interactMob(arg, arg2);
+        ActionResult lv = super.interactMob(player, hand);
         if (!lv.isAccepted()) {
-            ItemStack lv2 = arg.getStackInHand(arg2);
+            ItemStack lv2 = player.getStackInHand(hand);
             if (lv2.getItem() == Items.SADDLE) {
-                return lv2.useOnEntity(arg, this, arg2);
+                return lv2.useOnEntity(player, this, hand);
             }
             return ActionResult.PASS;
         }
@@ -195,34 +195,34 @@ Saddleable {
     }
 
     @Override
-    public void saddle(@Nullable SoundCategory arg) {
+    public void saddle(@Nullable SoundCategory sound) {
         this.saddledComponent.setSaddled(true);
-        if (arg != null) {
-            this.world.playSoundFromEntity(null, this, SoundEvents.ENTITY_PIG_SADDLE, arg, 0.5f, 1.0f);
+        if (sound != null) {
+            this.world.playSoundFromEntity(null, this, SoundEvents.ENTITY_PIG_SADDLE, sound, 0.5f, 1.0f);
         }
     }
 
     @Override
-    public Vec3d updatePassengerForDismount(LivingEntity arg) {
+    public Vec3d updatePassengerForDismount(LivingEntity passenger) {
         Direction lv = this.getMovementDirection();
         if (lv.getAxis() == Direction.Axis.Y) {
-            return super.updatePassengerForDismount(arg);
+            return super.updatePassengerForDismount(passenger);
         }
         int[][] is = Dismounting.getDismountOffsets(lv);
         BlockPos lv2 = this.getBlockPos();
         BlockPos.Mutable lv3 = new BlockPos.Mutable();
-        for (EntityPose lv4 : arg.getPoses()) {
-            Box lv5 = arg.getBoundingBox(lv4);
+        for (EntityPose lv4 : passenger.getPoses()) {
+            Box lv5 = passenger.getBoundingBox(lv4);
             for (int[] js : is) {
                 Vec3d lv6;
                 lv3.set(lv2.getX() + js[0], lv2.getY(), lv2.getZ() + js[1]);
-                double d = this.world.getCollisionHeightAt(lv3);
-                if (!Dismounting.canDismountInBlock(d) || !Dismounting.canPlaceEntityAt(this.world, arg, lv5.offset(lv6 = Vec3d.ofCenter(lv3, d)))) continue;
-                arg.setPose(lv4);
+                double d = this.world.getDismountHeight(lv3);
+                if (!Dismounting.canDismountInBlock(d) || !Dismounting.canPlaceEntityAt(this.world, passenger, lv5.offset(lv6 = Vec3d.ofCenter(lv3, d)))) continue;
+                passenger.setPose(lv4);
                 return lv6;
             }
         }
-        return super.updatePassengerForDismount(arg);
+        return super.updatePassengerForDismount(passenger);
     }
 
     @Override
@@ -246,8 +246,8 @@ Saddleable {
     }
 
     @Override
-    public void travel(Vec3d arg) {
-        this.travel(this, this.saddledComponent, arg);
+    public void travel(Vec3d movementInput) {
+        this.travel(this, this.saddledComponent, movementInput);
     }
 
     @Override
@@ -256,8 +256,8 @@ Saddleable {
     }
 
     @Override
-    public void setMovementInput(Vec3d arg) {
-        super.travel(arg);
+    public void setMovementInput(Vec3d movementInput) {
+        super.travel(movementInput);
     }
 
     @Override
@@ -271,8 +271,8 @@ Saddleable {
     }
 
     @Override
-    public boolean isBreedingItem(ItemStack arg) {
-        return BREEDING_INGREDIENT.test(arg);
+    public boolean isBreedingItem(ItemStack stack) {
+        return BREEDING_INGREDIENT.test(stack);
     }
 
     @Override

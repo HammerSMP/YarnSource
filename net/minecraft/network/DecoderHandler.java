@@ -33,8 +33,8 @@ extends ByteToMessageDecoder {
     private static final Marker MARKER = MarkerManager.getMarker((String)"PACKET_RECEIVED", (Marker)ClientConnection.MARKER_NETWORK_PACKETS);
     private final NetworkSide side;
 
-    public DecoderHandler(NetworkSide arg) {
-        this.side = arg;
+    public DecoderHandler(NetworkSide side) {
+        this.side = side;
     }
 
     protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) throws Exception {

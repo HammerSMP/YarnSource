@@ -91,12 +91,12 @@ public class ParticleTypes {
     public static final DefaultParticleType WHITE_ASH = ParticleTypes.register("white_ash", false);
     public static final Codec<ParticleEffect> field_25125 = Registry.PARTICLE_TYPE.dispatch("type", ParticleEffect::getType, ParticleType::method_29138);
 
-    private static DefaultParticleType register(String string, boolean bl) {
-        return Registry.register(Registry.PARTICLE_TYPE, string, new DefaultParticleType(bl));
+    private static DefaultParticleType register(String name, boolean alwaysShow) {
+        return Registry.register(Registry.PARTICLE_TYPE, name, new DefaultParticleType(alwaysShow));
     }
 
-    private static <T extends ParticleEffect> ParticleType<T> register(String string, ParticleEffect.Factory<T> arg, final Function<ParticleType<T>, Codec<T>> function) {
-        return Registry.register(Registry.PARTICLE_TYPE, string, new ParticleType<T>(false, arg){
+    private static <T extends ParticleEffect> ParticleType<T> register(String name, ParticleEffect.Factory<T> factory, final Function<ParticleType<T>, Codec<T>> function) {
+        return Registry.register(Registry.PARTICLE_TYPE, name, new ParticleType<T>(false, factory){
 
             @Override
             public Codec<T> method_29138() {

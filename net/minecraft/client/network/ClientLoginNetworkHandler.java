@@ -35,6 +35,8 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.DisconnectedScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.client.realms.DisconnectedRealmsScreen;
+import net.minecraft.client.realms.RealmsScreen;
 import net.minecraft.client.util.NetworkUtils;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.NetworkEncryptionUtils;
@@ -47,8 +49,6 @@ import net.minecraft.network.packet.s2c.login.LoginDisconnectS2CPacket;
 import net.minecraft.network.packet.s2c.login.LoginHelloS2CPacket;
 import net.minecraft.network.packet.s2c.login.LoginQueryRequestS2CPacket;
 import net.minecraft.network.packet.s2c.login.LoginSuccessS2CPacket;
-import net.minecraft.realms.DisconnectedRealmsScreen;
-import net.minecraft.realms.RealmsScreen;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import org.apache.logging.log4j.LogManager;
@@ -65,19 +65,19 @@ implements ClientLoginPacketListener {
     private final ClientConnection connection;
     private GameProfile profile;
 
-    public ClientLoginNetworkHandler(ClientConnection arg, MinecraftClient arg2, @Nullable Screen arg3, Consumer<Text> consumer) {
-        this.connection = arg;
-        this.client = arg2;
-        this.parentGui = arg3;
-        this.statusConsumer = consumer;
+    public ClientLoginNetworkHandler(ClientConnection connection, MinecraftClient client, @Nullable Screen parentGui, Consumer<Text> statusConsumer) {
+        this.connection = connection;
+        this.client = client;
+        this.parentGui = parentGui;
+        this.statusConsumer = statusConsumer;
     }
 
     @Override
-    public void onHello(LoginHelloS2CPacket arg) {
+    public void onHello(LoginHelloS2CPacket packet) {
         SecretKey secretKey = NetworkEncryptionUtils.generateKey();
-        PublicKey publicKey = arg.getPublicKey();
-        String string = new BigInteger(NetworkEncryptionUtils.generateServerId(arg.getServerId(), publicKey, secretKey)).toString(16);
-        LoginKeyC2SPacket lv = new LoginKeyC2SPacket(secretKey, publicKey, arg.getNonce());
+        PublicKey publicKey = packet.getPublicKey();
+        String string = new BigInteger(NetworkEncryptionUtils.generateServerId(packet.getServerId(), publicKey, secretKey)).toString(16);
+        LoginKeyC2SPacket lv = new LoginKeyC2SPacket(secretKey, publicKey, packet.getNonce());
         this.statusConsumer.accept(new TranslatableText("connect.authorizing"));
         NetworkUtils.downloadExecutor.submit(() -> {
             Text lv = this.joinServerSession(string);
@@ -95,9 +95,9 @@ implements ClientLoginPacketListener {
     }
 
     @Nullable
-    private Text joinServerSession(String string) {
+    private Text joinServerSession(String serverId) {
         try {
-            this.getSessionService().joinServer(this.client.getSession().getProfile(), this.client.getSession().getAccessToken(), string);
+            this.getSessionService().joinServer(this.client.getSession().getProfile(), this.client.getSession().getAccessToken(), serverId);
         }
         catch (AuthenticationUnavailableException authenticationUnavailableException) {
             return new TranslatableText("disconnect.loginFailedInfo", new TranslatableText("disconnect.loginFailedInfo.serversUnavailable"));
@@ -116,19 +116,19 @@ implements ClientLoginPacketListener {
     }
 
     @Override
-    public void onLoginSuccess(LoginSuccessS2CPacket arg) {
+    public void onLoginSuccess(LoginSuccessS2CPacket packet) {
         this.statusConsumer.accept(new TranslatableText("connect.joining"));
-        this.profile = arg.getProfile();
+        this.profile = packet.getProfile();
         this.connection.setState(NetworkState.PLAY);
         this.connection.setPacketListener(new ClientPlayNetworkHandler(this.client, this.parentGui, this.connection, this.profile));
     }
 
     @Override
-    public void onDisconnected(Text arg) {
+    public void onDisconnected(Text reason) {
         if (this.parentGui != null && this.parentGui instanceof RealmsScreen) {
-            this.client.openScreen(new DisconnectedRealmsScreen(this.parentGui, "connect.failed", arg));
+            this.client.openScreen(new DisconnectedRealmsScreen(this.parentGui, "connect.failed", reason));
         } else {
-            this.client.openScreen(new DisconnectedScreen(this.parentGui, "connect.failed", arg));
+            this.client.openScreen(new DisconnectedScreen(this.parentGui, "connect.failed", reason));
         }
     }
 
@@ -138,21 +138,21 @@ implements ClientLoginPacketListener {
     }
 
     @Override
-    public void onDisconnect(LoginDisconnectS2CPacket arg) {
-        this.connection.disconnect(arg.getReason());
+    public void onDisconnect(LoginDisconnectS2CPacket packet) {
+        this.connection.disconnect(packet.getReason());
     }
 
     @Override
-    public void onCompression(LoginCompressionS2CPacket arg) {
+    public void onCompression(LoginCompressionS2CPacket packet) {
         if (!this.connection.isLocal()) {
-            this.connection.setCompressionThreshold(arg.getCompressionThreshold());
+            this.connection.setCompressionThreshold(packet.getCompressionThreshold());
         }
     }
 
     @Override
-    public void onQueryRequest(LoginQueryRequestS2CPacket arg) {
+    public void onQueryRequest(LoginQueryRequestS2CPacket packet) {
         this.statusConsumer.accept(new TranslatableText("connect.negotiating"));
-        this.connection.send(new LoginQueryResponseC2SPacket(arg.getQueryId(), null));
+        this.connection.send(new LoginQueryResponseC2SPacket(packet.getQueryId(), null));
     }
 }
 

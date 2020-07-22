@@ -56,9 +56,9 @@ extends ConditionalLootFunction {
     private static final Logger LOGGER = LogManager.getLogger();
     private final List<Enchantment> enchantments;
 
-    private EnchantRandomlyLootFunction(LootCondition[] args, Collection<Enchantment> collection) {
-        super(args);
-        this.enchantments = ImmutableList.copyOf(collection);
+    private EnchantRandomlyLootFunction(LootCondition[] conditions, Collection<Enchantment> enchantments) {
+        super(conditions);
+        this.enchantments = ImmutableList.copyOf(enchantments);
     }
 
     @Override
@@ -67,21 +67,21 @@ extends ConditionalLootFunction {
     }
 
     @Override
-    public ItemStack process(ItemStack arg, LootContext arg22) {
+    public ItemStack process(ItemStack stack, LootContext context) {
         Enchantment lv2;
-        Random random = arg22.getRandom();
+        Random random = context.getRandom();
         if (this.enchantments.isEmpty()) {
-            boolean bl = arg.getItem() == Items.BOOK;
-            List list = Registry.ENCHANTMENT.stream().filter(Enchantment::isAvailableForRandomSelection).filter(arg2 -> bl || arg2.isAcceptableItem(arg)).collect(Collectors.toList());
+            boolean bl = stack.getItem() == Items.BOOK;
+            List list = Registry.ENCHANTMENT.stream().filter(Enchantment::isAvailableForRandomSelection).filter(arg2 -> bl || arg2.isAcceptableItem(stack)).collect(Collectors.toList());
             if (list.isEmpty()) {
-                LOGGER.warn("Couldn't find a compatible enchantment for {}", (Object)arg);
-                return arg;
+                LOGGER.warn("Couldn't find a compatible enchantment for {}", (Object)stack);
+                return stack;
             }
             Enchantment lv = (Enchantment)list.get(random.nextInt(list.size()));
         } else {
             lv2 = this.enchantments.get(random.nextInt(this.enchantments.size()));
         }
-        return EnchantRandomlyLootFunction.method_26266(arg, lv2, random);
+        return EnchantRandomlyLootFunction.method_26266(stack, lv2, random);
     }
 
     private static ItemStack method_26266(ItemStack arg, Enchantment arg2, Random random) {
@@ -96,7 +96,7 @@ extends ConditionalLootFunction {
     }
 
     public static ConditionalLootFunction.Builder<?> builder() {
-        return EnchantRandomlyLootFunction.builder(args -> new EnchantRandomlyLootFunction((LootCondition[])args, (Collection<Enchantment>)ImmutableList.of()));
+        return EnchantRandomlyLootFunction.builder(conditions -> new EnchantRandomlyLootFunction((LootCondition[])conditions, (Collection<Enchantment>)ImmutableList.of()));
     }
 
     public static class Serializer
@@ -132,8 +132,8 @@ extends ConditionalLootFunction {
         }
 
         @Override
-        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
-            return this.fromJson(jsonObject, jsonDeserializationContext, args);
+        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject json, JsonDeserializationContext context, LootCondition[] conditions) {
+            return this.fromJson(json, context, conditions);
         }
     }
 
@@ -146,8 +146,8 @@ extends ConditionalLootFunction {
             return this;
         }
 
-        public Builder add(Enchantment arg) {
-            this.enchantments.add(arg);
+        public Builder add(Enchantment enchantment) {
+            this.enchantments.add(enchantment);
             return this;
         }
 

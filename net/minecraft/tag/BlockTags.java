@@ -4,15 +4,15 @@
 package net.minecraft.tag;
 
 import net.minecraft.block.Block;
-import net.minecraft.class_5413;
-import net.minecraft.class_5414;
-import net.minecraft.class_5415;
-import net.minecraft.tag.GlobalTagAccessor;
+import net.minecraft.tag.RequiredTagList;
+import net.minecraft.tag.RequiredTagListRegistry;
 import net.minecraft.tag.Tag;
+import net.minecraft.tag.TagGroup;
+import net.minecraft.tag.TagManager;
 import net.minecraft.util.Identifier;
 
 public final class BlockTags {
-    protected static final GlobalTagAccessor<Block> ACCESSOR = class_5413.method_30201(new Identifier("block"), class_5415::method_30215);
+    protected static final RequiredTagList<Block> REQUIRED_TAGS = RequiredTagListRegistry.register(new Identifier("block"), TagManager::getBlocks);
     public static final Tag.Identified<Block> WOOL = BlockTags.register("wool");
     public static final Tag.Identified<Block> PLANKS = BlockTags.register("planks");
     public static final Tag.Identified<Block> STONE_BRICKS = BlockTags.register("stone_bricks");
@@ -97,13 +97,15 @@ public final class BlockTags {
     public static final Tag.Identified<Block> INFINIBURN_OVERWORLD = BlockTags.register("infiniburn_overworld");
     public static final Tag.Identified<Block> INFINIBURN_NETHER = BlockTags.register("infiniburn_nether");
     public static final Tag.Identified<Block> INFINIBURN_END = BlockTags.register("infiniburn_end");
+    public static final Tag.Identified<Block> BASE_STONE_OVERWORLD = BlockTags.register("base_stone_overworld");
+    public static final Tag.Identified<Block> BASE_STONE_NETHER = BlockTags.register("base_stone_nether");
 
-    private static Tag.Identified<Block> register(String string) {
-        return ACCESSOR.get(string);
+    private static Tag.Identified<Block> register(String id) {
+        return REQUIRED_TAGS.add(id);
     }
 
-    public static class_5414<Block> getContainer() {
-        return ACCESSOR.getContainer();
+    public static TagGroup<Block> getTagGroup() {
+        return REQUIRED_TAGS.getGroup();
     }
 }
 

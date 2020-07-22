@@ -27,8 +27,8 @@ public interface TaskQueue<T, F> {
     implements TaskQueue<PrioritizedTask, Runnable> {
         private final List<Queue<Runnable>> queues;
 
-        public Prioritized(int i2) {
-            this.queues = IntStream.range(0, i2).mapToObj(i -> Queues.newConcurrentLinkedQueue()).collect(Collectors.toList());
+        public Prioritized(int priorityCount) {
+            this.queues = IntStream.range(0, priorityCount).mapToObj(i -> Queues.newConcurrentLinkedQueue()).collect(Collectors.toList());
         }
 
         @Override
@@ -66,8 +66,8 @@ public interface TaskQueue<T, F> {
         private final int priority;
         private final Runnable runnable;
 
-        public PrioritizedTask(int i, Runnable runnable) {
-            this.priority = i;
+        public PrioritizedTask(int priority, Runnable runnable) {
+            this.priority = priority;
             this.runnable = runnable;
         }
 
@@ -96,8 +96,8 @@ public interface TaskQueue<T, F> {
         }
 
         @Override
-        public boolean add(T object) {
-            return this.queue.add(object);
+        public boolean add(T message) {
+            return this.queue.add(message);
         }
 
         @Override

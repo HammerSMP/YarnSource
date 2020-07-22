@@ -71,17 +71,17 @@ extends AbstractListTag<Tag> {
         }
 
         @Override
-        public /* synthetic */ Tag read(DataInput dataInput, int i, PositionTracker arg) throws IOException {
-            return this.read(dataInput, i, arg);
+        public /* synthetic */ Tag read(DataInput input, int depth, PositionTracker tracker) throws IOException {
+            return this.read(input, depth, tracker);
         }
     };
     private static final ByteSet NBT_NUMBER_TYPES = new ByteOpenHashSet(Arrays.asList((byte)1, (byte)2, (byte)3, (byte)4, (byte)5, (byte)6));
     private final List<Tag> value;
     private byte type;
 
-    private ListTag(List<Tag> list, byte b) {
+    private ListTag(List<Tag> list, byte type) {
         this.value = list;
-        this.type = b;
+        this.type = type;
     }
 
     public ListTag() {
@@ -89,12 +89,12 @@ extends AbstractListTag<Tag> {
     }
 
     @Override
-    public void write(DataOutput dataOutput) throws IOException {
+    public void write(DataOutput output) throws IOException {
         this.type = this.value.isEmpty() ? (byte)0 : this.value.get(0).getType();
-        dataOutput.writeByte(this.type);
-        dataOutput.writeInt(this.value.size());
+        output.writeByte(this.type);
+        output.writeInt(this.value.size());
         for (Tag lv : this.value) {
-            lv.write(dataOutput);
+            lv.write(output);
         }
     }
 
@@ -137,25 +137,25 @@ extends AbstractListTag<Tag> {
         return this.value.isEmpty();
     }
 
-    public CompoundTag getCompound(int i) {
+    public CompoundTag getCompound(int index) {
         Tag lv;
-        if (i >= 0 && i < this.value.size() && (lv = this.value.get(i)).getType() == 10) {
+        if (index >= 0 && index < this.value.size() && (lv = this.value.get(index)).getType() == 10) {
             return (CompoundTag)lv;
         }
         return new CompoundTag();
     }
 
-    public ListTag getList(int i) {
+    public ListTag getList(int index) {
         Tag lv;
-        if (i >= 0 && i < this.value.size() && (lv = this.value.get(i)).getType() == 9) {
+        if (index >= 0 && index < this.value.size() && (lv = this.value.get(index)).getType() == 9) {
             return (ListTag)lv;
         }
         return new ListTag();
     }
 
-    public short getShort(int i) {
+    public short getShort(int index) {
         Tag lv;
-        if (i >= 0 && i < this.value.size() && (lv = this.value.get(i)).getType() == 2) {
+        if (index >= 0 && index < this.value.size() && (lv = this.value.get(index)).getType() == 2) {
             return ((ShortTag)lv).getShort();
         }
         return 0;
@@ -169,35 +169,35 @@ extends AbstractListTag<Tag> {
         return 0;
     }
 
-    public int[] getIntArray(int i) {
+    public int[] getIntArray(int index) {
         Tag lv;
-        if (i >= 0 && i < this.value.size() && (lv = this.value.get(i)).getType() == 11) {
+        if (index >= 0 && index < this.value.size() && (lv = this.value.get(index)).getType() == 11) {
             return ((IntArrayTag)lv).getIntArray();
         }
         return new int[0];
     }
 
-    public double getDouble(int i) {
+    public double getDouble(int index) {
         Tag lv;
-        if (i >= 0 && i < this.value.size() && (lv = this.value.get(i)).getType() == 6) {
+        if (index >= 0 && index < this.value.size() && (lv = this.value.get(index)).getType() == 6) {
             return ((DoubleTag)lv).getDouble();
         }
         return 0.0;
     }
 
-    public float getFloat(int i) {
+    public float getFloat(int index) {
         Tag lv;
-        if (i >= 0 && i < this.value.size() && (lv = this.value.get(i)).getType() == 5) {
+        if (index >= 0 && index < this.value.size() && (lv = this.value.get(index)).getType() == 5) {
             return ((FloatTag)lv).getFloat();
         }
         return 0.0f;
     }
 
-    public String getString(int i) {
-        if (i < 0 || i >= this.value.size()) {
+    public String getString(int index) {
+        if (index < 0 || index >= this.value.size()) {
             return "";
         }
-        Tag lv = this.value.get(i);
+        Tag lv = this.value.get(index);
         if (lv.getType() == 8) {
             return lv.asString();
         }
@@ -231,32 +231,32 @@ extends AbstractListTag<Tag> {
     }
 
     @Override
-    public boolean setTag(int i, Tag arg) {
-        if (this.canAdd(arg)) {
-            this.value.set(i, arg);
+    public boolean setTag(int index, Tag tag) {
+        if (this.canAdd(tag)) {
+            this.value.set(index, tag);
             return true;
         }
         return false;
     }
 
     @Override
-    public boolean addTag(int i, Tag arg) {
-        if (this.canAdd(arg)) {
-            this.value.add(i, arg);
+    public boolean addTag(int index, Tag tag) {
+        if (this.canAdd(tag)) {
+            this.value.add(index, tag);
             return true;
         }
         return false;
     }
 
-    private boolean canAdd(Tag arg) {
-        if (arg.getType() == 0) {
+    private boolean canAdd(Tag tag) {
+        if (tag.getType() == 0) {
             return false;
         }
         if (this.type == 0) {
-            this.type = arg.getType();
+            this.type = tag.getType();
             return true;
         }
-        return this.type == arg.getType();
+        return this.type == tag.getType();
     }
 
     @Override
@@ -267,11 +267,11 @@ extends AbstractListTag<Tag> {
     }
 
     @Override
-    public boolean equals(Object object) {
-        if (this == object) {
+    public boolean equals(Object o) {
+        if (this == o) {
             return true;
         }
-        return object instanceof ListTag && Objects.equals(this.value, ((ListTag)object).value);
+        return o instanceof ListTag && Objects.equals(this.value, ((ListTag)o).value);
     }
 
     @Override
@@ -280,7 +280,7 @@ extends AbstractListTag<Tag> {
     }
 
     @Override
-    public Text toText(String string, int i) {
+    public Text toText(String indent, int depth) {
         if (this.isEmpty()) {
             return new LiteralText("[]");
         }
@@ -297,20 +297,20 @@ extends AbstractListTag<Tag> {
             return lv;
         }
         LiteralText lv2 = new LiteralText("[");
-        if (!string.isEmpty()) {
+        if (!indent.isEmpty()) {
             lv2.append("\n");
         }
         String string3 = String.valueOf(',');
         for (int k = 0; k < this.value.size(); ++k) {
-            LiteralText lv3 = new LiteralText(Strings.repeat((String)string, (int)(i + 1)));
-            lv3.append(this.value.get(k).toText(string, i + 1));
+            LiteralText lv3 = new LiteralText(Strings.repeat((String)indent, (int)(depth + 1)));
+            lv3.append(this.value.get(k).toText(indent, depth + 1));
             if (k != this.value.size() - 1) {
-                lv3.append(string3).append(string.isEmpty() ? " " : "\n");
+                lv3.append(string3).append(indent.isEmpty() ? " " : "\n");
             }
             lv2.append(lv3);
         }
-        if (!string.isEmpty()) {
-            lv2.append("\n").append(Strings.repeat((String)string, (int)i));
+        if (!indent.isEmpty()) {
+            lv2.append("\n").append(Strings.repeat((String)indent, (int)depth));
         }
         lv2.append("]");
         return lv2;

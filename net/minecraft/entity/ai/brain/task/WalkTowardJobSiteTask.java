@@ -26,9 +26,9 @@ public class WalkTowardJobSiteTask
 extends Task<VillagerEntity> {
     final float speed;
 
-    public WalkTowardJobSiteTask(float f) {
+    public WalkTowardJobSiteTask(float speed) {
         super((Map<MemoryModuleType<?>, MemoryModuleState>)ImmutableMap.of(MemoryModuleType.POTENTIAL_JOB_SITE, (Object)((Object)MemoryModuleState.VALUE_PRESENT)), 1200);
-        this.speed = f;
+        this.speed = speed;
     }
 
     @Override
@@ -65,13 +65,13 @@ extends Task<VillagerEntity> {
     }
 
     @Override
-    protected /* synthetic */ boolean shouldKeepRunning(ServerWorld arg, LivingEntity arg2, long l) {
-        return this.shouldKeepRunning(arg, (VillagerEntity)arg2, l);
+    protected /* synthetic */ boolean shouldKeepRunning(ServerWorld world, LivingEntity entity, long time) {
+        return this.shouldKeepRunning(world, (VillagerEntity)entity, time);
     }
 
     @Override
-    protected /* synthetic */ void keepRunning(ServerWorld arg, LivingEntity arg2, long l) {
-        this.keepRunning(arg, (VillagerEntity)arg2, l);
+    protected /* synthetic */ void keepRunning(ServerWorld world, LivingEntity entity, long time) {
+        this.keepRunning(world, (VillagerEntity)entity, time);
     }
 }
 

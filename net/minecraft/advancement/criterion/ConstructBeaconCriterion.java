@@ -32,35 +32,35 @@ extends AbstractCriterion<Conditions> {
         return new Conditions(arg, lv);
     }
 
-    public void trigger(ServerPlayerEntity arg, BeaconBlockEntity arg22) {
-        this.test(arg, arg2 -> arg2.matches(arg22));
+    public void trigger(ServerPlayerEntity player, BeaconBlockEntity beacon) {
+        this.test(player, arg2 -> arg2.matches(beacon));
     }
 
     @Override
-    public /* synthetic */ AbstractCriterionConditions conditionsFromJson(JsonObject jsonObject, EntityPredicate.Extended arg, AdvancementEntityPredicateDeserializer arg2) {
-        return this.conditionsFromJson(jsonObject, arg, arg2);
+    public /* synthetic */ AbstractCriterionConditions conditionsFromJson(JsonObject obj, EntityPredicate.Extended playerPredicate, AdvancementEntityPredicateDeserializer predicateDeserializer) {
+        return this.conditionsFromJson(obj, playerPredicate, predicateDeserializer);
     }
 
     public static class Conditions
     extends AbstractCriterionConditions {
         private final NumberRange.IntRange level;
 
-        public Conditions(EntityPredicate.Extended arg, NumberRange.IntRange arg2) {
-            super(ID, arg);
-            this.level = arg2;
+        public Conditions(EntityPredicate.Extended player, NumberRange.IntRange level) {
+            super(ID, player);
+            this.level = level;
         }
 
-        public static Conditions level(NumberRange.IntRange arg) {
-            return new Conditions(EntityPredicate.Extended.EMPTY, arg);
+        public static Conditions level(NumberRange.IntRange level) {
+            return new Conditions(EntityPredicate.Extended.EMPTY, level);
         }
 
-        public boolean matches(BeaconBlockEntity arg) {
-            return this.level.test(arg.getLevel());
+        public boolean matches(BeaconBlockEntity beacon) {
+            return this.level.test(beacon.getLevel());
         }
 
         @Override
-        public JsonObject toJson(AdvancementEntityPredicateSerializer arg) {
-            JsonObject jsonObject = super.toJson(arg);
+        public JsonObject toJson(AdvancementEntityPredicateSerializer predicateSerializer) {
+            JsonObject jsonObject = super.toJson(predicateSerializer);
             jsonObject.add("level", this.level.toJson());
             return jsonObject;
         }

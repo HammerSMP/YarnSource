@@ -183,33 +183,33 @@ public class GameOptions {
     public String language = "en_us";
     public boolean field_25623;
 
-    public GameOptions(MinecraftClient arg, File file) {
-        this.client = arg;
-        this.optionsFile = new File(file, "options.txt");
-        if (arg.is64Bit() && Runtime.getRuntime().maxMemory() >= 1000000000L) {
+    public GameOptions(MinecraftClient client, File optionsFile) {
+        this.client = client;
+        this.optionsFile = new File(optionsFile, "options.txt");
+        if (client.is64Bit() && Runtime.getRuntime().maxMemory() >= 1000000000L) {
             Option.RENDER_DISTANCE.setMax(32.0f);
         } else {
             Option.RENDER_DISTANCE.setMax(16.0f);
         }
-        this.viewDistance = arg.is64Bit() ? 12 : 8;
+        this.viewDistance = client.is64Bit() ? 12 : 8;
         this.field_25623 = Util.getOperatingSystem() == Util.OperatingSystem.WINDOWS;
         this.load();
     }
 
-    public float getTextBackgroundOpacity(float f) {
-        return this.backgroundForChatOnly ? f : (float)this.textBackgroundOpacity;
+    public float getTextBackgroundOpacity(float fallback) {
+        return this.backgroundForChatOnly ? fallback : (float)this.textBackgroundOpacity;
     }
 
-    public int getTextBackgroundColor(float f) {
-        return (int)(this.getTextBackgroundOpacity(f) * 255.0f) << 24 & 0xFF000000;
+    public int getTextBackgroundColor(float fallbackOpacity) {
+        return (int)(this.getTextBackgroundOpacity(fallbackOpacity) * 255.0f) << 24 & 0xFF000000;
     }
 
-    public int getTextBackgroundColor(int i) {
-        return this.backgroundForChatOnly ? i : (int)(this.textBackgroundOpacity * 255.0) << 24 & 0xFF000000;
+    public int getTextBackgroundColor(int fallbackColor) {
+        return this.backgroundForChatOnly ? fallbackColor : (int)(this.textBackgroundOpacity * 255.0) << 24 & 0xFF000000;
     }
 
-    public void setKeyCode(KeyBinding arg, InputUtil.Key arg2) {
-        arg.setBoundKey(arg2);
+    public void setKeyCode(KeyBinding key, InputUtil.Key code) {
+        key.setBoundKey(code);
         this.write();
     }
 
@@ -489,15 +489,15 @@ public class GameOptions {
         }
     }
 
-    private CompoundTag update(CompoundTag arg) {
+    private CompoundTag update(CompoundTag tag) {
         int i = 0;
         try {
-            i = Integer.parseInt(arg.getString("version"));
+            i = Integer.parseInt(tag.getString("version"));
         }
         catch (RuntimeException runtimeException) {
             // empty catch block
         }
-        return NbtHelper.update(this.client.getDataFixer(), DataFixTypes.OPTIONS, arg, i);
+        return NbtHelper.update(this.client.getDataFixer(), DataFixTypes.OPTIONS, tag, i);
     }
 
     private static float parseFloat(String string) {
@@ -607,16 +607,16 @@ public class GameOptions {
         this.onPlayerModelPartChange();
     }
 
-    public float getSoundVolume(SoundCategory arg) {
-        if (this.soundVolumeLevels.containsKey((Object)arg)) {
-            return this.soundVolumeLevels.get((Object)arg).floatValue();
+    public float getSoundVolume(SoundCategory category) {
+        if (this.soundVolumeLevels.containsKey((Object)category)) {
+            return this.soundVolumeLevels.get((Object)category).floatValue();
         }
         return 1.0f;
     }
 
-    public void setSoundVolume(SoundCategory arg, float f) {
-        this.soundVolumeLevels.put(arg, Float.valueOf(f));
-        this.client.getSoundManager().updateSoundVolume(arg, f);
+    public void setSoundVolume(SoundCategory category, float volume) {
+        this.soundVolumeLevels.put(category, Float.valueOf(volume));
+        this.client.getSoundManager().updateSoundVolume(category, volume);
     }
 
     public void onPlayerModelPartChange() {
@@ -633,20 +633,20 @@ public class GameOptions {
         return ImmutableSet.copyOf(this.enabledPlayerModelParts);
     }
 
-    public void setPlayerModelPart(PlayerModelPart arg, boolean bl) {
-        if (bl) {
-            this.enabledPlayerModelParts.add(arg);
+    public void setPlayerModelPart(PlayerModelPart part, boolean enabled) {
+        if (enabled) {
+            this.enabledPlayerModelParts.add(part);
         } else {
-            this.enabledPlayerModelParts.remove((Object)arg);
+            this.enabledPlayerModelParts.remove((Object)part);
         }
         this.onPlayerModelPartChange();
     }
 
-    public void togglePlayerModelPart(PlayerModelPart arg) {
-        if (this.getEnabledPlayerModelParts().contains((Object)arg)) {
-            this.enabledPlayerModelParts.remove((Object)arg);
+    public void togglePlayerModelPart(PlayerModelPart part) {
+        if (this.getEnabledPlayerModelParts().contains((Object)part)) {
+            this.enabledPlayerModelParts.remove((Object)part);
         } else {
-            this.enabledPlayerModelParts.add(arg);
+            this.enabledPlayerModelParts.add(part);
         }
         this.onPlayerModelPartChange();
     }
@@ -662,14 +662,14 @@ public class GameOptions {
         return this.useNativeTransport;
     }
 
-    public void addResourcePackProfilesToManager(ResourcePackManager arg) {
+    public void addResourcePackProfilesToManager(ResourcePackManager manager) {
         LinkedHashSet set = Sets.newLinkedHashSet();
         Iterator<String> iterator = this.resourcePacks.iterator();
         while (iterator.hasNext()) {
             String string = iterator.next();
-            ResourcePackProfile lv = arg.getProfile(string);
+            ResourcePackProfile lv = manager.getProfile(string);
             if (lv == null && !string.startsWith("file/")) {
-                lv = arg.getProfile("file/" + string);
+                lv = manager.getProfile("file/" + string);
             }
             if (lv == null) {
                 LOGGER.warn("Removed resource pack {} from options because it doesn't seem to exist anymore", (Object)string);
@@ -688,7 +688,7 @@ public class GameOptions {
             }
             set.add(lv.getName());
         }
-        arg.setEnabledProfiles(set);
+        manager.setEnabledProfiles(set);
     }
 }
 

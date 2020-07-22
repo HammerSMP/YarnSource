@@ -27,7 +27,7 @@ import net.minecraft.util.ProgressListener;
 import net.minecraft.util.WorldSavePath;
 import net.minecraft.util.dynamic.RegistryOps;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.registry.RegistryTracker;
+import net.minecraft.util.registry.DynamicRegistryManager;
 import net.minecraft.world.SaveProperties;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biomes;
@@ -63,7 +63,7 @@ public class AnvilLevelStorage {
         }
         int i = list.size() + list2.size() + list3.size();
         LOGGER.info("Total conversion count is {}", (Object)i);
-        RegistryTracker.Modifiable lv = RegistryTracker.create();
+        DynamicRegistryManager.Impl lv = DynamicRegistryManager.create();
         RegistryOps<Tag> lv2 = RegistryOps.of(NbtOps.INSTANCE, ResourceManager.Empty.INSTANCE, lv);
         SaveProperties lv3 = arg.readLevelProperties(lv2, DataPackSettings.SAFE_MODE);
         long l2 = l = lv3 != null ? lv3.getGeneratorOptions().getSeed() : 0L;
@@ -72,9 +72,9 @@ public class AnvilLevelStorage {
         } else {
             lv5 = new VanillaLayeredBiomeSource(l, false, false);
         }
-        AnvilLevelStorage.convertRegions(new File(file, "region"), list, lv5, 0, i, arg2);
-        AnvilLevelStorage.convertRegions(new File(file2, "region"), list2, new FixedBiomeSource(Biomes.NETHER_WASTES), list.size(), i, arg2);
-        AnvilLevelStorage.convertRegions(new File(file3, "region"), list3, new FixedBiomeSource(Biomes.THE_END), list.size() + list2.size(), i, arg2);
+        AnvilLevelStorage.convertRegions(lv, new File(file, "region"), list, lv5, 0, i, arg2);
+        AnvilLevelStorage.convertRegions(lv, new File(file2, "region"), list2, new FixedBiomeSource(Biomes.NETHER_WASTES), list.size(), i, arg2);
+        AnvilLevelStorage.convertRegions(lv, new File(file3, "region"), list3, new FixedBiomeSource(Biomes.THE_END), list.size() + list2.size(), i, arg2);
         AnvilLevelStorage.makeMcrLevelDatBackup(arg);
         arg.method_27425(lv, lv3);
         return true;
@@ -92,18 +92,18 @@ public class AnvilLevelStorage {
         }
     }
 
-    private static void convertRegions(File file, Iterable<File> iterable, BiomeSource arg, int i, int j, ProgressListener arg2) {
+    private static void convertRegions(DynamicRegistryManager.Impl arg, File file, Iterable<File> iterable, BiomeSource arg2, int i, int j, ProgressListener arg3) {
         for (File file2 : iterable) {
-            AnvilLevelStorage.convertRegion(file, file2, arg, i, j, arg2);
+            AnvilLevelStorage.convertRegion(arg, file, file2, arg2, i, j, arg3);
             int k = (int)Math.round(100.0 * (double)(++i) / (double)j);
-            arg2.progressStagePercentage(k);
+            arg3.progressStagePercentage(k);
         }
     }
 
     /*
      * WARNING - void declaration
      */
-    private static void convertRegion(File file, File file2, BiomeSource arg, int i, int j, ProgressListener arg2) {
+    private static void convertRegion(DynamicRegistryManager.Impl arg, File file, File file2, BiomeSource arg2, int i, int j, ProgressListener arg3) {
         String string = file2.getName();
         try (RegionFile lv = new RegionFile(file2, file, true);
              RegionFile lv2 = new RegionFile(new File(file, string.substring(0, string.length() - ".mcr".length()) + ".mca"), file, true);){
@@ -128,7 +128,7 @@ public class AnvilLevelStorage {
                     CompoundTag lv9 = new CompoundTag();
                     CompoundTag lv10 = new CompoundTag();
                     lv9.put("Level", lv10);
-                    AlphaChunkIo.convertAlphaChunk(lv8, lv10, arg);
+                    AlphaChunkIo.convertAlphaChunk(arg, lv8, lv10, arg2);
                     try (DataOutputStream dataOutputStream = lv2.getChunkOutputStream(lv3);){
                         NbtIo.write(lv9, (DataOutput)dataOutputStream);
                         continue;
@@ -137,7 +137,7 @@ public class AnvilLevelStorage {
                 int m = (int)Math.round(100.0 * (double)(i * 1024) / (double)(j * 1024));
                 int n = (int)Math.round(100.0 * (double)((k + 1) * 32 + i * 1024) / (double)(j * 1024));
                 if (n <= m) continue;
-                arg2.progressStagePercentage(n);
+                arg3.progressStagePercentage(n);
             }
         }
         catch (IOException iOException2) {

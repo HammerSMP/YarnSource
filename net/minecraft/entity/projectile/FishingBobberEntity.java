@@ -73,35 +73,35 @@ extends ProjectileEntity {
     private final int luckOfTheSeaLevel;
     private final int lureLevel;
 
-    private FishingBobberEntity(World arg, PlayerEntity arg2, int i, int j) {
-        super((EntityType<? extends ProjectileEntity>)EntityType.FISHING_BOBBER, arg);
+    private FishingBobberEntity(World world, PlayerEntity owner, int lureLevel, int luckOfTheSeaLevel) {
+        super((EntityType<? extends ProjectileEntity>)EntityType.FISHING_BOBBER, world);
         this.ignoreCameraFrustum = true;
-        this.setOwner(arg2);
-        arg2.fishHook = this;
-        this.luckOfTheSeaLevel = Math.max(0, i);
-        this.lureLevel = Math.max(0, j);
+        this.setOwner(owner);
+        owner.fishHook = this;
+        this.luckOfTheSeaLevel = Math.max(0, lureLevel);
+        this.lureLevel = Math.max(0, luckOfTheSeaLevel);
     }
 
     @Environment(value=EnvType.CLIENT)
-    public FishingBobberEntity(World arg, PlayerEntity arg2, double d, double e, double f) {
-        this(arg, arg2, 0, 0);
-        this.updatePosition(d, e, f);
+    public FishingBobberEntity(World world, PlayerEntity thrower, double x, double y, double z) {
+        this(world, thrower, 0, 0);
+        this.updatePosition(x, y, z);
         this.prevX = this.getX();
         this.prevY = this.getY();
         this.prevZ = this.getZ();
     }
 
-    public FishingBobberEntity(PlayerEntity arg, World arg2, int i, int j) {
-        this(arg2, arg, i, j);
-        float f = arg.pitch;
-        float g = arg.yaw;
+    public FishingBobberEntity(PlayerEntity thrower, World world, int lureLevel, int luckOfTheSeaLevel) {
+        this(world, thrower, lureLevel, luckOfTheSeaLevel);
+        float f = thrower.pitch;
+        float g = thrower.yaw;
         float h = MathHelper.cos(-g * ((float)Math.PI / 180) - (float)Math.PI);
         float k = MathHelper.sin(-g * ((float)Math.PI / 180) - (float)Math.PI);
         float l = -MathHelper.cos(-f * ((float)Math.PI / 180));
         float m = MathHelper.sin(-f * ((float)Math.PI / 180));
-        double d = arg.getX() - (double)k * 0.3;
-        double e = arg.getEyeY();
-        double n = arg.getZ() - (double)h * 0.3;
+        double d = thrower.getX() - (double)k * 0.3;
+        double e = thrower.getEyeY();
+        double n = thrower.getZ() - (double)h * 0.3;
         this.refreshPositionAndAngles(d, e, n, g, f);
         Vec3d lv = new Vec3d(-k, MathHelper.clamp(-(m / l), -5.0f, 5.0f), -h);
         double o = lv.length();
@@ -120,30 +120,30 @@ extends ProjectileEntity {
     }
 
     @Override
-    public void onTrackedDataSet(TrackedData<?> arg) {
-        if (HOOK_ENTITY_ID.equals(arg)) {
+    public void onTrackedDataSet(TrackedData<?> data) {
+        if (HOOK_ENTITY_ID.equals(data)) {
             int i = this.getDataTracker().get(HOOK_ENTITY_ID);
             Entity entity = this.hookedEntity = i > 0 ? this.world.getEntityById(i - 1) : null;
         }
-        if (CAUGHT_FISH.equals(arg)) {
+        if (CAUGHT_FISH.equals(data)) {
             this.caughtFish = this.getDataTracker().get(CAUGHT_FISH);
             if (this.caughtFish) {
                 this.setVelocity(this.getVelocity().x, -0.4f * MathHelper.nextFloat(this.velocityRandom, 0.6f, 1.0f), this.getVelocity().z);
             }
         }
-        super.onTrackedDataSet(arg);
+        super.onTrackedDataSet(data);
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public boolean shouldRender(double d) {
+    public boolean shouldRender(double distance) {
         double e = 64.0;
-        return d < 4096.0;
+        return distance < 4096.0;
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void updateTrackedPositionAndAngles(double d, double e, double f, float g, float h, int i, boolean bl) {
+    public void updateTrackedPositionAndAngles(double x, double y, double z, float yaw, float pitch, int interpolationSteps, boolean interpolate) {
     }
 
     @Override
@@ -257,28 +257,28 @@ extends ProjectileEntity {
     }
 
     @Override
-    protected void onEntityHit(EntityHitResult arg) {
-        super.onEntityHit(arg);
+    protected void onEntityHit(EntityHitResult entityHitResult) {
+        super.onEntityHit(entityHitResult);
         if (!this.world.isClient) {
-            this.hookedEntity = arg.getEntity();
+            this.hookedEntity = entityHitResult.getEntity();
             this.updateHookedEntityId();
         }
     }
 
     @Override
-    protected void onBlockHit(BlockHitResult arg) {
-        super.onBlockHit(arg);
-        this.setVelocity(this.getVelocity().normalize().multiply(arg.squaredDistanceTo(this)));
+    protected void onBlockHit(BlockHitResult blockHitResult) {
+        super.onBlockHit(blockHitResult);
+        this.setVelocity(this.getVelocity().normalize().multiply(blockHitResult.squaredDistanceTo(this)));
     }
 
     private void updateHookedEntityId() {
         this.getDataTracker().set(HOOK_ENTITY_ID, this.hookedEntity.getEntityId() + 1);
     }
 
-    private void tickFishingLogic(BlockPos arg) {
+    private void tickFishingLogic(BlockPos pos) {
         ServerWorld lv = (ServerWorld)this.world;
         int i = 1;
-        BlockPos lv2 = arg.up();
+        BlockPos lv2 = pos.up();
         if (this.random.nextFloat() < 0.25f && this.world.hasRain(lv2)) {
             ++i;
         }
@@ -351,10 +351,10 @@ extends ProjectileEntity {
         }
     }
 
-    private boolean isOpenOrWaterAround(BlockPos arg) {
+    private boolean isOpenOrWaterAround(BlockPos pos) {
         PositionType lv = PositionType.INVALID;
         for (int i = -1; i <= 2; ++i) {
-            PositionType lv2 = this.getPositionType(arg.add(-2, i, -2), arg.add(2, i, 2));
+            PositionType lv2 = this.getPositionType(pos.add(-2, i, -2), pos.add(2, i, 2));
             switch (lv2) {
                 case INVALID: {
                     return false;
@@ -373,17 +373,17 @@ extends ProjectileEntity {
         return true;
     }
 
-    private PositionType getPositionType(BlockPos arg3, BlockPos arg22) {
-        return BlockPos.stream(arg3, arg22).map(this::getPositionType).reduce((arg, arg2) -> arg == arg2 ? arg : PositionType.INVALID).orElse(PositionType.INVALID);
+    private PositionType getPositionType(BlockPos start, BlockPos end) {
+        return BlockPos.stream(start, end).map(this::getPositionType).reduce((arg, arg2) -> arg == arg2 ? arg : PositionType.INVALID).orElse(PositionType.INVALID);
     }
 
-    private PositionType getPositionType(BlockPos arg) {
-        BlockState lv = this.world.getBlockState(arg);
+    private PositionType getPositionType(BlockPos pos) {
+        BlockState lv = this.world.getBlockState(pos);
         if (lv.isAir() || lv.isOf(Blocks.LILY_PAD)) {
             return PositionType.ABOVE_WATER;
         }
         FluidState lv2 = lv.getFluidState();
-        if (lv2.isIn(FluidTags.WATER) && lv2.isStill() && lv.getCollisionShape(this.world, arg).isEmpty()) {
+        if (lv2.isIn(FluidTags.WATER) && lv2.isStill() && lv.getCollisionShape(this.world, pos).isEmpty()) {
             return PositionType.INSIDE_WATER;
         }
         return PositionType.INVALID;
@@ -394,14 +394,14 @@ extends ProjectileEntity {
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
+    public void writeCustomDataToTag(CompoundTag tag) {
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
+    public void readCustomDataFromTag(CompoundTag tag) {
     }
 
-    public int use(ItemStack arg) {
+    public int use(ItemStack usedItem) {
         PlayerEntity lv = this.getOwner();
         if (this.world.isClient || lv == null) {
             return 0;
@@ -409,14 +409,14 @@ extends ProjectileEntity {
         int i = 0;
         if (this.hookedEntity != null) {
             this.pullHookedEntity();
-            Criteria.FISHING_ROD_HOOKED.trigger((ServerPlayerEntity)lv, arg, this, Collections.emptyList());
+            Criteria.FISHING_ROD_HOOKED.trigger((ServerPlayerEntity)lv, usedItem, this, Collections.emptyList());
             this.world.sendEntityStatus(this, (byte)31);
             i = this.hookedEntity instanceof ItemEntity ? 3 : 5;
         } else if (this.hookCountdown > 0) {
-            LootContext.Builder lv2 = new LootContext.Builder((ServerWorld)this.world).parameter(LootContextParameters.POSITION, this.getBlockPos()).parameter(LootContextParameters.TOOL, arg).parameter(LootContextParameters.THIS_ENTITY, this).random(this.random).luck((float)this.luckOfTheSeaLevel + lv.getLuck());
+            LootContext.Builder lv2 = new LootContext.Builder((ServerWorld)this.world).parameter(LootContextParameters.POSITION, this.getBlockPos()).parameter(LootContextParameters.TOOL, usedItem).parameter(LootContextParameters.THIS_ENTITY, this).random(this.random).luck((float)this.luckOfTheSeaLevel + lv.getLuck());
             LootTable lv3 = this.world.getServer().getLootManager().getTable(LootTables.FISHING_GAMEPLAY);
             List<ItemStack> list = lv3.generateLoot(lv2.build(LootContextTypes.FISHING));
-            Criteria.FISHING_ROD_HOOKED.trigger((ServerPlayerEntity)lv, arg, this, list);
+            Criteria.FISHING_ROD_HOOKED.trigger((ServerPlayerEntity)lv, usedItem, this, list);
             for (ItemStack lv4 : list) {
                 ItemEntity lv5 = new ItemEntity(this.world, this.getX(), this.getY(), this.getZ(), lv4);
                 double d = lv.getX() - this.getX();
@@ -440,11 +440,11 @@ extends ProjectileEntity {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void handleStatus(byte b) {
-        if (b == 31 && this.world.isClient && this.hookedEntity instanceof PlayerEntity && ((PlayerEntity)this.hookedEntity).isMainPlayer()) {
+    public void handleStatus(byte status) {
+        if (status == 31 && this.world.isClient && this.hookedEntity instanceof PlayerEntity && ((PlayerEntity)this.hookedEntity).isMainPlayer()) {
             this.pullHookedEntity();
         }
-        super.handleStatus(b);
+        super.handleStatus(status);
     }
 
     protected void pullHookedEntity() {

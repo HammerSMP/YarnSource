@@ -25,24 +25,24 @@ implements Packet<ClientLoginPacketListener> {
     public LoginHelloS2CPacket() {
     }
 
-    public LoginHelloS2CPacket(String string, PublicKey publicKey, byte[] bs) {
-        this.serverId = string;
+    public LoginHelloS2CPacket(String serverId, PublicKey publicKey, byte[] nonce) {
+        this.serverId = serverId;
         this.publicKey = publicKey;
-        this.nonce = bs;
+        this.nonce = nonce;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.serverId = arg.readString(20);
-        this.publicKey = NetworkEncryptionUtils.readEncodedPublicKey(arg.readByteArray());
-        this.nonce = arg.readByteArray();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.serverId = buf.readString(20);
+        this.publicKey = NetworkEncryptionUtils.readEncodedPublicKey(buf.readByteArray());
+        this.nonce = buf.readByteArray();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeString(this.serverId);
-        arg.writeByteArray(this.publicKey.getEncoded());
-        arg.writeByteArray(this.nonce);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeString(this.serverId);
+        buf.writeByteArray(this.publicKey.getEncoded());
+        buf.writeByteArray(this.nonce);
     }
 
     @Override

@@ -22,9 +22,9 @@ extends BlockItem {
 
     @Override
     @Nullable
-    protected BlockState getPlacementState(ItemPlacementContext arg) {
-        PlayerEntity lv = arg.getPlayer();
-        return lv == null || lv.isCreativeLevelTwoOp() ? super.getPlacementState(arg) : null;
+    protected BlockState getPlacementState(ItemPlacementContext context) {
+        PlayerEntity lv = context.getPlayer();
+        return lv == null || lv.isCreativeLevelTwoOp() ? super.getPlacementState(context) : null;
     }
 }
 

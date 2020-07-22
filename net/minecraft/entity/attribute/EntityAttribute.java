@@ -8,9 +8,9 @@ public class EntityAttribute {
     private boolean tracked;
     private final String translationKey;
 
-    protected EntityAttribute(String string, double d) {
-        this.fallback = d;
-        this.translationKey = string;
+    protected EntityAttribute(String translationKey, double fallback) {
+        this.fallback = fallback;
+        this.translationKey = translationKey;
     }
 
     public double getDefaultValue() {
@@ -21,13 +21,13 @@ public class EntityAttribute {
         return this.tracked;
     }
 
-    public EntityAttribute setTracked(boolean bl) {
-        this.tracked = bl;
+    public EntityAttribute setTracked(boolean tracked) {
+        this.tracked = tracked;
         return this;
     }
 
-    public double clamp(double d) {
-        return d;
+    public double clamp(double value) {
+        return value;
     }
 
     public String getTranslationKey() {

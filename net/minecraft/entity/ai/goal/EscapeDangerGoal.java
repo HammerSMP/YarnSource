@@ -26,9 +26,9 @@ extends Goal {
     protected double targetZ;
     protected boolean active;
 
-    public EscapeDangerGoal(PathAwareEntity arg, double d) {
-        this.mob = arg;
-        this.speed = d;
+    public EscapeDangerGoal(PathAwareEntity mob, double speed) {
+        this.mob = mob;
+        this.speed = speed;
         this.setControls(EnumSet.of(Goal.Control.MOVE));
     }
 
@@ -79,20 +79,20 @@ extends Goal {
     }
 
     @Nullable
-    protected BlockPos locateClosestWater(BlockView arg, Entity arg2, int i, int j) {
-        BlockPos lv = arg2.getBlockPos();
+    protected BlockPos locateClosestWater(BlockView blockView, Entity entity, int rangeX, int rangeY) {
+        BlockPos lv = entity.getBlockPos();
         int k = lv.getX();
         int l = lv.getY();
         int m = lv.getZ();
-        float f = i * i * j * 2;
+        float f = rangeX * rangeX * rangeY * 2;
         BlockPos lv2 = null;
         BlockPos.Mutable lv3 = new BlockPos.Mutable();
-        for (int n = k - i; n <= k + i; ++n) {
-            for (int o = l - j; o <= l + j; ++o) {
-                for (int p = m - i; p <= m + i; ++p) {
+        for (int n = k - rangeX; n <= k + rangeX; ++n) {
+            for (int o = l - rangeY; o <= l + rangeY; ++o) {
+                for (int p = m - rangeX; p <= m + rangeX; ++p) {
                     float g;
                     lv3.set(n, o, p);
-                    if (!arg.getFluidState(lv3).isIn(FluidTags.WATER) || !((g = (float)((n - k) * (n - k) + (o - l) * (o - l) + (p - m) * (p - m))) < f)) continue;
+                    if (!blockView.getFluidState(lv3).isIn(FluidTags.WATER) || !((g = (float)((n - k) * (n - k) + (o - l) * (o - l) + (p - m) * (p - m))) < f)) continue;
                     f = g;
                     lv2 = new BlockPos(lv3);
                 }

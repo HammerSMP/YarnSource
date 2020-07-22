@@ -28,45 +28,45 @@ implements Packet<ClientPlayPacketListener> {
     public TitleS2CPacket() {
     }
 
-    public TitleS2CPacket(Action arg, Text arg2) {
-        this(arg, arg2, -1, -1, -1);
+    public TitleS2CPacket(Action action, Text text) {
+        this(action, text, -1, -1, -1);
     }
 
-    public TitleS2CPacket(int i, int j, int k) {
-        this(Action.TIMES, null, i, j, k);
+    public TitleS2CPacket(int fadeInTicks, int stayTicks, int fadeOutTicks) {
+        this(Action.TIMES, null, fadeInTicks, stayTicks, fadeOutTicks);
     }
 
-    public TitleS2CPacket(Action arg, @Nullable Text arg2, int i, int j, int k) {
-        this.action = arg;
-        this.text = arg2;
-        this.fadeInTicks = i;
-        this.stayTicks = j;
-        this.fadeOutTicks = k;
-    }
-
-    @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.action = arg.readEnumConstant(Action.class);
-        if (this.action == Action.TITLE || this.action == Action.SUBTITLE || this.action == Action.ACTIONBAR) {
-            this.text = arg.readText();
-        }
-        if (this.action == Action.TIMES) {
-            this.fadeInTicks = arg.readInt();
-            this.stayTicks = arg.readInt();
-            this.fadeOutTicks = arg.readInt();
-        }
+    public TitleS2CPacket(Action action, @Nullable Text text, int fadeInTicks, int stayTicks, int fadeOutTicks) {
+        this.action = action;
+        this.text = text;
+        this.fadeInTicks = fadeInTicks;
+        this.stayTicks = stayTicks;
+        this.fadeOutTicks = fadeOutTicks;
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeEnumConstant(this.action);
+    public void read(PacketByteBuf buf) throws IOException {
+        this.action = buf.readEnumConstant(Action.class);
         if (this.action == Action.TITLE || this.action == Action.SUBTITLE || this.action == Action.ACTIONBAR) {
-            arg.writeText(this.text);
+            this.text = buf.readText();
         }
         if (this.action == Action.TIMES) {
-            arg.writeInt(this.fadeInTicks);
-            arg.writeInt(this.stayTicks);
-            arg.writeInt(this.fadeOutTicks);
+            this.fadeInTicks = buf.readInt();
+            this.stayTicks = buf.readInt();
+            this.fadeOutTicks = buf.readInt();
+        }
+    }
+
+    @Override
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeEnumConstant(this.action);
+        if (this.action == Action.TITLE || this.action == Action.SUBTITLE || this.action == Action.ACTIONBAR) {
+            buf.writeText(this.text);
+        }
+        if (this.action == Action.TIMES) {
+            buf.writeInt(this.fadeInTicks);
+            buf.writeInt(this.stayTicks);
+            buf.writeInt(this.fadeOutTicks);
         }
     }
 

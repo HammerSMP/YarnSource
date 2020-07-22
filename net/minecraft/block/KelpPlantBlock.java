@@ -31,17 +31,17 @@ implements FluidFillable {
     }
 
     @Override
-    public FluidState getFluidState(BlockState arg) {
+    public FluidState getFluidState(BlockState state) {
         return Fluids.WATER.getStill(false);
     }
 
     @Override
-    public boolean canFillWithFluid(BlockView arg, BlockPos arg2, BlockState arg3, Fluid arg4) {
+    public boolean canFillWithFluid(BlockView world, BlockPos pos, BlockState state, Fluid fluid) {
         return false;
     }
 
     @Override
-    public boolean tryFillWithFluid(WorldAccess arg, BlockPos arg2, BlockState arg3, FluidState arg4) {
+    public boolean tryFillWithFluid(WorldAccess world, BlockPos pos, BlockState state, FluidState fluidState) {
         return false;
     }
 }

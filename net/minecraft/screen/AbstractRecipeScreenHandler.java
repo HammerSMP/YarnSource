@@ -9,11 +9,11 @@ package net.minecraft.screen;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.class_5421;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.recipe.InputSlotFiller;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeFinder;
+import net.minecraft.recipe.book.RecipeBookCategory;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -24,8 +24,8 @@ extends ScreenHandler {
         super(arg, i);
     }
 
-    public void fillInputSlots(boolean bl, Recipe<?> arg, ServerPlayerEntity arg2) {
-        new InputSlotFiller(this).fillInputSlots(arg2, arg, bl);
+    public void fillInputSlots(boolean craftAll, Recipe<?> recipe, ServerPlayerEntity player) {
+        new InputSlotFiller(this).fillInputSlots(player, recipe, craftAll);
     }
 
     public abstract void populateRecipeFinder(RecipeFinder var1);
@@ -44,6 +44,6 @@ extends ScreenHandler {
     public abstract int getCraftingSlotCount();
 
     @Environment(value=EnvType.CLIENT)
-    public abstract class_5421 method_30264();
+    public abstract RecipeBookCategory getCategory();
 }
 

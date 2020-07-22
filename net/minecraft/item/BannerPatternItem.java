@@ -26,9 +26,9 @@ public class BannerPatternItem
 extends Item {
     private final BannerPattern pattern;
 
-    public BannerPatternItem(BannerPattern arg, Item.Settings arg2) {
-        super(arg2);
-        this.pattern = arg;
+    public BannerPatternItem(BannerPattern pattern, Item.Settings settings) {
+        super(settings);
+        this.pattern = pattern;
     }
 
     public BannerPattern getPattern() {
@@ -37,8 +37,8 @@ extends Item {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void appendTooltip(ItemStack arg, @Nullable World arg2, List<Text> list, TooltipContext arg3) {
-        list.add(this.getDescription().formatted(Formatting.GRAY));
+    public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
+        tooltip.add(this.getDescription().formatted(Formatting.GRAY));
     }
 
     @Environment(value=EnvType.CLIENT)

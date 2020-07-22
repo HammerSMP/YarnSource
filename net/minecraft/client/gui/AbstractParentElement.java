@@ -21,16 +21,16 @@ extends DrawableHelper
 implements ParentElement {
     @Nullable
     private Element focused;
-    private boolean isDragging;
+    private boolean dragging;
 
     @Override
     public final boolean isDragging() {
-        return this.isDragging;
+        return this.dragging;
     }
 
     @Override
-    public final void setDragging(boolean bl) {
-        this.isDragging = bl;
+    public final void setDragging(boolean dragging) {
+        this.dragging = dragging;
     }
 
     @Override
@@ -40,8 +40,8 @@ implements ParentElement {
     }
 
     @Override
-    public void setFocused(@Nullable Element arg) {
-        this.focused = arg;
+    public void setFocused(@Nullable Element focused) {
+        this.focused = focused;
     }
 }
 

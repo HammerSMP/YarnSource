@@ -27,8 +27,8 @@ public class MusicTracker {
     private SoundInstance current;
     private int timeUntilNextSong = 100;
 
-    public MusicTracker(MinecraftClient arg) {
-        this.client = arg;
+    public MusicTracker(MinecraftClient client) {
+        this.client = client;
     }
 
     public void tick() {
@@ -49,8 +49,8 @@ public class MusicTracker {
         }
     }
 
-    public void play(MusicSound arg) {
-        this.current = PositionedSoundInstance.music(arg.getEvent());
+    public void play(MusicSound type) {
+        this.current = PositionedSoundInstance.music(type.getEvent());
         if (this.current.getSound() != SoundManager.MISSING_SOUND) {
             this.client.getSoundManager().play(this.current);
         }
@@ -65,11 +65,11 @@ public class MusicTracker {
         this.timeUntilNextSong += 100;
     }
 
-    public boolean isPlayingType(MusicSound arg) {
+    public boolean isPlayingType(MusicSound type) {
         if (this.current == null) {
             return false;
         }
-        return arg.getEvent().getId().equals(this.current.getId());
+        return type.getEvent().getId().equals(this.current.getId());
     }
 }
 

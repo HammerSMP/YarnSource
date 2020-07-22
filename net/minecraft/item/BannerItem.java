@@ -38,8 +38,8 @@ extends WallStandingBlockItem {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public static void appendBannerTooltip(ItemStack arg, List<Text> list) {
-        CompoundTag lv = arg.getSubTag("BlockEntityTag");
+    public static void appendBannerTooltip(ItemStack stack, List<Text> tooltip) {
+        CompoundTag lv = stack.getSubTag("BlockEntityTag");
         if (lv == null || !lv.contains("Patterns")) {
             return;
         }
@@ -49,7 +49,7 @@ extends WallStandingBlockItem {
             DyeColor lv4 = DyeColor.byId(lv3.getInt("Color"));
             BannerPattern lv5 = BannerPattern.byId(lv3.getString("Pattern"));
             if (lv5 == null) continue;
-            list.add(new TranslatableText("block.minecraft.banner." + lv5.getName() + '.' + lv4.getName()).formatted(Formatting.GRAY));
+            tooltip.add(new TranslatableText("block.minecraft.banner." + lv5.getName() + '.' + lv4.getName()).formatted(Formatting.GRAY));
         }
     }
 
@@ -59,8 +59,8 @@ extends WallStandingBlockItem {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void appendTooltip(ItemStack arg, @Nullable World arg2, List<Text> list, TooltipContext arg3) {
-        BannerItem.appendBannerTooltip(arg, list);
+    public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
+        BannerItem.appendBannerTooltip(stack, tooltip);
     }
 }
 

@@ -31,17 +31,17 @@ extends ElementListWidget<ButtonEntry> {
         this.centerListVertically = false;
     }
 
-    public int addSingleOptionEntry(Option arg) {
-        return this.addEntry(ButtonEntry.create(this.client.options, this.width, arg));
+    public int addSingleOptionEntry(Option option) {
+        return this.addEntry(ButtonEntry.create(this.client.options, this.width, option));
     }
 
-    public void addOptionEntry(Option arg, @Nullable Option arg2) {
-        this.addEntry(ButtonEntry.create(this.client.options, this.width, arg, arg2));
+    public void addOptionEntry(Option firstOption, @Nullable Option secondOption) {
+        this.addEntry(ButtonEntry.create(this.client.options, this.width, firstOption, secondOption));
     }
 
-    public void addAll(Option[] args) {
-        for (int i = 0; i < args.length; i += 2) {
-            this.addOptionEntry(args[i], i < args.length - 1 ? args[i + 1] : null);
+    public void addAll(Option[] options) {
+        for (int i = 0; i < options.length; i += 2) {
+            this.addOptionEntry(options[i], i < options.length - 1 ? options[i + 1] : null);
         }
     }
 
@@ -55,10 +55,10 @@ extends ElementListWidget<ButtonEntry> {
         return super.getScrollbarPositionX() + 32;
     }
 
-    public Optional<AbstractButtonWidget> getHoveredButton(double d, double e) {
+    public Optional<AbstractButtonWidget> getHoveredButton(double mouseX, double mouseY) {
         for (ButtonEntry lv : this.children()) {
             for (AbstractButtonWidget lv2 : lv.buttons) {
-                if (!lv2.isMouseOver(d, e)) continue;
+                if (!lv2.isMouseOver(mouseX, mouseY)) continue;
                 return Optional.of(lv2);
             }
         }
@@ -70,27 +70,27 @@ extends ElementListWidget<ButtonEntry> {
     extends ElementListWidget.Entry<ButtonEntry> {
         private final List<AbstractButtonWidget> buttons;
 
-        private ButtonEntry(List<AbstractButtonWidget> list) {
-            this.buttons = list;
+        private ButtonEntry(List<AbstractButtonWidget> buttons) {
+            this.buttons = buttons;
         }
 
-        public static ButtonEntry create(GameOptions arg, int i, Option arg2) {
-            return new ButtonEntry((List<AbstractButtonWidget>)ImmutableList.of((Object)arg2.createButton(arg, i / 2 - 155, 0, 310)));
+        public static ButtonEntry create(GameOptions options, int width, Option option) {
+            return new ButtonEntry((List<AbstractButtonWidget>)ImmutableList.of((Object)option.createButton(options, width / 2 - 155, 0, 310)));
         }
 
-        public static ButtonEntry create(GameOptions arg, int i, Option arg2, @Nullable Option arg3) {
-            AbstractButtonWidget lv = arg2.createButton(arg, i / 2 - 155, 0, 150);
-            if (arg3 == null) {
+        public static ButtonEntry create(GameOptions options, int width, Option firstOption, @Nullable Option secondOption) {
+            AbstractButtonWidget lv = firstOption.createButton(options, width / 2 - 155, 0, 150);
+            if (secondOption == null) {
                 return new ButtonEntry((List<AbstractButtonWidget>)ImmutableList.of((Object)lv));
             }
-            return new ButtonEntry((List<AbstractButtonWidget>)ImmutableList.of((Object)lv, (Object)arg3.createButton(arg, i / 2 - 155 + 160, 0, 150)));
+            return new ButtonEntry((List<AbstractButtonWidget>)ImmutableList.of((Object)lv, (Object)secondOption.createButton(options, width / 2 - 155 + 160, 0, 150)));
         }
 
         @Override
-        public void render(MatrixStack arg, int i, int j, int k, int l, int m, int n, int o, boolean bl, float f) {
-            this.buttons.forEach(arg2 -> {
-                arg2.y = j;
-                arg2.render(arg, n, o, f);
+        public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+            this.buttons.forEach(button -> {
+                button.y = y;
+                button.render(matrices, mouseX, mouseY, tickDelta);
             });
         }
 

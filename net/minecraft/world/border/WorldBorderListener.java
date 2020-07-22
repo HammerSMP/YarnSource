@@ -24,43 +24,43 @@ public interface WorldBorderListener {
     implements WorldBorderListener {
         private final WorldBorder border;
 
-        public WorldBorderSyncer(WorldBorder arg) {
-            this.border = arg;
+        public WorldBorderSyncer(WorldBorder border) {
+            this.border = border;
         }
 
         @Override
-        public void onSizeChange(WorldBorder arg, double d) {
-            this.border.setSize(d);
+        public void onSizeChange(WorldBorder border, double size) {
+            this.border.setSize(size);
         }
 
         @Override
-        public void onInterpolateSize(WorldBorder arg, double d, double e, long l) {
-            this.border.interpolateSize(d, e, l);
+        public void onInterpolateSize(WorldBorder border, double fromSize, double toSize, long time) {
+            this.border.interpolateSize(fromSize, toSize, time);
         }
 
         @Override
-        public void onCenterChanged(WorldBorder arg, double d, double e) {
-            this.border.setCenter(d, e);
+        public void onCenterChanged(WorldBorder border, double centerX, double centerZ) {
+            this.border.setCenter(centerX, centerZ);
         }
 
         @Override
-        public void onWarningTimeChanged(WorldBorder arg, int i) {
-            this.border.setWarningTime(i);
+        public void onWarningTimeChanged(WorldBorder border, int warningTime) {
+            this.border.setWarningTime(warningTime);
         }
 
         @Override
-        public void onWarningBlocksChanged(WorldBorder arg, int i) {
-            this.border.setWarningBlocks(i);
+        public void onWarningBlocksChanged(WorldBorder border, int warningBlockDistance) {
+            this.border.setWarningBlocks(warningBlockDistance);
         }
 
         @Override
-        public void onDamagePerBlockChanged(WorldBorder arg, double d) {
-            this.border.setDamagePerBlock(d);
+        public void onDamagePerBlockChanged(WorldBorder border, double damagePerBlock) {
+            this.border.setDamagePerBlock(damagePerBlock);
         }
 
         @Override
-        public void onSafeZoneChanged(WorldBorder arg, double d) {
-            this.border.setBuffer(d);
+        public void onSafeZoneChanged(WorldBorder border, double safeZoneRadius) {
+            this.border.setBuffer(safeZoneRadius);
         }
     }
 }

@@ -100,10 +100,10 @@ extends IllagerEntity {
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
         if (this.johnny) {
-            arg.putBoolean("Johnny", true);
+            tag.putBoolean("Johnny", true);
         }
     }
 
@@ -120,10 +120,10 @@ extends IllagerEntity {
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        if (arg.contains("Johnny", 99)) {
-            this.johnny = arg.getBoolean("Johnny");
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        if (tag.contains("Johnny", 99)) {
+            this.johnny = tag.getBoolean("Johnny");
         }
     }
 
@@ -134,36 +134,36 @@ extends IllagerEntity {
 
     @Override
     @Nullable
-    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
-        EntityData lv = super.initialize(arg, arg2, arg3, arg4, arg5);
+    public EntityData initialize(class_5425 arg, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable CompoundTag entityTag) {
+        EntityData lv = super.initialize(arg, difficulty, spawnReason, entityData, entityTag);
         ((MobNavigation)this.getNavigation()).setCanPathThroughDoors(true);
-        this.initEquipment(arg2);
-        this.updateEnchantments(arg2);
+        this.initEquipment(difficulty);
+        this.updateEnchantments(difficulty);
         return lv;
     }
 
     @Override
-    protected void initEquipment(LocalDifficulty arg) {
+    protected void initEquipment(LocalDifficulty difficulty) {
         if (this.getRaid() == null) {
             this.equipStack(EquipmentSlot.MAINHAND, new ItemStack(Items.IRON_AXE));
         }
     }
 
     @Override
-    public boolean isTeammate(Entity arg) {
-        if (super.isTeammate(arg)) {
+    public boolean isTeammate(Entity other) {
+        if (super.isTeammate(other)) {
             return true;
         }
-        if (arg instanceof LivingEntity && ((LivingEntity)arg).getGroup() == EntityGroup.ILLAGER) {
-            return this.getScoreboardTeam() == null && arg.getScoreboardTeam() == null;
+        if (other instanceof LivingEntity && ((LivingEntity)other).getGroup() == EntityGroup.ILLAGER) {
+            return this.getScoreboardTeam() == null && other.getScoreboardTeam() == null;
         }
         return false;
     }
 
     @Override
-    public void setCustomName(@Nullable Text arg) {
-        super.setCustomName(arg);
-        if (!this.johnny && arg != null && arg.getString().equals("Johnny")) {
+    public void setCustomName(@Nullable Text name) {
+        super.setCustomName(name);
+        if (!this.johnny && name != null && name.getString().equals("Johnny")) {
             this.johnny = true;
         }
     }
@@ -179,20 +179,20 @@ extends IllagerEntity {
     }
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource arg) {
+    protected SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.ENTITY_VINDICATOR_HURT;
     }
 
     @Override
-    public void addBonusForWave(int i, boolean bl) {
+    public void addBonusForWave(int wave, boolean unused) {
         boolean bl2;
         ItemStack lv = new ItemStack(Items.IRON_AXE);
         Raid lv2 = this.getRaid();
         int j = 1;
-        if (i > lv2.getMaxWaves(Difficulty.NORMAL)) {
+        if (wave > lv2.getMaxWaves(Difficulty.NORMAL)) {
             j = 2;
         }
-        boolean bl3 = bl2 = this.random.nextFloat() <= lv2.getEnchantmentChance();
+        boolean bl = bl2 = this.random.nextFloat() <= lv2.getEnchantmentChance();
         if (bl2) {
             HashMap map = Maps.newHashMap();
             map.put(Enchantments.SHARPNESS, j);
@@ -203,8 +203,8 @@ extends IllagerEntity {
 
     static class FollowEntityGoal
     extends FollowTargetGoal<LivingEntity> {
-        public FollowEntityGoal(VindicatorEntity arg) {
-            super(arg, LivingEntity.class, 0, true, true, LivingEntity::isMobOrPlayer);
+        public FollowEntityGoal(VindicatorEntity vindicator) {
+            super(vindicator, LivingEntity.class, 0, true, true, LivingEntity::isMobOrPlayer);
         }
 
         @Override
@@ -247,17 +247,17 @@ extends IllagerEntity {
 
     class AttackGoal
     extends MeleeAttackGoal {
-        public AttackGoal(VindicatorEntity arg2) {
-            super(arg2, 1.0, false);
+        public AttackGoal(VindicatorEntity vindicator) {
+            super(vindicator, 1.0, false);
         }
 
         @Override
-        protected double getSquaredMaxAttackDistance(LivingEntity arg) {
+        protected double getSquaredMaxAttackDistance(LivingEntity entity) {
             if (this.mob.getVehicle() instanceof RavagerEntity) {
                 float f = this.mob.getVehicle().getWidth() - 0.1f;
-                return f * 2.0f * (f * 2.0f) + arg.getWidth();
+                return f * 2.0f * (f * 2.0f) + entity.getWidth();
             }
-            return super.getSquaredMaxAttackDistance(arg);
+            return super.getSquaredMaxAttackDistance(entity);
         }
     }
 }

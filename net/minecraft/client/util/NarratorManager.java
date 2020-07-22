@@ -36,30 +36,30 @@ implements ClientChatListener {
     private final Narrator narrator = Narrator.getNarrator();
 
     @Override
-    public void onChatMessage(MessageType arg, Text arg2, UUID uUID) {
-        if (MinecraftClient.getInstance().shouldBlockMessages(uUID)) {
+    public void onChatMessage(MessageType messageType, Text message, UUID senderUuid) {
+        if (MinecraftClient.getInstance().shouldBlockMessages(senderUuid)) {
             return;
         }
         NarratorOption lv = NarratorManager.getNarratorOption();
         if (lv == NarratorOption.OFF || !this.narrator.active()) {
             return;
         }
-        if (lv == NarratorOption.ALL || lv == NarratorOption.CHAT && arg == MessageType.CHAT || lv == NarratorOption.SYSTEM && arg == MessageType.SYSTEM) {
+        if (lv == NarratorOption.ALL || lv == NarratorOption.CHAT && messageType == MessageType.CHAT || lv == NarratorOption.SYSTEM && messageType == MessageType.SYSTEM) {
             Text lv3;
-            if (arg2 instanceof TranslatableText && "chat.type.text".equals(((TranslatableText)arg2).getKey())) {
-                TranslatableText lv2 = new TranslatableText("chat.type.text.narrate", ((TranslatableText)arg2).getArgs());
+            if (message instanceof TranslatableText && "chat.type.text".equals(((TranslatableText)message).getKey())) {
+                TranslatableText lv2 = new TranslatableText("chat.type.text.narrate", ((TranslatableText)message).getArgs());
             } else {
-                lv3 = arg2;
+                lv3 = message;
             }
-            this.narrate(arg.interruptsNarration(), lv3.getString());
+            this.narrate(messageType.interruptsNarration(), lv3.getString());
         }
     }
 
-    public void narrate(String string) {
+    public void narrate(String text) {
         NarratorOption lv = NarratorManager.getNarratorOption();
-        if (this.narrator.active() && lv != NarratorOption.OFF && lv != NarratorOption.CHAT && !string.isEmpty()) {
+        if (this.narrator.active() && lv != NarratorOption.OFF && lv != NarratorOption.CHAT && !text.isEmpty()) {
             this.narrator.clear();
-            this.narrate(true, string);
+            this.narrate(true, text);
         }
     }
 
@@ -67,22 +67,22 @@ implements ClientChatListener {
         return MinecraftClient.getInstance().options.narrator;
     }
 
-    private void narrate(boolean bl, String string) {
+    private void narrate(boolean interrupt, String message) {
         if (SharedConstants.isDevelopment) {
-            LOGGER.debug("Narrating: {}", (Object)string.replaceAll("\n", "\\\\n"));
+            LOGGER.debug("Narrating: {}", (Object)message.replaceAll("\n", "\\\\n"));
         }
-        this.narrator.say(string, bl);
+        this.narrator.say(message, interrupt);
     }
 
-    public void addToast(NarratorOption arg) {
+    public void addToast(NarratorOption option) {
         this.clear();
-        this.narrator.say(new TranslatableText("options.narrator").append(" : ").append(arg.getTranslationKey()).getString(), true);
+        this.narrator.say(new TranslatableText("options.narrator").append(" : ").append(option.getTranslationKey()).getString(), true);
         ToastManager lv = MinecraftClient.getInstance().getToastManager();
         if (this.narrator.active()) {
-            if (arg == NarratorOption.OFF) {
+            if (option == NarratorOption.OFF) {
                 SystemToast.show(lv, SystemToast.Type.NARRATOR_TOGGLE, new TranslatableText("narrator.toast.disabled"), null);
             } else {
-                SystemToast.show(lv, SystemToast.Type.NARRATOR_TOGGLE, new TranslatableText("narrator.toast.enabled"), arg.getTranslationKey());
+                SystemToast.show(lv, SystemToast.Type.NARRATOR_TOGGLE, new TranslatableText("narrator.toast.enabled"), option.getTranslationKey());
             }
         } else {
             SystemToast.show(lv, SystemToast.Type.NARRATOR_TOGGLE, new TranslatableText("narrator.toast.disabled"), new TranslatableText("options.narrator.notavailable"));

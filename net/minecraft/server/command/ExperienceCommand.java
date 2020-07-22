@@ -29,7 +29,7 @@ import java.util.Collection;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 import java.util.function.ToIntFunction;
-import net.minecraft.command.arguments.EntityArgumentType;
+import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
@@ -40,44 +40,44 @@ import net.minecraft.util.math.MathHelper;
 public class ExperienceCommand {
     private static final SimpleCommandExceptionType SET_POINT_INVALID_EXCEPTION = new SimpleCommandExceptionType((Message)new TranslatableText("commands.experience.set.points.invalid"));
 
-    public static void register(CommandDispatcher<ServerCommandSource> commandDispatcher) {
-        LiteralCommandNode literalCommandNode = commandDispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)CommandManager.literal("experience").requires(arg -> arg.hasPermissionLevel(2))).then(CommandManager.literal("add").then(CommandManager.argument("targets", EntityArgumentType.players()).then(((RequiredArgumentBuilder)((RequiredArgumentBuilder)CommandManager.argument("amount", IntegerArgumentType.integer()).executes(commandContext -> ExperienceCommand.executeAdd((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getPlayers((CommandContext<ServerCommandSource>)commandContext, "targets"), IntegerArgumentType.getInteger((CommandContext)commandContext, (String)"amount"), Component.POINTS))).then(CommandManager.literal("points").executes(commandContext -> ExperienceCommand.executeAdd((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getPlayers((CommandContext<ServerCommandSource>)commandContext, "targets"), IntegerArgumentType.getInteger((CommandContext)commandContext, (String)"amount"), Component.POINTS)))).then(CommandManager.literal("levels").executes(commandContext -> ExperienceCommand.executeAdd((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getPlayers((CommandContext<ServerCommandSource>)commandContext, "targets"), IntegerArgumentType.getInteger((CommandContext)commandContext, (String)"amount"), Component.LEVELS))))))).then(CommandManager.literal("set").then(CommandManager.argument("targets", EntityArgumentType.players()).then(((RequiredArgumentBuilder)((RequiredArgumentBuilder)CommandManager.argument("amount", IntegerArgumentType.integer((int)0)).executes(commandContext -> ExperienceCommand.executeSet((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getPlayers((CommandContext<ServerCommandSource>)commandContext, "targets"), IntegerArgumentType.getInteger((CommandContext)commandContext, (String)"amount"), Component.POINTS))).then(CommandManager.literal("points").executes(commandContext -> ExperienceCommand.executeSet((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getPlayers((CommandContext<ServerCommandSource>)commandContext, "targets"), IntegerArgumentType.getInteger((CommandContext)commandContext, (String)"amount"), Component.POINTS)))).then(CommandManager.literal("levels").executes(commandContext -> ExperienceCommand.executeSet((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getPlayers((CommandContext<ServerCommandSource>)commandContext, "targets"), IntegerArgumentType.getInteger((CommandContext)commandContext, (String)"amount"), Component.LEVELS))))))).then(CommandManager.literal("query").then(((RequiredArgumentBuilder)CommandManager.argument("targets", EntityArgumentType.player()).then(CommandManager.literal("points").executes(commandContext -> ExperienceCommand.executeQuery((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getPlayer((CommandContext<ServerCommandSource>)commandContext, "targets"), Component.POINTS)))).then(CommandManager.literal("levels").executes(commandContext -> ExperienceCommand.executeQuery((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getPlayer((CommandContext<ServerCommandSource>)commandContext, "targets"), Component.LEVELS))))));
-        commandDispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)CommandManager.literal("xp").requires(arg -> arg.hasPermissionLevel(2))).redirect((CommandNode)literalCommandNode));
+    public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
+        LiteralCommandNode literalCommandNode = dispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)CommandManager.literal("experience").requires(arg -> arg.hasPermissionLevel(2))).then(CommandManager.literal("add").then(CommandManager.argument("targets", EntityArgumentType.players()).then(((RequiredArgumentBuilder)((RequiredArgumentBuilder)CommandManager.argument("amount", IntegerArgumentType.integer()).executes(commandContext -> ExperienceCommand.executeAdd((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getPlayers((CommandContext<ServerCommandSource>)commandContext, "targets"), IntegerArgumentType.getInteger((CommandContext)commandContext, (String)"amount"), Component.POINTS))).then(CommandManager.literal("points").executes(commandContext -> ExperienceCommand.executeAdd((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getPlayers((CommandContext<ServerCommandSource>)commandContext, "targets"), IntegerArgumentType.getInteger((CommandContext)commandContext, (String)"amount"), Component.POINTS)))).then(CommandManager.literal("levels").executes(commandContext -> ExperienceCommand.executeAdd((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getPlayers((CommandContext<ServerCommandSource>)commandContext, "targets"), IntegerArgumentType.getInteger((CommandContext)commandContext, (String)"amount"), Component.LEVELS))))))).then(CommandManager.literal("set").then(CommandManager.argument("targets", EntityArgumentType.players()).then(((RequiredArgumentBuilder)((RequiredArgumentBuilder)CommandManager.argument("amount", IntegerArgumentType.integer((int)0)).executes(commandContext -> ExperienceCommand.executeSet((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getPlayers((CommandContext<ServerCommandSource>)commandContext, "targets"), IntegerArgumentType.getInteger((CommandContext)commandContext, (String)"amount"), Component.POINTS))).then(CommandManager.literal("points").executes(commandContext -> ExperienceCommand.executeSet((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getPlayers((CommandContext<ServerCommandSource>)commandContext, "targets"), IntegerArgumentType.getInteger((CommandContext)commandContext, (String)"amount"), Component.POINTS)))).then(CommandManager.literal("levels").executes(commandContext -> ExperienceCommand.executeSet((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getPlayers((CommandContext<ServerCommandSource>)commandContext, "targets"), IntegerArgumentType.getInteger((CommandContext)commandContext, (String)"amount"), Component.LEVELS))))))).then(CommandManager.literal("query").then(((RequiredArgumentBuilder)CommandManager.argument("targets", EntityArgumentType.player()).then(CommandManager.literal("points").executes(commandContext -> ExperienceCommand.executeQuery((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getPlayer((CommandContext<ServerCommandSource>)commandContext, "targets"), Component.POINTS)))).then(CommandManager.literal("levels").executes(commandContext -> ExperienceCommand.executeQuery((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getPlayer((CommandContext<ServerCommandSource>)commandContext, "targets"), Component.LEVELS))))));
+        dispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)CommandManager.literal("xp").requires(arg -> arg.hasPermissionLevel(2))).redirect((CommandNode)literalCommandNode));
     }
 
-    private static int executeQuery(ServerCommandSource arg, ServerPlayerEntity arg2, Component arg3) {
-        int i = arg3.getter.applyAsInt(arg2);
-        arg.sendFeedback(new TranslatableText("commands.experience.query." + arg3.name, arg2.getDisplayName(), i), false);
+    private static int executeQuery(ServerCommandSource source, ServerPlayerEntity player, Component component) {
+        int i = component.getter.applyAsInt(player);
+        source.sendFeedback(new TranslatableText("commands.experience.query." + component.name, player.getDisplayName(), i), false);
         return i;
     }
 
-    private static int executeAdd(ServerCommandSource arg, Collection<? extends ServerPlayerEntity> collection, int i, Component arg2) {
-        for (ServerPlayerEntity serverPlayerEntity : collection) {
-            arg2.adder.accept(serverPlayerEntity, i);
+    private static int executeAdd(ServerCommandSource source, Collection<? extends ServerPlayerEntity> targets, int amount, Component component) {
+        for (ServerPlayerEntity serverPlayerEntity : targets) {
+            component.adder.accept(serverPlayerEntity, amount);
         }
-        if (collection.size() == 1) {
-            arg.sendFeedback(new TranslatableText("commands.experience.add." + arg2.name + ".success.single", i, collection.iterator().next().getDisplayName()), true);
+        if (targets.size() == 1) {
+            source.sendFeedback(new TranslatableText("commands.experience.add." + component.name + ".success.single", amount, targets.iterator().next().getDisplayName()), true);
         } else {
-            arg.sendFeedback(new TranslatableText("commands.experience.add." + arg2.name + ".success.multiple", i, collection.size()), true);
+            source.sendFeedback(new TranslatableText("commands.experience.add." + component.name + ".success.multiple", amount, targets.size()), true);
         }
-        return collection.size();
+        return targets.size();
     }
 
-    private static int executeSet(ServerCommandSource arg, Collection<? extends ServerPlayerEntity> collection, int i, Component arg2) throws CommandSyntaxException {
+    private static int executeSet(ServerCommandSource source, Collection<? extends ServerPlayerEntity> targets, int amount, Component component) throws CommandSyntaxException {
         int j = 0;
-        for (ServerPlayerEntity serverPlayerEntity : collection) {
-            if (!arg2.setter.test(serverPlayerEntity, i)) continue;
+        for (ServerPlayerEntity serverPlayerEntity : targets) {
+            if (!component.setter.test(serverPlayerEntity, amount)) continue;
             ++j;
         }
         if (j == 0) {
             throw SET_POINT_INVALID_EXCEPTION.create();
         }
-        if (collection.size() == 1) {
-            arg.sendFeedback(new TranslatableText("commands.experience.set." + arg2.name + ".success.single", i, collection.iterator().next().getDisplayName()), true);
+        if (targets.size() == 1) {
+            source.sendFeedback(new TranslatableText("commands.experience.set." + component.name + ".success.single", amount, targets.iterator().next().getDisplayName()), true);
         } else {
-            arg.sendFeedback(new TranslatableText("commands.experience.set." + arg2.name + ".success.multiple", i, collection.size()), true);
+            source.sendFeedback(new TranslatableText("commands.experience.set." + component.name + ".success.multiple", amount, targets.size()), true);
         }
-        return collection.size();
+        return targets.size();
     }
 
     static enum Component {
@@ -98,11 +98,11 @@ public class ExperienceCommand {
         public final String name;
         private final ToIntFunction<ServerPlayerEntity> getter;
 
-        private Component(String string2, BiConsumer<ServerPlayerEntity, Integer> biConsumer, BiPredicate<ServerPlayerEntity, Integer> biPredicate, ToIntFunction<ServerPlayerEntity> toIntFunction) {
-            this.adder = biConsumer;
-            this.name = string2;
-            this.setter = biPredicate;
-            this.getter = toIntFunction;
+        private Component(String name, BiConsumer<ServerPlayerEntity, Integer> adder, BiPredicate<ServerPlayerEntity, Integer> setter, ToIntFunction<ServerPlayerEntity> getter) {
+            this.adder = adder;
+            this.name = name;
+            this.setter = setter;
+            this.getter = getter;
         }
     }
 }

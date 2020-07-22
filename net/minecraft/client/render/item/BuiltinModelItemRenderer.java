@@ -71,15 +71,15 @@ public class BuiltinModelItemRenderer {
     /*
      * WARNING - void declaration
      */
-    public void render(ItemStack arg, ModelTransformation.Mode arg2, MatrixStack arg3, VertexConsumerProvider arg4, int i, int j) {
-        Item lv = arg.getItem();
+    public void render(ItemStack stack, ModelTransformation.Mode arg2, MatrixStack arg3, VertexConsumerProvider arg4, int i, int j) {
+        Item lv = stack.getItem();
         if (lv instanceof BlockItem) {
             void lv13;
             Block lv2 = ((BlockItem)lv).getBlock();
             if (lv2 instanceof AbstractSkullBlock) {
                 GameProfile gameProfile = null;
-                if (arg.hasTag()) {
-                    CompoundTag lv3 = arg.getTag();
+                if (stack.hasTag()) {
+                    CompoundTag lv3 = stack.getTag();
                     if (lv3.contains("SkullOwner", 10)) {
                         gameProfile = NbtHelper.toGameProfile(lv3.getCompound("SkullOwner"));
                     } else if (lv3.contains("SkullOwner", 8) && !StringUtils.isBlank((CharSequence)lv3.getString("SkullOwner"))) {
@@ -93,7 +93,7 @@ public class BuiltinModelItemRenderer {
                 return;
             }
             if (lv2 instanceof AbstractBannerBlock) {
-                this.renderBanner.readFrom(arg, ((AbstractBannerBlock)lv2).getColor());
+                this.renderBanner.readFrom(stack, ((AbstractBannerBlock)lv2).getColor());
                 BannerBlockEntity lv4 = this.renderBanner;
             } else if (lv2 instanceof BedBlock) {
                 this.renderBed.setColor(((BedBlock)lv2).getColor());
@@ -120,15 +120,15 @@ public class BuiltinModelItemRenderer {
             return;
         }
         if (lv == Items.SHIELD) {
-            boolean bl = arg.getSubTag("BlockEntityTag") != null;
+            boolean bl = stack.getSubTag("BlockEntityTag") != null;
             arg3.push();
             arg3.scale(1.0f, -1.0f, -1.0f);
             SpriteIdentifier lv14 = bl ? ModelLoader.SHIELD_BASE : ModelLoader.SHIELD_BASE_NO_PATTERN;
-            VertexConsumer lv15 = lv14.getSprite().getTextureSpecificVertexConsumer(ItemRenderer.method_29711(arg4, this.modelShield.getLayer(lv14.getAtlasId()), true, arg.hasGlint()));
+            VertexConsumer lv15 = lv14.getSprite().getTextureSpecificVertexConsumer(ItemRenderer.getDirectGlintVertexConsumer(arg4, this.modelShield.getLayer(lv14.getAtlasId()), true, stack.hasGlint()));
             this.modelShield.method_23775().render(arg3, lv15, i, j, 1.0f, 1.0f, 1.0f, 1.0f);
             if (bl) {
-                List<Pair<BannerPattern, DyeColor>> list = BannerBlockEntity.method_24280(ShieldItem.getColor(arg), BannerBlockEntity.getPatternListTag(arg));
-                BannerBlockEntityRenderer.renderCanvas(arg3, arg4, i, j, this.modelShield.method_23774(), lv14, false, list, arg.hasGlint());
+                List<Pair<BannerPattern, DyeColor>> list = BannerBlockEntity.method_24280(ShieldItem.getColor(stack), BannerBlockEntity.getPatternListTag(stack));
+                BannerBlockEntityRenderer.renderCanvas(arg3, arg4, i, j, this.modelShield.method_23774(), lv14, false, list, stack.hasGlint());
             } else {
                 this.modelShield.method_23774().render(arg3, lv15, i, j, 1.0f, 1.0f, 1.0f, 1.0f);
             }
@@ -136,7 +136,7 @@ public class BuiltinModelItemRenderer {
         } else if (lv == Items.TRIDENT) {
             arg3.push();
             arg3.scale(1.0f, -1.0f, -1.0f);
-            VertexConsumer lv16 = ItemRenderer.method_29711(arg4, this.modelTrident.getLayer(TridentEntityModel.TEXTURE), false, arg.hasGlint());
+            VertexConsumer lv16 = ItemRenderer.getDirectGlintVertexConsumer(arg4, this.modelTrident.getLayer(TridentEntityModel.TEXTURE), false, stack.hasGlint());
             this.modelTrident.render(arg3, lv16, i, j, 1.0f, 1.0f, 1.0f, 1.0f);
             arg3.pop();
         }

@@ -30,9 +30,9 @@ implements MultipartModelSelector {
     private final String key;
     private final String valueString;
 
-    public SimpleMultipartModelSelector(String string, String string2) {
-        this.key = string;
-        this.valueString = string2;
+    public SimpleMultipartModelSelector(String key, String valueString) {
+        this.key = key;
+        this.valueString = valueString;
     }
 
     @Override
@@ -61,12 +61,12 @@ implements MultipartModelSelector {
         return bl ? predicate2.negate() : predicate2;
     }
 
-    private Predicate<BlockState> createPredicate(StateManager<Block, BlockState> arg, Property<?> arg22, String string) {
-        Optional<?> optional = arg22.parse(string);
+    private Predicate<BlockState> createPredicate(StateManager<Block, BlockState> stateFactory, Property<?> property, String valueString) {
+        Optional<?> optional = property.parse(valueString);
         if (!optional.isPresent()) {
-            throw new RuntimeException(String.format("Unknown value '%s' for property '%s' on '%s' in '%s'", string, this.key, arg.getOwner().toString(), this.valueString));
+            throw new RuntimeException(String.format("Unknown value '%s' for property '%s' on '%s' in '%s'", valueString, this.key, stateFactory.getOwner().toString(), this.valueString));
         }
-        return arg2 -> arg2.get(arg22).equals(optional.get());
+        return arg2 -> arg2.get(property).equals(optional.get());
     }
 
     public String toString() {

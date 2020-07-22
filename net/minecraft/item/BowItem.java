@@ -31,51 +31,51 @@ implements Vanishable {
     }
 
     @Override
-    public void onStoppedUsing(ItemStack arg, World arg22, LivingEntity arg3, int i) {
+    public void onStoppedUsing(ItemStack stack, World world, LivingEntity user, int remainingUseTicks) {
         boolean bl2;
         int j;
         float f;
-        if (!(arg3 instanceof PlayerEntity)) {
+        if (!(user instanceof PlayerEntity)) {
             return;
         }
-        PlayerEntity lv = (PlayerEntity)arg3;
-        boolean bl = lv.abilities.creativeMode || EnchantmentHelper.getLevel(Enchantments.INFINITY, arg) > 0;
-        ItemStack lv2 = lv.getArrowType(arg);
+        PlayerEntity lv = (PlayerEntity)user;
+        boolean bl = lv.abilities.creativeMode || EnchantmentHelper.getLevel(Enchantments.INFINITY, stack) > 0;
+        ItemStack lv2 = lv.getArrowType(stack);
         if (lv2.isEmpty() && !bl) {
             return;
         }
         if (lv2.isEmpty()) {
             lv2 = new ItemStack(Items.ARROW);
         }
-        if ((double)(f = BowItem.getPullProgress(j = this.getMaxUseTime(arg) - i)) < 0.1) {
+        if ((double)(f = BowItem.getPullProgress(j = this.getMaxUseTime(stack) - remainingUseTicks)) < 0.1) {
             return;
         }
         boolean bl3 = bl2 = bl && lv2.getItem() == Items.ARROW;
-        if (!arg22.isClient) {
+        if (!world.isClient) {
             int l;
             int k;
             ArrowItem lv3 = (ArrowItem)(lv2.getItem() instanceof ArrowItem ? lv2.getItem() : Items.ARROW);
-            PersistentProjectileEntity lv4 = lv3.createArrow(arg22, lv2, lv);
+            PersistentProjectileEntity lv4 = lv3.createArrow(world, lv2, lv);
             lv4.setProperties(lv, lv.pitch, lv.yaw, 0.0f, f * 3.0f, 1.0f);
             if (f == 1.0f) {
                 lv4.setCritical(true);
             }
-            if ((k = EnchantmentHelper.getLevel(Enchantments.POWER, arg)) > 0) {
+            if ((k = EnchantmentHelper.getLevel(Enchantments.POWER, stack)) > 0) {
                 lv4.setDamage(lv4.getDamage() + (double)k * 0.5 + 0.5);
             }
-            if ((l = EnchantmentHelper.getLevel(Enchantments.PUNCH, arg)) > 0) {
+            if ((l = EnchantmentHelper.getLevel(Enchantments.PUNCH, stack)) > 0) {
                 lv4.setPunch(l);
             }
-            if (EnchantmentHelper.getLevel(Enchantments.FLAME, arg) > 0) {
+            if (EnchantmentHelper.getLevel(Enchantments.FLAME, stack) > 0) {
                 lv4.setOnFireFor(100);
             }
-            arg.damage(1, lv, arg2 -> arg2.sendToolBreakStatus(lv.getActiveHand()));
+            stack.damage(1, lv, p -> p.sendToolBreakStatus(lv.getActiveHand()));
             if (bl2 || lv.abilities.creativeMode && (lv2.getItem() == Items.SPECTRAL_ARROW || lv2.getItem() == Items.TIPPED_ARROW)) {
                 lv4.pickupType = PersistentProjectileEntity.PickupPermission.CREATIVE_ONLY;
             }
-            arg22.spawnEntity(lv4);
+            world.spawnEntity(lv4);
         }
-        arg22.playSound(null, lv.getX(), lv.getY(), lv.getZ(), SoundEvents.ENTITY_ARROW_SHOOT, SoundCategory.PLAYERS, 1.0f, 1.0f / (RANDOM.nextFloat() * 0.4f + 1.2f) + f * 0.5f);
+        world.playSound(null, lv.getX(), lv.getY(), lv.getZ(), SoundEvents.ENTITY_ARROW_SHOOT, SoundCategory.PLAYERS, 1.0f, 1.0f / (RANDOM.nextFloat() * 0.4f + 1.2f) + f * 0.5f);
         if (!bl2 && !lv.abilities.creativeMode) {
             lv2.decrement(1);
             if (lv2.isEmpty()) {
@@ -85,8 +85,8 @@ implements Vanishable {
         lv.incrementStat(Stats.USED.getOrCreateStat(this));
     }
 
-    public static float getPullProgress(int i) {
-        float f = (float)i / 20.0f;
+    public static float getPullProgress(int useTicks) {
+        float f = (float)useTicks / 20.0f;
         if ((f = (f * f + f * 2.0f) / 3.0f) > 1.0f) {
             f = 1.0f;
         }
@@ -94,22 +94,22 @@ implements Vanishable {
     }
 
     @Override
-    public int getMaxUseTime(ItemStack arg) {
+    public int getMaxUseTime(ItemStack stack) {
         return 72000;
     }
 
     @Override
-    public UseAction getUseAction(ItemStack arg) {
+    public UseAction getUseAction(ItemStack stack) {
         return UseAction.BOW;
     }
 
     @Override
-    public TypedActionResult<ItemStack> use(World arg, PlayerEntity arg2, Hand arg3) {
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         boolean bl;
-        ItemStack lv = arg2.getStackInHand(arg3);
-        boolean bl2 = bl = !arg2.getArrowType(lv).isEmpty();
-        if (arg2.abilities.creativeMode || bl) {
-            arg2.setCurrentHand(arg3);
+        ItemStack lv = user.getStackInHand(hand);
+        boolean bl2 = bl = !user.getArrowType(lv).isEmpty();
+        if (user.abilities.creativeMode || bl) {
+            user.setCurrentHand(hand);
             return TypedActionResult.consume(lv);
         }
         return TypedActionResult.fail(lv);

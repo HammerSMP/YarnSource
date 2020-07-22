@@ -29,8 +29,8 @@ extends LootableContainerBlockEntity {
     private DefaultedList<ItemStack> inventory = DefaultedList.ofSize(27, ItemStack.EMPTY);
     private int viewerCount;
 
-    private BarrelBlockEntity(BlockEntityType<?> arg) {
-        super(arg);
+    private BarrelBlockEntity(BlockEntityType<?> type) {
+        super(type);
     }
 
     public BarrelBlockEntity() {
@@ -38,20 +38,20 @@ extends LootableContainerBlockEntity {
     }
 
     @Override
-    public CompoundTag toTag(CompoundTag arg) {
-        super.toTag(arg);
-        if (!this.serializeLootTable(arg)) {
-            Inventories.toTag(arg, this.inventory);
+    public CompoundTag toTag(CompoundTag tag) {
+        super.toTag(tag);
+        if (!this.serializeLootTable(tag)) {
+            Inventories.toTag(tag, this.inventory);
         }
-        return arg;
+        return tag;
     }
 
     @Override
-    public void fromTag(BlockState arg, CompoundTag arg2) {
-        super.fromTag(arg, arg2);
+    public void fromTag(BlockState state, CompoundTag tag) {
+        super.fromTag(state, tag);
         this.inventory = DefaultedList.ofSize(this.size(), ItemStack.EMPTY);
-        if (!this.deserializeLootTable(arg2)) {
-            Inventories.fromTag(arg2, this.inventory);
+        if (!this.deserializeLootTable(tag)) {
+            Inventories.fromTag(tag, this.inventory);
         }
     }
 
@@ -66,8 +66,8 @@ extends LootableContainerBlockEntity {
     }
 
     @Override
-    protected void setInvStackList(DefaultedList<ItemStack> arg) {
-        this.inventory = arg;
+    protected void setInvStackList(DefaultedList<ItemStack> list) {
+        this.inventory = list;
     }
 
     @Override
@@ -76,13 +76,13 @@ extends LootableContainerBlockEntity {
     }
 
     @Override
-    protected ScreenHandler createScreenHandler(int i, PlayerInventory arg) {
-        return GenericContainerScreenHandler.createGeneric9x3(i, arg, this);
+    protected ScreenHandler createScreenHandler(int syncId, PlayerInventory playerInventory) {
+        return GenericContainerScreenHandler.createGeneric9x3(syncId, playerInventory, this);
     }
 
     @Override
-    public void onOpen(PlayerEntity arg) {
-        if (!arg.isSpectator()) {
+    public void onOpen(PlayerEntity player) {
+        if (!player.isSpectator()) {
             if (this.viewerCount < 0) {
                 this.viewerCount = 0;
             }
@@ -123,14 +123,14 @@ extends LootableContainerBlockEntity {
     }
 
     @Override
-    public void onClose(PlayerEntity arg) {
-        if (!arg.isSpectator()) {
+    public void onClose(PlayerEntity player) {
+        if (!player.isSpectator()) {
             --this.viewerCount;
         }
     }
 
-    private void setOpen(BlockState arg, boolean bl) {
-        this.world.setBlockState(this.getPos(), (BlockState)arg.with(BarrelBlock.OPEN, bl), 3);
+    private void setOpen(BlockState state, boolean open) {
+        this.world.setBlockState(this.getPos(), (BlockState)state.with(BarrelBlock.OPEN, open), 3);
     }
 
     private void playSound(BlockState arg, SoundEvent arg2) {

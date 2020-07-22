@@ -36,15 +36,15 @@ public class BiomeEffects {
     private final Optional<BiomeAdditionsSound> additionsSound;
     private final Optional<MusicSound> music;
 
-    private BiomeEffects(int i, int j, int k, Optional<BiomeParticleConfig> optional, Optional<SoundEvent> optional2, Optional<BiomeMoodSound> optional3, Optional<BiomeAdditionsSound> optional4, Optional<MusicSound> optional5) {
-        this.fogColor = i;
-        this.waterColor = j;
-        this.waterFogColor = k;
-        this.particleConfig = optional;
-        this.loopSound = optional2;
-        this.moodSound = optional3;
-        this.additionsSound = optional4;
-        this.music = optional5;
+    private BiomeEffects(int fogColor, int waterColor, int waterFogColor, Optional<BiomeParticleConfig> particleConfig, Optional<SoundEvent> loopSound, Optional<BiomeMoodSound> moodSound, Optional<BiomeAdditionsSound> additionsSound, Optional<MusicSound> music) {
+        this.fogColor = fogColor;
+        this.waterColor = waterColor;
+        this.waterFogColor = waterFogColor;
+        this.particleConfig = particleConfig;
+        this.loopSound = loopSound;
+        this.moodSound = moodSound;
+        this.additionsSound = additionsSound;
+        this.music = music;
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -97,43 +97,43 @@ public class BiomeEffects {
         private Optional<BiomeAdditionsSound> additionsSound = Optional.empty();
         private Optional<MusicSound> musicSound = Optional.empty();
 
-        public Builder fogColor(int i) {
-            this.fogColor = OptionalInt.of(i);
+        public Builder fogColor(int fogColor) {
+            this.fogColor = OptionalInt.of(fogColor);
             return this;
         }
 
-        public Builder waterColor(int i) {
-            this.waterColor = OptionalInt.of(i);
+        public Builder waterColor(int waterColor) {
+            this.waterColor = OptionalInt.of(waterColor);
             return this;
         }
 
-        public Builder waterFogColor(int i) {
-            this.waterFogColor = OptionalInt.of(i);
+        public Builder waterFogColor(int waterFogColor) {
+            this.waterFogColor = OptionalInt.of(waterFogColor);
             return this;
         }
 
-        public Builder particleConfig(BiomeParticleConfig arg) {
-            this.particleConfig = Optional.of(arg);
+        public Builder particleConfig(BiomeParticleConfig particleConfig) {
+            this.particleConfig = Optional.of(particleConfig);
             return this;
         }
 
-        public Builder loopSound(SoundEvent arg) {
-            this.loopSound = Optional.of(arg);
+        public Builder loopSound(SoundEvent sound) {
+            this.loopSound = Optional.of(sound);
             return this;
         }
 
-        public Builder moodSound(BiomeMoodSound arg) {
-            this.moodSound = Optional.of(arg);
+        public Builder moodSound(BiomeMoodSound moodSound) {
+            this.moodSound = Optional.of(moodSound);
             return this;
         }
 
-        public Builder additionsSound(BiomeAdditionsSound arg) {
-            this.additionsSound = Optional.of(arg);
+        public Builder additionsSound(BiomeAdditionsSound additionsSound) {
+            this.additionsSound = Optional.of(additionsSound);
             return this;
         }
 
-        public Builder music(MusicSound arg) {
-            this.musicSound = Optional.of(arg);
+        public Builder music(MusicSound music) {
+            this.musicSound = Optional.of(music);
             return this;
         }
 

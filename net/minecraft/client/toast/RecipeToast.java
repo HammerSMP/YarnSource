@@ -27,46 +27,46 @@ implements Toast {
     private long startTime;
     private boolean justUpdated;
 
-    public RecipeToast(Recipe<?> arg) {
-        this.recipes.add(arg);
+    public RecipeToast(Recipe<?> recipes) {
+        this.recipes.add(recipes);
     }
 
     @Override
-    public Toast.Visibility draw(MatrixStack arg, ToastManager arg2, long l) {
+    public Toast.Visibility draw(MatrixStack matrices, ToastManager manager, long startTime) {
         if (this.justUpdated) {
-            this.startTime = l;
+            this.startTime = startTime;
             this.justUpdated = false;
         }
         if (this.recipes.isEmpty()) {
             return Toast.Visibility.HIDE;
         }
-        arg2.getGame().getTextureManager().bindTexture(TOASTS_TEX);
+        manager.getGame().getTextureManager().bindTexture(TOASTS_TEX);
         RenderSystem.color3f(1.0f, 1.0f, 1.0f);
-        arg2.drawTexture(arg, 0, 0, 0, 32, this.method_29049(), this.method_29050());
-        arg2.getGame().textRenderer.draw(arg, I18n.translate("recipe.toast.title", new Object[0]), 30.0f, 7.0f, -11534256);
-        arg2.getGame().textRenderer.draw(arg, I18n.translate("recipe.toast.description", new Object[0]), 30.0f, 18.0f, -16777216);
-        Recipe<?> lv = this.recipes.get((int)(l / Math.max(1L, 5000L / (long)this.recipes.size()) % (long)this.recipes.size()));
+        manager.drawTexture(matrices, 0, 0, 0, 32, this.getWidth(), this.getHeight());
+        manager.getGame().textRenderer.draw(matrices, I18n.translate("recipe.toast.title", new Object[0]), 30.0f, 7.0f, -11534256);
+        manager.getGame().textRenderer.draw(matrices, I18n.translate("recipe.toast.description", new Object[0]), 30.0f, 18.0f, -16777216);
+        Recipe<?> lv = this.recipes.get((int)(startTime / Math.max(1L, 5000L / (long)this.recipes.size()) % (long)this.recipes.size()));
         ItemStack lv2 = lv.getRecipeKindIcon();
         RenderSystem.pushMatrix();
         RenderSystem.scalef(0.6f, 0.6f, 1.0f);
-        arg2.getGame().getItemRenderer().renderInGui(lv2, 3, 3);
+        manager.getGame().getItemRenderer().renderInGui(lv2, 3, 3);
         RenderSystem.popMatrix();
-        arg2.getGame().getItemRenderer().renderInGui(lv.getOutput(), 8, 8);
-        return l - this.startTime >= 5000L ? Toast.Visibility.HIDE : Toast.Visibility.SHOW;
+        manager.getGame().getItemRenderer().renderInGui(lv.getOutput(), 8, 8);
+        return startTime - this.startTime >= 5000L ? Toast.Visibility.HIDE : Toast.Visibility.SHOW;
     }
 
-    public void addRecipes(Recipe<?> arg) {
-        if (this.recipes.add(arg)) {
+    public void addRecipes(Recipe<?> recipes) {
+        if (this.recipes.add(recipes)) {
             this.justUpdated = true;
         }
     }
 
-    public static void show(ToastManager arg, Recipe<?> arg2) {
-        RecipeToast lv = arg.getToast(RecipeToast.class, TYPE);
+    public static void show(ToastManager manager, Recipe<?> recipes) {
+        RecipeToast lv = manager.getToast(RecipeToast.class, TYPE);
         if (lv == null) {
-            arg.add(new RecipeToast(arg2));
+            manager.add(new RecipeToast(recipes));
         } else {
-            lv.addRecipes(arg2);
+            lv.addRecipes(recipes);
         }
     }
 }

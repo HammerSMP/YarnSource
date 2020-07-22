@@ -11,11 +11,11 @@ import net.minecraft.world.gen.decorator.DecoratorConfig;
 
 public class ChanceDecoratorConfig
 implements DecoratorConfig {
-    public static final Codec<ChanceDecoratorConfig> field_24980 = Codec.INT.fieldOf("chance").xmap(ChanceDecoratorConfig::new, arg -> arg.chance).codec();
+    public static final Codec<ChanceDecoratorConfig> CODEC = Codec.INT.fieldOf("chance").xmap(ChanceDecoratorConfig::new, arg -> arg.chance).codec();
     public final int chance;
 
-    public ChanceDecoratorConfig(int i) {
-        this.chance = i;
+    public ChanceDecoratorConfig(int chance) {
+        this.chance = chance;
     }
 }
 

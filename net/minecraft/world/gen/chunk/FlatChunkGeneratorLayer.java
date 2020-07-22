@@ -16,18 +16,17 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.util.dynamic.NumberCodecs;
 import net.minecraft.util.registry.Registry;
 
 public class FlatChunkGeneratorLayer {
-    public static final Codec<FlatChunkGeneratorLayer> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)NumberCodecs.rangedInt(0, 256).fieldOf("height").forGetter(FlatChunkGeneratorLayer::getThickness), (App)Registry.BLOCK.fieldOf("block").withDefault((Object)Blocks.AIR).forGetter(arg -> arg.getBlockState().getBlock())).apply((Applicative)instance, FlatChunkGeneratorLayer::new));
+    public static final Codec<FlatChunkGeneratorLayer> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Codec.intRange((int)0, (int)256).fieldOf("height").forGetter(FlatChunkGeneratorLayer::getThickness), (App)Registry.BLOCK.fieldOf("block").orElse((Object)Blocks.AIR).forGetter(arg -> arg.getBlockState().getBlock())).apply((Applicative)instance, FlatChunkGeneratorLayer::new));
     private final BlockState blockState;
     private final int thickness;
     private int startY;
 
-    public FlatChunkGeneratorLayer(int i, Block arg) {
-        this.thickness = i;
-        this.blockState = arg.getDefaultState();
+    public FlatChunkGeneratorLayer(int thickness, Block block) {
+        this.thickness = thickness;
+        this.blockState = block.getDefaultState();
     }
 
     public int getThickness() {
@@ -42,8 +41,8 @@ public class FlatChunkGeneratorLayer {
         return this.startY;
     }
 
-    public void setStartY(int i) {
-        this.startY = i;
+    public void setStartY(int startY) {
+        this.startY = startY;
     }
 
     public String toString() {

@@ -68,16 +68,16 @@ public final class SpawnHelper {
     private static final int CHUNK_AREA = (int)Math.pow(17.0, 2.0);
     private static final SpawnGroup[] SPAWNABLE_GROUPS = (SpawnGroup[])Stream.of(SpawnGroup.values()).filter(arg -> arg != SpawnGroup.MISC).toArray(SpawnGroup[]::new);
 
-    public static Info setupSpawn(int i, Iterable<Entity> iterable, ChunkSource arg) {
+    public static Info setupSpawn(int spawningChunkCount, Iterable<Entity> entities, ChunkSource chunkSource) {
         GravityField lv = new GravityField();
         Object2IntOpenHashMap object2IntOpenHashMap = new Object2IntOpenHashMap();
-        for (Entity lv2 : iterable) {
+        for (Entity lv2 : entities) {
             SpawnGroup lv4;
             MobEntity lv3;
             if (lv2 instanceof MobEntity && ((lv3 = (MobEntity)lv2).isPersistent() || lv3.cannotDespawn()) || (lv4 = lv2.getType().getSpawnGroup()) == SpawnGroup.MISC) continue;
             BlockPos lv5 = lv2.getBlockPos();
             long l = ChunkPos.toLong(lv5.getX() >> 4, lv5.getZ() >> 4);
-            arg.query(l, arg5 -> {
+            chunkSource.query(l, arg5 -> {
                 Biome lv = SpawnHelper.getBiomeDirectly(lv5, arg5);
                 Biome.SpawnDensity lv2 = lv.getSpawnDensity(lv2.getType());
                 if (lv2 != null) {
@@ -86,71 +86,71 @@ public final class SpawnHelper {
                 object2IntOpenHashMap.addTo((Object)lv4, 1);
             });
         }
-        return new Info(i, object2IntOpenHashMap, lv);
+        return new Info(spawningChunkCount, object2IntOpenHashMap, lv);
     }
 
-    private static Biome getBiomeDirectly(BlockPos arg, Chunk arg2) {
-        return DirectBiomeAccessType.INSTANCE.getBiome(0L, arg.getX(), arg.getY(), arg.getZ(), arg2.getBiomeArray());
+    private static Biome getBiomeDirectly(BlockPos pos, Chunk chunk) {
+        return DirectBiomeAccessType.INSTANCE.getBiome(0L, pos.getX(), pos.getY(), pos.getZ(), chunk.getBiomeArray());
     }
 
-    public static void spawn(ServerWorld arg, WorldChunk arg22, Info arg32, boolean bl, boolean bl2, boolean bl3) {
-        arg.getProfiler().push("spawner");
+    public static void spawn(ServerWorld world, WorldChunk chunk, Info info, boolean spawnAnimals, boolean spawnMonsters, boolean shouldSpawnAnimals) {
+        world.getProfiler().push("spawner");
         for (SpawnGroup lv : SPAWNABLE_GROUPS) {
-            if (!bl && lv.isPeaceful() || !bl2 && !lv.isPeaceful() || !bl3 && lv.isAnimal() || !arg32.isBelowCap(lv)) continue;
-            SpawnHelper.spawnEntitiesInChunk(lv, arg, arg22, (arg2, arg3, arg4) -> arg32.test(arg2, arg3, arg4), (arg2, arg3) -> arg32.run(arg2, arg3));
+            if (!spawnAnimals && lv.isPeaceful() || !spawnMonsters && !lv.isPeaceful() || !shouldSpawnAnimals && lv.isAnimal() || !info.isBelowCap(lv)) continue;
+            SpawnHelper.spawnEntitiesInChunk(lv, world, chunk, (arg2, arg3, arg4) -> info.test(arg2, arg3, arg4), (arg2, arg3) -> info.run(arg2, arg3));
         }
-        arg.getProfiler().pop();
+        world.getProfiler().pop();
     }
 
-    public static void spawnEntitiesInChunk(SpawnGroup arg, ServerWorld arg2, WorldChunk arg3, Checker arg4, Runner arg5) {
-        BlockPos lv = SpawnHelper.getSpawnPos(arg2, arg3);
+    public static void spawnEntitiesInChunk(SpawnGroup group, ServerWorld world, WorldChunk chunk, Checker checker, Runner runner) {
+        BlockPos lv = SpawnHelper.getSpawnPos(world, chunk);
         if (lv.getY() < 1) {
             return;
         }
-        SpawnHelper.spawnEntitiesInChunk(arg, arg2, arg3, lv, arg4, arg5);
+        SpawnHelper.spawnEntitiesInChunk(group, world, chunk, lv, checker, runner);
     }
 
-    public static void spawnEntitiesInChunk(SpawnGroup arg, ServerWorld arg2, Chunk arg3, BlockPos arg4, Checker arg5, Runner arg6) {
-        StructureAccessor lv = arg2.getStructureAccessor();
-        ChunkGenerator lv2 = arg2.getChunkManager().getChunkGenerator();
-        int i = arg4.getY();
-        BlockState lv3 = arg3.getBlockState(arg4);
-        if (lv3.isSolidBlock(arg3, arg4)) {
+    public static void spawnEntitiesInChunk(SpawnGroup group, ServerWorld world, Chunk chunk, BlockPos pos, Checker checker, Runner runner) {
+        StructureAccessor lv = world.getStructureAccessor();
+        ChunkGenerator lv2 = world.getChunkManager().getChunkGenerator();
+        int i = pos.getY();
+        BlockState lv3 = chunk.getBlockState(pos);
+        if (lv3.isSolidBlock(chunk, pos)) {
             return;
         }
         BlockPos.Mutable lv4 = new BlockPos.Mutable();
         int j = 0;
         block0: for (int k = 0; k < 3; ++k) {
-            int l = arg4.getX();
-            int m = arg4.getZ();
+            int l = pos.getX();
+            int m = pos.getZ();
             int n = 6;
             Biome.SpawnEntry lv5 = null;
             EntityData lv6 = null;
-            int o = MathHelper.ceil(arg2.random.nextFloat() * 4.0f);
+            int o = MathHelper.ceil(world.random.nextFloat() * 4.0f);
             int p = 0;
             for (int q = 0; q < o; ++q) {
                 double f;
-                lv4.set(l += arg2.random.nextInt(6) - arg2.random.nextInt(6), i, m += arg2.random.nextInt(6) - arg2.random.nextInt(6));
+                lv4.set(l += world.random.nextInt(6) - world.random.nextInt(6), i, m += world.random.nextInt(6) - world.random.nextInt(6));
                 double d = (double)l + 0.5;
                 double e = (double)m + 0.5;
-                PlayerEntity lv7 = arg2.getClosestPlayer(d, (double)i, e, -1.0, false);
-                if (lv7 == null || !SpawnHelper.isAcceptableSpawnPosition(arg2, arg3, lv4, f = lv7.squaredDistanceTo(d, i, e))) continue;
+                PlayerEntity lv7 = world.getClosestPlayer(d, (double)i, e, -1.0, false);
+                if (lv7 == null || !SpawnHelper.isAcceptableSpawnPosition(world, chunk, lv4, f = lv7.squaredDistanceTo(d, i, e))) continue;
                 if (lv5 == null) {
-                    lv5 = SpawnHelper.pickRandomSpawnEntry(arg2, lv, lv2, arg, arg2.random, lv4);
+                    lv5 = SpawnHelper.pickRandomSpawnEntry(world, lv, lv2, group, world.random, lv4);
                     if (lv5 == null) continue block0;
-                    o = lv5.minGroupSize + arg2.random.nextInt(1 + lv5.maxGroupSize - lv5.minGroupSize);
+                    o = lv5.minGroupSize + world.random.nextInt(1 + lv5.maxGroupSize - lv5.minGroupSize);
                 }
-                if (!SpawnHelper.canSpawn(arg2, arg, lv, lv2, lv5, lv4, f) || !arg5.test(lv5.type, lv4, arg3)) continue;
-                MobEntity lv8 = SpawnHelper.createMob(arg2, lv5.type);
+                if (!SpawnHelper.canSpawn(world, group, lv, lv2, lv5, lv4, f) || !checker.test(lv5.type, lv4, chunk)) continue;
+                MobEntity lv8 = SpawnHelper.createMob(world, lv5.type);
                 if (lv8 == null) {
                     return;
                 }
-                lv8.refreshPositionAndAngles(d, i, e, arg2.random.nextFloat() * 360.0f, 0.0f);
-                if (!SpawnHelper.isValidSpawn(arg2, lv8, f)) continue;
-                lv6 = lv8.initialize(arg2, arg2.getLocalDifficulty(lv8.getBlockPos()), SpawnReason.NATURAL, lv6, null);
+                lv8.refreshPositionAndAngles(d, i, e, world.random.nextFloat() * 360.0f, 0.0f);
+                if (!SpawnHelper.isValidSpawn(world, lv8, f)) continue;
+                lv6 = lv8.initialize(world, world.getLocalDifficulty(lv8.getBlockPos()), SpawnReason.NATURAL, lv6, null);
                 ++p;
-                arg2.spawnEntity(lv8);
-                arg6.run(lv8, arg3);
+                world.spawnEntity(lv8);
+                runner.run(lv8, chunk);
                 if (++j >= lv8.getLimitPerChunk()) {
                     return;
                 }
@@ -159,48 +159,48 @@ public final class SpawnHelper {
         }
     }
 
-    private static boolean isAcceptableSpawnPosition(ServerWorld arg, Chunk arg2, BlockPos.Mutable arg3, double d) {
-        if (d <= 576.0) {
+    private static boolean isAcceptableSpawnPosition(ServerWorld world, Chunk chunk, BlockPos.Mutable pos, double squaredDistance) {
+        if (squaredDistance <= 576.0) {
             return false;
         }
-        if (arg.getSpawnPos().isWithinDistance(new Vec3d((double)arg3.getX() + 0.5, arg3.getY(), (double)arg3.getZ() + 0.5), 24.0)) {
+        if (world.getSpawnPos().isWithinDistance(new Vec3d((double)pos.getX() + 0.5, pos.getY(), (double)pos.getZ() + 0.5), 24.0)) {
             return false;
         }
-        ChunkPos lv = new ChunkPos(arg3);
-        return Objects.equals(lv, arg2.getPos()) || arg.getChunkManager().shouldTickChunk(lv);
+        ChunkPos lv = new ChunkPos(pos);
+        return Objects.equals(lv, chunk.getPos()) || world.getChunkManager().shouldTickChunk(lv);
     }
 
-    private static boolean canSpawn(ServerWorld arg, SpawnGroup arg2, StructureAccessor arg3, ChunkGenerator arg4, Biome.SpawnEntry arg5, BlockPos.Mutable arg6, double d) {
-        EntityType<?> lv = arg5.type;
+    private static boolean canSpawn(ServerWorld world, SpawnGroup group, StructureAccessor structureAccessor, ChunkGenerator chunkGenerator, Biome.SpawnEntry spawnEntry, BlockPos.Mutable pos, double squaredDistance) {
+        EntityType<?> lv = spawnEntry.type;
         if (lv.getSpawnGroup() == SpawnGroup.MISC) {
             return false;
         }
-        if (!lv.isSpawnableFarFromPlayer() && d > (double)(lv.getSpawnGroup().getImmediateDespawnRange() * lv.getSpawnGroup().getImmediateDespawnRange())) {
+        if (!lv.isSpawnableFarFromPlayer() && squaredDistance > (double)(lv.getSpawnGroup().getImmediateDespawnRange() * lv.getSpawnGroup().getImmediateDespawnRange())) {
             return false;
         }
-        if (!lv.isSummonable() || !SpawnHelper.containsSpawnEntry(arg, arg3, arg4, arg2, arg5, arg6)) {
+        if (!lv.isSummonable() || !SpawnHelper.containsSpawnEntry(world, structureAccessor, chunkGenerator, group, spawnEntry, pos)) {
             return false;
         }
         SpawnRestriction.Location lv2 = SpawnRestriction.getLocation(lv);
-        if (!SpawnHelper.canSpawn(lv2, arg, arg6, lv)) {
+        if (!SpawnHelper.canSpawn(lv2, world, pos, lv)) {
             return false;
         }
-        if (!SpawnRestriction.canSpawn(lv, arg, SpawnReason.NATURAL, arg6, arg.random)) {
+        if (!SpawnRestriction.canSpawn(lv, world, SpawnReason.NATURAL, pos, world.random)) {
             return false;
         }
-        return arg.doesNotCollide(lv.createSimpleBoundingBox((double)arg6.getX() + 0.5, arg6.getY(), (double)arg6.getZ() + 0.5));
+        return world.doesNotCollide(lv.createSimpleBoundingBox((double)pos.getX() + 0.5, pos.getY(), (double)pos.getZ() + 0.5));
     }
 
     /*
      * WARNING - void declaration
      */
     @Nullable
-    private static MobEntity createMob(ServerWorld arg, EntityType<?> arg2) {
+    private static MobEntity createMob(ServerWorld world, EntityType<?> type) {
         void lv3;
         try {
-            Object lv = arg2.create(arg);
+            Object lv = type.create(world);
             if (!(lv instanceof MobEntity)) {
-                throw new IllegalStateException("Trying to spawn a non-mob: " + Registry.ENTITY_TYPE.getId(arg2));
+                throw new IllegalStateException("Trying to spawn a non-mob: " + Registry.ENTITY_TYPE.getId(type));
             }
             MobEntity lv2 = (MobEntity)lv;
         }
@@ -211,11 +211,11 @@ public final class SpawnHelper {
         return lv3;
     }
 
-    private static boolean isValidSpawn(ServerWorld arg, MobEntity arg2, double d) {
-        if (d > (double)(arg2.getType().getSpawnGroup().getImmediateDespawnRange() * arg2.getType().getSpawnGroup().getImmediateDespawnRange()) && arg2.canImmediatelyDespawn(d)) {
+    private static boolean isValidSpawn(ServerWorld world, MobEntity entity, double squaredDistance) {
+        if (squaredDistance > (double)(entity.getType().getSpawnGroup().getImmediateDespawnRange() * entity.getType().getSpawnGroup().getImmediateDespawnRange()) && entity.canImmediatelyDespawn(squaredDistance)) {
             return false;
         }
-        return arg2.canSpawn(arg, SpawnReason.NATURAL) && arg2.canSpawn(arg);
+        return entity.canSpawn(world, SpawnReason.NATURAL) && entity.canSpawn(world);
     }
 
     @Nullable
@@ -242,68 +242,68 @@ public final class SpawnHelper {
         return arg3.getEntitySpawnList(arg6 != null ? arg6 : arg.getBiome(arg5), arg2, arg4, arg5);
     }
 
-    private static BlockPos getSpawnPos(World arg, WorldChunk arg2) {
-        ChunkPos lv = arg2.getPos();
-        int i = lv.getStartX() + arg.random.nextInt(16);
-        int j = lv.getStartZ() + arg.random.nextInt(16);
-        int k = arg2.sampleHeightmap(Heightmap.Type.WORLD_SURFACE, i, j) + 1;
-        int l = arg.random.nextInt(k + 1);
+    private static BlockPos getSpawnPos(World world, WorldChunk chunk) {
+        ChunkPos lv = chunk.getPos();
+        int i = lv.getStartX() + world.random.nextInt(16);
+        int j = lv.getStartZ() + world.random.nextInt(16);
+        int k = chunk.sampleHeightmap(Heightmap.Type.WORLD_SURFACE, i, j) + 1;
+        int l = world.random.nextInt(k + 1);
         return new BlockPos(i, l, j);
     }
 
-    public static boolean isClearForSpawn(BlockView arg, BlockPos arg2, BlockState arg3, FluidState arg4, EntityType<?> arg5) {
-        if (arg3.isFullCube(arg, arg2)) {
+    public static boolean isClearForSpawn(BlockView blockView, BlockPos pos, BlockState state, FluidState fluidState, EntityType<?> arg5) {
+        if (state.isFullCube(blockView, pos)) {
             return false;
         }
-        if (arg3.emitsRedstonePower()) {
+        if (state.emitsRedstonePower()) {
             return false;
         }
-        if (!arg4.isEmpty()) {
+        if (!fluidState.isEmpty()) {
             return false;
         }
-        if (arg3.isIn(BlockTags.PREVENT_MOB_SPAWNING_INSIDE)) {
+        if (state.isIn(BlockTags.PREVENT_MOB_SPAWNING_INSIDE)) {
             return false;
         }
-        return !arg5.method_29496(arg3);
+        return !arg5.isInvalidSpawn(state);
     }
 
-    public static boolean canSpawn(SpawnRestriction.Location arg, WorldView arg2, BlockPos arg3, @Nullable EntityType<?> arg4) {
-        if (arg == SpawnRestriction.Location.NO_RESTRICTIONS) {
+    public static boolean canSpawn(SpawnRestriction.Location location, WorldView world, BlockPos pos, @Nullable EntityType<?> entityType) {
+        if (location == SpawnRestriction.Location.NO_RESTRICTIONS) {
             return true;
         }
-        if (arg4 == null || !arg2.getWorldBorder().contains(arg3)) {
+        if (entityType == null || !world.getWorldBorder().contains(pos)) {
             return false;
         }
-        BlockState lv = arg2.getBlockState(arg3);
-        FluidState lv2 = arg2.getFluidState(arg3);
-        BlockPos lv3 = arg3.up();
-        BlockPos lv4 = arg3.down();
-        switch (arg) {
+        BlockState lv = world.getBlockState(pos);
+        FluidState lv2 = world.getFluidState(pos);
+        BlockPos lv3 = pos.up();
+        BlockPos lv4 = pos.down();
+        switch (location) {
             case IN_WATER: {
-                return lv2.isIn(FluidTags.WATER) && arg2.getFluidState(lv4).isIn(FluidTags.WATER) && !arg2.getBlockState(lv3).isSolidBlock(arg2, lv3);
+                return lv2.isIn(FluidTags.WATER) && world.getFluidState(lv4).isIn(FluidTags.WATER) && !world.getBlockState(lv3).isSolidBlock(world, lv3);
             }
             case IN_LAVA: {
                 return lv2.isIn(FluidTags.LAVA);
             }
         }
-        BlockState lv5 = arg2.getBlockState(lv4);
-        if (!lv5.allowsSpawning(arg2, lv4, arg4)) {
+        BlockState lv5 = world.getBlockState(lv4);
+        if (!lv5.allowsSpawning(world, lv4, entityType)) {
             return false;
         }
-        return SpawnHelper.isClearForSpawn(arg2, arg3, lv, lv2, arg4) && SpawnHelper.isClearForSpawn(arg2, lv3, arg2.getBlockState(lv3), arg2.getFluidState(lv3), arg4);
+        return SpawnHelper.isClearForSpawn(world, pos, lv, lv2, entityType) && SpawnHelper.isClearForSpawn(world, lv3, world.getBlockState(lv3), world.getFluidState(lv3), entityType);
     }
 
     /*
      * WARNING - void declaration
      */
-    public static void populateEntities(class_5425 arg, Biome arg2, int i, int j, Random random) {
-        List<Biome.SpawnEntry> list = arg2.getEntitySpawnList(SpawnGroup.CREATURE);
+    public static void populateEntities(class_5425 arg, Biome biome, int chunkX, int chunkZ, Random random) {
+        List<Biome.SpawnEntry> list = biome.getEntitySpawnList(SpawnGroup.CREATURE);
         if (list.isEmpty()) {
             return;
         }
-        int k = i << 4;
-        int l = j << 4;
-        while (random.nextFloat() < arg2.getMaxSpawnChance()) {
+        int k = chunkX << 4;
+        int l = chunkZ << 4;
+        while (random.nextFloat() < biome.getMaxSpawnChance()) {
             Biome.SpawnEntry lv = WeightedPicker.getRandom(random, list);
             int m = lv.minGroupSize + random.nextInt(1 + lv.maxGroupSize - lv.minGroupSize);
             EntityData lv2 = null;
@@ -347,19 +347,19 @@ public final class SpawnHelper {
         }
     }
 
-    private static BlockPos getEntitySpawnPos(WorldView arg, EntityType<?> arg2, int i, int j) {
+    private static BlockPos getEntitySpawnPos(WorldView world, EntityType<?> entityType, int x, int z) {
         Vec3i lv2;
-        int k = arg.getTopY(SpawnRestriction.getHeightmapType(arg2), i, j);
-        BlockPos.Mutable lv = new BlockPos.Mutable(i, k, j);
-        if (arg.getDimension().hasCeiling()) {
+        int k = world.getTopY(SpawnRestriction.getHeightmapType(entityType), x, z);
+        BlockPos.Mutable lv = new BlockPos.Mutable(x, k, z);
+        if (world.getDimension().hasCeiling()) {
             do {
                 lv.move(Direction.DOWN);
-            } while (!arg.getBlockState(lv).isAir());
+            } while (!world.getBlockState(lv).isAir());
             do {
                 lv.move(Direction.DOWN);
-            } while (arg.getBlockState(lv).isAir() && lv.getY() > 0);
+            } while (world.getBlockState(lv).isAir() && lv.getY() > 0);
         }
-        if (SpawnRestriction.getLocation(arg2) == SpawnRestriction.Location.ON_GROUND && arg.getBlockState((BlockPos)(lv2 = lv.down())).canPathfindThrough(arg, (BlockPos)lv2, NavigationType.LAND)) {
+        if (SpawnRestriction.getLocation(entityType) == SpawnRestriction.Location.ON_GROUND && world.getBlockState((BlockPos)(lv2 = lv.down())).canPathfindThrough(world, (BlockPos)lv2, NavigationType.LAND)) {
             return lv2;
         }
         return lv.toImmutable();
@@ -391,36 +391,36 @@ public final class SpawnHelper {
         private EntityType<?> cachedEntityType;
         private double cachedDensityMass;
 
-        private Info(int i, Object2IntOpenHashMap<SpawnGroup> object2IntOpenHashMap, GravityField arg) {
-            this.spawningChunkCount = i;
-            this.groupToCount = object2IntOpenHashMap;
-            this.densityField = arg;
-            this.groupToCountView = Object2IntMaps.unmodifiable(object2IntOpenHashMap);
+        private Info(int spawningChunkCount, Object2IntOpenHashMap<SpawnGroup> groupToCount, GravityField densityField) {
+            this.spawningChunkCount = spawningChunkCount;
+            this.groupToCount = groupToCount;
+            this.densityField = densityField;
+            this.groupToCountView = Object2IntMaps.unmodifiable(groupToCount);
         }
 
-        private boolean test(EntityType<?> arg, BlockPos arg2, Chunk arg3) {
+        private boolean test(EntityType<?> type, BlockPos pos, Chunk chunk) {
             double d;
-            this.cachedPos = arg2;
-            this.cachedEntityType = arg;
-            Biome lv = SpawnHelper.getBiomeDirectly(arg2, arg3);
-            Biome.SpawnDensity lv2 = lv.getSpawnDensity(arg);
+            this.cachedPos = pos;
+            this.cachedEntityType = type;
+            Biome lv = SpawnHelper.getBiomeDirectly(pos, chunk);
+            Biome.SpawnDensity lv2 = lv.getSpawnDensity(type);
             if (lv2 == null) {
                 this.cachedDensityMass = 0.0;
                 return true;
             }
             this.cachedDensityMass = d = lv2.getMass();
-            double e = this.densityField.calculate(arg2, d);
+            double e = this.densityField.calculate(pos, d);
             return e <= lv2.getGravityLimit();
         }
 
-        private void run(MobEntity arg, Chunk arg2) {
+        private void run(MobEntity entity, Chunk chunk) {
             double f;
-            EntityType<?> lv = arg.getType();
-            BlockPos lv2 = arg.getBlockPos();
+            EntityType<?> lv = entity.getType();
+            BlockPos lv2 = entity.getBlockPos();
             if (lv2.equals(this.cachedPos) && lv == this.cachedEntityType) {
                 double d = this.cachedDensityMass;
             } else {
-                Biome lv3 = SpawnHelper.getBiomeDirectly(lv2, arg2);
+                Biome lv3 = SpawnHelper.getBiomeDirectly(lv2, chunk);
                 Biome.SpawnDensity lv4 = lv3.getSpawnDensity(lv);
                 if (lv4 != null) {
                     double e = lv4.getMass();
@@ -441,9 +441,9 @@ public final class SpawnHelper {
             return this.groupToCountView;
         }
 
-        private boolean isBelowCap(SpawnGroup arg) {
-            int i = arg.getCapacity() * this.spawningChunkCount / CHUNK_AREA;
-            return this.groupToCount.getInt((Object)arg) < i;
+        private boolean isBelowCap(SpawnGroup group) {
+            int i = group.getCapacity() * this.spawningChunkCount / CHUNK_AREA;
+            return this.groupToCount.getInt((Object)group) < i;
         }
     }
 }

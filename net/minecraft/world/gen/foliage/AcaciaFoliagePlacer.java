@@ -16,16 +16,17 @@ import java.util.Set;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.ModifiableTestableWorld;
+import net.minecraft.world.gen.UniformIntDistribution;
 import net.minecraft.world.gen.feature.TreeFeatureConfig;
 import net.minecraft.world.gen.foliage.FoliagePlacer;
 import net.minecraft.world.gen.foliage.FoliagePlacerType;
 
 public class AcaciaFoliagePlacer
 extends FoliagePlacer {
-    public static final Codec<AcaciaFoliagePlacer> CODEC = RecordCodecBuilder.create(instance -> AcaciaFoliagePlacer.method_28846(instance).apply((Applicative)instance, AcaciaFoliagePlacer::new));
+    public static final Codec<AcaciaFoliagePlacer> CODEC = RecordCodecBuilder.create(instance -> AcaciaFoliagePlacer.method_30411(instance).apply((Applicative)instance, AcaciaFoliagePlacer::new));
 
-    public AcaciaFoliagePlacer(int i, int j, int k, int l) {
-        super(i, j, k, l);
+    public AcaciaFoliagePlacer(UniformIntDistribution arg, UniformIntDistribution arg2) {
+        super(arg, arg2);
     }
 
     @Override
@@ -34,25 +35,25 @@ extends FoliagePlacer {
     }
 
     @Override
-    protected void generate(ModifiableTestableWorld arg, Random random, TreeFeatureConfig arg2, int i, FoliagePlacer.TreeNode arg3, int j, int k, Set<BlockPos> set, int l, BlockBox arg4) {
+    protected void generate(ModifiableTestableWorld world, Random random, TreeFeatureConfig config, int trunkHeight, FoliagePlacer.TreeNode arg3, int foliageHeight, int radius, Set<BlockPos> leaves, int l, BlockBox arg4) {
         boolean bl = arg3.isGiantTrunk();
         BlockPos lv = arg3.getCenter().up(l);
-        this.generate(arg, random, arg2, lv, k + arg3.getFoliageRadius(), set, -1 - j, bl, arg4);
-        this.generate(arg, random, arg2, lv, k - 1, set, -j, bl, arg4);
-        this.generate(arg, random, arg2, lv, k + arg3.getFoliageRadius() - 1, set, 0, bl, arg4);
+        this.generate(world, random, config, lv, radius + arg3.getFoliageRadius(), leaves, -1 - foliageHeight, bl, arg4);
+        this.generate(world, random, config, lv, radius - 1, leaves, -foliageHeight, bl, arg4);
+        this.generate(world, random, config, lv, radius + arg3.getFoliageRadius() - 1, leaves, 0, bl, arg4);
     }
 
     @Override
-    public int getHeight(Random random, int i, TreeFeatureConfig arg) {
+    public int getHeight(Random random, int trunkHeight, TreeFeatureConfig config) {
         return 0;
     }
 
     @Override
-    protected boolean isInvalidForLeaves(Random random, int i, int j, int k, int l, boolean bl) {
-        if (j == 0) {
-            return (i > 1 || k > 1) && i != 0 && k != 0;
+    protected boolean isInvalidForLeaves(Random random, int baseHeight, int dx, int dy, int dz, boolean bl) {
+        if (dx == 0) {
+            return (baseHeight > 1 || dy > 1) && baseHeight != 0 && dy != 0;
         }
-        return i == l && k == l && l > 0;
+        return baseHeight == dz && dy == dz && dz > 0;
     }
 }
 

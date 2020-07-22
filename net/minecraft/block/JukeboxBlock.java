@@ -42,40 +42,40 @@ extends BlockWithEntity {
     }
 
     @Override
-    public void onPlaced(World arg, BlockPos arg2, BlockState arg3, @Nullable LivingEntity arg4, ItemStack arg5) {
+    public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
         CompoundTag lv2;
-        super.onPlaced(arg, arg2, arg3, arg4, arg5);
-        CompoundTag lv = arg5.getOrCreateTag();
+        super.onPlaced(world, pos, state, placer, itemStack);
+        CompoundTag lv = itemStack.getOrCreateTag();
         if (lv.contains("BlockEntityTag") && (lv2 = lv.getCompound("BlockEntityTag")).contains("RecordItem")) {
-            arg.setBlockState(arg2, (BlockState)arg3.with(HAS_RECORD, true), 2);
+            world.setBlockState(pos, (BlockState)state.with(HAS_RECORD, true), 2);
         }
     }
 
     @Override
-    public ActionResult onUse(BlockState arg, World arg2, BlockPos arg3, PlayerEntity arg4, Hand arg5, BlockHitResult arg6) {
-        if (arg.get(HAS_RECORD).booleanValue()) {
-            this.removeRecord(arg2, arg3);
-            arg = (BlockState)arg.with(HAS_RECORD, false);
-            arg2.setBlockState(arg3, arg, 2);
-            return ActionResult.success(arg2.isClient);
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        if (state.get(HAS_RECORD).booleanValue()) {
+            this.removeRecord(world, pos);
+            state = (BlockState)state.with(HAS_RECORD, false);
+            world.setBlockState(pos, state, 2);
+            return ActionResult.success(world.isClient);
         }
         return ActionResult.PASS;
     }
 
-    public void setRecord(WorldAccess arg, BlockPos arg2, BlockState arg3, ItemStack arg4) {
-        BlockEntity lv = arg.getBlockEntity(arg2);
+    public void setRecord(WorldAccess world, BlockPos pos, BlockState state, ItemStack stack) {
+        BlockEntity lv = world.getBlockEntity(pos);
         if (!(lv instanceof JukeboxBlockEntity)) {
             return;
         }
-        ((JukeboxBlockEntity)lv).setRecord(arg4.copy());
-        arg.setBlockState(arg2, (BlockState)arg3.with(HAS_RECORD, true), 2);
+        ((JukeboxBlockEntity)lv).setRecord(stack.copy());
+        world.setBlockState(pos, (BlockState)state.with(HAS_RECORD, true), 2);
     }
 
-    private void removeRecord(World arg, BlockPos arg2) {
-        if (arg.isClient) {
+    private void removeRecord(World world, BlockPos pos) {
+        if (world.isClient) {
             return;
         }
-        BlockEntity lv = arg.getBlockEntity(arg2);
+        BlockEntity lv = world.getBlockEntity(pos);
         if (!(lv instanceof JukeboxBlockEntity)) {
             return;
         }
@@ -84,41 +84,41 @@ extends BlockWithEntity {
         if (lv3.isEmpty()) {
             return;
         }
-        arg.syncWorldEvent(1010, arg2, 0);
+        world.syncWorldEvent(1010, pos, 0);
         lv2.clear();
         float f = 0.7f;
-        double d = (double)(arg.random.nextFloat() * 0.7f) + (double)0.15f;
-        double e = (double)(arg.random.nextFloat() * 0.7f) + 0.06000000238418579 + 0.6;
-        double g = (double)(arg.random.nextFloat() * 0.7f) + (double)0.15f;
+        double d = (double)(world.random.nextFloat() * 0.7f) + (double)0.15f;
+        double e = (double)(world.random.nextFloat() * 0.7f) + 0.06000000238418579 + 0.6;
+        double g = (double)(world.random.nextFloat() * 0.7f) + (double)0.15f;
         ItemStack lv4 = lv3.copy();
-        ItemEntity lv5 = new ItemEntity(arg, (double)arg2.getX() + d, (double)arg2.getY() + e, (double)arg2.getZ() + g, lv4);
+        ItemEntity lv5 = new ItemEntity(world, (double)pos.getX() + d, (double)pos.getY() + e, (double)pos.getZ() + g, lv4);
         lv5.setToDefaultPickupDelay();
-        arg.spawnEntity(lv5);
+        world.spawnEntity(lv5);
     }
 
     @Override
-    public void onStateReplaced(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
-        if (arg.isOf(arg4.getBlock())) {
+    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
+        if (state.isOf(newState.getBlock())) {
             return;
         }
-        this.removeRecord(arg2, arg3);
-        super.onStateReplaced(arg, arg2, arg3, arg4, bl);
+        this.removeRecord(world, pos);
+        super.onStateReplaced(state, world, pos, newState, moved);
     }
 
     @Override
-    public BlockEntity createBlockEntity(BlockView arg) {
+    public BlockEntity createBlockEntity(BlockView world) {
         return new JukeboxBlockEntity();
     }
 
     @Override
-    public boolean hasComparatorOutput(BlockState arg) {
+    public boolean hasComparatorOutput(BlockState state) {
         return true;
     }
 
     @Override
-    public int getComparatorOutput(BlockState arg, World arg2, BlockPos arg3) {
+    public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
         Item lv2;
-        BlockEntity lv = arg2.getBlockEntity(arg3);
+        BlockEntity lv = world.getBlockEntity(pos);
         if (lv instanceof JukeboxBlockEntity && (lv2 = ((JukeboxBlockEntity)lv).getRecord().getItem()) instanceof MusicDiscItem) {
             return ((MusicDiscItem)lv2).getComparatorOutput();
         }
@@ -126,13 +126,13 @@ extends BlockWithEntity {
     }
 
     @Override
-    public BlockRenderType getRenderType(BlockState arg) {
+    public BlockRenderType getRenderType(BlockState state) {
         return BlockRenderType.MODEL;
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(HAS_RECORD);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(HAS_RECORD);
     }
 }
 

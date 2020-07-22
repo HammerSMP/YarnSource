@@ -23,10 +23,10 @@ extends ThreadExecutor<R> {
     }
 
     @Override
-    protected void executeTask(R runnable) {
+    protected void executeTask(R task) {
         ++this.runningTasks;
         try {
-            super.executeTask(runnable);
+            super.executeTask(task);
         }
         finally {
             --this.runningTasks;

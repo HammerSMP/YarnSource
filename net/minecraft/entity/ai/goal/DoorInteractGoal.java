@@ -21,8 +21,8 @@ extends Goal {
     private float xOffset;
     private float zOffset;
 
-    public DoorInteractGoal(MobEntity arg) {
-        this.mob = arg;
+    public DoorInteractGoal(MobEntity mob) {
+        this.mob = mob;
         if (!this.method_30146()) {
             throw new IllegalArgumentException("Unsupported mob type for DoorInteractGoal");
         }
@@ -40,10 +40,10 @@ extends Goal {
         return lv.get(DoorBlock.OPEN);
     }
 
-    protected void setDoorOpen(boolean bl) {
+    protected void setDoorOpen(boolean open) {
         BlockState lv;
         if (this.doorValid && (lv = this.mob.world.getBlockState(this.doorPos)).getBlock() instanceof DoorBlock) {
-            ((DoorBlock)lv.getBlock()).setOpen(this.mob.world, this.doorPos, bl);
+            ((DoorBlock)lv.getBlock()).setOpen(this.mob.world, this.doorPos, open);
         }
     }
 

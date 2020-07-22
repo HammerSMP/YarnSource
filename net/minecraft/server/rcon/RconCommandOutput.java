@@ -19,8 +19,8 @@ implements CommandOutput {
     private final StringBuffer buffer = new StringBuffer();
     private final MinecraftServer server;
 
-    public RconCommandOutput(MinecraftServer minecraftServer) {
-        this.server = minecraftServer;
+    public RconCommandOutput(MinecraftServer server) {
+        this.server = server;
     }
 
     public void clear() {
@@ -37,8 +37,8 @@ implements CommandOutput {
     }
 
     @Override
-    public void sendSystemMessage(Text arg, UUID uUID) {
-        this.buffer.append(arg.getString());
+    public void sendSystemMessage(Text message, UUID senderUuid) {
+        this.buffer.append(message.getString());
     }
 
     @Override

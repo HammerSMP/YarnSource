@@ -33,8 +33,8 @@ implements SoundInstanceListener {
     private final List<SubtitleEntry> entries = Lists.newArrayList();
     private boolean enabled;
 
-    public SubtitlesHud(MinecraftClient arg) {
-        this.client = arg;
+    public SubtitlesHud(MinecraftClient client) {
+        this.client = client;
     }
 
     public void render(MatrixStack arg) {
@@ -103,19 +103,19 @@ implements SoundInstanceListener {
     }
 
     @Override
-    public void onSoundPlayed(SoundInstance arg, WeightedSoundSet arg2) {
-        if (arg2.getSubtitle() == null) {
+    public void onSoundPlayed(SoundInstance sound, WeightedSoundSet soundSet) {
+        if (soundSet.getSubtitle() == null) {
             return;
         }
-        Text lv = arg2.getSubtitle();
+        Text lv = soundSet.getSubtitle();
         if (!this.entries.isEmpty()) {
             for (SubtitleEntry lv2 : this.entries) {
                 if (!lv2.getText().equals(lv)) continue;
-                lv2.reset(new Vec3d(arg.getX(), arg.getY(), arg.getZ()));
+                lv2.reset(new Vec3d(sound.getX(), sound.getY(), sound.getZ()));
                 return;
             }
         }
-        this.entries.add(new SubtitleEntry(lv, new Vec3d(arg.getX(), arg.getY(), arg.getZ())));
+        this.entries.add(new SubtitleEntry(lv, new Vec3d(sound.getX(), sound.getY(), sound.getZ())));
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -124,9 +124,9 @@ implements SoundInstanceListener {
         private long time;
         private Vec3d pos;
 
-        public SubtitleEntry(Text arg2, Vec3d arg3) {
+        public SubtitleEntry(Text arg2, Vec3d pos) {
             this.text = arg2;
-            this.pos = arg3;
+            this.pos = pos;
             this.time = Util.getMeasuringTimeMs();
         }
 
@@ -142,8 +142,8 @@ implements SoundInstanceListener {
             return this.pos;
         }
 
-        public void reset(Vec3d arg) {
-            this.pos = arg;
+        public void reset(Vec3d pos) {
+            this.pos = pos;
             this.time = Util.getMeasuringTimeMs();
         }
     }

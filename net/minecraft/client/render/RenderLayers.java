@@ -280,8 +280,8 @@ public class RenderLayers {
     });
     private static boolean fancyGraphicsOrBetter;
 
-    public static RenderLayer getBlockLayer(BlockState arg) {
-        Block lv = arg.getBlock();
+    public static RenderLayer getBlockLayer(BlockState state) {
+        Block lv = state.getBlock();
         if (lv instanceof LeavesBlock) {
             return fancyGraphicsOrBetter ? RenderLayer.getCutoutMipped() : RenderLayer.getSolid();
         }
@@ -292,7 +292,7 @@ public class RenderLayers {
         return RenderLayer.getSolid();
     }
 
-    public static RenderLayer method_29359(BlockState arg) {
+    public static RenderLayer getMovingBlockLayer(BlockState arg) {
         Block lv = arg.getBlock();
         if (lv instanceof LeavesBlock) {
             return fancyGraphicsOrBetter ? RenderLayer.getCutoutMipped() : RenderLayer.getSolid();
@@ -307,36 +307,36 @@ public class RenderLayers {
         return RenderLayer.getSolid();
     }
 
-    public static RenderLayer getEntityBlockLayer(BlockState arg, boolean bl) {
-        RenderLayer lv = RenderLayers.getBlockLayer(arg);
+    public static RenderLayer getEntityBlockLayer(BlockState state, boolean direct) {
+        RenderLayer lv = RenderLayers.getBlockLayer(state);
         if (lv == RenderLayer.getTranslucent()) {
             if (!MinecraftClient.isFabulousGraphicsOrBetter()) {
                 return TexturedRenderLayers.getEntityTranslucentCull();
             }
-            return bl ? TexturedRenderLayers.getEntityTranslucentCull() : TexturedRenderLayers.method_29382();
+            return direct ? TexturedRenderLayers.getEntityTranslucentCull() : TexturedRenderLayers.getItemEntityTranslucentCull();
         }
         return TexturedRenderLayers.getEntityCutout();
     }
 
-    public static RenderLayer getItemLayer(ItemStack arg, boolean bl) {
-        Item lv = arg.getItem();
+    public static RenderLayer getItemLayer(ItemStack stack, boolean direct) {
+        Item lv = stack.getItem();
         if (lv instanceof BlockItem) {
             Block lv2 = ((BlockItem)lv).getBlock();
-            return RenderLayers.getEntityBlockLayer(lv2.getDefaultState(), bl);
+            return RenderLayers.getEntityBlockLayer(lv2.getDefaultState(), direct);
         }
-        return bl ? TexturedRenderLayers.getEntityTranslucentCull() : TexturedRenderLayers.method_29382();
+        return direct ? TexturedRenderLayers.getEntityTranslucentCull() : TexturedRenderLayers.getItemEntityTranslucentCull();
     }
 
-    public static RenderLayer getFluidLayer(FluidState arg) {
-        RenderLayer lv = FLUIDS.get(arg.getFluid());
+    public static RenderLayer getFluidLayer(FluidState state) {
+        RenderLayer lv = FLUIDS.get(state.getFluid());
         if (lv != null) {
             return lv;
         }
         return RenderLayer.getSolid();
     }
 
-    public static void setFancyGraphicsOrBetter(boolean bl) {
-        fancyGraphicsOrBetter = bl;
+    public static void setFancyGraphicsOrBetter(boolean fancyGraphicsOrBetter) {
+        RenderLayers.fancyGraphicsOrBetter = fancyGraphicsOrBetter;
     }
 }
 

@@ -71,14 +71,14 @@ extends Task<VillagerEntity> {
     }
 
     @Nullable
-    private BlockPos chooseRandomTarget(ServerWorld arg) {
-        return this.targetPositions.isEmpty() ? null : this.targetPositions.get(arg.getRandom().nextInt(this.targetPositions.size()));
+    private BlockPos chooseRandomTarget(ServerWorld world) {
+        return this.targetPositions.isEmpty() ? null : this.targetPositions.get(world.getRandom().nextInt(this.targetPositions.size()));
     }
 
-    private boolean isSuitableTarget(BlockPos arg, ServerWorld arg2) {
-        BlockState lv = arg2.getBlockState(arg);
+    private boolean isSuitableTarget(BlockPos pos, ServerWorld world) {
+        BlockState lv = world.getBlockState(pos);
         Block lv2 = lv.getBlock();
-        Block lv3 = arg2.getBlockState(arg.down()).getBlock();
+        Block lv3 = world.getBlockState(pos.down()).getBlock();
         return lv2 instanceof CropBlock && ((CropBlock)lv2).isMature(lv) || lv.isAir() && lv3 instanceof FarmlandBlock;
     }
 
@@ -157,18 +157,18 @@ extends Task<VillagerEntity> {
     }
 
     @Override
-    protected /* synthetic */ boolean shouldKeepRunning(ServerWorld arg, LivingEntity arg2, long l) {
-        return this.shouldKeepRunning(arg, (VillagerEntity)arg2, l);
+    protected /* synthetic */ boolean shouldKeepRunning(ServerWorld world, LivingEntity entity, long time) {
+        return this.shouldKeepRunning(world, (VillagerEntity)entity, time);
     }
 
     @Override
-    protected /* synthetic */ void finishRunning(ServerWorld arg, LivingEntity arg2, long l) {
-        this.finishRunning(arg, (VillagerEntity)arg2, l);
+    protected /* synthetic */ void finishRunning(ServerWorld world, LivingEntity entity, long time) {
+        this.finishRunning(world, (VillagerEntity)entity, time);
     }
 
     @Override
-    protected /* synthetic */ void keepRunning(ServerWorld arg, LivingEntity arg2, long l) {
-        this.keepRunning(arg, (VillagerEntity)arg2, l);
+    protected /* synthetic */ void keepRunning(ServerWorld world, LivingEntity entity, long time) {
+        this.keepRunning(world, (VillagerEntity)entity, time);
     }
 }
 

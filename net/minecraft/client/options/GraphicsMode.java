@@ -23,9 +23,9 @@ public enum GraphicsMode {
     private final int id;
     private final String translationKey;
 
-    private GraphicsMode(int j, String string2) {
-        this.id = j;
-        this.translationKey = string2;
+    private GraphicsMode(int id, String translationKey) {
+        this.id = id;
+        this.translationKey = translationKey;
     }
 
     public int getId() {
@@ -55,8 +55,8 @@ public enum GraphicsMode {
         throw new IllegalArgumentException();
     }
 
-    public static GraphicsMode byId(int i) {
-        return VALUES[MathHelper.floorMod(i, VALUES.length)];
+    public static GraphicsMode byId(int id) {
+        return VALUES[MathHelper.floorMod(id, VALUES.length)];
     }
 
     static {

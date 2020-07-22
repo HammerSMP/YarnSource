@@ -70,8 +70,8 @@ extends WaterCreatureEntity {
     }
 
     @Override
-    protected float getActiveEyeHeight(EntityPose arg, EntityDimensions arg2) {
-        return arg2.height * 0.5f;
+    protected float getActiveEyeHeight(EntityPose pose, EntityDimensions dimensions) {
+        return dimensions.height * 0.5f;
     }
 
     @Override
@@ -80,7 +80,7 @@ extends WaterCreatureEntity {
     }
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource arg) {
+    protected SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.ENTITY_SQUID_HURT;
     }
 
@@ -158,8 +158,8 @@ extends WaterCreatureEntity {
     }
 
     @Override
-    public boolean damage(DamageSource arg, float f) {
-        if (super.damage(arg, f) && this.getAttacker() != null) {
+    public boolean damage(DamageSource source, float amount) {
+        if (super.damage(source, amount) && this.getAttacker() != null) {
             this.squirt();
             return true;
         }
@@ -183,28 +183,28 @@ extends WaterCreatureEntity {
     }
 
     @Override
-    public void travel(Vec3d arg) {
+    public void travel(Vec3d movementInput) {
         this.move(MovementType.SELF, this.getVelocity());
     }
 
-    public static boolean canSpawn(EntityType<SquidEntity> arg, WorldAccess arg2, SpawnReason arg3, BlockPos arg4, Random random) {
-        return arg4.getY() > 45 && arg4.getY() < arg2.getSeaLevel();
+    public static boolean canSpawn(EntityType<SquidEntity> type, WorldAccess world, SpawnReason spawnReason, BlockPos pos, Random random) {
+        return pos.getY() > 45 && pos.getY() < world.getSeaLevel();
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void handleStatus(byte b) {
-        if (b == 19) {
+    public void handleStatus(byte status) {
+        if (status == 19) {
             this.field_6908 = 0.0f;
         } else {
-            super.handleStatus(b);
+            super.handleStatus(status);
         }
     }
 
-    public void setConstantVelocity(float f, float g, float h) {
-        this.constantVelocityX = f;
-        this.constantVelocityY = g;
-        this.constantVelocityZ = h;
+    public void setConstantVelocity(float x, float y, float z) {
+        this.constantVelocityX = x;
+        this.constantVelocityY = y;
+        this.constantVelocityZ = z;
     }
 
     public boolean hasConstantVelocity() {
@@ -269,8 +269,8 @@ extends WaterCreatureEntity {
     extends Goal {
         private final SquidEntity squid;
 
-        public SwimGoal(SquidEntity arg2) {
-            this.squid = arg2;
+        public SwimGoal(SquidEntity squid) {
+            this.squid = squid;
         }
 
         @Override

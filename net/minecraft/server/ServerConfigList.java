@@ -55,8 +55,8 @@ public abstract class ServerConfigList<K, V extends ServerConfigEntry<K>> {
         return this.file;
     }
 
-    public void add(V arg) {
-        this.map.put(this.toString(((ServerConfigEntry)arg).getKey()), arg);
+    public void add(V entry) {
+        this.map.put(this.toString(((ServerConfigEntry)entry).getKey()), entry);
         try {
             this.save();
         }
@@ -66,13 +66,13 @@ public abstract class ServerConfigList<K, V extends ServerConfigEntry<K>> {
     }
 
     @Nullable
-    public V get(K object) {
+    public V get(K key) {
         this.removeInvalidEntries();
-        return (V)((ServerConfigEntry)this.map.get(this.toString(object)));
+        return (V)((ServerConfigEntry)this.map.get(this.toString(key)));
     }
 
-    public void remove(K object) {
-        this.map.remove(this.toString(object));
+    public void remove(K key) {
+        this.map.remove(this.toString(key));
         try {
             this.save();
         }
@@ -81,8 +81,8 @@ public abstract class ServerConfigList<K, V extends ServerConfigEntry<K>> {
         }
     }
 
-    public void remove(ServerConfigEntry<K> arg) {
-        this.remove(arg.getKey());
+    public void remove(ServerConfigEntry<K> entry) {
+        this.remove(entry.getKey());
     }
 
     public String[] getNames() {
@@ -93,8 +93,8 @@ public abstract class ServerConfigList<K, V extends ServerConfigEntry<K>> {
         return this.map.size() < 1;
     }
 
-    protected String toString(K object) {
-        return object.toString();
+    protected String toString(K profile) {
+        return profile.toString();
     }
 
     protected boolean contains(K object) {

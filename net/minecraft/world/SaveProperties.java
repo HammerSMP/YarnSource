@@ -17,7 +17,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resource.DataPackSettings;
 import net.minecraft.util.crash.CrashReportSection;
-import net.minecraft.util.registry.RegistryTracker;
+import net.minecraft.util.registry.DynamicRegistryManager;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
@@ -36,17 +36,17 @@ public interface SaveProperties {
 
     public void addServerBrand(String var1, boolean var2);
 
-    default public void populateCrashReport(CrashReportSection arg) {
-        arg.add("Known server brands", () -> String.join((CharSequence)", ", this.getServerBrands()));
-        arg.add("Level was modded", () -> Boolean.toString(this.isModded()));
-        arg.add("Level storage version", () -> {
+    default public void populateCrashReport(CrashReportSection reportSection) {
+        reportSection.add("Known server brands", () -> String.join((CharSequence)", ", this.getServerBrands()));
+        reportSection.add("Level was modded", () -> Boolean.toString(this.isModded()));
+        reportSection.add("Level storage version", () -> {
             int i = this.getVersion();
             return String.format("0x%05X - %s", i, this.getFormatName(i));
         });
     }
 
-    default public String getFormatName(int i) {
-        switch (i) {
+    default public String getFormatName(int id) {
+        switch (id) {
             case 19133: {
                 return "Anvil";
             }
@@ -67,7 +67,7 @@ public interface SaveProperties {
     @Environment(value=EnvType.CLIENT)
     public LevelInfo getLevelInfo();
 
-    public CompoundTag cloneWorldTag(RegistryTracker var1, @Nullable CompoundTag var2);
+    public CompoundTag cloneWorldTag(DynamicRegistryManager var1, @Nullable CompoundTag var2);
 
     public boolean isHardcore();
 
@@ -93,9 +93,9 @@ public interface SaveProperties {
 
     public CompoundTag getPlayerData();
 
-    public CompoundTag method_29036();
+    public CompoundTag getDragonFight();
 
-    public void method_29037(CompoundTag var1);
+    public void setDragonFight(CompoundTag var1);
 
     public GeneratorOptions getGeneratorOptions();
 

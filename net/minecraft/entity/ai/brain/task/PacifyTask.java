@@ -18,15 +18,15 @@ public class PacifyTask
 extends Task<LivingEntity> {
     private final int duration;
 
-    public PacifyTask(MemoryModuleType<?> arg, int i) {
-        super((Map<MemoryModuleType<?>, MemoryModuleState>)ImmutableMap.of(MemoryModuleType.ATTACK_TARGET, (Object)((Object)MemoryModuleState.REGISTERED), MemoryModuleType.PACIFIED, (Object)((Object)MemoryModuleState.VALUE_ABSENT), arg, (Object)((Object)MemoryModuleState.VALUE_PRESENT)));
-        this.duration = i;
+    public PacifyTask(MemoryModuleType<?> requiredMemoryModuleType, int duration) {
+        super((Map<MemoryModuleType<?>, MemoryModuleState>)ImmutableMap.of(MemoryModuleType.ATTACK_TARGET, (Object)((Object)MemoryModuleState.REGISTERED), MemoryModuleType.PACIFIED, (Object)((Object)MemoryModuleState.VALUE_ABSENT), requiredMemoryModuleType, (Object)((Object)MemoryModuleState.VALUE_PRESENT)));
+        this.duration = duration;
     }
 
     @Override
-    protected void run(ServerWorld arg, LivingEntity arg2, long l) {
-        arg2.getBrain().remember(MemoryModuleType.PACIFIED, true, this.duration);
-        arg2.getBrain().forget(MemoryModuleType.ATTACK_TARGET);
+    protected void run(ServerWorld world, LivingEntity entity, long time) {
+        entity.getBrain().remember(MemoryModuleType.PACIFIED, true, this.duration);
+        entity.getBrain().forget(MemoryModuleType.ATTACK_TARGET);
     }
 }
 

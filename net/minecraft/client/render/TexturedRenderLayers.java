@@ -47,7 +47,7 @@ public class TexturedRenderLayers {
     private static final RenderLayer CHEST_RENDER_LAYER = RenderLayer.getEntityCutout(CHEST_ATLAS_TEXTURE);
     private static final RenderLayer ENTITY_SOLID = RenderLayer.getEntitySolid(SpriteAtlasTexture.BLOCK_ATLAS_TEX);
     private static final RenderLayer ENTITY_CUTOUT = RenderLayer.getEntityCutout(SpriteAtlasTexture.BLOCK_ATLAS_TEX);
-    private static final RenderLayer field_25286 = RenderLayer.getItemEntityTranslucentCull(SpriteAtlasTexture.BLOCK_ATLAS_TEX);
+    private static final RenderLayer ITEM_ENTITY_TRANSLUCENT_CULL = RenderLayer.getItemEntityTranslucentCull(SpriteAtlasTexture.BLOCK_ATLAS_TEX);
     private static final RenderLayer ENTITY_TRANSLUCENT_CULL = RenderLayer.getEntityTranslucentCull(SpriteAtlasTexture.BLOCK_ATLAS_TEX);
     public static final SpriteIdentifier SHULKER_TEXTURE_ID = new SpriteIdentifier(SHULKER_BOXES_ATLAS_TEXTURE, new Identifier("entity/shulker/shulker"));
     public static final List<SpriteIdentifier> COLORED_SHULKER_BOXES_TEXTURES = (List)Stream.of("white", "orange", "magenta", "light_blue", "yellow", "lime", "pink", "gray", "light_gray", "cyan", "purple", "blue", "brown", "green", "red", "black").map(string -> new SpriteIdentifier(SHULKER_BOXES_ATLAS_TEXTURE, new Identifier("entity/shulker/shulker_" + string))).collect(ImmutableList.toImmutableList());
@@ -96,68 +96,68 @@ public class TexturedRenderLayers {
         return ENTITY_CUTOUT;
     }
 
-    public static RenderLayer method_29382() {
-        return field_25286;
+    public static RenderLayer getItemEntityTranslucentCull() {
+        return ITEM_ENTITY_TRANSLUCENT_CULL;
     }
 
     public static RenderLayer getEntityTranslucentCull() {
         return ENTITY_TRANSLUCENT_CULL;
     }
 
-    public static void addDefaultTextures(Consumer<SpriteIdentifier> consumer) {
-        consumer.accept(SHULKER_TEXTURE_ID);
-        COLORED_SHULKER_BOXES_TEXTURES.forEach(consumer);
+    public static void addDefaultTextures(Consumer<SpriteIdentifier> adder) {
+        adder.accept(SHULKER_TEXTURE_ID);
+        COLORED_SHULKER_BOXES_TEXTURES.forEach(adder);
         for (BannerPattern bannerPattern : BannerPattern.values()) {
-            consumer.accept(new SpriteIdentifier(BANNER_PATTERNS_ATLAS_TEXTURE, bannerPattern.getSpriteId(true)));
-            consumer.accept(new SpriteIdentifier(SHIELD_PATTERNS_ATLAS_TEXTURE, bannerPattern.getSpriteId(false)));
+            adder.accept(new SpriteIdentifier(BANNER_PATTERNS_ATLAS_TEXTURE, bannerPattern.getSpriteId(true)));
+            adder.accept(new SpriteIdentifier(SHIELD_PATTERNS_ATLAS_TEXTURE, bannerPattern.getSpriteId(false)));
         }
-        WOOD_TYPE_TEXTURES.values().forEach(consumer);
+        WOOD_TYPE_TEXTURES.values().forEach(adder);
         for (SpriteIdentifier spriteIdentifier : BED_TEXTURES) {
-            consumer.accept(spriteIdentifier);
+            adder.accept(spriteIdentifier);
         }
-        consumer.accept(TRAPPED);
-        consumer.accept(TRAPPED_LEFT);
-        consumer.accept(TRAPPED_RIGHT);
-        consumer.accept(CHRISTMAS);
-        consumer.accept(CHRISTMAS_LEFT);
-        consumer.accept(CHRISTMAS_RIGHT);
-        consumer.accept(NORMAL);
-        consumer.accept(NORMAL_LEFT);
-        consumer.accept(NORMAL_RIGHT);
-        consumer.accept(ENDER);
+        adder.accept(TRAPPED);
+        adder.accept(TRAPPED_LEFT);
+        adder.accept(TRAPPED_RIGHT);
+        adder.accept(CHRISTMAS);
+        adder.accept(CHRISTMAS_LEFT);
+        adder.accept(CHRISTMAS_RIGHT);
+        adder.accept(NORMAL);
+        adder.accept(NORMAL_LEFT);
+        adder.accept(NORMAL_RIGHT);
+        adder.accept(ENDER);
     }
 
-    public static SpriteIdentifier getSignTextureId(SignType arg) {
-        return new SpriteIdentifier(SIGNS_ATLAS_TEXTURE, new Identifier("entity/signs/" + arg.getName()));
+    public static SpriteIdentifier getSignTextureId(SignType type) {
+        return new SpriteIdentifier(SIGNS_ATLAS_TEXTURE, new Identifier("entity/signs/" + type.getName()));
     }
 
-    private static SpriteIdentifier getChestTextureId(String string) {
-        return new SpriteIdentifier(CHEST_ATLAS_TEXTURE, new Identifier("entity/chest/" + string));
+    private static SpriteIdentifier getChestTextureId(String variant) {
+        return new SpriteIdentifier(CHEST_ATLAS_TEXTURE, new Identifier("entity/chest/" + variant));
     }
 
-    public static SpriteIdentifier getChestTexture(BlockEntity arg, ChestType arg2, boolean bl) {
-        if (bl) {
-            return TexturedRenderLayers.getChestTexture(arg2, CHRISTMAS, CHRISTMAS_LEFT, CHRISTMAS_RIGHT);
+    public static SpriteIdentifier getChestTexture(BlockEntity blockEntity, ChestType type, boolean christmas) {
+        if (christmas) {
+            return TexturedRenderLayers.getChestTexture(type, CHRISTMAS, CHRISTMAS_LEFT, CHRISTMAS_RIGHT);
         }
-        if (arg instanceof TrappedChestBlockEntity) {
-            return TexturedRenderLayers.getChestTexture(arg2, TRAPPED, TRAPPED_LEFT, TRAPPED_RIGHT);
+        if (blockEntity instanceof TrappedChestBlockEntity) {
+            return TexturedRenderLayers.getChestTexture(type, TRAPPED, TRAPPED_LEFT, TRAPPED_RIGHT);
         }
-        if (arg instanceof EnderChestBlockEntity) {
+        if (blockEntity instanceof EnderChestBlockEntity) {
             return ENDER;
         }
-        return TexturedRenderLayers.getChestTexture(arg2, NORMAL, NORMAL_LEFT, NORMAL_RIGHT);
+        return TexturedRenderLayers.getChestTexture(type, NORMAL, NORMAL_LEFT, NORMAL_RIGHT);
     }
 
-    private static SpriteIdentifier getChestTexture(ChestType arg, SpriteIdentifier arg2, SpriteIdentifier arg3, SpriteIdentifier arg4) {
-        switch (arg) {
+    private static SpriteIdentifier getChestTexture(ChestType type, SpriteIdentifier single, SpriteIdentifier left, SpriteIdentifier right) {
+        switch (type) {
             case LEFT: {
-                return arg3;
+                return left;
             }
             case RIGHT: {
-                return arg4;
+                return right;
             }
         }
-        return arg2;
+        return single;
     }
 }
 

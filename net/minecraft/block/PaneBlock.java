@@ -36,10 +36,10 @@ extends HorizontalConnectingBlock {
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext arg) {
-        World lv = arg.getWorld();
-        BlockPos lv2 = arg.getBlockPos();
-        FluidState lv3 = arg.getWorld().getFluidState(arg.getBlockPos());
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        World lv = ctx.getWorld();
+        BlockPos lv2 = ctx.getBlockPos();
+        FluidState lv3 = ctx.getWorld().getFluidState(ctx.getBlockPos());
         BlockPos lv4 = lv2.north();
         BlockPos lv5 = lv2.south();
         BlockPos lv6 = lv2.west();
@@ -52,43 +52,43 @@ extends HorizontalConnectingBlock {
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
-        if (arg.get(WATERLOGGED).booleanValue()) {
-            arg4.getFluidTickScheduler().schedule(arg5, Fluids.WATER, Fluids.WATER.getTickRate(arg4));
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
+        if (state.get(WATERLOGGED).booleanValue()) {
+            world.getFluidTickScheduler().schedule(pos, Fluids.WATER, Fluids.WATER.getTickRate(world));
         }
-        if (arg2.getAxis().isHorizontal()) {
-            return (BlockState)arg.with((Property)FACING_PROPERTIES.get(arg2), this.connectsTo(arg3, arg3.isSideSolidFullSquare(arg4, arg6, arg2.getOpposite())));
+        if (direction.getAxis().isHorizontal()) {
+            return (BlockState)state.with((Property)FACING_PROPERTIES.get(direction), this.connectsTo(newState, newState.isSideSolidFullSquare(world, posFrom, direction.getOpposite())));
         }
-        return super.getStateForNeighborUpdate(arg, arg2, arg3, arg4, arg5, arg6);
+        return super.getStateForNeighborUpdate(state, direction, newState, world, pos, posFrom);
     }
 
     @Override
-    public VoxelShape getVisualShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
+    public VoxelShape getVisualShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
         return VoxelShapes.empty();
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public boolean isSideInvisible(BlockState arg, BlockState arg2, Direction arg3) {
-        if (arg2.isOf(this)) {
-            if (!arg3.getAxis().isHorizontal()) {
+    public boolean isSideInvisible(BlockState state, BlockState stateFrom, Direction direction) {
+        if (stateFrom.isOf(this)) {
+            if (!direction.getAxis().isHorizontal()) {
                 return true;
             }
-            if (((Boolean)arg.get((Property)FACING_PROPERTIES.get(arg3))).booleanValue() && ((Boolean)arg2.get((Property)FACING_PROPERTIES.get(arg3.getOpposite()))).booleanValue()) {
+            if (((Boolean)state.get((Property)FACING_PROPERTIES.get(direction))).booleanValue() && ((Boolean)stateFrom.get((Property)FACING_PROPERTIES.get(direction.getOpposite()))).booleanValue()) {
                 return true;
             }
         }
-        return super.isSideInvisible(arg, arg2, arg3);
+        return super.isSideInvisible(state, stateFrom, direction);
     }
 
-    public final boolean connectsTo(BlockState arg, boolean bl) {
-        Block lv = arg.getBlock();
+    public final boolean connectsTo(BlockState state, boolean bl) {
+        Block lv = state.getBlock();
         return !PaneBlock.cannotConnect(lv) && bl || lv instanceof PaneBlock || lv.isIn(BlockTags.WALLS);
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(NORTH, EAST, WEST, SOUTH, WATERLOGGED);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(NORTH, EAST, WEST, SOUTH, WATERLOGGED);
     }
 }
 

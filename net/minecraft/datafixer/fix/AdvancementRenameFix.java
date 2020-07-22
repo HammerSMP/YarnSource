@@ -23,10 +23,10 @@ extends DataFix {
     private final String name;
     private final Function<String, String> renamer;
 
-    public AdvancementRenameFix(Schema schema, boolean bl, String string, Function<String, String> function) {
-        super(schema, bl);
-        this.name = string;
-        this.renamer = function;
+    public AdvancementRenameFix(Schema outputSchema, boolean changesType, String name, Function<String, String> renamer) {
+        super(outputSchema, changesType);
+        this.name = name;
+        this.renamer = renamer;
     }
 
     protected TypeRewriteRule makeRule() {

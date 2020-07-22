@@ -47,20 +47,20 @@ public class WeightedUnbakedModel
 implements UnbakedModel {
     private final List<ModelVariant> variants;
 
-    public WeightedUnbakedModel(List<ModelVariant> list) {
-        this.variants = list;
+    public WeightedUnbakedModel(List<ModelVariant> variants) {
+        this.variants = variants;
     }
 
     public List<ModelVariant> getVariants() {
         return this.variants;
     }
 
-    public boolean equals(Object object) {
-        if (this == object) {
+    public boolean equals(Object o) {
+        if (this == o) {
             return true;
         }
-        if (object instanceof WeightedUnbakedModel) {
-            WeightedUnbakedModel lv = (WeightedUnbakedModel)object;
+        if (o instanceof WeightedUnbakedModel) {
+            WeightedUnbakedModel lv = (WeightedUnbakedModel)o;
             return this.variants.equals(lv.variants);
         }
         return false;
@@ -76,19 +76,19 @@ implements UnbakedModel {
     }
 
     @Override
-    public Collection<SpriteIdentifier> getTextureDependencies(Function<Identifier, UnbakedModel> function, Set<Pair<String, String>> set) {
-        return this.getVariants().stream().map(ModelVariant::getLocation).distinct().flatMap(arg -> ((UnbakedModel)function.apply((Identifier)arg)).getTextureDependencies(function, set).stream()).collect(Collectors.toSet());
+    public Collection<SpriteIdentifier> getTextureDependencies(Function<Identifier, UnbakedModel> unbakedModelGetter, Set<Pair<String, String>> unresolvedTextureReferences) {
+        return this.getVariants().stream().map(ModelVariant::getLocation).distinct().flatMap(arg -> ((UnbakedModel)unbakedModelGetter.apply((Identifier)arg)).getTextureDependencies(unbakedModelGetter, unresolvedTextureReferences).stream()).collect(Collectors.toSet());
     }
 
     @Override
     @Nullable
-    public BakedModel bake(ModelLoader arg, Function<SpriteIdentifier, Sprite> function, ModelBakeSettings arg2, Identifier arg3) {
+    public BakedModel bake(ModelLoader loader, Function<SpriteIdentifier, Sprite> textureGetter, ModelBakeSettings rotationContainer, Identifier modelId) {
         if (this.getVariants().isEmpty()) {
             return null;
         }
         WeightedBakedModel.Builder lv = new WeightedBakedModel.Builder();
         for (ModelVariant lv2 : this.getVariants()) {
-            BakedModel lv3 = arg.bake(lv2.getLocation(), lv2);
+            BakedModel lv3 = loader.bake(lv2.getLocation(), lv2);
             lv.add(lv3, lv2.getWeight());
         }
         return lv.getFirst();
@@ -113,8 +113,8 @@ implements UnbakedModel {
             return new WeightedUnbakedModel(list);
         }
 
-        public /* synthetic */ Object deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
-            return this.deserialize(jsonElement, type, jsonDeserializationContext);
+        public /* synthetic */ Object deserialize(JsonElement functionJson, Type unused, JsonDeserializationContext context) throws JsonParseException {
+            return this.deserialize(functionJson, unused, context);
         }
     }
 }

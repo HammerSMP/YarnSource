@@ -11,6 +11,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.OverlayTexture;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.PlayerModelPart;
@@ -59,7 +60,7 @@ extends FeatureRenderer<T, M> {
         arg.translate(0.0, 0.0, 0.125);
         ((EntityModel)this.getContextModel()).copyStateTo(this.elytra);
         this.elytra.setAngles(arg3, f, g, j, k, l);
-        VertexConsumer lv7 = ItemRenderer.method_29711(arg2, this.elytra.getLayer(lv6), false, lv.hasGlint());
+        VertexConsumer lv7 = ItemRenderer.getArmorVertexConsumer(arg2, RenderLayer.getArmorCutoutNoCull(lv6), false, lv.hasGlint());
         this.elytra.render(arg, lv7, i, OverlayTexture.DEFAULT_UV, 1.0f, 1.0f, 1.0f, 1.0f);
         arg.pop();
     }

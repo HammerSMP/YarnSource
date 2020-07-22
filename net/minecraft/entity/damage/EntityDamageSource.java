@@ -22,9 +22,9 @@ extends DamageSource {
     protected final Entity source;
     private boolean thorns;
 
-    public EntityDamageSource(String string, @Nullable Entity arg) {
-        super(string);
-        this.source = arg;
+    public EntityDamageSource(String name, @Nullable Entity source) {
+        super(name);
+        this.source = source;
     }
 
     public EntityDamageSource setThorns() {
@@ -43,13 +43,13 @@ extends DamageSource {
     }
 
     @Override
-    public Text getDeathMessage(LivingEntity arg) {
+    public Text getDeathMessage(LivingEntity entity) {
         ItemStack lv = this.source instanceof LivingEntity ? ((LivingEntity)this.source).getMainHandStack() : ItemStack.EMPTY;
         String string = "death.attack." + this.name;
         if (!lv.isEmpty() && lv.hasCustomName()) {
-            return new TranslatableText(string + ".item", arg.getDisplayName(), this.source.getDisplayName(), lv.toHoverableText());
+            return new TranslatableText(string + ".item", entity.getDisplayName(), this.source.getDisplayName(), lv.toHoverableText());
         }
-        return new TranslatableText(string, arg.getDisplayName(), this.source.getDisplayName());
+        return new TranslatableText(string, entity.getDisplayName(), this.source.getDisplayName());
     }
 
     @Override

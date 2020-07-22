@@ -64,7 +64,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class GeneratorOptions {
-    public static final Codec<GeneratorOptions> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Codec.LONG.fieldOf("seed").stable().forGetter(GeneratorOptions::getSeed), (App)Codec.BOOL.fieldOf("generate_features").withDefault((Object)true).stable().forGetter(GeneratorOptions::shouldGenerateStructures), (App)Codec.BOOL.fieldOf("bonus_chest").withDefault((Object)false).stable().forGetter(GeneratorOptions::hasBonusChest), (App)SimpleRegistry.createCodec(Registry.DIMENSION_OPTIONS, Lifecycle.stable(), DimensionOptions.CODEC).xmap(DimensionOptions::method_29569, Function.identity()).fieldOf("dimensions").forGetter(GeneratorOptions::getDimensionMap), (App)Codec.STRING.optionalFieldOf("legacy_custom_options").stable().forGetter(arg -> arg.legacyCustomOptions)).apply((Applicative)instance, instance.stable((Object)((Function5)GeneratorOptions::new)))).comapFlatMap(GeneratorOptions::method_28610, Function.identity());
+    public static final Codec<GeneratorOptions> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Codec.LONG.fieldOf("seed").stable().forGetter(GeneratorOptions::getSeed), (App)Codec.BOOL.fieldOf("generate_features").orElse((Object)true).stable().forGetter(GeneratorOptions::shouldGenerateStructures), (App)Codec.BOOL.fieldOf("bonus_chest").orElse((Object)false).stable().forGetter(GeneratorOptions::hasBonusChest), (App)SimpleRegistry.createCodec(Registry.DIMENSION_OPTIONS, Lifecycle.stable(), DimensionOptions.CODEC).xmap(DimensionOptions::method_29569, Function.identity()).fieldOf("dimensions").forGetter(GeneratorOptions::getDimensionMap), (App)Codec.STRING.optionalFieldOf("legacy_custom_options").stable().forGetter(arg -> arg.legacyCustomOptions)).apply((Applicative)instance, instance.stable((Object)((Function5)GeneratorOptions::new)))).comapFlatMap(GeneratorOptions::method_28610, Function.identity());
     private static final Logger LOGGER = LogManager.getLogger();
     private static final int DEMO_SEED = "North Carolina".hashCode();
     public static final GeneratorOptions DEMO_CONFIG = new GeneratorOptions(DEMO_SEED, true, true, GeneratorOptions.method_28608(DimensionType.method_28517(DEMO_SEED), GeneratorOptions.createOverworldGenerator(DEMO_SEED)));
@@ -85,16 +85,16 @@ public class GeneratorOptions {
         return DimensionOptions.method_29567(this.seed, this.options);
     }
 
-    public GeneratorOptions(long l, boolean bl, boolean bl2, SimpleRegistry<DimensionOptions> arg) {
-        this(l, bl, bl2, arg, Optional.empty());
+    public GeneratorOptions(long seed, boolean generateStructures, boolean bonusChest, SimpleRegistry<DimensionOptions> arg) {
+        this(seed, generateStructures, bonusChest, arg, Optional.empty());
     }
 
-    private GeneratorOptions(long l, boolean bl, boolean bl2, SimpleRegistry<DimensionOptions> arg, Optional<String> optional) {
-        this.seed = l;
-        this.generateStructures = bl;
-        this.bonusChest = bl2;
+    private GeneratorOptions(long seed, boolean generateStructures, boolean bonusChest, SimpleRegistry<DimensionOptions> arg, Optional<String> legacyCustomOptions) {
+        this.seed = seed;
+        this.generateStructures = generateStructures;
+        this.bonusChest = bonusChest;
         this.options = arg;
-        this.legacyCustomOptions = optional;
+        this.legacyCustomOptions = legacyCustomOptions;
     }
 
     public static GeneratorOptions getDefaultOptions() {
@@ -102,8 +102,8 @@ public class GeneratorOptions {
         return new GeneratorOptions(l, true, false, GeneratorOptions.method_28608(DimensionType.method_28517(l), GeneratorOptions.createOverworldGenerator(l)));
     }
 
-    public static SurfaceChunkGenerator createOverworldGenerator(long l) {
-        return new SurfaceChunkGenerator(new VanillaLayeredBiomeSource(l, false, false), l, ChunkGeneratorType.Preset.OVERWORLD.getChunkGeneratorType());
+    public static SurfaceChunkGenerator createOverworldGenerator(long seed) {
+        return new SurfaceChunkGenerator(new VanillaLayeredBiomeSource(seed, false, false), seed, () -> ChunkGeneratorType.field_26355);
     }
 
     public long getSeed() {
@@ -220,23 +220,23 @@ public class GeneratorOptions {
                 return new GeneratorOptions(l, bl, false, GeneratorOptions.method_28608(lv, DebugChunkGenerator.INSTANCE));
             }
             case "amplified": {
-                return new GeneratorOptions(l, bl, false, GeneratorOptions.method_28608(lv, new SurfaceChunkGenerator(new VanillaLayeredBiomeSource(l, false, false), l, ChunkGeneratorType.Preset.AMPLIFIED.getChunkGeneratorType())));
+                return new GeneratorOptions(l, bl, false, GeneratorOptions.method_28608(lv, new SurfaceChunkGenerator(new VanillaLayeredBiomeSource(l, false, false), l, () -> ChunkGeneratorType.field_26356)));
             }
             case "largebiomes": {
-                return new GeneratorOptions(l, bl, false, GeneratorOptions.method_28608(lv, new SurfaceChunkGenerator(new VanillaLayeredBiomeSource(l, false, true), l, ChunkGeneratorType.Preset.OVERWORLD.getChunkGeneratorType())));
+                return new GeneratorOptions(l, bl, false, GeneratorOptions.method_28608(lv, new SurfaceChunkGenerator(new VanillaLayeredBiomeSource(l, false, true), l, () -> ChunkGeneratorType.field_26355)));
             }
         }
         return new GeneratorOptions(l, bl, false, GeneratorOptions.method_28608(lv, GeneratorOptions.createOverworldGenerator(l)));
     }
 
     @Environment(value=EnvType.CLIENT)
-    public GeneratorOptions withHardcore(boolean bl, OptionalLong optionalLong) {
+    public GeneratorOptions withHardcore(boolean hardcore, OptionalLong seed) {
         GeneratorOptions lv5;
         SimpleRegistry<DimensionOptions> lv3;
-        long l = optionalLong.orElse(this.seed);
-        if (optionalLong.isPresent()) {
+        long l = seed.orElse(this.seed);
+        if (seed.isPresent()) {
             SimpleRegistry<DimensionOptions> lv = new SimpleRegistry<DimensionOptions>(Registry.DIMENSION_OPTIONS, Lifecycle.experimental());
-            long m = optionalLong.getAsLong();
+            long m = seed.getAsLong();
             for (Map.Entry<RegistryKey<DimensionOptions>, DimensionOptions> entry : this.options.getEntries()) {
                 RegistryKey<DimensionOptions> lv2 = entry.getKey();
                 lv.add(lv2, new DimensionOptions(entry.getValue().getDimensionTypeSupplier(), entry.getValue().getChunkGenerator().withSeed(m)));
@@ -249,7 +249,7 @@ public class GeneratorOptions {
         if (this.isDebugWorld()) {
             GeneratorOptions lv4 = new GeneratorOptions(l, false, false, lv3);
         } else {
-            lv5 = new GeneratorOptions(l, this.shouldGenerateStructures(), this.hasBonusChest() && !bl, lv3);
+            lv5 = new GeneratorOptions(l, this.shouldGenerateStructures(), this.hasBonusChest() && !hardcore, lv3);
         }
         return lv5;
     }

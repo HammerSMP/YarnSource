@@ -15,8 +15,8 @@ public class BooleanProperty
 extends Property<Boolean> {
     private final ImmutableSet<Boolean> values = ImmutableSet.of((Object)true, (Object)false);
 
-    protected BooleanProperty(String string) {
-        super(string, Boolean.class);
+    protected BooleanProperty(String name) {
+        super(name, Boolean.class);
     }
 
     @Override
@@ -24,14 +24,14 @@ extends Property<Boolean> {
         return this.values;
     }
 
-    public static BooleanProperty of(String string) {
-        return new BooleanProperty(string);
+    public static BooleanProperty of(String name) {
+        return new BooleanProperty(name);
     }
 
     @Override
-    public Optional<Boolean> parse(String string) {
-        if ("true".equals(string) || "false".equals(string)) {
-            return Optional.of(Boolean.valueOf(string));
+    public Optional<Boolean> parse(String name) {
+        if ("true".equals(name) || "false".equals(name)) {
+            return Optional.of(Boolean.valueOf(name));
         }
         return Optional.empty();
     }

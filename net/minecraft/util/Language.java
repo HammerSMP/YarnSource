@@ -57,13 +57,13 @@ public abstract class Language {
             }
 
             @Override
-            public String get(String string) {
-                return this.field_25308.getOrDefault(string, string);
+            public String get(String key) {
+                return this.field_25308.getOrDefault(key, key);
             }
 
             @Override
-            public boolean hasTranslation(String string) {
-                return this.field_25308.containsKey(string);
+            public boolean hasTranslation(String key) {
+                return this.field_25308.containsKey(key);
             }
 
             @Override
@@ -73,17 +73,17 @@ public abstract class Language {
             }
 
             @Override
-            public String reorder(String string, boolean bl) {
+            public String reorder(String string, boolean allowTokens) {
                 return string;
             }
         };
     }
 
-    public static void load(InputStream inputStream, BiConsumer<String, String> biConsumer) {
+    public static void load(InputStream inputStream, BiConsumer<String, String> entryConsumer) {
         JsonObject jsonObject = (JsonObject)GSON.fromJson((Reader)new InputStreamReader(inputStream, StandardCharsets.UTF_8), JsonObject.class);
         for (Map.Entry entry : jsonObject.entrySet()) {
             String string = TOKEN_PATTERN.matcher(JsonHelper.asString((JsonElement)entry.getValue(), (String)entry.getKey())).replaceAll("%$1s");
-            biConsumer.accept((String)entry.getKey(), string);
+            entryConsumer.accept((String)entry.getKey(), string);
         }
     }
 
@@ -92,8 +92,8 @@ public abstract class Language {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public static void setInstance(Language arg) {
-        instance = arg;
+    public static void setInstance(Language language) {
+        instance = language;
     }
 
     public abstract String get(String var1);

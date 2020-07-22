@@ -28,31 +28,31 @@ extends DispenserBlock {
     }
 
     @Override
-    protected DispenserBehavior getBehaviorForItem(ItemStack arg) {
+    protected DispenserBehavior getBehaviorForItem(ItemStack stack) {
         return BEHAVIOR;
     }
 
     @Override
-    public BlockEntity createBlockEntity(BlockView arg) {
+    public BlockEntity createBlockEntity(BlockView world) {
         return new DropperBlockEntity();
     }
 
     @Override
-    protected void dispense(ServerWorld arg, BlockPos arg2) {
+    protected void dispense(ServerWorld arg, BlockPos pos) {
         ItemStack lv7;
-        BlockPointerImpl lv = new BlockPointerImpl(arg, arg2);
+        BlockPointerImpl lv = new BlockPointerImpl(arg, pos);
         DispenserBlockEntity lv2 = (DispenserBlockEntity)lv.getBlockEntity();
         int i = lv2.chooseNonEmptySlot();
         if (i < 0) {
-            arg.syncWorldEvent(1001, arg2, 0);
+            arg.syncWorldEvent(1001, pos, 0);
             return;
         }
         ItemStack lv3 = lv2.getStack(i);
         if (lv3.isEmpty()) {
             return;
         }
-        Direction lv4 = arg.getBlockState(arg2).get(FACING);
-        Inventory lv5 = HopperBlockEntity.getInventoryAt(arg, arg2.offset(lv4));
+        Direction lv4 = arg.getBlockState(pos).get(FACING);
+        Inventory lv5 = HopperBlockEntity.getInventoryAt(arg, pos.offset(lv4));
         if (lv5 == null) {
             ItemStack lv6 = BEHAVIOR.dispense(lv, lv3);
         } else {

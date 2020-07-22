@@ -24,24 +24,24 @@ implements Packet<ClientPlayPacketListener> {
     public BlockBreakingProgressS2CPacket() {
     }
 
-    public BlockBreakingProgressS2CPacket(int i, BlockPos arg, int j) {
-        this.entityId = i;
-        this.pos = arg;
-        this.progress = j;
+    public BlockBreakingProgressS2CPacket(int entityId, BlockPos pos, int progress) {
+        this.entityId = entityId;
+        this.pos = pos;
+        this.progress = progress;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.entityId = arg.readVarInt();
-        this.pos = arg.readBlockPos();
-        this.progress = arg.readUnsignedByte();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.entityId = buf.readVarInt();
+        this.pos = buf.readBlockPos();
+        this.progress = buf.readUnsignedByte();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeVarInt(this.entityId);
-        arg.writeBlockPos(this.pos);
-        arg.writeByte(this.progress);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeVarInt(this.entityId);
+        buf.writeBlockPos(this.pos);
+        buf.writeByte(this.progress);
     }
 
     @Override

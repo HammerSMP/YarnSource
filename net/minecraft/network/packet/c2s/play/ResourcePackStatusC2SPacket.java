@@ -15,18 +15,18 @@ implements Packet<ServerPlayPacketListener> {
     public ResourcePackStatusC2SPacket() {
     }
 
-    public ResourcePackStatusC2SPacket(Status arg) {
-        this.status = arg;
+    public ResourcePackStatusC2SPacket(Status status) {
+        this.status = status;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.status = arg.readEnumConstant(Status.class);
+    public void read(PacketByteBuf buf) throws IOException {
+        this.status = buf.readEnumConstant(Status.class);
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeEnumConstant(this.status);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeEnumConstant(this.status);
     }
 
     @Override

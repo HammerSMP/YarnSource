@@ -40,6 +40,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.CopyOption;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
@@ -63,6 +64,7 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinWorkerThread;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.LongSupplier;
 import java.util.function.Supplier;
@@ -75,6 +77,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.Bootstrap;
 import net.minecraft.SharedConstants;
+import net.minecraft.client.util.CharPredicate;
 import net.minecraft.datafixer.Schemas;
 import net.minecraft.state.property.Property;
 import net.minecraft.util.Identifier;
@@ -87,9 +90,9 @@ import org.apache.logging.log4j.Logger;
 
 public class Util {
     private static final AtomicInteger NEXT_SERVER_WORKER_ID = new AtomicInteger(1);
-    private static final ExecutorService BOOTSTRAP = Util.method_28122("Bootstrap");
-    private static final ExecutorService SERVER_WORKER_EXECUTOR = Util.method_28122("Main");
-    private static final ExecutorService field_24477 = Util.method_27959();
+    private static final ExecutorService BOOTSTRAP_EXECUTOR = Util.createWorker("Bootstrap");
+    private static final ExecutorService SERVER_WORKER_EXECUTOR = Util.createWorker("Main");
+    private static final ExecutorService IO_WORKER_EXECUTOR = Util.createIoWorker();
     public static LongSupplier nanoTimeSupplier = System::nanoTime;
     public static final UUID NIL_UUID = new UUID(0L, 0L);
     private static final Logger LOGGER = LogManager.getLogger();
@@ -102,11 +105,11 @@ public class Util {
         return arg.name((Comparable)object);
     }
 
-    public static String createTranslationKey(String string, @Nullable Identifier arg) {
-        if (arg == null) {
-            return string + ".unregistered_sadface";
+    public static String createTranslationKey(String type, @Nullable Identifier id) {
+        if (id == null) {
+            return type + ".unregistered_sadface";
         }
-        return string + '.' + arg.getNamespace() + '.' + arg.getPath().replace('/', '.');
+        return type + '.' + id.getNamespace() + '.' + id.getPath().replace('/', '.');
     }
 
     public static long getMeasuringTimeMs() {
@@ -121,7 +124,7 @@ public class Util {
         return Instant.now().toEpochMilli();
     }
 
-    private static ExecutorService method_28122(String string) {
+    private static ExecutorService createWorker(String string) {
         ForkJoinPool executorService2;
         int i = MathHelper.clamp(Runtime.getRuntime().availableProcessors() - 1, 1, 7);
         if (i <= 0) {
@@ -147,38 +150,38 @@ public class Util {
         return executorService2;
     }
 
-    public static Executor method_28124() {
-        return BOOTSTRAP;
+    public static Executor getBootstrapExecutor() {
+        return BOOTSTRAP_EXECUTOR;
     }
 
     public static Executor getServerWorkerExecutor() {
         return SERVER_WORKER_EXECUTOR;
     }
 
-    public static Executor method_27958() {
-        return field_24477;
+    public static Executor getIoWorkerExecutor() {
+        return IO_WORKER_EXECUTOR;
     }
 
     public static void shutdownServerWorkerExecutor() {
-        Util.method_27957(SERVER_WORKER_EXECUTOR);
-        Util.method_27957(field_24477);
+        Util.attemptShutdown(SERVER_WORKER_EXECUTOR);
+        Util.attemptShutdown(IO_WORKER_EXECUTOR);
     }
 
-    private static void method_27957(ExecutorService executorService) {
+    private static void attemptShutdown(ExecutorService service) {
         boolean bl2;
-        executorService.shutdown();
+        service.shutdown();
         try {
-            boolean bl = executorService.awaitTermination(3L, TimeUnit.SECONDS);
+            boolean bl = service.awaitTermination(3L, TimeUnit.SECONDS);
         }
         catch (InterruptedException interruptedException) {
             bl2 = false;
         }
         if (!bl2) {
-            executorService.shutdownNow();
+            service.shutdownNow();
         }
     }
 
-    private static ExecutorService method_27959() {
+    private static ExecutorService createIoWorker() {
         return Executors.newCachedThreadPool(runnable -> {
             Thread thread = new Thread(runnable);
             thread.setName("IO-Worker-" + NEXT_SERVER_WORKER_ID.getAndIncrement());
@@ -300,12 +303,12 @@ public class Util {
         return object2;
     }
 
-    public static <T> T make(Supplier<T> supplier) {
-        return supplier.get();
+    public static <T> T make(Supplier<T> factory) {
+        return factory.get();
     }
 
-    public static <T> T make(T object, Consumer<T> consumer) {
-        consumer.accept(object);
+    public static <T> T make(T object, Consumer<T> initializer) {
+        initializer.accept(object);
         return object;
     }
 
@@ -313,11 +316,11 @@ public class Util {
         return IdentityHashStrategy.INSTANCE;
     }
 
-    public static <V> CompletableFuture<List<V>> combine(List<? extends CompletableFuture<? extends V>> list) {
-        ArrayList list2 = Lists.newArrayListWithCapacity((int)list.size());
-        CompletableFuture[] completableFutures = new CompletableFuture[list.size()];
+    public static <V> CompletableFuture<List<V>> combine(List<? extends CompletableFuture<? extends V>> futures) {
+        ArrayList list2 = Lists.newArrayListWithCapacity((int)futures.size());
+        CompletableFuture[] completableFutures = new CompletableFuture[futures.size()];
         CompletableFuture completableFuture = new CompletableFuture();
-        list.forEach(completableFuture2 -> {
+        futures.forEach(completableFuture2 -> {
             int i = list2.size();
             list2.add(null);
             completableFutures[i] = completableFuture2.whenComplete((object, throwable) -> {
@@ -344,13 +347,13 @@ public class Util {
         return optional;
     }
 
-    public static Runnable debugRunnable(Runnable runnable, Supplier<String> supplier) {
+    public static Runnable debugRunnable(Runnable runnable, Supplier<String> messageSupplier) {
         return runnable;
     }
 
-    public static <T extends Throwable> T throwOrPause(T throwable) {
+    public static <T extends Throwable> T throwOrPause(T t) {
         if (SharedConstants.isDevelopment) {
-            LOGGER.error("Trying to throw a fatal exception, pausing in IDE", throwable);
+            LOGGER.error("Trying to throw a fatal exception, pausing in IDE", t);
             try {
                 do {
                     Thread.sleep(1000L);
@@ -358,78 +361,173 @@ public class Util {
                 } while (true);
             }
             catch (InterruptedException interruptedException) {
-                return throwable;
+                return t;
             }
         }
-        return throwable;
+        return t;
     }
 
-    public static String getInnermostMessage(Throwable throwable) {
-        if (throwable.getCause() != null) {
-            return Util.getInnermostMessage(throwable.getCause());
+    public static String getInnermostMessage(Throwable t) {
+        if (t.getCause() != null) {
+            return Util.getInnermostMessage(t.getCause());
         }
-        if (throwable.getMessage() != null) {
-            return throwable.getMessage();
+        if (t.getMessage() != null) {
+            return t.getMessage();
         }
-        return throwable.toString();
+        return t.toString();
     }
 
-    public static <T> T getRandom(T[] objects, Random random) {
-        return objects[random.nextInt(objects.length)];
+    public static <T> T getRandom(T[] array, Random random) {
+        return array[random.nextInt(array.length)];
     }
 
-    public static int getRandom(int[] is, Random random) {
-        return is[random.nextInt(is.length)];
+    public static int getRandom(int[] array, Random random) {
+        return array[random.nextInt(array.length)];
     }
 
-    public static void method_27760(File file, File file2, File file3) {
-        if (file3.exists()) {
-            file3.delete();
+    private static BooleanSupplier renameTask(final Path src, final Path dest) {
+        return new BooleanSupplier(){
+
+            @Override
+            public boolean getAsBoolean() {
+                try {
+                    Files.move(src, dest, new CopyOption[0]);
+                    return true;
+                }
+                catch (IOException iOException) {
+                    LOGGER.error("Failed to rename", (Throwable)iOException);
+                    return false;
+                }
+            }
+
+            public String toString() {
+                return "rename " + src + " to " + dest;
+            }
+        };
+    }
+
+    private static BooleanSupplier deleteTask(final Path path) {
+        return new BooleanSupplier(){
+
+            @Override
+            public boolean getAsBoolean() {
+                try {
+                    Files.deleteIfExists(path);
+                    return true;
+                }
+                catch (IOException iOException) {
+                    LOGGER.warn("Failed to delete", (Throwable)iOException);
+                    return false;
+                }
+            }
+
+            public String toString() {
+                return "delete old " + path;
+            }
+        };
+    }
+
+    private static BooleanSupplier deletionVerifyTask(final Path path) {
+        return new BooleanSupplier(){
+
+            @Override
+            public boolean getAsBoolean() {
+                return !Files.exists(path, new LinkOption[0]);
+            }
+
+            public String toString() {
+                return "verify that " + path + " is deleted";
+            }
+        };
+    }
+
+    private static BooleanSupplier existenceCheckTask(final Path path) {
+        return new BooleanSupplier(){
+
+            @Override
+            public boolean getAsBoolean() {
+                return Files.isRegularFile(path, new LinkOption[0]);
+            }
+
+            public String toString() {
+                return "verify that " + path + " is present";
+            }
+        };
+    }
+
+    private static boolean attemptTasks(BooleanSupplier ... booleanSuppliers) {
+        for (BooleanSupplier booleanSupplier : booleanSuppliers) {
+            if (booleanSupplier.getAsBoolean()) continue;
+            LOGGER.warn("Failed to execute {}", (Object)booleanSupplier);
+            return false;
         }
-        file.renameTo(file3);
-        if (file.exists()) {
-            file.delete();
+        return true;
+    }
+
+    private static boolean attemptTasks(int retries, String taskName, BooleanSupplier ... tasks) {
+        for (int j = 0; j < retries; ++j) {
+            if (Util.attemptTasks(tasks)) {
+                return true;
+            }
+            LOGGER.error("Failed to {}, retrying {}/{}", (Object)taskName, (Object)j, (Object)retries);
         }
-        file2.renameTo(file);
-        if (file2.exists()) {
-            file2.delete();
+        LOGGER.error("Failed to {}, aborting, progress might be lost", (Object)taskName);
+        return false;
+    }
+
+    public static void backupAndReplace(File current, File newFile, File backup) {
+        Util.backupAndReplace(current.toPath(), newFile.toPath(), backup.toPath());
+    }
+
+    public static void backupAndReplace(Path current, Path newPath, Path backup) {
+        int i = 10;
+        if (Files.exists(current, new LinkOption[0])) {
+            if (!Util.attemptTasks(10, "create backup " + backup, Util.deleteTask(backup), Util.renameTask(current, backup), Util.existenceCheckTask(backup))) {
+                return;
+            }
+        }
+        if (!Util.attemptTasks(10, "remove old " + current, Util.deleteTask(current), Util.deletionVerifyTask(current))) {
+            return;
+        }
+        if (!Util.attemptTasks(10, "replace " + current + " with " + newPath, Util.renameTask(newPath, current), Util.existenceCheckTask(current))) {
+            Util.attemptTasks(10, "restore " + current + " from " + backup, Util.renameTask(backup, current), Util.existenceCheckTask(current));
         }
     }
 
     @Environment(value=EnvType.CLIENT)
-    public static int moveCursor(String string, int i, int j) {
+    public static int moveCursor(String string, int cursor, int delta) {
         int k = string.length();
-        if (j >= 0) {
-            for (int l = 0; i < k && l < j; ++l) {
-                if (!Character.isHighSurrogate(string.charAt(i++)) || i >= k || !Character.isLowSurrogate(string.charAt(i))) continue;
-                ++i;
+        if (delta >= 0) {
+            for (int l = 0; cursor < k && l < delta; ++l) {
+                if (!Character.isHighSurrogate(string.charAt(cursor++)) || cursor >= k || !Character.isLowSurrogate(string.charAt(cursor))) continue;
+                ++cursor;
             }
         } else {
-            for (int m = j; i > 0 && m < 0; ++m) {
-                if (!Character.isLowSurrogate(string.charAt(--i)) || i <= 0 || !Character.isHighSurrogate(string.charAt(i - 1))) continue;
-                --i;
+            for (int m = delta; cursor > 0 && m < 0; ++m) {
+                if (!Character.isLowSurrogate(string.charAt(--cursor)) || cursor <= 0 || !Character.isHighSurrogate(string.charAt(cursor - 1))) continue;
+                --cursor;
             }
         }
-        return i;
+        return cursor;
     }
 
     public static Consumer<String> method_29188(String string, Consumer<String> consumer) {
         return string2 -> consumer.accept(string + string2);
     }
 
-    public static DataResult<int[]> toIntArray(IntStream intStream, int i) {
-        int[] is = intStream.limit(i + 1).toArray();
-        if (is.length != i) {
-            String string = "Input is not a list of " + i + " ints";
-            if (is.length >= i) {
-                return DataResult.error((String)string, (Object)Arrays.copyOf(is, i));
+    public static DataResult<int[]> toIntArray(IntStream intStream, int length) {
+        int[] is = intStream.limit(length + 1).toArray();
+        if (is.length != length) {
+            String string = "Input is not a list of " + length + " ints";
+            if (is.length >= length) {
+                return DataResult.error((String)string, (Object)Arrays.copyOf(is, length));
             }
             return DataResult.error((String)string);
         }
         return DataResult.success((Object)is);
     }
 
-    public static void method_29476() {
+    public static void startTimerHack() {
         Thread thread = new Thread("Timer hack thread"){
 
             @Override
@@ -451,15 +549,15 @@ public class Util {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public static void method_29775(Path path, Path path2, Path path3) throws IOException {
-        Path path4 = path.relativize(path3);
-        Path path5 = path2.resolve(path4);
-        Files.copy(path3, path5, new CopyOption[0]);
+    public static void relativeCopy(Path src, Path dest, Path toCopy) throws IOException {
+        Path path4 = src.relativize(toCopy);
+        Path path5 = dest.resolve(path4);
+        Files.copy(toCopy, path5, new CopyOption[0]);
     }
 
     @Environment(value=EnvType.CLIENT)
-    public static String method_30309(String string) {
-        return string.toLowerCase(Locale.ROOT).chars().mapToObj(i -> Identifier.isCharValid((char)i) ? Character.toString((char)i) : "_").collect(Collectors.joining());
+    public static String replaceInvalidChars(String string, CharPredicate predicate) {
+        return string.toLowerCase(Locale.ROOT).chars().mapToObj(i -> predicate.test((char)i) ? Character.toString((char)i) : "_").collect(Collectors.joining());
     }
 
     static enum IdentityHashStrategy implements Hash.Strategy<Object>
@@ -483,8 +581,8 @@ public class Util {
 
             @Override
             @Environment(value=EnvType.CLIENT)
-            protected String[] getURLOpenCommand(URL uRL) {
-                return new String[]{"rundll32", "url.dll,FileProtocolHandler", uRL.toString()};
+            protected String[] getURLOpenCommand(URL url) {
+                return new String[]{"rundll32", "url.dll,FileProtocolHandler", url.toString()};
             }
         }
         ,
@@ -492,8 +590,8 @@ public class Util {
 
             @Override
             @Environment(value=EnvType.CLIENT)
-            protected String[] getURLOpenCommand(URL uRL) {
-                return new String[]{"open", uRL.toString()};
+            protected String[] getURLOpenCommand(URL url) {
+                return new String[]{"open", url.toString()};
             }
         }
         ,
@@ -501,9 +599,9 @@ public class Util {
 
 
         @Environment(value=EnvType.CLIENT)
-        public void open(URL uRL) {
+        public void open(URL url) {
             try {
-                Process process = AccessController.doPrivileged(() -> Runtime.getRuntime().exec(this.getURLOpenCommand(uRL)));
+                Process process = AccessController.doPrivileged(() -> Runtime.getRuntime().exec(this.getURLOpenCommand(url)));
                 for (String string : IOUtils.readLines((InputStream)process.getErrorStream())) {
                     LOGGER.error(string);
                 }
@@ -512,7 +610,7 @@ public class Util {
                 process.getOutputStream().close();
             }
             catch (IOException | PrivilegedActionException exception) {
-                LOGGER.error("Couldn't open url '{}'", (Object)uRL, (Object)exception);
+                LOGGER.error("Couldn't open url '{}'", (Object)url, (Object)exception);
             }
         }
 
@@ -537,9 +635,9 @@ public class Util {
         }
 
         @Environment(value=EnvType.CLIENT)
-        protected String[] getURLOpenCommand(URL uRL) {
-            String string = uRL.toString();
-            if ("file".equals(uRL.getProtocol())) {
+        protected String[] getURLOpenCommand(URL url) {
+            String string = url.toString();
+            if ("file".equals(url.getProtocol())) {
                 string = string.replace("file:", "file://");
             }
             return new String[]{"xdg-open", string};

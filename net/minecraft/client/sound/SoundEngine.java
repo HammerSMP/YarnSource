@@ -153,12 +153,12 @@ public class SoundEngine {
     }
 
     @Nullable
-    public Source createSource(RunMode arg) {
-        return (arg == RunMode.STREAMING ? this.staticSources : this.streamingSources).createSource();
+    public Source createSource(RunMode mode) {
+        return (mode == RunMode.STREAMING ? this.staticSources : this.streamingSources).createSource();
     }
 
-    public void release(Source arg) {
-        if (!this.streamingSources.release(arg) && !this.staticSources.release(arg)) {
+    public void release(Source source) {
+        if (!this.streamingSources.release(source) && !this.staticSources.release(source)) {
             throw new IllegalStateException("Tried to release unknown channel");
         }
     }
@@ -173,8 +173,8 @@ public class SoundEngine {
         private final int maxSourceCount;
         private final Set<Source> sources = Sets.newIdentityHashSet();
 
-        public SourceSetImpl(int i) {
-            this.maxSourceCount = i;
+        public SourceSetImpl(int maxSourceCount) {
+            this.maxSourceCount = maxSourceCount;
         }
 
         @Override

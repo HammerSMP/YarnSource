@@ -31,8 +31,8 @@ import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Pair;
-import net.minecraft.command.arguments.FunctionArgumentType;
-import net.minecraft.command.arguments.TimeArgumentType;
+import net.minecraft.command.argument.FunctionArgumentType;
+import net.minecraft.command.argument.TimeArgumentType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.CommandSource;
@@ -51,31 +51,31 @@ public class ScheduleCommand {
     private static final DynamicCommandExceptionType CLEARED_FAILURE_EXCEPTION = new DynamicCommandExceptionType(object -> new TranslatableText("commands.schedule.cleared.failure", object));
     private static final SuggestionProvider<ServerCommandSource> SUGGESTION_PROVIDER = (commandContext, suggestionsBuilder) -> CommandSource.suggestMatching(((ServerCommandSource)commandContext.getSource()).getMinecraftServer().getSaveProperties().getMainWorldProperties().getScheduledEvents().method_22592(), suggestionsBuilder);
 
-    public static void register(CommandDispatcher<ServerCommandSource> commandDispatcher) {
-        commandDispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)CommandManager.literal("schedule").requires(arg -> arg.hasPermissionLevel(2))).then(CommandManager.literal("function").then(CommandManager.argument("function", FunctionArgumentType.function()).suggests(FunctionCommand.SUGGESTION_PROVIDER).then(((RequiredArgumentBuilder)((RequiredArgumentBuilder)CommandManager.argument("time", TimeArgumentType.time()).executes(commandContext -> ScheduleCommand.execute((ServerCommandSource)commandContext.getSource(), FunctionArgumentType.getFunctionOrTag((CommandContext<ServerCommandSource>)commandContext, "function"), IntegerArgumentType.getInteger((CommandContext)commandContext, (String)"time"), true))).then(CommandManager.literal("append").executes(commandContext -> ScheduleCommand.execute((ServerCommandSource)commandContext.getSource(), FunctionArgumentType.getFunctionOrTag((CommandContext<ServerCommandSource>)commandContext, "function"), IntegerArgumentType.getInteger((CommandContext)commandContext, (String)"time"), false)))).then(CommandManager.literal("replace").executes(commandContext -> ScheduleCommand.execute((ServerCommandSource)commandContext.getSource(), FunctionArgumentType.getFunctionOrTag((CommandContext<ServerCommandSource>)commandContext, "function"), IntegerArgumentType.getInteger((CommandContext)commandContext, (String)"time"), true))))))).then(CommandManager.literal("clear").then(CommandManager.argument("function", StringArgumentType.greedyString()).suggests(SUGGESTION_PROVIDER).executes(commandContext -> ScheduleCommand.method_22833((ServerCommandSource)commandContext.getSource(), StringArgumentType.getString((CommandContext)commandContext, (String)"function"))))));
+    public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
+        dispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)CommandManager.literal("schedule").requires(arg -> arg.hasPermissionLevel(2))).then(CommandManager.literal("function").then(CommandManager.argument("function", FunctionArgumentType.function()).suggests(FunctionCommand.SUGGESTION_PROVIDER).then(((RequiredArgumentBuilder)((RequiredArgumentBuilder)CommandManager.argument("time", TimeArgumentType.time()).executes(commandContext -> ScheduleCommand.execute((ServerCommandSource)commandContext.getSource(), FunctionArgumentType.getFunctionOrTag((CommandContext<ServerCommandSource>)commandContext, "function"), IntegerArgumentType.getInteger((CommandContext)commandContext, (String)"time"), true))).then(CommandManager.literal("append").executes(commandContext -> ScheduleCommand.execute((ServerCommandSource)commandContext.getSource(), FunctionArgumentType.getFunctionOrTag((CommandContext<ServerCommandSource>)commandContext, "function"), IntegerArgumentType.getInteger((CommandContext)commandContext, (String)"time"), false)))).then(CommandManager.literal("replace").executes(commandContext -> ScheduleCommand.execute((ServerCommandSource)commandContext.getSource(), FunctionArgumentType.getFunctionOrTag((CommandContext<ServerCommandSource>)commandContext, "function"), IntegerArgumentType.getInteger((CommandContext)commandContext, (String)"time"), true))))))).then(CommandManager.literal("clear").then(CommandManager.argument("function", StringArgumentType.greedyString()).suggests(SUGGESTION_PROVIDER).executes(commandContext -> ScheduleCommand.method_22833((ServerCommandSource)commandContext.getSource(), StringArgumentType.getString((CommandContext)commandContext, (String)"function"))))));
     }
 
-    private static int execute(ServerCommandSource arg, Pair<Identifier, Either<CommandFunction, Tag<CommandFunction>>> pair, int i, boolean bl) throws CommandSyntaxException {
+    private static int execute(ServerCommandSource source, Pair<Identifier, Either<CommandFunction, Tag<CommandFunction>>> pair, int i, boolean bl) throws CommandSyntaxException {
         if (i == 0) {
             throw SAME_TICK_EXCEPTION.create();
         }
-        long l = arg.getWorld().getTime() + (long)i;
+        long l = source.getWorld().getTime() + (long)i;
         Identifier lv = (Identifier)pair.getFirst();
-        Timer<MinecraftServer> lv2 = arg.getMinecraftServer().getSaveProperties().getMainWorldProperties().getScheduledEvents();
+        Timer<MinecraftServer> lv2 = source.getMinecraftServer().getSaveProperties().getMainWorldProperties().getScheduledEvents();
         ((Either)pair.getSecond()).ifLeft(arg4 -> {
             String string = lv.toString();
             if (bl) {
                 lv2.method_22593(string);
             }
             lv2.setEvent(string, l, new FunctionTimerCallback(lv));
-            arg.sendFeedback(new TranslatableText("commands.schedule.created.function", lv, i, l), true);
+            source.sendFeedback(new TranslatableText("commands.schedule.created.function", lv, i, l), true);
         }).ifRight(arg4 -> {
             String string = "#" + lv.toString();
             if (bl) {
                 lv2.method_22593(string);
             }
             lv2.setEvent(string, l, new FunctionTagTimerCallback(lv));
-            arg.sendFeedback(new TranslatableText("commands.schedule.created.tag", lv, i, l), true);
+            source.sendFeedback(new TranslatableText("commands.schedule.created.tag", lv, i, l), true);
         });
         return (int)Math.floorMod(l, Integer.MAX_VALUE);
     }

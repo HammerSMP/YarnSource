@@ -32,12 +32,12 @@ public class SoundLoader {
     private final ResourceManager resourceManager;
     private final Map<Identifier, CompletableFuture<StaticSound>> loadedSounds = Maps.newHashMap();
 
-    public SoundLoader(ResourceManager arg) {
-        this.resourceManager = arg;
+    public SoundLoader(ResourceManager resourceManager) {
+        this.resourceManager = resourceManager;
     }
 
-    public CompletableFuture<StaticSound> loadStatic(Identifier arg2) {
-        return this.loadedSounds.computeIfAbsent(arg2, arg -> CompletableFuture.supplyAsync(() -> {
+    public CompletableFuture<StaticSound> loadStatic(Identifier id) {
+        return this.loadedSounds.computeIfAbsent(id, arg -> CompletableFuture.supplyAsync(() -> {
             /*
              * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
              * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [2[TRYBLOCK]], but top level block is 9[TRYBLOCK]
@@ -75,12 +75,12 @@ public class SoundLoader {
         }, Util.getServerWorkerExecutor()));
     }
 
-    public CompletableFuture<AudioStream> loadStreamed(Identifier arg, boolean bl) {
+    public CompletableFuture<AudioStream> loadStreamed(Identifier id, boolean repeatInstantly) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                Resource lv = this.resourceManager.getResource(arg);
+                Resource lv = this.resourceManager.getResource(id);
                 InputStream inputStream = lv.getInputStream();
-                return bl ? new RepeatingAudioStream(OggAudioStream::new, inputStream) : new OggAudioStream(inputStream);
+                return repeatInstantly ? new RepeatingAudioStream(OggAudioStream::new, inputStream) : new OggAudioStream(inputStream);
             }
             catch (IOException iOException) {
                 throw new CompletionException(iOException);
@@ -93,8 +93,8 @@ public class SoundLoader {
         this.loadedSounds.clear();
     }
 
-    public CompletableFuture<?> loadStatic(Collection<Sound> collection) {
-        return CompletableFuture.allOf((CompletableFuture[])collection.stream().map(arg -> this.loadStatic(arg.getLocation())).toArray(CompletableFuture[]::new));
+    public CompletableFuture<?> loadStatic(Collection<Sound> sounds) {
+        return CompletableFuture.allOf((CompletableFuture[])sounds.stream().map(arg -> this.loadStatic(arg.getLocation())).toArray(CompletableFuture[]::new));
     }
 }
 

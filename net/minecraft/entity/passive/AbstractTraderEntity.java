@@ -63,20 +63,19 @@ Trader {
     }
 
     @Override
-    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
-        if (arg4 == null) {
-            arg4 = new PassiveEntity.PassiveData();
-            ((PassiveEntity.PassiveData)arg4).setBabyAllowed(false);
+    public EntityData initialize(class_5425 arg, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable CompoundTag entityTag) {
+        if (entityData == null) {
+            entityData = new PassiveEntity.PassiveData(false);
         }
-        return super.initialize(arg, arg2, arg3, arg4, arg5);
+        return super.initialize(arg, difficulty, spawnReason, entityData, entityTag);
     }
 
     public int getHeadRollingTimeLeft() {
         return this.dataTracker.get(HEAD_ROLLING_TIME_LEFT);
     }
 
-    public void setHeadRollingTimeLeft(int i) {
-        this.dataTracker.set(HEAD_ROLLING_TIME_LEFT, i);
+    public void setHeadRollingTimeLeft(int ticks) {
+        this.dataTracker.set(HEAD_ROLLING_TIME_LEFT, ticks);
     }
 
     @Override
@@ -85,7 +84,7 @@ Trader {
     }
 
     @Override
-    protected float getActiveEyeHeight(EntityPose arg, EntityDimensions arg2) {
+    protected float getActiveEyeHeight(EntityPose pose, EntityDimensions dimensions) {
         if (this.isBaby()) {
             return 0.81f;
         }
@@ -99,8 +98,8 @@ Trader {
     }
 
     @Override
-    public void setCurrentCustomer(@Nullable PlayerEntity arg) {
-        this.customer = arg;
+    public void setCurrentCustomer(@Nullable PlayerEntity customer) {
+        this.customer = customer;
     }
 
     @Override
@@ -124,20 +123,20 @@ Trader {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void setOffersFromServer(@Nullable TraderOfferList arg) {
+    public void setOffersFromServer(@Nullable TraderOfferList offers) {
     }
 
     @Override
-    public void setExperienceFromServer(int i) {
+    public void setExperienceFromServer(int experience) {
     }
 
     @Override
-    public void trade(TradeOffer arg) {
-        arg.use();
+    public void trade(TradeOffer offer) {
+        offer.use();
         this.ambientSoundChance = -this.getMinAmbientSoundDelay();
-        this.afterUsing(arg);
+        this.afterUsing(offer);
         if (this.customer instanceof ServerPlayerEntity) {
-            Criteria.VILLAGER_TRADE.handle((ServerPlayerEntity)this.customer, this, arg.getMutableSellItem());
+            Criteria.VILLAGER_TRADE.handle((ServerPlayerEntity)this.customer, this, offer.getMutableSellItem());
         }
     }
 
@@ -149,10 +148,10 @@ Trader {
     }
 
     @Override
-    public void onSellingItem(ItemStack arg) {
+    public void onSellingItem(ItemStack stack) {
         if (!this.world.isClient && this.ambientSoundChance > -this.getMinAmbientSoundDelay() + 20) {
             this.ambientSoundChance = -this.getMinAmbientSoundDelay();
-            this.playSound(this.getTradingSound(!arg.isEmpty()), this.getSoundVolume(), this.getSoundPitch());
+            this.playSound(this.getTradingSound(!stack.isEmpty()), this.getSoundVolume(), this.getSoundPitch());
         }
     }
 
@@ -161,8 +160,8 @@ Trader {
         return SoundEvents.ENTITY_VILLAGER_YES;
     }
 
-    protected SoundEvent getTradingSound(boolean bl) {
-        return bl ? SoundEvents.ENTITY_VILLAGER_YES : SoundEvents.ENTITY_VILLAGER_NO;
+    protected SoundEvent getTradingSound(boolean sold) {
+        return sold ? SoundEvents.ENTITY_VILLAGER_YES : SoundEvents.ENTITY_VILLAGER_NO;
     }
 
     public void playCelebrateSound() {
@@ -170,29 +169,29 @@ Trader {
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
         TraderOfferList lv = this.getOffers();
         if (!lv.isEmpty()) {
-            arg.put("Offers", lv.toTag());
+            tag.put("Offers", lv.toTag());
         }
-        arg.put("Inventory", this.inventory.getTags());
+        tag.put("Inventory", this.inventory.getTags());
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        if (arg.contains("Offers", 10)) {
-            this.offers = new TraderOfferList(arg.getCompound("Offers"));
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        if (tag.contains("Offers", 10)) {
+            this.offers = new TraderOfferList(tag.getCompound("Offers"));
         }
-        this.inventory.readTags(arg.getList("Inventory", 10));
+        this.inventory.readTags(tag.getList("Inventory", 10));
     }
 
     @Override
     @Nullable
-    public Entity changeDimension(ServerWorld arg) {
+    public Entity moveToWorld(ServerWorld destination) {
         this.resetCustomer();
-        return super.changeDimension(arg);
+        return super.moveToWorld(destination);
     }
 
     protected void resetCustomer() {
@@ -200,23 +199,23 @@ Trader {
     }
 
     @Override
-    public void onDeath(DamageSource arg) {
-        super.onDeath(arg);
+    public void onDeath(DamageSource source) {
+        super.onDeath(source);
         this.resetCustomer();
     }
 
     @Environment(value=EnvType.CLIENT)
-    protected void produceParticles(ParticleEffect arg) {
+    protected void produceParticles(ParticleEffect parameters) {
         for (int i = 0; i < 5; ++i) {
             double d = this.random.nextGaussian() * 0.02;
             double e = this.random.nextGaussian() * 0.02;
             double f = this.random.nextGaussian() * 0.02;
-            this.world.addParticle(arg, this.getParticleX(1.0), this.getRandomBodyY() + 1.0, this.getParticleZ(1.0), d, e, f);
+            this.world.addParticle(parameters, this.getParticleX(1.0), this.getRandomBodyY() + 1.0, this.getParticleZ(1.0), d, e, f);
         }
     }
 
     @Override
-    public boolean canBeLeashedBy(PlayerEntity arg) {
+    public boolean canBeLeashedBy(PlayerEntity player) {
         return false;
     }
 
@@ -225,13 +224,13 @@ Trader {
     }
 
     @Override
-    public boolean equip(int i, ItemStack arg) {
-        if (super.equip(i, arg)) {
+    public boolean equip(int slot, ItemStack item) {
+        if (super.equip(slot, item)) {
             return true;
         }
-        int j = i - 300;
+        int j = slot - 300;
         if (j >= 0 && j < this.inventory.size()) {
-            this.inventory.setStack(j, arg);
+            this.inventory.setStack(j, item);
             return true;
         }
         return false;
@@ -244,22 +243,22 @@ Trader {
 
     protected abstract void fillRecipes();
 
-    protected void fillRecipesFromPool(TraderOfferList arg, TradeOffers.Factory[] args, int i) {
+    protected void fillRecipesFromPool(TraderOfferList recipeList, TradeOffers.Factory[] pool, int count) {
         HashSet set = Sets.newHashSet();
-        if (args.length > i) {
-            while (set.size() < i) {
-                set.add(this.random.nextInt(args.length));
+        if (pool.length > count) {
+            while (set.size() < count) {
+                set.add(this.random.nextInt(pool.length));
             }
         } else {
-            for (int j = 0; j < args.length; ++j) {
+            for (int j = 0; j < pool.length; ++j) {
                 set.add(j);
             }
         }
         for (Integer integer : set) {
-            TradeOffers.Factory lv = args[integer];
+            TradeOffers.Factory lv = pool[integer];
             TradeOffer lv2 = lv.create(this, this.random);
             if (lv2 == null) continue;
-            arg.add(lv2);
+            recipeList.add(lv2);
         }
     }
 }

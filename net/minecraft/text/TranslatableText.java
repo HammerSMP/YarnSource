@@ -45,14 +45,14 @@ implements ParsableText {
     private final List<StringRenderable> translations = Lists.newArrayList();
     private static final Pattern ARG_FORMAT = Pattern.compile("%(?:(\\d+)\\$)?([A-Za-z%]|$)");
 
-    public TranslatableText(String string) {
-        this.key = string;
+    public TranslatableText(String key) {
+        this.key = key;
         this.args = EMPTY_ARGUMENTS;
     }
 
-    public TranslatableText(String string, Object ... objects) {
-        this.key = string;
-        this.args = objects;
+    public TranslatableText(String key, Object ... args) {
+        this.key = key;
+        this.args = args;
     }
 
     private void updateTranslations() {
@@ -72,8 +72,8 @@ implements ParsableText {
         }
     }
 
-    private void setTranslation(String string, Language arg) {
-        Matcher matcher = ARG_FORMAT.matcher(string);
+    private void setTranslation(String translation, Language language) {
+        Matcher matcher = ARG_FORMAT.matcher(translation);
         try {
             int i = 0;
             int j = 0;
@@ -81,14 +81,14 @@ implements ParsableText {
                 int k = matcher.start();
                 int l = matcher.end();
                 if (k > j) {
-                    String string2 = string.substring(j, k);
+                    String string2 = translation.substring(j, k);
                     if (string2.indexOf(37) != -1) {
                         throw new IllegalArgumentException();
                     }
                     this.translations.add(StringRenderable.plain(string2));
                 }
                 String string3 = matcher.group(2);
-                String string4 = string.substring(k, l);
+                String string4 = translation.substring(k, l);
                 if ("%".equals(string3) && "%%".equals(string4)) {
                     this.translations.add(LITERAL_PERCENT_SIGN);
                 } else if ("s".equals(string3)) {
@@ -96,15 +96,15 @@ implements ParsableText {
                     String string5 = matcher.group(1);
                     int n = m = string5 != null ? Integer.parseInt(string5) - 1 : i++;
                     if (m < this.args.length) {
-                        this.translations.add(this.method_29434(m, arg));
+                        this.translations.add(this.method_29434(m, language));
                     }
                 } else {
                     throw new TranslationException(this, "Unsupported format: '" + string4 + "'");
                 }
                 j = l;
             }
-            if (j < string.length()) {
-                String string6 = string.substring(j);
+            if (j < translation.length()) {
+                String string6 = translation.substring(j);
                 if (string6.indexOf(37) != -1) {
                     throw new IllegalArgumentException();
                 }
@@ -134,10 +134,10 @@ implements ParsableText {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public <T> Optional<T> visitSelf(StringRenderable.StyledVisitor<T> arg, Style arg2) {
+    public <T> Optional<T> visitSelf(StringRenderable.StyledVisitor<T> visitor, Style style) {
         this.updateTranslations();
         for (StringRenderable lv : this.translations) {
-            Optional<T> optional = lv.visit(arg, arg2);
+            Optional<T> optional = lv.visit(visitor, style);
             if (!optional.isPresent()) continue;
             return optional;
         }
@@ -145,10 +145,10 @@ implements ParsableText {
     }
 
     @Override
-    public <T> Optional<T> visitSelf(StringRenderable.Visitor<T> arg) {
+    public <T> Optional<T> visitSelf(StringRenderable.Visitor<T> visitor) {
         this.updateTranslations();
         for (StringRenderable lv : this.translations) {
-            Optional<T> optional = lv.visit(arg);
+            Optional<T> optional = lv.visit(visitor);
             if (!optional.isPresent()) continue;
             return optional;
         }
@@ -156,11 +156,11 @@ implements ParsableText {
     }
 
     @Override
-    public MutableText parse(@Nullable ServerCommandSource arg, @Nullable Entity arg2, int i) throws CommandSyntaxException {
+    public MutableText parse(@Nullable ServerCommandSource source, @Nullable Entity sender, int depth) throws CommandSyntaxException {
         Object[] objects = new Object[this.args.length];
         for (int j = 0; j < objects.length; ++j) {
             Object object = this.args[j];
-            objects[j] = object instanceof Text ? Texts.parse(arg, (Text)object, arg2, i) : object;
+            objects[j] = object instanceof Text ? Texts.parse(source, (Text)object, sender, depth) : object;
         }
         return new TranslatableText(this.key, objects);
     }

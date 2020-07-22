@@ -69,17 +69,17 @@ public interface VillagerType {
         hashMap.put(Biomes.WOODED_MOUNTAINS, TAIGA);
     });
 
-    public static VillagerType create(final String string) {
-        return Registry.register(Registry.VILLAGER_TYPE, new Identifier(string), new VillagerType(){
+    public static VillagerType create(final String id) {
+        return Registry.register(Registry.VILLAGER_TYPE, new Identifier(id), new VillagerType(){
 
             public String toString() {
-                return string;
+                return id;
             }
         });
     }
 
-    public static VillagerType forBiome(Biome arg) {
-        return BIOME_TO_TYPE.getOrDefault(arg, PLAINS);
+    public static VillagerType forBiome(Biome biome) {
+        return BIOME_TO_TYPE.getOrDefault(biome, PLAINS);
     }
 }
 

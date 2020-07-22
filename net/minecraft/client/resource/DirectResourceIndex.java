@@ -29,18 +29,18 @@ public class DirectResourceIndex
 extends ResourceIndex {
     private final File assetDir;
 
-    public DirectResourceIndex(File file) {
-        this.assetDir = file;
+    public DirectResourceIndex(File assetDir) {
+        this.assetDir = assetDir;
     }
 
     @Override
-    public File getResource(Identifier arg) {
-        return new File(this.assetDir, arg.toString().replace(':', '/'));
+    public File getResource(Identifier identifier) {
+        return new File(this.assetDir, identifier.toString().replace(':', '/'));
     }
 
     @Override
-    public File findFile(String string) {
-        return new File(this.assetDir, string);
+    public File findFile(String path) {
+        return new File(this.assetDir, path);
     }
 
     /*

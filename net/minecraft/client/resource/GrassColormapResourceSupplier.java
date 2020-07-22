@@ -37,8 +37,8 @@ extends SinglePreparationResourceReloadListener<int[]> {
     }
 
     @Override
-    protected /* synthetic */ Object prepare(ResourceManager arg, Profiler arg2) {
-        return this.method_18662(arg, arg2);
+    protected /* synthetic */ Object prepare(ResourceManager manager, Profiler profiler) {
+        return this.method_18662(manager, profiler);
     }
 }
 

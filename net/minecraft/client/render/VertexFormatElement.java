@@ -25,21 +25,21 @@ public class VertexFormatElement {
     private final int count;
     private final int size;
 
-    public VertexFormatElement(int i, Format arg, Type arg2, int j) {
-        if (this.isValidType(i, arg2)) {
-            this.type = arg2;
+    public VertexFormatElement(int index, Format format, Type type, int count) {
+        if (this.isValidType(index, type)) {
+            this.type = type;
         } else {
             LOGGER.warn("Multiple vertex elements of the same type other than UVs are not supported. Forcing type to UV.");
             this.type = Type.UV;
         }
-        this.format = arg;
-        this.index = i;
-        this.count = j;
-        this.size = arg.getSize() * this.count;
+        this.format = format;
+        this.index = index;
+        this.count = count;
+        this.size = format.getSize() * this.count;
     }
 
-    private boolean isValidType(int i, Type arg) {
-        return i == 0 || arg == Type.UV;
+    private boolean isValidType(int index, Type arg) {
+        return index == 0 || arg == Type.UV;
     }
 
     public final Format getFormat() {
@@ -62,14 +62,14 @@ public class VertexFormatElement {
         return this.size;
     }
 
-    public boolean equals(Object object) {
-        if (this == object) {
+    public boolean equals(Object o) {
+        if (this == o) {
             return true;
         }
-        if (object == null || this.getClass() != object.getClass()) {
+        if (o == null || this.getClass() != o.getClass()) {
             return false;
         }
-        VertexFormatElement lv = (VertexFormatElement)object;
+        VertexFormatElement lv = (VertexFormatElement)o;
         if (this.count != lv.count) {
             return false;
         }
@@ -90,8 +90,8 @@ public class VertexFormatElement {
         return i;
     }
 
-    public void startDrawing(long l, int i) {
-        this.type.startDrawing(this.count, this.format.getGlId(), i, l, this.index);
+    public void startDrawing(long pointer, int stride) {
+        this.type.startDrawing(this.count, this.format.getGlId(), stride, pointer, this.index);
     }
 
     public void endDrawing() {
@@ -112,10 +112,10 @@ public class VertexFormatElement {
         private final String name;
         private final int glId;
 
-        private Format(int j, String string2, int k) {
-            this.size = j;
-            this.name = string2;
-            this.glId = k;
+        private Format(int size, String name, int glId) {
+            this.size = size;
+            this.name = name;
+            this.glId = glId;
         }
 
         public int getSize() {
@@ -168,18 +168,18 @@ public class VertexFormatElement {
         private final Starter starter;
         private final IntConsumer finisher;
 
-        private Type(String string2, Starter arg, IntConsumer intConsumer) {
-            this.name = string2;
+        private Type(String name, Starter arg, IntConsumer intConsumer) {
+            this.name = name;
             this.starter = arg;
             this.finisher = intConsumer;
         }
 
-        private void startDrawing(int i, int j, int k, long l, int m) {
-            this.starter.setupBufferState(i, j, k, l, m);
+        private void startDrawing(int count, int glId, int stride, long pointer, int elementIndex) {
+            this.starter.setupBufferState(count, glId, stride, pointer, elementIndex);
         }
 
-        public void endDrawing(int i) {
-            this.finisher.accept(i);
+        public void endDrawing(int elementIndex) {
+            this.finisher.accept(elementIndex);
         }
 
         public String getName() {

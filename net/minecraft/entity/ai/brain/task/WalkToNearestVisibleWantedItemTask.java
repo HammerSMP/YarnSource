@@ -28,25 +28,25 @@ extends Task<E> {
         this(arg -> true, f, bl, i);
     }
 
-    public WalkToNearestVisibleWantedItemTask(Predicate<E> predicate, float f, boolean bl, int i) {
-        super((Map<MemoryModuleType<?>, MemoryModuleState>)ImmutableMap.of(MemoryModuleType.LOOK_TARGET, (Object)((Object)MemoryModuleState.REGISTERED), MemoryModuleType.WALK_TARGET, (Object)((Object)(bl ? MemoryModuleState.REGISTERED : MemoryModuleState.VALUE_ABSENT)), MemoryModuleType.NEAREST_VISIBLE_WANTED_ITEM, (Object)((Object)MemoryModuleState.VALUE_PRESENT)));
-        this.startCondition = predicate;
+    public WalkToNearestVisibleWantedItemTask(Predicate<E> startCondition, float f, boolean requiresWalkTarget, int i) {
+        super((Map<MemoryModuleType<?>, MemoryModuleState>)ImmutableMap.of(MemoryModuleType.LOOK_TARGET, (Object)((Object)MemoryModuleState.REGISTERED), MemoryModuleType.WALK_TARGET, (Object)((Object)(requiresWalkTarget ? MemoryModuleState.REGISTERED : MemoryModuleState.VALUE_ABSENT)), MemoryModuleType.NEAREST_VISIBLE_WANTED_ITEM, (Object)((Object)MemoryModuleState.VALUE_PRESENT)));
+        this.startCondition = startCondition;
         this.radius = i;
         this.field_23131 = f;
     }
 
     @Override
-    protected boolean shouldRun(ServerWorld arg, E arg2) {
-        return this.startCondition.test(arg2) && this.getNearestVisibleWantedItem(arg2).isInRange((Entity)arg2, this.radius);
+    protected boolean shouldRun(ServerWorld world, E entity) {
+        return this.startCondition.test(entity) && this.getNearestVisibleWantedItem(entity).isInRange((Entity)entity, this.radius);
     }
 
     @Override
-    protected void run(ServerWorld arg, E arg2, long l) {
-        LookTargetUtil.walkTowards(arg2, this.getNearestVisibleWantedItem(arg2), this.field_23131, 0);
+    protected void run(ServerWorld world, E entity, long time) {
+        LookTargetUtil.walkTowards(entity, this.getNearestVisibleWantedItem(entity), this.field_23131, 0);
     }
 
-    private ItemEntity getNearestVisibleWantedItem(E arg) {
-        return ((LivingEntity)arg).getBrain().getOptionalMemory(MemoryModuleType.NEAREST_VISIBLE_WANTED_ITEM).get();
+    private ItemEntity getNearestVisibleWantedItem(E entity) {
+        return ((LivingEntity)entity).getBrain().getOptionalMemory(MemoryModuleType.NEAREST_VISIBLE_WANTED_ITEM).get();
     }
 }
 

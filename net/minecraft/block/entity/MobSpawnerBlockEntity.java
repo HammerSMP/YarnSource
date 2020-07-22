@@ -25,8 +25,8 @@ implements Tickable {
     private final MobSpawnerLogic logic = new MobSpawnerLogic(){
 
         @Override
-        public void sendStatus(int i) {
-            MobSpawnerBlockEntity.this.world.addSyncedBlockEvent(MobSpawnerBlockEntity.this.pos, Blocks.SPAWNER, i, 0);
+        public void sendStatus(int status) {
+            MobSpawnerBlockEntity.this.world.addSyncedBlockEvent(MobSpawnerBlockEntity.this.pos, Blocks.SPAWNER, status, 0);
         }
 
         @Override
@@ -40,8 +40,8 @@ implements Tickable {
         }
 
         @Override
-        public void setSpawnEntry(MobSpawnerEntry arg) {
-            super.setSpawnEntry(arg);
+        public void setSpawnEntry(MobSpawnerEntry spawnEntry) {
+            super.setSpawnEntry(spawnEntry);
             if (this.getWorld() != null) {
                 BlockState lv = this.getWorld().getBlockState(this.getPos());
                 this.getWorld().updateListeners(MobSpawnerBlockEntity.this.pos, lv, lv, 4);
@@ -54,16 +54,16 @@ implements Tickable {
     }
 
     @Override
-    public void fromTag(BlockState arg, CompoundTag arg2) {
-        super.fromTag(arg, arg2);
-        this.logic.fromTag(arg2);
+    public void fromTag(BlockState state, CompoundTag tag) {
+        super.fromTag(state, tag);
+        this.logic.fromTag(tag);
     }
 
     @Override
-    public CompoundTag toTag(CompoundTag arg) {
-        super.toTag(arg);
-        this.logic.toTag(arg);
-        return arg;
+    public CompoundTag toTag(CompoundTag tag) {
+        super.toTag(tag);
+        this.logic.toTag(tag);
+        return tag;
     }
 
     @Override
@@ -85,11 +85,11 @@ implements Tickable {
     }
 
     @Override
-    public boolean onSyncedBlockEvent(int i, int j) {
-        if (this.logic.method_8275(i)) {
+    public boolean onSyncedBlockEvent(int type, int data) {
+        if (this.logic.method_8275(type)) {
             return true;
         }
-        return super.onSyncedBlockEvent(i, j);
+        return super.onSyncedBlockEvent(type, data);
     }
 
     @Override

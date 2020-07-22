@@ -9,18 +9,18 @@ import net.minecraft.entity.EquipmentSlot;
 
 public class RespirationEnchantment
 extends Enchantment {
-    public RespirationEnchantment(Enchantment.Rarity arg, EquipmentSlot ... args) {
-        super(arg, EnchantmentTarget.ARMOR_HEAD, args);
+    public RespirationEnchantment(Enchantment.Rarity weight, EquipmentSlot ... slotTypes) {
+        super(weight, EnchantmentTarget.ARMOR_HEAD, slotTypes);
     }
 
     @Override
-    public int getMinPower(int i) {
-        return 10 * i;
+    public int getMinPower(int level) {
+        return 10 * level;
     }
 
     @Override
-    public int getMaxPower(int i) {
-        return this.getMinPower(i) + 30;
+    public int getMaxPower(int level) {
+        return this.getMinPower(level) + 30;
     }
 
     @Override

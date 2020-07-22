@@ -39,13 +39,13 @@ public abstract class TrunkPlacer {
     protected final int secondRandomHeight;
 
     protected static <P extends TrunkPlacer> Products.P3<RecordCodecBuilder.Mu<P>, Integer, Integer, Integer> method_28904(RecordCodecBuilder.Instance<P> instance) {
-        return instance.group((App)Codec.INT.fieldOf("base_height").forGetter(arg -> arg.baseHeight), (App)Codec.INT.fieldOf("height_rand_a").forGetter(arg -> arg.firstRandomHeight), (App)Codec.INT.fieldOf("height_rand_b").forGetter(arg -> arg.secondRandomHeight));
+        return instance.group((App)Codec.intRange((int)0, (int)32).fieldOf("base_height").forGetter(arg -> arg.baseHeight), (App)Codec.intRange((int)0, (int)24).fieldOf("height_rand_a").forGetter(arg -> arg.firstRandomHeight), (App)Codec.intRange((int)0, (int)24).fieldOf("height_rand_b").forGetter(arg -> arg.secondRandomHeight));
     }
 
-    public TrunkPlacer(int i, int j, int k) {
-        this.baseHeight = i;
-        this.firstRandomHeight = j;
-        this.secondRandomHeight = k;
+    public TrunkPlacer(int baseHeight, int firstRandomHeight, int secondRandomHeight) {
+        this.baseHeight = baseHeight;
+        this.firstRandomHeight = firstRandomHeight;
+        this.secondRandomHeight = secondRandomHeight;
     }
 
     protected abstract TrunkPlacerType<?> getType();

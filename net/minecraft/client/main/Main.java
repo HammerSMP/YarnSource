@@ -62,7 +62,7 @@ public class Main {
      * WARNING - Removed try catching itself - possible behaviour change.
      * WARNING - void declaration
      */
-    public static void main(String[] strings) {
+    public static void main(String[] args) {
         Thread thread3;
         void lv7;
         OptionParser optionParser = new OptionParser();
@@ -96,7 +96,7 @@ public class Main {
         ArgumentAcceptingOptionSpec optionSpec22 = optionParser.accepts("userType").withRequiredArg().defaultsTo((Object)"legacy", (Object[])new String[0]);
         ArgumentAcceptingOptionSpec optionSpec23 = optionParser.accepts("versionType").withRequiredArg().defaultsTo((Object)"release", (Object[])new String[0]);
         NonOptionArgumentSpec optionSpec24 = optionParser.nonOptions();
-        OptionSet optionSet = optionParser.parse(strings);
+        OptionSet optionSet = optionParser.parse(args);
         List list = optionSet.valuesOf((OptionSpec)optionSpec24);
         if (!list.isEmpty()) {
             System.out.println("Completely ignored arguments: " + list);
@@ -145,7 +145,7 @@ public class Main {
         CrashReport.initCrashReport();
         Bootstrap.initialize();
         Bootstrap.logMissing();
-        Util.method_29476();
+        Util.startTimerHack();
         Session lv = new Session((String)optionSpec11.value(optionSet), string6, (String)optionSpec13.value(optionSet), (String)optionSpec22.value(optionSet));
         RunArgs lv2 = new RunArgs(new RunArgs.Network(lv, propertyMap, propertyMap2, proxy), new WindowSettings(i, j, optionalInt, optionalInt2, bl), new RunArgs.Directories(file, file3, file2, string7), new RunArgs.Game(bl2, string4, string5, bl3, bl4), new RunArgs.AutoConnect(string8, integer));
         Thread thread = new Thread("Client Shutdown Thread"){
@@ -229,8 +229,8 @@ public class Main {
         }
     }
 
-    private static OptionalInt toOptional(@Nullable Integer integer) {
-        return integer != null ? OptionalInt.of(integer) : OptionalInt.empty();
+    private static OptionalInt toOptional(@Nullable Integer i) {
+        return i != null ? OptionalInt.of(i) : OptionalInt.empty();
     }
 
     @Nullable
@@ -248,8 +248,8 @@ public class Main {
         }
     }
 
-    private static boolean isNotNullOrEmpty(@Nullable String string) {
-        return string != null && !string.isEmpty();
+    private static boolean isNotNullOrEmpty(@Nullable String s) {
+        return s != null && !s.isEmpty();
     }
 
     static {

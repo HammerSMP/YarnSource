@@ -23,10 +23,10 @@ implements Packet<ClientPlayPacketListener> {
     public ConfirmGuiActionS2CPacket() {
     }
 
-    public ConfirmGuiActionS2CPacket(int i, short s, boolean bl) {
-        this.id = i;
-        this.actionId = s;
-        this.accepted = bl;
+    public ConfirmGuiActionS2CPacket(int id, short actionId, boolean accepted) {
+        this.id = id;
+        this.actionId = actionId;
+        this.accepted = accepted;
     }
 
     @Override
@@ -35,17 +35,17 @@ implements Packet<ClientPlayPacketListener> {
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.id = arg.readUnsignedByte();
-        this.actionId = arg.readShort();
-        this.accepted = arg.readBoolean();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.id = buf.readUnsignedByte();
+        this.actionId = buf.readShort();
+        this.accepted = buf.readBoolean();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeByte(this.id);
-        arg.writeShort(this.actionId);
-        arg.writeBoolean(this.accepted);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeByte(this.id);
+        buf.writeShort(this.actionId);
+        buf.writeBoolean(this.accepted);
     }
 
     @Environment(value=EnvType.CLIENT)

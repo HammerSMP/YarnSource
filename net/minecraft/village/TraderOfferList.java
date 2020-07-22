@@ -27,60 +27,60 @@ extends ArrayList<TradeOffer> {
     }
 
     @Nullable
-    public TradeOffer getValidRecipe(ItemStack arg, ItemStack arg2, int i) {
-        if (i > 0 && i < this.size()) {
-            TradeOffer lv = (TradeOffer)this.get(i);
-            if (lv.matchesBuyItems(arg, arg2)) {
+    public TradeOffer getValidRecipe(ItemStack firstBuyItem, ItemStack secondBuyItem, int index) {
+        if (index > 0 && index < this.size()) {
+            TradeOffer lv = (TradeOffer)this.get(index);
+            if (lv.matchesBuyItems(firstBuyItem, secondBuyItem)) {
                 return lv;
             }
             return null;
         }
         for (int j = 0; j < this.size(); ++j) {
             TradeOffer lv2 = (TradeOffer)this.get(j);
-            if (!lv2.matchesBuyItems(arg, arg2)) continue;
+            if (!lv2.matchesBuyItems(firstBuyItem, secondBuyItem)) continue;
             return lv2;
         }
         return null;
     }
 
-    public void toPacket(PacketByteBuf arg) {
-        arg.writeByte((byte)(this.size() & 0xFF));
+    public void toPacket(PacketByteBuf buffer) {
+        buffer.writeByte((byte)(this.size() & 0xFF));
         for (int i = 0; i < this.size(); ++i) {
             TradeOffer lv = (TradeOffer)this.get(i);
-            arg.writeItemStack(lv.getOriginalFirstBuyItem());
-            arg.writeItemStack(lv.getMutableSellItem());
+            buffer.writeItemStack(lv.getOriginalFirstBuyItem());
+            buffer.writeItemStack(lv.getMutableSellItem());
             ItemStack lv2 = lv.getSecondBuyItem();
-            arg.writeBoolean(!lv2.isEmpty());
+            buffer.writeBoolean(!lv2.isEmpty());
             if (!lv2.isEmpty()) {
-                arg.writeItemStack(lv2);
+                buffer.writeItemStack(lv2);
             }
-            arg.writeBoolean(lv.isDisabled());
-            arg.writeInt(lv.getUses());
-            arg.writeInt(lv.getMaxUses());
-            arg.writeInt(lv.getTraderExperience());
-            arg.writeInt(lv.getSpecialPrice());
-            arg.writeFloat(lv.getPriceMultiplier());
-            arg.writeInt(lv.getDemandBonus());
+            buffer.writeBoolean(lv.isDisabled());
+            buffer.writeInt(lv.getUses());
+            buffer.writeInt(lv.getMaxUses());
+            buffer.writeInt(lv.getTraderExperience());
+            buffer.writeInt(lv.getSpecialPrice());
+            buffer.writeFloat(lv.getPriceMultiplier());
+            buffer.writeInt(lv.getDemandBonus());
         }
     }
 
-    public static TraderOfferList fromPacket(PacketByteBuf arg) {
+    public static TraderOfferList fromPacket(PacketByteBuf byteBuf) {
         TraderOfferList lv = new TraderOfferList();
-        int i = arg.readByte() & 0xFF;
+        int i = byteBuf.readByte() & 0xFF;
         for (int j = 0; j < i; ++j) {
-            ItemStack lv2 = arg.readItemStack();
-            ItemStack lv3 = arg.readItemStack();
+            ItemStack lv2 = byteBuf.readItemStack();
+            ItemStack lv3 = byteBuf.readItemStack();
             ItemStack lv4 = ItemStack.EMPTY;
-            if (arg.readBoolean()) {
-                lv4 = arg.readItemStack();
+            if (byteBuf.readBoolean()) {
+                lv4 = byteBuf.readItemStack();
             }
-            boolean bl = arg.readBoolean();
-            int k = arg.readInt();
-            int l = arg.readInt();
-            int m = arg.readInt();
-            int n = arg.readInt();
-            float f = arg.readFloat();
-            int o = arg.readInt();
+            boolean bl = byteBuf.readBoolean();
+            int k = byteBuf.readInt();
+            int l = byteBuf.readInt();
+            int m = byteBuf.readInt();
+            int n = byteBuf.readInt();
+            float f = byteBuf.readFloat();
+            int o = byteBuf.readInt();
             TradeOffer lv5 = new TradeOffer(lv2, lv4, lv3, k, l, m, f, o);
             if (bl) {
                 lv5.clearUses();

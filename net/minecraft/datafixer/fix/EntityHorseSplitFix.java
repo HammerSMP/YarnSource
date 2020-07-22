@@ -23,14 +23,14 @@ import net.minecraft.datafixer.fix.EntityTransformFix;
 
 public class EntityHorseSplitFix
 extends EntityTransformFix {
-    public EntityHorseSplitFix(Schema schema, boolean bl) {
-        super("EntityHorseSplitFix", schema, bl);
+    public EntityHorseSplitFix(Schema outputSchema, boolean changesType) {
+        super("EntityHorseSplitFix", outputSchema, changesType);
     }
 
     @Override
-    protected Pair<String, Typed<?>> transform(String string, Typed<?> typed) {
+    protected Pair<String, Typed<?>> transform(String choice, Typed<?> typed) {
         Dynamic dynamic = (Dynamic)typed.get(DSL.remainderFinder());
-        if (Objects.equals("EntityHorse", string)) {
+        if (Objects.equals("EntityHorse", choice)) {
             String string6;
             int i = dynamic.get("Type").asInt(0);
             switch (i) {
@@ -58,7 +58,7 @@ extends EntityTransformFix {
             Type type = (Type)this.getOutputSchema().findChoiceType(TypeReferences.ENTITY).types().get(string6);
             return Pair.of((Object)string6, (Object)((Pair)typed.write().flatMap(((Type)type)::readTyped).result().orElseThrow(() -> new IllegalStateException("Could not parse the new horse"))).getFirst());
         }
-        return Pair.of((Object)string, typed);
+        return Pair.of((Object)choice, typed);
     }
 }
 

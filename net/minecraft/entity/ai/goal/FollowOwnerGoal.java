@@ -30,16 +30,16 @@ extends Goal {
     private float oldWaterPathfindingPenalty;
     private final boolean leavesAllowed;
 
-    public FollowOwnerGoal(TameableEntity arg, double d, float f, float g, boolean bl) {
-        this.tameable = arg;
-        this.world = arg.world;
-        this.speed = d;
-        this.navigation = arg.getNavigation();
-        this.minDistance = f;
-        this.maxDistance = g;
-        this.leavesAllowed = bl;
+    public FollowOwnerGoal(TameableEntity tameable, double speed, float minDistance, float maxDistance, boolean leavesAllowed) {
+        this.tameable = tameable;
+        this.world = tameable.world;
+        this.speed = speed;
+        this.navigation = tameable.getNavigation();
+        this.minDistance = minDistance;
+        this.maxDistance = maxDistance;
+        this.leavesAllowed = leavesAllowed;
         this.setControls(EnumSet.of(Goal.Control.MOVE, Goal.Control.LOOK));
-        if (!(arg.getNavigation() instanceof MobNavigation) && !(arg.getNavigation() instanceof BirdNavigation)) {
+        if (!(tameable.getNavigation() instanceof MobNavigation) && !(tameable.getNavigation() instanceof BirdNavigation)) {
             throw new IllegalArgumentException("Unsupported mob type for FollowOwnerGoal");
         }
     }
@@ -117,33 +117,33 @@ extends Goal {
         }
     }
 
-    private boolean tryTeleportTo(int i, int j, int k) {
-        if (Math.abs((double)i - this.owner.getX()) < 2.0 && Math.abs((double)k - this.owner.getZ()) < 2.0) {
+    private boolean tryTeleportTo(int x, int y, int z) {
+        if (Math.abs((double)x - this.owner.getX()) < 2.0 && Math.abs((double)z - this.owner.getZ()) < 2.0) {
             return false;
         }
-        if (!this.canTeleportTo(new BlockPos(i, j, k))) {
+        if (!this.canTeleportTo(new BlockPos(x, y, z))) {
             return false;
         }
-        this.tameable.refreshPositionAndAngles((double)i + 0.5, j, (double)k + 0.5, this.tameable.yaw, this.tameable.pitch);
+        this.tameable.refreshPositionAndAngles((double)x + 0.5, y, (double)z + 0.5, this.tameable.yaw, this.tameable.pitch);
         this.navigation.stop();
         return true;
     }
 
-    private boolean canTeleportTo(BlockPos arg) {
-        PathNodeType lv = LandPathNodeMaker.getLandNodeType(this.world, arg.mutableCopy());
+    private boolean canTeleportTo(BlockPos pos) {
+        PathNodeType lv = LandPathNodeMaker.getLandNodeType(this.world, pos.mutableCopy());
         if (lv != PathNodeType.WALKABLE) {
             return false;
         }
-        BlockState lv2 = this.world.getBlockState(arg.down());
+        BlockState lv2 = this.world.getBlockState(pos.down());
         if (!this.leavesAllowed && lv2.getBlock() instanceof LeavesBlock) {
             return false;
         }
-        BlockPos lv3 = arg.subtract(this.tameable.getBlockPos());
+        BlockPos lv3 = pos.subtract(this.tameable.getBlockPos());
         return this.world.doesNotCollide(this.tameable, this.tameable.getBoundingBox().offset(lv3));
     }
 
-    private int getRandomInt(int i, int j) {
-        return this.tameable.getRandom().nextInt(j - i + 1) + i;
+    private int getRandomInt(int min, int max) {
+        return this.tameable.getRandom().nextInt(max - min + 1) + min;
     }
 }
 

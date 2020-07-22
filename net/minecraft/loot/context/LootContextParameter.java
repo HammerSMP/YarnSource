@@ -8,8 +8,8 @@ import net.minecraft.util.Identifier;
 public class LootContextParameter<T> {
     private final Identifier id;
 
-    public LootContextParameter(Identifier arg) {
-        this.id = arg;
+    public LootContextParameter(Identifier id) {
+        this.id = id;
     }
 
     public Identifier getIdentifier() {

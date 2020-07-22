@@ -37,12 +37,12 @@ public class RecipeBookGhostSlots {
         this.time = 0.0f;
     }
 
-    public void addSlot(Ingredient arg, int i, int j) {
-        this.slots.add(new GhostInputSlot(arg, i, j));
+    public void addSlot(Ingredient ingredient, int x, int y) {
+        this.slots.add(new GhostInputSlot(ingredient, x, y));
     }
 
-    public GhostInputSlot getSlot(int i) {
-        return this.slots.get(i);
+    public GhostInputSlot getSlot(int index) {
+        return this.slots.get(index);
     }
 
     public int getSlotCount() {
@@ -54,8 +54,8 @@ public class RecipeBookGhostSlots {
         return this.recipe;
     }
 
-    public void setRecipe(Recipe<?> arg) {
-        this.recipe = arg;
+    public void setRecipe(Recipe<?> recipe) {
+        this.recipe = recipe;
     }
 
     public void draw(MatrixStack arg, MinecraftClient arg2, int i, int j, boolean bl, float f) {
@@ -88,10 +88,10 @@ public class RecipeBookGhostSlots {
         private final int x;
         private final int y;
 
-        public GhostInputSlot(Ingredient arg2, int i, int j) {
-            this.ingredient = arg2;
-            this.x = i;
-            this.y = j;
+        public GhostInputSlot(Ingredient ingredient, int x, int y) {
+            this.ingredient = ingredient;
+            this.x = x;
+            this.y = y;
         }
 
         public int getX() {

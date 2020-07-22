@@ -9,8 +9,8 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShapes;
 
 public class ShulkerLidCollisions {
-    public static Box getLidCollisionBox(BlockPos arg, Direction arg2) {
-        return VoxelShapes.fullCube().getBoundingBox().stretch(0.5f * (float)arg2.getOffsetX(), 0.5f * (float)arg2.getOffsetY(), 0.5f * (float)arg2.getOffsetZ()).shrink(arg2.getOffsetX(), arg2.getOffsetY(), arg2.getOffsetZ()).offset(arg.offset(arg2));
+    public static Box getLidCollisionBox(BlockPos pos, Direction direction) {
+        return VoxelShapes.fullCube().getBoundingBox().stretch(0.5f * (float)direction.getOffsetX(), 0.5f * (float)direction.getOffsetY(), 0.5f * (float)direction.getOffsetZ()).shrink(direction.getOffsetX(), direction.getOffsetY(), direction.getOffsetZ()).offset(pos.offset(direction));
     }
 }
 

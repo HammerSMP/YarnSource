@@ -18,8 +18,8 @@ public enum StatusEffectType {
 
     private final Formatting formatting;
 
-    private StatusEffectType(Formatting arg) {
-        this.formatting = arg;
+    private StatusEffectType(Formatting format) {
+        this.formatting = format;
     }
 
     @Environment(value=EnvType.CLIENT)

@@ -14,7 +14,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
@@ -29,19 +28,18 @@ extends Feature<NetherrackReplaceBlobsFeatureConfig> {
 
     @Override
     public boolean generate(ServerWorldAccess arg, ChunkGenerator arg2, Random random, BlockPos arg3, NetherrackReplaceBlobsFeatureConfig arg4) {
-        Block lv = arg4.target.getBlock();
+        Block lv = arg4.field_25849.getBlock();
         BlockPos lv2 = NetherrackReplaceBlobsFeature.method_27107(arg, arg3.mutableCopy().method_27158(Direction.Axis.Y, 1, arg.getHeight() - 1), lv);
         if (lv2 == null) {
             return false;
         }
-        Vec3i lv3 = NetherrackReplaceBlobsFeature.method_27108(random, arg4);
-        int i = Math.max(lv3.getX(), Math.max(lv3.getY(), lv3.getZ()));
+        int i = arg4.method_30405().getValue(random);
         boolean bl = false;
-        for (BlockPos lv4 : BlockPos.iterateOutwards(lv2, lv3.getX(), lv3.getY(), lv3.getZ())) {
-            if (lv4.getManhattanDistance(lv2) > i) break;
-            BlockState lv5 = arg.getBlockState(lv4);
-            if (!lv5.isOf(lv)) continue;
-            this.setBlockState(arg, lv4, arg4.state);
+        for (BlockPos lv3 : BlockPos.iterateOutwards(lv2, i, i, i)) {
+            if (lv3.getManhattanDistance(lv2) > i) break;
+            BlockState lv4 = arg.getBlockState(lv3);
+            if (!lv4.isOf(lv)) continue;
+            this.setBlockState(arg, lv3, arg4.field_25850);
             bl = true;
         }
         return bl;
@@ -57,10 +55,6 @@ extends Feature<NetherrackReplaceBlobsFeatureConfig> {
             arg2.move(Direction.DOWN);
         }
         return null;
-    }
-
-    private static Vec3i method_27108(Random random, NetherrackReplaceBlobsFeatureConfig arg) {
-        return new Vec3i(arg.minReachPos.getX() + random.nextInt(arg.maxReachPos.getX() - arg.minReachPos.getX() + 1), arg.minReachPos.getY() + random.nextInt(arg.maxReachPos.getY() - arg.minReachPos.getY() + 1), arg.minReachPos.getZ() + random.nextInt(arg.maxReachPos.getZ() - arg.minReachPos.getZ() + 1));
     }
 }
 

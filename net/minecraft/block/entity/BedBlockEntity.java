@@ -23,9 +23,9 @@ extends BlockEntity {
         super(BlockEntityType.BED);
     }
 
-    public BedBlockEntity(DyeColor arg) {
+    public BedBlockEntity(DyeColor color) {
         this();
-        this.setColor(arg);
+        this.setColor(color);
     }
 
     @Override
@@ -41,8 +41,8 @@ extends BlockEntity {
         return this.color;
     }
 
-    public void setColor(DyeColor arg) {
-        this.color = arg;
+    public void setColor(DyeColor color) {
+        this.color = color;
     }
 }
 

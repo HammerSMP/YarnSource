@@ -23,9 +23,9 @@ implements Packet<ServerPlayPacketListener> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public ButtonClickC2SPacket(int i, int j) {
-        this.syncId = i;
-        this.buttonId = j;
+    public ButtonClickC2SPacket(int syncId, int buttonId) {
+        this.syncId = syncId;
+        this.buttonId = buttonId;
     }
 
     @Override
@@ -34,15 +34,15 @@ implements Packet<ServerPlayPacketListener> {
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.syncId = arg.readByte();
-        this.buttonId = arg.readByte();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.syncId = buf.readByte();
+        this.buttonId = buf.readByte();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeByte(this.syncId);
-        arg.writeByte(this.buttonId);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeByte(this.syncId);
+        buf.writeByte(this.buttonId);
     }
 
     public int getSyncId() {

@@ -22,23 +22,23 @@ implements ServerHandshakePacketListener {
     private final MinecraftServer server;
     private final ClientConnection connection;
 
-    public ServerHandshakeNetworkHandler(MinecraftServer minecraftServer, ClientConnection arg) {
-        this.server = minecraftServer;
-        this.connection = arg;
+    public ServerHandshakeNetworkHandler(MinecraftServer server, ClientConnection connection) {
+        this.server = server;
+        this.connection = connection;
     }
 
     @Override
-    public void onHandshake(HandshakeC2SPacket arg) {
-        switch (arg.getIntendedState()) {
+    public void onHandshake(HandshakeC2SPacket packet) {
+        switch (packet.getIntendedState()) {
             case LOGIN: {
                 this.connection.setState(NetworkState.LOGIN);
-                if (arg.getProtocolVersion() > SharedConstants.getGameVersion().getProtocolVersion()) {
+                if (packet.getProtocolVersion() > SharedConstants.getGameVersion().getProtocolVersion()) {
                     TranslatableText lv = new TranslatableText("multiplayer.disconnect.outdated_server", SharedConstants.getGameVersion().getName());
                     this.connection.send(new LoginDisconnectS2CPacket(lv));
                     this.connection.disconnect(lv);
                     break;
                 }
-                if (arg.getProtocolVersion() < SharedConstants.getGameVersion().getProtocolVersion()) {
+                if (packet.getProtocolVersion() < SharedConstants.getGameVersion().getProtocolVersion()) {
                     TranslatableText lv2 = new TranslatableText("multiplayer.disconnect.outdated_client", SharedConstants.getGameVersion().getName());
                     this.connection.send(new LoginDisconnectS2CPacket(lv2));
                     this.connection.disconnect(lv2);
@@ -57,13 +57,13 @@ implements ServerHandshakePacketListener {
                 break;
             }
             default: {
-                throw new UnsupportedOperationException("Invalid intention " + (Object)((Object)arg.getIntendedState()));
+                throw new UnsupportedOperationException("Invalid intention " + (Object)((Object)packet.getIntendedState()));
             }
         }
     }
 
     @Override
-    public void onDisconnected(Text arg) {
+    public void onDisconnected(Text reason) {
     }
 
     @Override

@@ -15,18 +15,18 @@ implements Packet<ServerPlayPacketListener> {
     public RenameItemC2SPacket() {
     }
 
-    public RenameItemC2SPacket(String string) {
-        this.name = string;
+    public RenameItemC2SPacket(String name) {
+        this.name = name;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.name = arg.readString(32767);
+    public void read(PacketByteBuf buf) throws IOException {
+        this.name = buf.readString(32767);
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeString(this.name);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeString(this.name);
     }
 
     @Override

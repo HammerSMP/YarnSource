@@ -20,14 +20,14 @@ implements Palette<T> {
     private final IdList<T> idList;
     private final T fallback;
 
-    public IdListPalette(IdList<T> arg, T object) {
-        this.idList = arg;
-        this.fallback = object;
+    public IdListPalette(IdList<T> idList, T defaultValue) {
+        this.idList = idList;
+        this.fallback = defaultValue;
     }
 
     @Override
     public int getIndex(T object) {
-        int i = this.idList.getId(object);
+        int i = this.idList.getRawId(object);
         return i == -1 ? 0 : i;
     }
 
@@ -37,18 +37,18 @@ implements Palette<T> {
     }
 
     @Override
-    public T getByIndex(int i) {
-        T object = this.idList.get(i);
+    public T getByIndex(int index) {
+        T object = this.idList.get(index);
         return object == null ? this.fallback : object;
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void fromPacket(PacketByteBuf arg) {
+    public void fromPacket(PacketByteBuf buf) {
     }
 
     @Override
-    public void toPacket(PacketByteBuf arg) {
+    public void toPacket(PacketByteBuf buf) {
     }
 
     @Override
@@ -57,7 +57,7 @@ implements Palette<T> {
     }
 
     @Override
-    public void fromTag(ListTag arg) {
+    public void fromTag(ListTag tag) {
     }
 }
 

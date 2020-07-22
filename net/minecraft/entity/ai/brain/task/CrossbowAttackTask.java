@@ -61,22 +61,22 @@ extends Task<E> {
         }
     }
 
-    private void tickState(E arg, LivingEntity arg2) {
+    private void tickState(E entity, LivingEntity target) {
         if (this.state == CrossbowState.UNCHARGED) {
-            ((LivingEntity)arg).setCurrentHand(ProjectileUtil.getHandPossiblyHolding(arg, Items.CROSSBOW));
+            ((LivingEntity)entity).setCurrentHand(ProjectileUtil.getHandPossiblyHolding(entity, Items.CROSSBOW));
             this.state = CrossbowState.CHARGING;
-            ((CrossbowUser)arg).setCharging(true);
+            ((CrossbowUser)entity).setCharging(true);
         } else if (this.state == CrossbowState.CHARGING) {
             ItemStack lv;
             int i;
-            if (!((LivingEntity)arg).isUsingItem()) {
+            if (!((LivingEntity)entity).isUsingItem()) {
                 this.state = CrossbowState.UNCHARGED;
             }
-            if ((i = ((LivingEntity)arg).getItemUseTime()) >= CrossbowItem.getPullTime(lv = ((LivingEntity)arg).getActiveItem())) {
-                ((LivingEntity)arg).stopUsingItem();
+            if ((i = ((LivingEntity)entity).getItemUseTime()) >= CrossbowItem.getPullTime(lv = ((LivingEntity)entity).getActiveItem())) {
+                ((LivingEntity)entity).stopUsingItem();
                 this.state = CrossbowState.CHARGED;
-                this.chargingCooldown = 20 + ((LivingEntity)arg).getRandom().nextInt(20);
-                ((CrossbowUser)arg).setCharging(false);
+                this.chargingCooldown = 20 + ((LivingEntity)entity).getRandom().nextInt(20);
+                ((CrossbowUser)entity).setCharging(false);
             }
         } else if (this.state == CrossbowState.CHARGED) {
             --this.chargingCooldown;
@@ -84,29 +84,29 @@ extends Task<E> {
                 this.state = CrossbowState.READY_TO_ATTACK;
             }
         } else if (this.state == CrossbowState.READY_TO_ATTACK) {
-            ((RangedAttackMob)arg).attack(arg2, 1.0f);
-            ItemStack lv2 = ((LivingEntity)arg).getStackInHand(ProjectileUtil.getHandPossiblyHolding(arg, Items.CROSSBOW));
+            ((RangedAttackMob)entity).attack(target, 1.0f);
+            ItemStack lv2 = ((LivingEntity)entity).getStackInHand(ProjectileUtil.getHandPossiblyHolding(entity, Items.CROSSBOW));
             CrossbowItem.setCharged(lv2, false);
             this.state = CrossbowState.UNCHARGED;
         }
     }
 
-    private void setLookTarget(MobEntity arg, LivingEntity arg2) {
-        arg.getBrain().remember(MemoryModuleType.LOOK_TARGET, new EntityLookTarget(arg2, true));
+    private void setLookTarget(MobEntity entity, LivingEntity target) {
+        entity.getBrain().remember(MemoryModuleType.LOOK_TARGET, new EntityLookTarget(target, true));
     }
 
-    private static LivingEntity getAttackTarget(LivingEntity arg) {
-        return arg.getBrain().getOptionalMemory(MemoryModuleType.ATTACK_TARGET).get();
-    }
-
-    @Override
-    protected /* synthetic */ boolean shouldKeepRunning(ServerWorld arg, LivingEntity arg2, long l) {
-        return this.shouldKeepRunning(arg, (E)((MobEntity)arg2), l);
+    private static LivingEntity getAttackTarget(LivingEntity entity) {
+        return entity.getBrain().getOptionalMemory(MemoryModuleType.ATTACK_TARGET).get();
     }
 
     @Override
-    protected /* synthetic */ void keepRunning(ServerWorld arg, LivingEntity arg2, long l) {
-        this.keepRunning(arg, (E)((MobEntity)arg2), l);
+    protected /* synthetic */ boolean shouldKeepRunning(ServerWorld world, LivingEntity entity, long time) {
+        return this.shouldKeepRunning(world, (E)((MobEntity)entity), time);
+    }
+
+    @Override
+    protected /* synthetic */ void keepRunning(ServerWorld world, LivingEntity entity, long time) {
+        this.keepRunning(world, (E)((MobEntity)entity), time);
     }
 
     static enum CrossbowState {

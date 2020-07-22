@@ -90,39 +90,39 @@ extends CompositeEntityModel<ParrotEntity> {
         this.animateModel(ParrotEntityModel.getPose(arg));
     }
 
-    public void poseOnShoulder(MatrixStack arg, VertexConsumer arg2, int i, int j, float f, float g, float h, float k, int l) {
+    public void poseOnShoulder(MatrixStack matrices, VertexConsumer vertexConsumer, int light, int overlay, float limbAngle, float limbDistance, float headYaw, float headPitch, int danceAngle) {
         this.animateModel(Pose.ON_SHOULDER);
-        this.setAngles(Pose.ON_SHOULDER, l, f, g, 0.0f, h, k);
-        this.getParts().forEach(arg3 -> arg3.render(arg, arg2, i, j));
+        this.setAngles(Pose.ON_SHOULDER, danceAngle, limbAngle, limbDistance, 0.0f, headYaw, headPitch);
+        this.getParts().forEach(arg3 -> arg3.render(matrices, vertexConsumer, light, overlay));
     }
 
-    private void setAngles(Pose arg, int i, float f, float g, float h, float j, float k) {
-        this.head.pitch = k * ((float)Math.PI / 180);
-        this.head.yaw = j * ((float)Math.PI / 180);
+    private void setAngles(Pose pose, int danceAngle, float limbAngle, float limbDistance, float age, float headYaw, float headPitch) {
+        this.head.pitch = headPitch * ((float)Math.PI / 180);
+        this.head.yaw = headYaw * ((float)Math.PI / 180);
         this.head.roll = 0.0f;
         this.head.pivotX = 0.0f;
         this.torso.pivotX = 0.0f;
         this.tail.pivotX = 0.0f;
         this.rightWing.pivotX = -1.5f;
         this.leftWing.pivotX = 1.5f;
-        switch (arg) {
+        switch (pose) {
             case SITTING: {
                 break;
             }
             case PARTY: {
-                float l = MathHelper.cos(i);
-                float m = MathHelper.sin(i);
+                float l = MathHelper.cos(danceAngle);
+                float m = MathHelper.sin(danceAngle);
                 this.head.pivotX = l;
                 this.head.pivotY = 15.69f + m;
                 this.head.pitch = 0.0f;
                 this.head.yaw = 0.0f;
-                this.head.roll = MathHelper.sin(i) * 0.4f;
+                this.head.roll = MathHelper.sin(danceAngle) * 0.4f;
                 this.torso.pivotX = l;
                 this.torso.pivotY = 16.5f + m;
-                this.leftWing.roll = -0.0873f - h;
+                this.leftWing.roll = -0.0873f - age;
                 this.leftWing.pivotX = 1.5f + l;
                 this.leftWing.pivotY = 16.94f + m;
-                this.rightWing.roll = 0.0873f + h;
+                this.rightWing.roll = 0.0873f + age;
                 this.rightWing.pivotX = -1.5f + l;
                 this.rightWing.pivotY = 16.94f + m;
                 this.tail.pivotX = l;
@@ -130,18 +130,18 @@ extends CompositeEntityModel<ParrotEntity> {
                 break;
             }
             case STANDING: {
-                this.leftLeg.pitch += MathHelper.cos(f * 0.6662f) * 1.4f * g;
-                this.rightLeg.pitch += MathHelper.cos(f * 0.6662f + (float)Math.PI) * 1.4f * g;
+                this.leftLeg.pitch += MathHelper.cos(limbAngle * 0.6662f) * 1.4f * limbDistance;
+                this.rightLeg.pitch += MathHelper.cos(limbAngle * 0.6662f + (float)Math.PI) * 1.4f * limbDistance;
             }
             default: {
-                float n = h * 0.3f;
+                float n = age * 0.3f;
                 this.head.pivotY = 15.69f + n;
-                this.tail.pitch = 1.015f + MathHelper.cos(f * 0.6662f) * 0.3f * g;
+                this.tail.pitch = 1.015f + MathHelper.cos(limbAngle * 0.6662f) * 0.3f * limbDistance;
                 this.tail.pivotY = 21.07f + n;
                 this.torso.pivotY = 16.5f + n;
-                this.leftWing.roll = -0.0873f - h;
+                this.leftWing.roll = -0.0873f - age;
                 this.leftWing.pivotY = 16.94f + n;
-                this.rightWing.roll = 0.0873f + h;
+                this.rightWing.roll = 0.0873f + age;
                 this.rightWing.pivotY = 16.94f + n;
                 this.leftLeg.pivotY = 22.0f + n;
                 this.rightLeg.pivotY = 22.0f + n;
@@ -149,7 +149,7 @@ extends CompositeEntityModel<ParrotEntity> {
         }
     }
 
-    private void animateModel(Pose arg) {
+    private void animateModel(Pose pose) {
         this.headFeathers.pitch = -0.2214f;
         this.torso.pitch = 0.4937f;
         this.leftWing.pitch = -0.6981f;
@@ -162,7 +162,7 @@ extends CompositeEntityModel<ParrotEntity> {
         this.rightLeg.pivotY = 22.0f;
         this.leftLeg.roll = 0.0f;
         this.rightLeg.roll = 0.0f;
-        switch (arg) {
+        switch (pose) {
             case FLYING: {
                 this.leftLeg.pitch += 0.6981317f;
                 this.rightLeg.pitch += 0.6981317f;
@@ -192,14 +192,14 @@ extends CompositeEntityModel<ParrotEntity> {
         }
     }
 
-    private static Pose getPose(ParrotEntity arg) {
-        if (arg.getSongPlaying()) {
+    private static Pose getPose(ParrotEntity parrot) {
+        if (parrot.getSongPlaying()) {
             return Pose.PARTY;
         }
-        if (arg.isInSittingPose()) {
+        if (parrot.isInSittingPose()) {
             return Pose.SITTING;
         }
-        if (arg.isInAir()) {
+        if (parrot.isInAir()) {
             return Pose.FLYING;
         }
         return Pose.STANDING;

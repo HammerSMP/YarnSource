@@ -20,7 +20,7 @@ extends HostileEntity {
     }
 
     @Override
-    protected float getActiveEyeHeight(EntityPose arg, EntityDimensions arg2) {
+    protected float getActiveEyeHeight(EntityPose pose, EntityDimensions dimensions) {
         return 10.440001f;
     }
 
@@ -29,8 +29,8 @@ extends HostileEntity {
     }
 
     @Override
-    public float getPathfindingFavor(BlockPos arg, WorldView arg2) {
-        return arg2.getBrightness(arg) - 0.5f;
+    public float getPathfindingFavor(BlockPos pos, WorldView world) {
+        return world.getBrightness(pos) - 0.5f;
     }
 }
 

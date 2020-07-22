@@ -97,17 +97,17 @@ public class Criteria {
     public static final ThrownItemPickedUpByEntityCriterion THROWN_ITEM_PICKED_UP_BY_ENTITY = Criteria.register(new ThrownItemPickedUpByEntityCriterion());
     public static final PlayerInteractedWithEntityCriterion PLAYER_INTERACTED_WITH_ENTITY = Criteria.register(new PlayerInteractedWithEntityCriterion());
 
-    private static <T extends Criterion<?>> T register(T arg) {
-        if (VALUES.containsKey(arg.getId())) {
-            throw new IllegalArgumentException("Duplicate criterion id " + arg.getId());
+    private static <T extends Criterion<?>> T register(T object) {
+        if (VALUES.containsKey(object.getId())) {
+            throw new IllegalArgumentException("Duplicate criterion id " + object.getId());
         }
-        VALUES.put(arg.getId(), arg);
-        return arg;
+        VALUES.put(object.getId(), object);
+        return object;
     }
 
     @Nullable
-    public static <T extends CriterionConditions> Criterion<T> getById(Identifier arg) {
-        return VALUES.get(arg);
+    public static <T extends CriterionConditions> Criterion<T> getById(Identifier id) {
+        return VALUES.get(id);
     }
 
     public static Iterable<? extends Criterion<?>> getCriteria() {

@@ -24,21 +24,21 @@ implements Packet<ServerPlayPacketListener> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public QueryBlockNbtC2SPacket(int i, BlockPos arg) {
-        this.transactionId = i;
-        this.pos = arg;
+    public QueryBlockNbtC2SPacket(int transactionId, BlockPos pos) {
+        this.transactionId = transactionId;
+        this.pos = pos;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.transactionId = arg.readVarInt();
-        this.pos = arg.readBlockPos();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.transactionId = buf.readVarInt();
+        this.pos = buf.readBlockPos();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeVarInt(this.transactionId);
-        arg.writeBlockPos(this.pos);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeVarInt(this.transactionId);
+        buf.writeBlockPos(this.pos);
     }
 
     @Override

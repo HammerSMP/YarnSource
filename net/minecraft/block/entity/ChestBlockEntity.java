@@ -76,21 +76,21 @@ Tickable {
     }
 
     @Override
-    public void fromTag(BlockState arg, CompoundTag arg2) {
-        super.fromTag(arg, arg2);
+    public void fromTag(BlockState state, CompoundTag tag) {
+        super.fromTag(state, tag);
         this.inventory = DefaultedList.ofSize(this.size(), ItemStack.EMPTY);
-        if (!this.deserializeLootTable(arg2)) {
-            Inventories.fromTag(arg2, this.inventory);
+        if (!this.deserializeLootTable(tag)) {
+            Inventories.fromTag(tag, this.inventory);
         }
     }
 
     @Override
-    public CompoundTag toTag(CompoundTag arg) {
-        super.toTag(arg);
-        if (!this.serializeLootTable(arg)) {
-            Inventories.toTag(arg, this.inventory);
+    public CompoundTag toTag(CompoundTag tag) {
+        super.toTag(tag);
+        if (!this.serializeLootTable(tag)) {
+            Inventories.toTag(tag, this.inventory);
         }
-        return arg;
+        return tag;
     }
 
     @Override
@@ -121,20 +121,20 @@ Tickable {
         }
     }
 
-    public static int tickViewerCount(World arg, LockableContainerBlockEntity arg2, int i, int j, int k, int l, int m) {
-        if (!arg.isClient && m != 0 && (i + j + k + l) % 200 == 0) {
-            m = ChestBlockEntity.countViewers(arg, arg2, j, k, l);
+    public static int tickViewerCount(World world, LockableContainerBlockEntity blockEntity, int ticksOpen, int x, int y, int z, int viewerCount) {
+        if (!world.isClient && viewerCount != 0 && (ticksOpen + x + y + z) % 200 == 0) {
+            viewerCount = ChestBlockEntity.countViewers(world, blockEntity, x, y, z);
         }
-        return m;
+        return viewerCount;
     }
 
-    public static int countViewers(World arg, LockableContainerBlockEntity arg2, int i, int j, int k) {
+    public static int countViewers(World world, LockableContainerBlockEntity container, int ticksOpen, int x, int y) {
         int l = 0;
         float f = 5.0f;
-        List<PlayerEntity> list = arg.getNonSpectatingEntities(PlayerEntity.class, new Box((float)i - 5.0f, (float)j - 5.0f, (float)k - 5.0f, (float)(i + 1) + 5.0f, (float)(j + 1) + 5.0f, (float)(k + 1) + 5.0f));
+        List<PlayerEntity> list = world.getNonSpectatingEntities(PlayerEntity.class, new Box((float)ticksOpen - 5.0f, (float)x - 5.0f, (float)y - 5.0f, (float)(ticksOpen + 1) + 5.0f, (float)(x + 1) + 5.0f, (float)(y + 1) + 5.0f));
         for (PlayerEntity lv : list) {
             Inventory lv2;
-            if (!(lv.currentScreenHandler instanceof GenericContainerScreenHandler) || (lv2 = ((GenericContainerScreenHandler)lv.currentScreenHandler).getInventory()) != arg2 && (!(lv2 instanceof DoubleInventory) || !((DoubleInventory)lv2).isPart(arg2))) continue;
+            if (!(lv.currentScreenHandler instanceof GenericContainerScreenHandler) || (lv2 = ((GenericContainerScreenHandler)lv.currentScreenHandler).getInventory()) != container && (!(lv2 instanceof DoubleInventory) || !((DoubleInventory)lv2).isPart(container))) continue;
             ++l;
         }
         return l;
@@ -157,17 +157,17 @@ Tickable {
     }
 
     @Override
-    public boolean onSyncedBlockEvent(int i, int j) {
-        if (i == 1) {
-            this.viewerCount = j;
+    public boolean onSyncedBlockEvent(int type, int data) {
+        if (type == 1) {
+            this.viewerCount = data;
             return true;
         }
-        return super.onSyncedBlockEvent(i, j);
+        return super.onSyncedBlockEvent(type, data);
     }
 
     @Override
-    public void onOpen(PlayerEntity arg) {
-        if (!arg.isSpectator()) {
+    public void onOpen(PlayerEntity player) {
+        if (!player.isSpectator()) {
             if (this.viewerCount < 0) {
                 this.viewerCount = 0;
             }
@@ -177,8 +177,8 @@ Tickable {
     }
 
     @Override
-    public void onClose(PlayerEntity arg) {
-        if (!arg.isSpectator()) {
+    public void onClose(PlayerEntity player) {
+        if (!player.isSpectator()) {
             --this.viewerCount;
             this.onInvOpenOrClose();
         }
@@ -198,34 +198,34 @@ Tickable {
     }
 
     @Override
-    protected void setInvStackList(DefaultedList<ItemStack> arg) {
-        this.inventory = arg;
+    protected void setInvStackList(DefaultedList<ItemStack> list) {
+        this.inventory = list;
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public float getAnimationProgress(float f) {
-        return MathHelper.lerp(f, this.lastAnimationAngle, this.animationAngle);
+    public float getAnimationProgress(float tickDelta) {
+        return MathHelper.lerp(tickDelta, this.lastAnimationAngle, this.animationAngle);
     }
 
-    public static int getPlayersLookingInChestCount(BlockView arg, BlockPos arg2) {
+    public static int getPlayersLookingInChestCount(BlockView world, BlockPos pos) {
         BlockEntity lv2;
-        BlockState lv = arg.getBlockState(arg2);
-        if (lv.getBlock().hasBlockEntity() && (lv2 = arg.getBlockEntity(arg2)) instanceof ChestBlockEntity) {
+        BlockState lv = world.getBlockState(pos);
+        if (lv.getBlock().hasBlockEntity() && (lv2 = world.getBlockEntity(pos)) instanceof ChestBlockEntity) {
             return ((ChestBlockEntity)lv2).viewerCount;
         }
         return 0;
     }
 
-    public static void copyInventory(ChestBlockEntity arg, ChestBlockEntity arg2) {
-        DefaultedList<ItemStack> lv = arg.getInvStackList();
-        arg.setInvStackList(arg2.getInvStackList());
-        arg2.setInvStackList(lv);
+    public static void copyInventory(ChestBlockEntity from, ChestBlockEntity to) {
+        DefaultedList<ItemStack> lv = from.getInvStackList();
+        from.setInvStackList(to.getInvStackList());
+        to.setInvStackList(lv);
     }
 
     @Override
-    protected ScreenHandler createScreenHandler(int i, PlayerInventory arg) {
-        return GenericContainerScreenHandler.createGeneric9x3(i, arg, this);
+    protected ScreenHandler createScreenHandler(int syncId, PlayerInventory playerInventory) {
+        return GenericContainerScreenHandler.createGeneric9x3(syncId, playerInventory, this);
     }
 }
 

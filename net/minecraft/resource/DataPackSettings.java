@@ -23,9 +23,9 @@ public class DataPackSettings {
     private final List<String> enabled;
     private final List<String> disabled;
 
-    public DataPackSettings(List<String> list, List<String> list2) {
-        this.enabled = ImmutableList.copyOf(list);
-        this.disabled = ImmutableList.copyOf(list2);
+    public DataPackSettings(List<String> enabled, List<String> disabled) {
+        this.enabled = ImmutableList.copyOf(enabled);
+        this.disabled = ImmutableList.copyOf(disabled);
     }
 
     public List<String> getEnabled() {

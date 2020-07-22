@@ -41,6 +41,11 @@ implements ServerWorldProperties {
     }
 
     @Override
+    public float getSpawnAngle() {
+        return this.properties.getSpawnAngle();
+    }
+
+    @Override
     public long getTime() {
         return this.properties.getTime();
     }
@@ -61,7 +66,7 @@ implements ServerWorldProperties {
     }
 
     @Override
-    public void setClearWeatherTime(int i) {
+    public void setClearWeatherTime(int clearWeatherTime) {
     }
 
     @Override
@@ -90,47 +95,51 @@ implements ServerWorldProperties {
     }
 
     @Override
-    public void setSpawnX(int i) {
+    public void setSpawnX(int spawnX) {
     }
 
     @Override
-    public void setSpawnY(int i) {
+    public void setSpawnY(int spawnY) {
     }
 
     @Override
-    public void setSpawnZ(int i) {
+    public void setSpawnZ(int spawnZ) {
     }
 
     @Override
-    public void method_29034(long l) {
+    public void setSpawnAngle(float angle) {
     }
 
     @Override
-    public void method_29035(long l) {
+    public void setTime(long time) {
     }
 
     @Override
-    public void setSpawnPos(BlockPos arg) {
+    public void setTimeOfDay(long timeOfDay) {
     }
 
     @Override
-    public void setThundering(boolean bl) {
+    public void setSpawnPos(BlockPos pos, float angle) {
     }
 
     @Override
-    public void setThunderTime(int i) {
+    public void setThundering(boolean thundering) {
     }
 
     @Override
-    public void setRaining(boolean bl) {
+    public void setThunderTime(int thunderTime) {
     }
 
     @Override
-    public void setRainTime(int i) {
+    public void setRaining(boolean raining) {
     }
 
     @Override
-    public void setGameMode(GameMode arg) {
+    public void setRainTime(int rainTime) {
+    }
+
+    @Override
+    public void setGameMode(GameMode gameMode) {
     }
 
     @Override
@@ -149,7 +158,7 @@ implements ServerWorldProperties {
     }
 
     @Override
-    public void setInitialized(boolean bl) {
+    public void setInitialized(boolean initialized) {
     }
 
     @Override
@@ -163,7 +172,7 @@ implements ServerWorldProperties {
     }
 
     @Override
-    public void setWorldBorder(WorldBorder.Properties arg) {
+    public void setWorldBorder(WorldBorder.Properties properties) {
     }
 
     @Override
@@ -187,7 +196,7 @@ implements ServerWorldProperties {
     }
 
     @Override
-    public void setWanderingTraderSpawnDelay(int i) {
+    public void setWanderingTraderSpawnDelay(int wanderingTraderSpawnDelay) {
     }
 
     @Override
@@ -196,17 +205,17 @@ implements ServerWorldProperties {
     }
 
     @Override
-    public void setWanderingTraderSpawnChance(int i) {
+    public void setWanderingTraderSpawnChance(int wanderingTraderSpawnChance) {
     }
 
     @Override
-    public void setWanderingTraderId(UUID uUID) {
+    public void setWanderingTraderId(UUID uuid) {
     }
 
     @Override
-    public void populateCrashReport(CrashReportSection arg) {
-        arg.add("Derived", true);
-        this.properties.populateCrashReport(arg);
+    public void populateCrashReport(CrashReportSection reportSection) {
+        reportSection.add("Derived", true);
+        this.properties.populateCrashReport(reportSection);
     }
 }
 

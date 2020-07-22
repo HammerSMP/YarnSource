@@ -41,26 +41,26 @@ implements BlockEntityProvider {
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(ORIENTATION);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(ORIENTATION);
     }
 
     @Override
-    public BlockState rotate(BlockState arg, BlockRotation arg2) {
-        return (BlockState)arg.with(ORIENTATION, arg2.getDirectionTransformation().mapJigsawOrientation(arg.get(ORIENTATION)));
+    public BlockState rotate(BlockState state, BlockRotation rotation) {
+        return (BlockState)state.with(ORIENTATION, rotation.getDirectionTransformation().mapJigsawOrientation(state.get(ORIENTATION)));
     }
 
     @Override
-    public BlockState mirror(BlockState arg, BlockMirror arg2) {
-        return (BlockState)arg.with(ORIENTATION, arg2.getDirectionTransformation().mapJigsawOrientation(arg.get(ORIENTATION)));
+    public BlockState mirror(BlockState state, BlockMirror mirror) {
+        return (BlockState)state.with(ORIENTATION, mirror.getDirectionTransformation().mapJigsawOrientation(state.get(ORIENTATION)));
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext arg) {
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
         Direction lv3;
-        Direction lv = arg.getSide();
+        Direction lv = ctx.getSide();
         if (lv.getAxis() == Direction.Axis.Y) {
-            Direction lv2 = arg.getPlayerFacing().getOpposite();
+            Direction lv2 = ctx.getPlayerFacing().getOpposite();
         } else {
             lv3 = Direction.UP;
         }
@@ -69,28 +69,28 @@ implements BlockEntityProvider {
 
     @Override
     @Nullable
-    public BlockEntity createBlockEntity(BlockView arg) {
+    public BlockEntity createBlockEntity(BlockView world) {
         return new JigsawBlockEntity();
     }
 
     @Override
-    public ActionResult onUse(BlockState arg, World arg2, BlockPos arg3, PlayerEntity arg4, Hand arg5, BlockHitResult arg6) {
-        BlockEntity lv = arg2.getBlockEntity(arg3);
-        if (lv instanceof JigsawBlockEntity && arg4.isCreativeLevelTwoOp()) {
-            arg4.openJigsawScreen((JigsawBlockEntity)lv);
-            return ActionResult.success(arg2.isClient);
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        BlockEntity lv = world.getBlockEntity(pos);
+        if (lv instanceof JigsawBlockEntity && player.isCreativeLevelTwoOp()) {
+            player.openJigsawScreen((JigsawBlockEntity)lv);
+            return ActionResult.success(world.isClient);
         }
         return ActionResult.PASS;
     }
 
-    public static boolean attachmentMatches(Structure.StructureBlockInfo arg, Structure.StructureBlockInfo arg2) {
-        Direction lv = JigsawBlock.getFacing(arg.state);
-        Direction lv2 = JigsawBlock.getFacing(arg2.state);
-        Direction lv3 = JigsawBlock.getRotation(arg.state);
-        Direction lv4 = JigsawBlock.getRotation(arg2.state);
-        JigsawBlockEntity.Joint lv5 = JigsawBlockEntity.Joint.byName(arg.tag.getString("joint")).orElseGet(() -> lv.getAxis().isHorizontal() ? JigsawBlockEntity.Joint.ALIGNED : JigsawBlockEntity.Joint.ROLLABLE);
+    public static boolean attachmentMatches(Structure.StructureBlockInfo info1, Structure.StructureBlockInfo info2) {
+        Direction lv = JigsawBlock.getFacing(info1.state);
+        Direction lv2 = JigsawBlock.getFacing(info2.state);
+        Direction lv3 = JigsawBlock.getRotation(info1.state);
+        Direction lv4 = JigsawBlock.getRotation(info2.state);
+        JigsawBlockEntity.Joint lv5 = JigsawBlockEntity.Joint.byName(info1.tag.getString("joint")).orElseGet(() -> lv.getAxis().isHorizontal() ? JigsawBlockEntity.Joint.ALIGNED : JigsawBlockEntity.Joint.ROLLABLE);
         boolean bl = lv5 == JigsawBlockEntity.Joint.ROLLABLE;
-        return lv == lv2.getOpposite() && (bl || lv3 == lv4) && arg.tag.getString("target").equals(arg2.tag.getString("name"));
+        return lv == lv2.getOpposite() && (bl || lv3 == lv4) && info1.tag.getString("target").equals(info2.tag.getString("name"));
     }
 
     public static Direction getFacing(BlockState arg) {

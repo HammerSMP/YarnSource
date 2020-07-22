@@ -25,26 +25,26 @@ implements Packet<ServerPlayPacketListener> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public PlayerInputC2SPacket(float f, float g, boolean bl, boolean bl2) {
-        this.sideways = f;
-        this.forward = g;
-        this.jumping = bl;
-        this.sneaking = bl2;
+    public PlayerInputC2SPacket(float sideways, float forward, boolean jumping, boolean sneaking) {
+        this.sideways = sideways;
+        this.forward = forward;
+        this.jumping = jumping;
+        this.sneaking = sneaking;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.sideways = arg.readFloat();
-        this.forward = arg.readFloat();
-        byte b = arg.readByte();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.sideways = buf.readFloat();
+        this.forward = buf.readFloat();
+        byte b = buf.readByte();
         this.jumping = (b & 1) > 0;
         this.sneaking = (b & 2) > 0;
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeFloat(this.sideways);
-        arg.writeFloat(this.forward);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeFloat(this.sideways);
+        buf.writeFloat(this.forward);
         byte b = 0;
         if (this.jumping) {
             b = (byte)(b | true ? 1 : 0);
@@ -52,7 +52,7 @@ implements Packet<ServerPlayPacketListener> {
         if (this.sneaking) {
             b = (byte)(b | 2);
         }
-        arg.writeByte(b);
+        buf.writeByte(b);
     }
 
     @Override

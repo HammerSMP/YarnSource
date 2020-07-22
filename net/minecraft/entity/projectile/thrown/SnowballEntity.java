@@ -31,12 +31,12 @@ extends ThrownItemEntity {
         super((EntityType<? extends ThrownItemEntity>)arg, arg2);
     }
 
-    public SnowballEntity(World arg, LivingEntity arg2) {
-        super((EntityType<? extends ThrownItemEntity>)EntityType.SNOWBALL, arg2, arg);
+    public SnowballEntity(World world, LivingEntity owner) {
+        super((EntityType<? extends ThrownItemEntity>)EntityType.SNOWBALL, owner, world);
     }
 
-    public SnowballEntity(World arg, double d, double e, double f) {
-        super((EntityType<? extends ThrownItemEntity>)EntityType.SNOWBALL, d, e, f, arg);
+    public SnowballEntity(World world, double x, double y, double z) {
+        super((EntityType<? extends ThrownItemEntity>)EntityType.SNOWBALL, x, y, z, world);
     }
 
     @Override
@@ -52,8 +52,8 @@ extends ThrownItemEntity {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void handleStatus(byte b) {
-        if (b == 3) {
+    public void handleStatus(byte status) {
+        if (status == 3) {
             ParticleEffect lv = this.getParticleParameters();
             for (int i = 0; i < 8; ++i) {
                 this.world.addParticle(lv, this.getX(), this.getY(), this.getZ(), 0.0, 0.0, 0.0);
@@ -62,16 +62,16 @@ extends ThrownItemEntity {
     }
 
     @Override
-    protected void onEntityHit(EntityHitResult arg) {
-        super.onEntityHit(arg);
-        Entity lv = arg.getEntity();
+    protected void onEntityHit(EntityHitResult entityHitResult) {
+        super.onEntityHit(entityHitResult);
+        Entity lv = entityHitResult.getEntity();
         int i = lv instanceof BlazeEntity ? 3 : 0;
         lv.damage(DamageSource.thrownProjectile(this, this.getOwner()), i);
     }
 
     @Override
-    protected void onCollision(HitResult arg) {
-        super.onCollision(arg);
+    protected void onCollision(HitResult hitResult) {
+        super.onCollision(hitResult);
         if (!this.world.isClient) {
             this.world.sendEntityStatus(this, (byte)3);
             this.remove();

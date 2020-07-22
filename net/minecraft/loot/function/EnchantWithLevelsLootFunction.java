@@ -29,10 +29,10 @@ extends ConditionalLootFunction {
     private final LootTableRange range;
     private final boolean treasureEnchantmentsAllowed;
 
-    private EnchantWithLevelsLootFunction(LootCondition[] args, LootTableRange arg, boolean bl) {
-        super(args);
-        this.range = arg;
-        this.treasureEnchantmentsAllowed = bl;
+    private EnchantWithLevelsLootFunction(LootCondition[] conditions, LootTableRange range, boolean treasureEnchantmentsAllowed) {
+        super(conditions);
+        this.range = range;
+        this.treasureEnchantmentsAllowed = treasureEnchantmentsAllowed;
     }
 
     @Override
@@ -41,13 +41,13 @@ extends ConditionalLootFunction {
     }
 
     @Override
-    public ItemStack process(ItemStack arg, LootContext arg2) {
-        Random random = arg2.getRandom();
-        return EnchantmentHelper.enchant(random, arg, this.range.next(random), this.treasureEnchantmentsAllowed);
+    public ItemStack process(ItemStack stack, LootContext context) {
+        Random random = context.getRandom();
+        return EnchantmentHelper.enchant(random, stack, this.range.next(random), this.treasureEnchantmentsAllowed);
     }
 
-    public static Builder builder(LootTableRange arg) {
-        return new Builder(arg);
+    public static Builder builder(LootTableRange range) {
+        return new Builder(range);
     }
 
     public static class Serializer
@@ -67,8 +67,8 @@ extends ConditionalLootFunction {
         }
 
         @Override
-        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
-            return this.fromJson(jsonObject, jsonDeserializationContext, args);
+        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject json, JsonDeserializationContext context, LootCondition[] conditions) {
+            return this.fromJson(json, context, conditions);
         }
     }
 
@@ -77,8 +77,8 @@ extends ConditionalLootFunction {
         private final LootTableRange range;
         private boolean treasureEnchantmentsAllowed;
 
-        public Builder(LootTableRange arg) {
-            this.range = arg;
+        public Builder(LootTableRange range) {
+            this.range = range;
         }
 
         @Override

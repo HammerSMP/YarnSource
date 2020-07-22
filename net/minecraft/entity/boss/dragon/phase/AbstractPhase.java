@@ -21,8 +21,8 @@ public abstract class AbstractPhase
 implements Phase {
     protected final EnderDragonEntity dragon;
 
-    public AbstractPhase(EnderDragonEntity arg) {
-        this.dragon = arg;
+    public AbstractPhase(EnderDragonEntity dragon) {
+        this.dragon = dragon;
     }
 
     @Override
@@ -39,7 +39,7 @@ implements Phase {
     }
 
     @Override
-    public void crystalDestroyed(EndCrystalEntity arg, BlockPos arg2, DamageSource arg3, @Nullable PlayerEntity arg4) {
+    public void crystalDestroyed(EndCrystalEntity crystal, BlockPos pos, DamageSource source, @Nullable PlayerEntity player) {
     }
 
     @Override

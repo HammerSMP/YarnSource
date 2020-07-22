@@ -40,8 +40,8 @@ public abstract class BlockEntity {
     private BlockState cachedState;
     private boolean invalid;
 
-    public BlockEntity(BlockEntityType<?> arg) {
-        this.type = arg;
+    public BlockEntity(BlockEntityType<?> type) {
+        this.type = type;
     }
 
     @Nullable
@@ -49,38 +49,38 @@ public abstract class BlockEntity {
         return this.world;
     }
 
-    public void setLocation(World arg, BlockPos arg2) {
-        this.world = arg;
-        this.pos = arg2.toImmutable();
+    public void setLocation(World world, BlockPos pos) {
+        this.world = world;
+        this.pos = pos.toImmutable();
     }
 
     public boolean hasWorld() {
         return this.world != null;
     }
 
-    public void fromTag(BlockState arg, CompoundTag arg2) {
-        this.pos = new BlockPos(arg2.getInt("x"), arg2.getInt("y"), arg2.getInt("z"));
+    public void fromTag(BlockState state, CompoundTag tag) {
+        this.pos = new BlockPos(tag.getInt("x"), tag.getInt("y"), tag.getInt("z"));
     }
 
-    public CompoundTag toTag(CompoundTag arg) {
-        return this.writeIdentifyingData(arg);
+    public CompoundTag toTag(CompoundTag tag) {
+        return this.writeIdentifyingData(tag);
     }
 
-    private CompoundTag writeIdentifyingData(CompoundTag arg) {
+    private CompoundTag writeIdentifyingData(CompoundTag tag) {
         Identifier lv = BlockEntityType.getId(this.getType());
         if (lv == null) {
             throw new RuntimeException(this.getClass() + " is missing a mapping! This is a bug!");
         }
-        arg.putString("id", lv.toString());
-        arg.putInt("x", this.pos.getX());
-        arg.putInt("y", this.pos.getY());
-        arg.putInt("z", this.pos.getZ());
-        return arg;
+        tag.putString("id", lv.toString());
+        tag.putInt("x", this.pos.getX());
+        tag.putInt("y", this.pos.getY());
+        tag.putInt("z", this.pos.getZ());
+        return tag;
     }
 
     @Nullable
-    public static BlockEntity createFromTag(BlockState arg2, CompoundTag arg22) {
-        String string = arg22.getString("id");
+    public static BlockEntity createFromTag(BlockState state, CompoundTag tag) {
+        String string = tag.getString("id");
         return Registry.BLOCK_ENTITY_TYPE.getOrEmpty(new Identifier(string)).map(arg -> {
             try {
                 return arg.instantiate();
@@ -91,7 +91,7 @@ public abstract class BlockEntity {
             }
         }).map(arg3 -> {
             try {
-                arg3.fromTag(arg2, arg22);
+                arg3.fromTag(state, tag);
                 return arg3;
             }
             catch (Throwable throwable) {
@@ -151,7 +151,7 @@ public abstract class BlockEntity {
         this.removed = false;
     }
 
-    public boolean onSyncedBlockEvent(int i, int j) {
+    public boolean onSyncedBlockEvent(int type, int data) {
         return false;
     }
 
@@ -168,18 +168,18 @@ public abstract class BlockEntity {
         CrashReportSection.addBlockInfo(arg, this.pos, this.world.getBlockState(this.pos));
     }
 
-    public void setPos(BlockPos arg) {
-        this.pos = arg.toImmutable();
+    public void setPos(BlockPos pos) {
+        this.pos = pos.toImmutable();
     }
 
     public boolean copyItemDataRequiresOperator() {
         return false;
     }
 
-    public void applyRotation(BlockRotation arg) {
+    public void applyRotation(BlockRotation rotation) {
     }
 
-    public void applyMirror(BlockMirror arg) {
+    public void applyMirror(BlockMirror mirror) {
     }
 
     public BlockEntityType<?> getType() {

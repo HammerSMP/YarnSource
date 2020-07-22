@@ -47,11 +47,11 @@ implements VertexConsumerProvider {
         return lv2;
     }
 
-    public void setColor(int i, int j, int k, int l) {
-        this.red = i;
-        this.green = j;
-        this.blue = k;
-        this.alpha = l;
+    public void setColor(int red, int green, int blue, int alpha) {
+        this.red = red;
+        this.green = green;
+        this.blue = blue;
+        this.alpha = alpha;
     }
 
     public void draw() {
@@ -68,53 +68,53 @@ implements VertexConsumerProvider {
         private float u;
         private float v;
 
-        private OutlineVertexConsumer(VertexConsumer arg, int i, int j, int k, int l) {
-            this.delegate = arg;
-            super.fixedColor(i, j, k, l);
+        private OutlineVertexConsumer(VertexConsumer delegate, int red, int green, int blue, int alpha) {
+            this.delegate = delegate;
+            super.fixedColor(red, green, blue, alpha);
         }
 
         @Override
-        public void fixedColor(int i, int j, int k, int l) {
+        public void fixedColor(int red, int green, int blue, int alpha) {
         }
 
         @Override
-        public VertexConsumer vertex(double d, double e, double f) {
-            this.x = d;
-            this.y = e;
-            this.z = f;
+        public VertexConsumer vertex(double x, double y, double z) {
+            this.x = x;
+            this.y = y;
+            this.z = z;
             return this;
         }
 
         @Override
-        public VertexConsumer color(int i, int j, int k, int l) {
+        public VertexConsumer color(int red, int green, int blue, int alpha) {
             return this;
         }
 
         @Override
-        public VertexConsumer texture(float f, float g) {
-            this.u = f;
-            this.v = g;
+        public VertexConsumer texture(float u, float v) {
+            this.u = u;
+            this.v = v;
             return this;
         }
 
         @Override
-        public VertexConsumer overlay(int i, int j) {
+        public VertexConsumer overlay(int u, int v) {
             return this;
         }
 
         @Override
-        public VertexConsumer light(int i, int j) {
+        public VertexConsumer light(int u, int v) {
             return this;
         }
 
         @Override
-        public VertexConsumer normal(float f, float g, float h) {
+        public VertexConsumer normal(float x, float y, float z) {
             return this;
         }
 
         @Override
-        public void vertex(float f, float g, float h, float i, float j, float k, float l, float m, float n, int o, int p, float q, float r, float s) {
-            this.delegate.vertex(f, g, h).color(this.fixedRed, this.fixedGreen, this.fixedBlue, this.fixedAlpha).texture(m, n).next();
+        public void vertex(float x, float y, float z, float red, float green, float blue, float alpha, float u, float v, int overlay, int light, float normalX, float normalY, float normalZ) {
+            this.delegate.vertex(x, y, z).color(this.fixedRed, this.fixedGreen, this.fixedBlue, this.fixedAlpha).texture(u, v).next();
         }
 
         @Override

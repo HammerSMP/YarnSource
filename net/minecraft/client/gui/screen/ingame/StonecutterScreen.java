@@ -32,38 +32,38 @@ extends HandledScreen<StonecutterScreenHandler> {
     private int scrollOffset;
     private boolean canCraft;
 
-    public StonecutterScreen(StonecutterScreenHandler arg, PlayerInventory arg2, Text arg3) {
-        super(arg, arg2, arg3);
-        arg.setContentsChangedListener(this::onInventoryChange);
+    public StonecutterScreen(StonecutterScreenHandler handler, PlayerInventory inventory, Text title) {
+        super(handler, inventory, title);
+        handler.setContentsChangedListener(this::onInventoryChange);
         --this.titleY;
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        super.render(arg, i, j, f);
-        this.drawMouseoverTooltip(arg, i, j);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        super.render(matrices, mouseX, mouseY, delta);
+        this.drawMouseoverTooltip(matrices, mouseX, mouseY);
     }
 
     @Override
-    protected void drawBackground(MatrixStack arg, float f, int i, int j) {
-        this.renderBackground(arg);
+    protected void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY) {
+        this.renderBackground(matrices);
         RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
         this.client.getTextureManager().bindTexture(TEXTURE);
         int k = this.x;
         int l = this.y;
-        this.drawTexture(arg, k, l, 0, 0, this.backgroundWidth, this.backgroundHeight);
+        this.drawTexture(matrices, k, l, 0, 0, this.backgroundWidth, this.backgroundHeight);
         int m = (int)(41.0f * this.scrollAmount);
-        this.drawTexture(arg, k + 119, l + 15 + m, 176 + (this.shouldScroll() ? 0 : 12), 0, 12, 15);
+        this.drawTexture(matrices, k + 119, l + 15 + m, 176 + (this.shouldScroll() ? 0 : 12), 0, 12, 15);
         int n = this.x + 52;
         int o = this.y + 14;
         int p = this.scrollOffset + 12;
-        this.renderRecipeBackground(arg, i, j, n, o, p);
+        this.renderRecipeBackground(matrices, mouseX, mouseY, n, o, p);
         this.renderRecipeIcons(n, o, p);
     }
 
     @Override
-    protected void drawMouseoverTooltip(MatrixStack arg, int i, int j) {
-        super.drawMouseoverTooltip(arg, i, j);
+    protected void drawMouseoverTooltip(MatrixStack matrices, int x, int y) {
+        super.drawMouseoverTooltip(matrices, x, y);
         if (this.canCraft) {
             int k = this.x + 52;
             int l = this.y + 14;
@@ -73,8 +73,8 @@ extends HandledScreen<StonecutterScreenHandler> {
                 int o = n - this.scrollOffset;
                 int p = k + o % 4 * 16;
                 int q = l + o / 4 * 18 + 2;
-                if (i < p || i >= p + 16 || j < q || j >= q + 18) continue;
-                this.renderTooltip(arg, list.get(n).getOutput(), i, j);
+                if (x < p || x >= p + 16 || y < q || y >= q + 18) continue;
+                this.renderTooltip(matrices, list.get(n).getOutput(), x, y);
             }
         }
     }
@@ -95,19 +95,19 @@ extends HandledScreen<StonecutterScreenHandler> {
         }
     }
 
-    private void renderRecipeIcons(int i, int j, int k) {
+    private void renderRecipeIcons(int x, int y, int scrollOffset) {
         List<StonecuttingRecipe> list = ((StonecutterScreenHandler)this.handler).getAvailableRecipes();
-        for (int l = this.scrollOffset; l < k && l < ((StonecutterScreenHandler)this.handler).getAvailableRecipeCount(); ++l) {
+        for (int l = this.scrollOffset; l < scrollOffset && l < ((StonecutterScreenHandler)this.handler).getAvailableRecipeCount(); ++l) {
             int m = l - this.scrollOffset;
-            int n = i + m % 4 * 16;
+            int n = x + m % 4 * 16;
             int o = m / 4;
-            int p = j + o * 18 + 2;
+            int p = y + o * 18 + 2;
             this.client.getItemRenderer().renderInGuiWithOverrides(list.get(l).getOutput(), n, p);
         }
     }
 
     @Override
-    public boolean mouseClicked(double d, double e, int i) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
         this.mouseClicked = false;
         if (this.canCraft) {
             int j = this.x + 52;
@@ -115,8 +115,8 @@ extends HandledScreen<StonecutterScreenHandler> {
             int l = this.scrollOffset + 12;
             for (int m = this.scrollOffset; m < l; ++m) {
                 int n = m - this.scrollOffset;
-                double f = d - (double)(j + n % 4 * 16);
-                double g = e - (double)(k + n / 4 * 18);
+                double f = mouseX - (double)(j + n % 4 * 16);
+                double g = mouseY - (double)(k + n / 4 * 18);
                 if (!(f >= 0.0) || !(g >= 0.0) || !(f < 16.0) || !(g < 18.0) || !((StonecutterScreenHandler)this.handler).onButtonClick(this.client.player, m)) continue;
                 MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_STONECUTTER_SELECT_RECIPE, 1.0f));
                 this.client.interactionManager.clickButton(((StonecutterScreenHandler)this.handler).syncId, m);
@@ -124,31 +124,31 @@ extends HandledScreen<StonecutterScreenHandler> {
             }
             j = this.x + 119;
             k = this.y + 9;
-            if (d >= (double)j && d < (double)(j + 12) && e >= (double)k && e < (double)(k + 54)) {
+            if (mouseX >= (double)j && mouseX < (double)(j + 12) && mouseY >= (double)k && mouseY < (double)(k + 54)) {
                 this.mouseClicked = true;
             }
         }
-        return super.mouseClicked(d, e, i);
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
-    public boolean mouseDragged(double d, double e, int i, double f, double g) {
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
         if (this.mouseClicked && this.shouldScroll()) {
             int j = this.y + 14;
             int k = j + 54;
-            this.scrollAmount = ((float)e - (float)j - 7.5f) / ((float)(k - j) - 15.0f);
+            this.scrollAmount = ((float)mouseY - (float)j - 7.5f) / ((float)(k - j) - 15.0f);
             this.scrollAmount = MathHelper.clamp(this.scrollAmount, 0.0f, 1.0f);
             this.scrollOffset = (int)((double)(this.scrollAmount * (float)this.getMaxScroll()) + 0.5) * 4;
             return true;
         }
-        return super.mouseDragged(d, e, i, f, g);
+        return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
     }
 
     @Override
-    public boolean mouseScrolled(double d, double e, double f) {
+    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
         if (this.shouldScroll()) {
             int i = this.getMaxScroll();
-            this.scrollAmount = (float)((double)this.scrollAmount - f / (double)i);
+            this.scrollAmount = (float)((double)this.scrollAmount - amount / (double)i);
             this.scrollAmount = MathHelper.clamp(this.scrollAmount, 0.0f, 1.0f);
             this.scrollOffset = (int)((double)(this.scrollAmount * (float)i) + 0.5) * 4;
         }

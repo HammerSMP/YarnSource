@@ -14,30 +14,30 @@ public class BackgroundHelper {
 
     public static class ColorMixer {
         @Environment(value=EnvType.CLIENT)
-        public static int getAlpha(int i) {
-            return i >>> 24;
+        public static int getAlpha(int argb) {
+            return argb >>> 24;
         }
 
-        public static int getRed(int i) {
-            return i >> 16 & 0xFF;
+        public static int getRed(int argb) {
+            return argb >> 16 & 0xFF;
         }
 
-        public static int getGreen(int i) {
-            return i >> 8 & 0xFF;
+        public static int getGreen(int argb) {
+            return argb >> 8 & 0xFF;
         }
 
-        public static int getBlue(int i) {
-            return i & 0xFF;
-        }
-
-        @Environment(value=EnvType.CLIENT)
-        public static int getArgb(int i, int j, int k, int l) {
-            return i << 24 | j << 16 | k << 8 | l;
+        public static int getBlue(int argb) {
+            return argb & 0xFF;
         }
 
         @Environment(value=EnvType.CLIENT)
-        public static int mixColor(int i, int j) {
-            return ColorMixer.getArgb(ColorMixer.getAlpha(i) * ColorMixer.getAlpha(j) / 255, ColorMixer.getRed(i) * ColorMixer.getRed(j) / 255, ColorMixer.getGreen(i) * ColorMixer.getGreen(j) / 255, ColorMixer.getBlue(i) * ColorMixer.getBlue(j) / 255);
+        public static int getArgb(int alpha, int red, int green, int blue) {
+            return alpha << 24 | red << 16 | green << 8 | blue;
+        }
+
+        @Environment(value=EnvType.CLIENT)
+        public static int mixColor(int first, int second) {
+            return ColorMixer.getArgb(ColorMixer.getAlpha(first) * ColorMixer.getAlpha(second) / 255, ColorMixer.getRed(first) * ColorMixer.getRed(second) / 255, ColorMixer.getGreen(first) * ColorMixer.getGreen(second) / 255, ColorMixer.getBlue(first) * ColorMixer.getBlue(second) / 255);
         }
     }
 }

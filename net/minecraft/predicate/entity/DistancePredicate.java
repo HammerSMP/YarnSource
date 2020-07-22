@@ -25,26 +25,26 @@ public class DistancePredicate {
     private final NumberRange.FloatRange horizontal;
     private final NumberRange.FloatRange absolute;
 
-    public DistancePredicate(NumberRange.FloatRange arg, NumberRange.FloatRange arg2, NumberRange.FloatRange arg3, NumberRange.FloatRange arg4, NumberRange.FloatRange arg5) {
-        this.x = arg;
-        this.y = arg2;
-        this.z = arg3;
-        this.horizontal = arg4;
-        this.absolute = arg5;
+    public DistancePredicate(NumberRange.FloatRange x, NumberRange.FloatRange y, NumberRange.FloatRange z, NumberRange.FloatRange horizontal, NumberRange.FloatRange absolute) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.horizontal = horizontal;
+        this.absolute = absolute;
     }
 
-    public static DistancePredicate horizontal(NumberRange.FloatRange arg) {
-        return new DistancePredicate(NumberRange.FloatRange.ANY, NumberRange.FloatRange.ANY, NumberRange.FloatRange.ANY, arg, NumberRange.FloatRange.ANY);
+    public static DistancePredicate horizontal(NumberRange.FloatRange horizontal) {
+        return new DistancePredicate(NumberRange.FloatRange.ANY, NumberRange.FloatRange.ANY, NumberRange.FloatRange.ANY, horizontal, NumberRange.FloatRange.ANY);
     }
 
-    public static DistancePredicate y(NumberRange.FloatRange arg) {
-        return new DistancePredicate(NumberRange.FloatRange.ANY, arg, NumberRange.FloatRange.ANY, NumberRange.FloatRange.ANY, NumberRange.FloatRange.ANY);
+    public static DistancePredicate y(NumberRange.FloatRange y) {
+        return new DistancePredicate(NumberRange.FloatRange.ANY, y, NumberRange.FloatRange.ANY, NumberRange.FloatRange.ANY, NumberRange.FloatRange.ANY);
     }
 
-    public boolean test(double d, double e, double f, double g, double h, double i) {
-        float j = (float)(d - g);
-        float k = (float)(e - h);
-        float l = (float)(f - i);
+    public boolean test(double x0, double y0, double z0, double x1, double y1, double z1) {
+        float j = (float)(x0 - x1);
+        float k = (float)(y0 - y1);
+        float l = (float)(z0 - z1);
         if (!(this.x.test(MathHelper.abs(j)) && this.y.test(MathHelper.abs(k)) && this.z.test(MathHelper.abs(l)))) {
             return false;
         }
@@ -54,11 +54,11 @@ public class DistancePredicate {
         return this.absolute.testSqrt(j * j + k * k + l * l);
     }
 
-    public static DistancePredicate fromJson(@Nullable JsonElement jsonElement) {
-        if (jsonElement == null || jsonElement.isJsonNull()) {
+    public static DistancePredicate fromJson(@Nullable JsonElement json) {
+        if (json == null || json.isJsonNull()) {
             return ANY;
         }
-        JsonObject jsonObject = JsonHelper.asObject(jsonElement, "distance");
+        JsonObject jsonObject = JsonHelper.asObject(json, "distance");
         NumberRange.FloatRange lv = NumberRange.FloatRange.fromJson(jsonObject.get("x"));
         NumberRange.FloatRange lv2 = NumberRange.FloatRange.fromJson(jsonObject.get("y"));
         NumberRange.FloatRange lv3 = NumberRange.FloatRange.fromJson(jsonObject.get("z"));

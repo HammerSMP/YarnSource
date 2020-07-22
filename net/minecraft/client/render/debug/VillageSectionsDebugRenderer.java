@@ -32,28 +32,28 @@ implements DebugRenderer.Renderer {
         this.sections.clear();
     }
 
-    public void addSection(ChunkSectionPos arg) {
-        this.sections.add(arg);
+    public void addSection(ChunkSectionPos pos) {
+        this.sections.add(pos);
     }
 
-    public void removeSection(ChunkSectionPos arg) {
-        this.sections.remove(arg);
+    public void removeSection(ChunkSectionPos pos) {
+        this.sections.remove(pos);
     }
 
     @Override
-    public void render(MatrixStack arg, VertexConsumerProvider arg2, double d, double e, double f) {
+    public void render(MatrixStack matrices, VertexConsumerProvider vertexConsumers, double cameraX, double cameraY, double cameraZ) {
         RenderSystem.pushMatrix();
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.disableTexture();
-        this.drawSections(d, e, f);
+        this.drawSections(cameraX, cameraY, cameraZ);
         RenderSystem.enableTexture();
         RenderSystem.disableBlend();
         RenderSystem.popMatrix();
     }
 
-    private void drawSections(double d, double e, double f) {
-        BlockPos lv = new BlockPos(d, e, f);
+    private void drawSections(double cameraX, double cameraY, double cameraZ) {
+        BlockPos lv = new BlockPos(cameraX, cameraY, cameraZ);
         this.sections.forEach(arg2 -> {
             if (lv.isWithinDistance(arg2.getCenterPos(), 60.0)) {
                 VillageSectionsDebugRenderer.drawBoxAtCenterOf(arg2);
@@ -61,9 +61,9 @@ implements DebugRenderer.Renderer {
         });
     }
 
-    private static void drawBoxAtCenterOf(ChunkSectionPos arg) {
+    private static void drawBoxAtCenterOf(ChunkSectionPos pos) {
         float f = 1.0f;
-        BlockPos lv = arg.getCenterPos();
+        BlockPos lv = pos.getCenterPos();
         BlockPos lv2 = lv.add(-1.0, -1.0, -1.0);
         BlockPos lv3 = lv.add(1.0, 1.0, 1.0);
         DebugRenderer.drawBox(lv2, lv3, 0.2f, 1.0f, 0.2f, 0.15f);

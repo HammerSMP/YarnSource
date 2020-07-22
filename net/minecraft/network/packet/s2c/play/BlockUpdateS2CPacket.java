@@ -26,21 +26,25 @@ implements Packet<ClientPlayPacketListener> {
     public BlockUpdateS2CPacket() {
     }
 
-    public BlockUpdateS2CPacket(BlockView arg, BlockPos arg2) {
-        this.pos = arg2;
-        this.state = arg.getBlockState(arg2);
+    public BlockUpdateS2CPacket(BlockPos arg, BlockState arg2) {
+        this.pos = arg;
+        this.state = arg2;
+    }
+
+    public BlockUpdateS2CPacket(BlockView world, BlockPos pos) {
+        this(pos, world.getBlockState(pos));
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.pos = arg.readBlockPos();
-        this.state = Block.STATE_IDS.get(arg.readVarInt());
+    public void read(PacketByteBuf buf) throws IOException {
+        this.pos = buf.readBlockPos();
+        this.state = Block.STATE_IDS.get(buf.readVarInt());
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeBlockPos(this.pos);
-        arg.writeVarInt(Block.getRawIdFromState(this.state));
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeBlockPos(this.pos);
+        buf.writeVarInt(Block.getRawIdFromState(this.state));
     }
 
     @Override

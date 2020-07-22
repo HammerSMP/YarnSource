@@ -28,10 +28,10 @@ extends Screen {
     private final Screen parent;
     private int reasonHeight;
 
-    public DisconnectedScreen(Screen arg, String string, Text arg2) {
-        super(new TranslatableText(string));
-        this.parent = arg;
-        this.reason = arg2;
+    public DisconnectedScreen(Screen parent, String title, Text reason) {
+        super(new TranslatableText(title));
+        this.parent = parent;
+        this.reason = reason;
     }
 
     @Override
@@ -49,19 +49,19 @@ extends Screen {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.renderBackground(arg);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.renderBackground(matrices);
         this.textRenderer.getClass();
-        this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, this.height / 2 - this.reasonHeight / 2 - 9 * 2, 0xAAAAAA);
+        this.drawCenteredText(matrices, this.textRenderer, this.title, this.width / 2, this.height / 2 - this.reasonHeight / 2 - 9 * 2, 0xAAAAAA);
         int k = this.height / 2 - this.reasonHeight / 2;
         if (this.reasonFormatted != null) {
             for (StringRenderable lv : this.reasonFormatted) {
-                this.drawCenteredText(arg, this.textRenderer, lv, this.width / 2, k, 0xFFFFFF);
+                this.drawCenteredText(matrices, this.textRenderer, lv, this.width / 2, k, 0xFFFFFF);
                 this.textRenderer.getClass();
                 k += 9;
             }
         }
-        super.render(arg, i, j, f);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 }
 

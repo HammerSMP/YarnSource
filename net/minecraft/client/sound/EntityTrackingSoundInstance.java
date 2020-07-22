@@ -19,14 +19,14 @@ public class EntityTrackingSoundInstance
 extends MovingSoundInstance {
     private final Entity entity;
 
-    public EntityTrackingSoundInstance(SoundEvent arg, SoundCategory arg2, Entity arg3) {
-        this(arg, arg2, 1.0f, 1.0f, arg3);
+    public EntityTrackingSoundInstance(SoundEvent sound, SoundCategory arg2, Entity arg3) {
+        this(sound, arg2, 1.0f, 1.0f, arg3);
     }
 
-    public EntityTrackingSoundInstance(SoundEvent arg, SoundCategory arg2, float f, float g, Entity arg3) {
-        super(arg, arg2);
-        this.volume = f;
-        this.pitch = g;
+    public EntityTrackingSoundInstance(SoundEvent sound, SoundCategory arg2, float volume, float pitch, Entity arg3) {
+        super(sound, arg2);
+        this.volume = volume;
+        this.pitch = pitch;
         this.entity = arg3;
         this.x = (float)this.entity.getX();
         this.y = (float)this.entity.getY();

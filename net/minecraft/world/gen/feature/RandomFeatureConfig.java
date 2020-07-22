@@ -12,6 +12,8 @@ import com.mojang.datafixers.kinds.App;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.List;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
 import net.minecraft.world.gen.feature.FeatureConfig;
 import net.minecraft.world.gen.feature.RandomFeatureEntry;
@@ -19,12 +21,21 @@ import net.minecraft.world.gen.feature.RandomFeatureEntry;
 public class RandomFeatureConfig
 implements FeatureConfig {
     public static final Codec<RandomFeatureConfig> CODEC = RecordCodecBuilder.create(instance -> instance.apply2(RandomFeatureConfig::new, (App)RandomFeatureEntry.CODEC.listOf().fieldOf("features").forGetter(arg -> arg.features), (App)ConfiguredFeature.CODEC.fieldOf("default").forGetter(arg -> arg.defaultFeature)));
-    public final List<RandomFeatureEntry<?>> features;
-    public final ConfiguredFeature<?, ?> defaultFeature;
+    public final List<RandomFeatureEntry> features;
+    public final Supplier<ConfiguredFeature<?, ?>> defaultFeature;
 
-    public RandomFeatureConfig(List<RandomFeatureEntry<?>> list, ConfiguredFeature<?, ?> arg) {
+    public RandomFeatureConfig(List<RandomFeatureEntry> features, ConfiguredFeature<?, ?> defaultFeature) {
+        this(features, () -> defaultFeature);
+    }
+
+    private RandomFeatureConfig(List<RandomFeatureEntry> list, Supplier<ConfiguredFeature<?, ?>> supplier) {
         this.features = list;
-        this.defaultFeature = arg;
+        this.defaultFeature = supplier;
+    }
+
+    @Override
+    public Stream<ConfiguredFeature<?, ?>> method_30649() {
+        return Stream.concat(this.features.stream().flatMap(arg -> arg.feature.get().method_30648()), this.defaultFeature.get().method_30648());
     }
 }
 

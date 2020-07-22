@@ -20,19 +20,19 @@ extends PotionItem {
     }
 
     @Override
-    public TypedActionResult<ItemStack> use(World arg, PlayerEntity arg2, Hand arg3) {
-        ItemStack lv = arg2.getStackInHand(arg3);
-        if (!arg.isClient) {
-            PotionEntity lv2 = new PotionEntity(arg, arg2);
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+        ItemStack lv = user.getStackInHand(hand);
+        if (!world.isClient) {
+            PotionEntity lv2 = new PotionEntity(world, user);
             lv2.setItem(lv);
-            lv2.setProperties(arg2, arg2.pitch, arg2.yaw, -20.0f, 0.5f, 1.0f);
-            arg.spawnEntity(lv2);
+            lv2.setProperties(user, user.pitch, user.yaw, -20.0f, 0.5f, 1.0f);
+            world.spawnEntity(lv2);
         }
-        arg2.incrementStat(Stats.USED.getOrCreateStat(this));
-        if (!arg2.abilities.creativeMode) {
+        user.incrementStat(Stats.USED.getOrCreateStat(this));
+        if (!user.abilities.creativeMode) {
             lv.decrement(1);
         }
-        return TypedActionResult.method_29237(lv, arg.isClient());
+        return TypedActionResult.method_29237(lv, world.isClient());
     }
 }
 

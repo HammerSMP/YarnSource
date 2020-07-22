@@ -24,25 +24,25 @@ implements Packet<ServerPlayPacketListener> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public UpdateSignC2SPacket(BlockPos arg, String string, String string2, String string3, String string4) {
-        this.pos = arg;
-        this.text = new String[]{string, string2, string3, string4};
+    public UpdateSignC2SPacket(BlockPos pos, String line1, String line2, String line3, String line4) {
+        this.pos = pos;
+        this.text = new String[]{line1, line2, line3, line4};
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.pos = arg.readBlockPos();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.pos = buf.readBlockPos();
         this.text = new String[4];
         for (int i = 0; i < 4; ++i) {
-            this.text[i] = arg.readString(384);
+            this.text[i] = buf.readString(384);
         }
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeBlockPos(this.pos);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeBlockPos(this.pos);
         for (int i = 0; i < 4; ++i) {
-            arg.writeString(this.text[i]);
+            buf.writeString(this.text[i]);
         }
     }
 

@@ -66,12 +66,12 @@ extends StatHandler {
     private final Set<Stat<?>> pendingStats = Sets.newHashSet();
     private int lastStatsUpdate = -300;
 
-    public ServerStatHandler(MinecraftServer minecraftServer, File file) {
-        this.server = minecraftServer;
+    public ServerStatHandler(MinecraftServer server, File file) {
+        this.server = server;
         this.file = file;
         if (file.isFile()) {
             try {
-                this.parse(minecraftServer.getDataFixer(), FileUtils.readFileToString((File)file));
+                this.parse(server.getDataFixer(), FileUtils.readFileToString((File)file));
             }
             catch (IOException iOException) {
                 LOGGER.error("Couldn't read statistics file {}", (Object)file, (Object)iOException);
@@ -92,9 +92,9 @@ extends StatHandler {
     }
 
     @Override
-    public void setStat(PlayerEntity arg, Stat<?> arg2, int i) {
-        super.setStat(arg, arg2, i);
-        this.pendingStats.add(arg2);
+    public void setStat(PlayerEntity player, Stat<?> stat, int value) {
+        super.setStat(player, stat, value);
+        this.pendingStats.add(stat);
     }
 
     private Set<Stat<?>> takePendingStats() {
@@ -103,8 +103,8 @@ extends StatHandler {
         return set;
     }
 
-    public void parse(DataFixer dataFixer, String string) {
-        try (JsonReader jsonReader = new JsonReader((Reader)new StringReader(string));){
+    public void parse(DataFixer dataFixer, String json) {
+        try (JsonReader jsonReader = new JsonReader((Reader)new StringReader(json));){
             jsonReader.setLenient(false);
             JsonElement jsonElement = Streams.parse((JsonReader)jsonReader);
             if (jsonElement.isJsonNull()) {
@@ -137,8 +137,8 @@ extends StatHandler {
         }
     }
 
-    private <T> Optional<Stat<T>> createStat(StatType<T> arg, String string) {
-        return Optional.ofNullable(Identifier.tryParse(string)).flatMap(arg.getRegistry()::getOrEmpty).map(arg::getOrCreateStat);
+    private <T> Optional<Stat<T>> createStat(StatType<T> type, String id) {
+        return Optional.ofNullable(Identifier.tryParse(id)).flatMap(type.getRegistry()::getOrEmpty).map(type::getOrCreateStat);
     }
 
     private static CompoundTag jsonToCompound(JsonObject jsonObject) {
@@ -180,7 +180,7 @@ extends StatHandler {
         this.pendingStats.addAll((Collection<Stat<?>>)this.statMap.keySet());
     }
 
-    public void sendStats(ServerPlayerEntity arg) {
+    public void sendStats(ServerPlayerEntity player) {
         int i = this.server.getTicks();
         Object2IntOpenHashMap object2IntMap = new Object2IntOpenHashMap();
         if (i - this.lastStatsUpdate > 300) {
@@ -189,7 +189,7 @@ extends StatHandler {
                 object2IntMap.put(lv, this.getStat(lv));
             }
         }
-        arg.networkHandler.sendPacket(new StatisticsS2CPacket((Object2IntMap<Stat<?>>)object2IntMap));
+        player.networkHandler.sendPacket(new StatisticsS2CPacket((Object2IntMap<Stat<?>>)object2IntMap));
     }
 }
 

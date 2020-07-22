@@ -3,7 +3,7 @@
  */
 package net.minecraft.world.biome.layer;
 
-import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.BuiltinRegistries;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.biome.layer.BiomeLayers;
@@ -38,71 +38,71 @@ public enum AddEdgeBiomesLayer implements CrossSamplingLayer
     private static final int TAIGA_ID;
 
     @Override
-    public int sample(LayerRandomnessSource arg, int i, int j, int k, int l, int m) {
-        Biome lv = (Biome)Registry.BIOME.get(m);
-        if (m == MUSHROOM_FIELDS_ID) {
-            if (BiomeLayers.isShallowOcean(i) || BiomeLayers.isShallowOcean(j) || BiomeLayers.isShallowOcean(k) || BiomeLayers.isShallowOcean(l)) {
+    public int sample(LayerRandomnessSource context, int n, int e, int s, int w, int center) {
+        Biome lv = (Biome)BuiltinRegistries.BIOME.get(center);
+        if (center == MUSHROOM_FIELDS_ID) {
+            if (BiomeLayers.isShallowOcean(n) || BiomeLayers.isShallowOcean(e) || BiomeLayers.isShallowOcean(s) || BiomeLayers.isShallowOcean(w)) {
                 return MUSHROOM_FIELD_SHORE_ID;
             }
         } else if (lv != null && lv.getCategory() == Biome.Category.JUNGLE) {
-            if (!(AddEdgeBiomesLayer.isWooded(i) && AddEdgeBiomesLayer.isWooded(j) && AddEdgeBiomesLayer.isWooded(k) && AddEdgeBiomesLayer.isWooded(l))) {
+            if (!(AddEdgeBiomesLayer.isWooded(n) && AddEdgeBiomesLayer.isWooded(e) && AddEdgeBiomesLayer.isWooded(s) && AddEdgeBiomesLayer.isWooded(w))) {
                 return JUNGLE_EDGE_ID;
             }
-            if (BiomeLayers.isOcean(i) || BiomeLayers.isOcean(j) || BiomeLayers.isOcean(k) || BiomeLayers.isOcean(l)) {
+            if (BiomeLayers.isOcean(n) || BiomeLayers.isOcean(e) || BiomeLayers.isOcean(s) || BiomeLayers.isOcean(w)) {
                 return BEACH_ID;
             }
-        } else if (m == MOUNTAINS_ID || m == WOODED_MOUNTAINS_ID || m == MOUNTAIN_EDGE_ID) {
-            if (!BiomeLayers.isOcean(m) && (BiomeLayers.isOcean(i) || BiomeLayers.isOcean(j) || BiomeLayers.isOcean(k) || BiomeLayers.isOcean(l))) {
+        } else if (center == MOUNTAINS_ID || center == WOODED_MOUNTAINS_ID || center == MOUNTAIN_EDGE_ID) {
+            if (!BiomeLayers.isOcean(center) && (BiomeLayers.isOcean(n) || BiomeLayers.isOcean(e) || BiomeLayers.isOcean(s) || BiomeLayers.isOcean(w))) {
                 return STONE_SHORE_ID;
             }
         } else if (lv != null && lv.getPrecipitation() == Biome.Precipitation.SNOW) {
-            if (!BiomeLayers.isOcean(m) && (BiomeLayers.isOcean(i) || BiomeLayers.isOcean(j) || BiomeLayers.isOcean(k) || BiomeLayers.isOcean(l))) {
+            if (!BiomeLayers.isOcean(center) && (BiomeLayers.isOcean(n) || BiomeLayers.isOcean(e) || BiomeLayers.isOcean(s) || BiomeLayers.isOcean(w))) {
                 return SNOWY_BEACH_ID;
             }
-        } else if (m == BADLANDS_ID || m == WOODED_BADLANDS_PLATEAU_ID) {
-            if (!(BiomeLayers.isOcean(i) || BiomeLayers.isOcean(j) || BiomeLayers.isOcean(k) || BiomeLayers.isOcean(l) || this.isBadlands(i) && this.isBadlands(j) && this.isBadlands(k) && this.isBadlands(l))) {
+        } else if (center == BADLANDS_ID || center == WOODED_BADLANDS_PLATEAU_ID) {
+            if (!(BiomeLayers.isOcean(n) || BiomeLayers.isOcean(e) || BiomeLayers.isOcean(s) || BiomeLayers.isOcean(w) || this.isBadlands(n) && this.isBadlands(e) && this.isBadlands(s) && this.isBadlands(w))) {
                 return DESERT_ID;
             }
-        } else if (!BiomeLayers.isOcean(m) && m != RIVER_ID && m != SWAMP_ID && (BiomeLayers.isOcean(i) || BiomeLayers.isOcean(j) || BiomeLayers.isOcean(k) || BiomeLayers.isOcean(l))) {
+        } else if (!BiomeLayers.isOcean(center) && center != RIVER_ID && center != SWAMP_ID && (BiomeLayers.isOcean(n) || BiomeLayers.isOcean(e) || BiomeLayers.isOcean(s) || BiomeLayers.isOcean(w))) {
             return BEACH_ID;
         }
-        return m;
+        return center;
     }
 
-    private static boolean isWooded(int i) {
-        if (Registry.BIOME.get(i) != null && ((Biome)Registry.BIOME.get(i)).getCategory() == Biome.Category.JUNGLE) {
+    private static boolean isWooded(int id) {
+        if (BuiltinRegistries.BIOME.get(id) != null && ((Biome)BuiltinRegistries.BIOME.get(id)).getCategory() == Biome.Category.JUNGLE) {
             return true;
         }
-        return i == JUNGLE_EDGE_ID || i == JUNGLE_ID || i == JUNGLE_HILLS_ID || i == FOREST_ID || i == TAIGA_ID || BiomeLayers.isOcean(i);
+        return id == JUNGLE_EDGE_ID || id == JUNGLE_ID || id == JUNGLE_HILLS_ID || id == FOREST_ID || id == TAIGA_ID || BiomeLayers.isOcean(id);
     }
 
-    private boolean isBadlands(int i) {
-        return i == BADLANDS_ID || i == WOODED_BADLANDS_PLATEAU_ID || i == BADLANDS_PLATEAU_ID || i == ERODED_BADLANDS_ID || i == MODIFIED_WOODED_BADLANDS_PLATEAU_ID || i == MODIFIED_BADLANDS_PLATEAU_ID;
+    private boolean isBadlands(int id) {
+        return id == BADLANDS_ID || id == WOODED_BADLANDS_PLATEAU_ID || id == BADLANDS_PLATEAU_ID || id == ERODED_BADLANDS_ID || id == MODIFIED_WOODED_BADLANDS_PLATEAU_ID || id == MODIFIED_BADLANDS_PLATEAU_ID;
     }
 
     static {
-        BEACH_ID = Registry.BIOME.getRawId(Biomes.BEACH);
-        SNOWY_BEACH_ID = Registry.BIOME.getRawId(Biomes.SNOWY_BEACH);
-        DESERT_ID = Registry.BIOME.getRawId(Biomes.DESERT);
-        MOUNTAINS_ID = Registry.BIOME.getRawId(Biomes.MOUNTAINS);
-        WOODED_MOUNTAINS_ID = Registry.BIOME.getRawId(Biomes.WOODED_MOUNTAINS);
-        FOREST_ID = Registry.BIOME.getRawId(Biomes.FOREST);
-        JUNGLE_ID = Registry.BIOME.getRawId(Biomes.JUNGLE);
-        JUNGLE_EDGE_ID = Registry.BIOME.getRawId(Biomes.JUNGLE_EDGE);
-        JUNGLE_HILLS_ID = Registry.BIOME.getRawId(Biomes.JUNGLE_HILLS);
-        BADLANDS_ID = Registry.BIOME.getRawId(Biomes.BADLANDS);
-        WOODED_BADLANDS_PLATEAU_ID = Registry.BIOME.getRawId(Biomes.WOODED_BADLANDS_PLATEAU);
-        BADLANDS_PLATEAU_ID = Registry.BIOME.getRawId(Biomes.BADLANDS_PLATEAU);
-        ERODED_BADLANDS_ID = Registry.BIOME.getRawId(Biomes.ERODED_BADLANDS);
-        MODIFIED_WOODED_BADLANDS_PLATEAU_ID = Registry.BIOME.getRawId(Biomes.MODIFIED_WOODED_BADLANDS_PLATEAU);
-        MODIFIED_BADLANDS_PLATEAU_ID = Registry.BIOME.getRawId(Biomes.MODIFIED_BADLANDS_PLATEAU);
-        MUSHROOM_FIELDS_ID = Registry.BIOME.getRawId(Biomes.MUSHROOM_FIELDS);
-        MUSHROOM_FIELD_SHORE_ID = Registry.BIOME.getRawId(Biomes.MUSHROOM_FIELD_SHORE);
-        RIVER_ID = Registry.BIOME.getRawId(Biomes.RIVER);
-        MOUNTAIN_EDGE_ID = Registry.BIOME.getRawId(Biomes.MOUNTAIN_EDGE);
-        STONE_SHORE_ID = Registry.BIOME.getRawId(Biomes.STONE_SHORE);
-        SWAMP_ID = Registry.BIOME.getRawId(Biomes.SWAMP);
-        TAIGA_ID = Registry.BIOME.getRawId(Biomes.TAIGA);
+        BEACH_ID = BuiltinRegistries.BIOME.getRawId(Biomes.BEACH);
+        SNOWY_BEACH_ID = BuiltinRegistries.BIOME.getRawId(Biomes.SNOWY_BEACH);
+        DESERT_ID = BuiltinRegistries.BIOME.getRawId(Biomes.DESERT);
+        MOUNTAINS_ID = BuiltinRegistries.BIOME.getRawId(Biomes.MOUNTAINS);
+        WOODED_MOUNTAINS_ID = BuiltinRegistries.BIOME.getRawId(Biomes.WOODED_MOUNTAINS);
+        FOREST_ID = BuiltinRegistries.BIOME.getRawId(Biomes.FOREST);
+        JUNGLE_ID = BuiltinRegistries.BIOME.getRawId(Biomes.JUNGLE);
+        JUNGLE_EDGE_ID = BuiltinRegistries.BIOME.getRawId(Biomes.JUNGLE_EDGE);
+        JUNGLE_HILLS_ID = BuiltinRegistries.BIOME.getRawId(Biomes.JUNGLE_HILLS);
+        BADLANDS_ID = BuiltinRegistries.BIOME.getRawId(Biomes.BADLANDS);
+        WOODED_BADLANDS_PLATEAU_ID = BuiltinRegistries.BIOME.getRawId(Biomes.WOODED_BADLANDS_PLATEAU);
+        BADLANDS_PLATEAU_ID = BuiltinRegistries.BIOME.getRawId(Biomes.BADLANDS_PLATEAU);
+        ERODED_BADLANDS_ID = BuiltinRegistries.BIOME.getRawId(Biomes.ERODED_BADLANDS);
+        MODIFIED_WOODED_BADLANDS_PLATEAU_ID = BuiltinRegistries.BIOME.getRawId(Biomes.MODIFIED_WOODED_BADLANDS_PLATEAU);
+        MODIFIED_BADLANDS_PLATEAU_ID = BuiltinRegistries.BIOME.getRawId(Biomes.MODIFIED_BADLANDS_PLATEAU);
+        MUSHROOM_FIELDS_ID = BuiltinRegistries.BIOME.getRawId(Biomes.MUSHROOM_FIELDS);
+        MUSHROOM_FIELD_SHORE_ID = BuiltinRegistries.BIOME.getRawId(Biomes.MUSHROOM_FIELD_SHORE);
+        RIVER_ID = BuiltinRegistries.BIOME.getRawId(Biomes.RIVER);
+        MOUNTAIN_EDGE_ID = BuiltinRegistries.BIOME.getRawId(Biomes.MOUNTAIN_EDGE);
+        STONE_SHORE_ID = BuiltinRegistries.BIOME.getRawId(Biomes.STONE_SHORE);
+        SWAMP_ID = BuiltinRegistries.BIOME.getRawId(Biomes.SWAMP);
+        TAIGA_ID = BuiltinRegistries.BIOME.getRawId(Biomes.TAIGA);
     }
 }
 

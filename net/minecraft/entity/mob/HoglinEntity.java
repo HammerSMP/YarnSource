@@ -77,7 +77,7 @@ Hoglin {
     }
 
     @Override
-    public boolean canBeLeashedBy(PlayerEntity arg) {
+    public boolean canBeLeashedBy(PlayerEntity player) {
         return !this.isLeashed();
     }
 
@@ -86,32 +86,32 @@ Hoglin {
     }
 
     @Override
-    public boolean tryAttack(Entity arg) {
-        if (!(arg instanceof LivingEntity)) {
+    public boolean tryAttack(Entity target) {
+        if (!(target instanceof LivingEntity)) {
             return false;
         }
         this.movementCooldownTicks = 10;
         this.world.sendEntityStatus(this, (byte)4);
         this.playSound(SoundEvents.ENTITY_HOGLIN_ATTACK, 1.0f, this.getSoundPitch());
-        HoglinBrain.onAttacking(this, (LivingEntity)arg);
-        return Hoglin.tryAttack(this, (LivingEntity)arg);
+        HoglinBrain.onAttacking(this, (LivingEntity)target);
+        return Hoglin.tryAttack(this, (LivingEntity)target);
     }
 
     @Override
-    protected void knockback(LivingEntity arg) {
+    protected void knockback(LivingEntity target) {
         if (this.isAdult()) {
-            Hoglin.knockback(this, arg);
+            Hoglin.knockback(this, target);
         }
     }
 
     @Override
-    public boolean damage(DamageSource arg, float f) {
-        boolean bl = super.damage(arg, f);
+    public boolean damage(DamageSource source, float amount) {
+        boolean bl = super.damage(source, amount);
         if (this.world.isClient) {
             return false;
         }
-        if (bl && arg.getAttacker() instanceof LivingEntity) {
-            HoglinBrain.onAttacked(this, (LivingEntity)arg.getAttacker());
+        if (bl && source.getAttacker() instanceof LivingEntity) {
+            HoglinBrain.onAttacked(this, (LivingEntity)source.getAttacker());
         }
         return bl;
     }
@@ -165,30 +165,30 @@ Hoglin {
         }
     }
 
-    public static boolean canSpawn(EntityType<HoglinEntity> arg, WorldAccess arg2, SpawnReason arg3, BlockPos arg4, Random random) {
-        return !arg2.getBlockState(arg4.down()).isOf(Blocks.NETHER_WART_BLOCK);
+    public static boolean canSpawn(EntityType<HoglinEntity> type, WorldAccess world, SpawnReason spawnReason, BlockPos pos, Random random) {
+        return !world.getBlockState(pos.down()).isOf(Blocks.NETHER_WART_BLOCK);
     }
 
     @Override
     @Nullable
-    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(class_5425 arg, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable CompoundTag entityTag) {
         if (arg.getRandom().nextFloat() < 0.2f) {
             this.setBaby(true);
         }
-        return super.initialize(arg, arg2, arg3, arg4, arg5);
+        return super.initialize(arg, difficulty, spawnReason, entityData, entityTag);
     }
 
     @Override
-    public boolean canImmediatelyDespawn(double d) {
+    public boolean canImmediatelyDespawn(double distanceSquared) {
         return !this.isPersistent();
     }
 
     @Override
-    public float getPathfindingFavor(BlockPos arg, WorldView arg2) {
-        if (HoglinBrain.isWarpedFungusAround(this, arg)) {
+    public float getPathfindingFavor(BlockPos pos, WorldView world) {
+        if (HoglinBrain.isWarpedFungusAround(this, pos)) {
             return -1.0f;
         }
-        if (arg2.getBlockState(arg.down()).isOf(Blocks.CRIMSON_NYLIUM)) {
+        if (world.getBlockState(pos.down()).isOf(Blocks.CRIMSON_NYLIUM)) {
             return 10.0f;
         }
         return 0.0f;
@@ -200,8 +200,8 @@ Hoglin {
     }
 
     @Override
-    public ActionResult interactMob(PlayerEntity arg, Hand arg2) {
-        ActionResult lv = super.interactMob(arg, arg2);
+    public ActionResult interactMob(PlayerEntity player, Hand hand) {
+        ActionResult lv = super.interactMob(player, hand);
         if (lv.isAccepted()) {
             this.setPersistent();
         }
@@ -210,12 +210,12 @@ Hoglin {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void handleStatus(byte b) {
-        if (b == 4) {
+    public void handleStatus(byte status) {
+        if (status == 4) {
             this.movementCooldownTicks = 10;
             this.playSound(SoundEvents.ENTITY_HOGLIN_ATTACK, 1.0f, this.getSoundPitch());
         } else {
-            super.handleStatus(b);
+            super.handleStatus(status);
         }
     }
 
@@ -231,18 +231,20 @@ Hoglin {
     }
 
     @Override
-    protected int getCurrentExperience(PlayerEntity arg) {
+    protected int getCurrentExperience(PlayerEntity player) {
         return this.experiencePoints;
     }
 
-    private void zombify(ServerWorld arg) {
+    private void zombify(ServerWorld word) {
         ZoglinEntity lv = this.method_29243(EntityType.ZOGLIN);
-        lv.addStatusEffect(new StatusEffectInstance(StatusEffects.NAUSEA, 200, 0));
+        if (lv != null) {
+            lv.addStatusEffect(new StatusEffectInstance(StatusEffects.NAUSEA, 200, 0));
+        }
     }
 
     @Override
-    public boolean isBreedingItem(ItemStack arg) {
-        return arg.getItem() == Items.CRIMSON_FUNGUS;
+    public boolean isBreedingItem(ItemStack stack) {
+        return stack.getItem() == Items.CRIMSON_FUNGUS;
     }
 
     public boolean isAdult() {
@@ -256,27 +258,27 @@ Hoglin {
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
         if (this.isImmuneToZombification()) {
-            arg.putBoolean("IsImmuneToZombification", true);
+            tag.putBoolean("IsImmuneToZombification", true);
         }
-        arg.putInt("TimeInOverworld", this.timeInOverworld);
+        tag.putInt("TimeInOverworld", this.timeInOverworld);
         if (this.cannotBeHunted) {
-            arg.putBoolean("CannotBeHunted", true);
+            tag.putBoolean("CannotBeHunted", true);
         }
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        this.setImmuneToZombification(arg.getBoolean("IsImmuneToZombification"));
-        this.timeInOverworld = arg.getInt("TimeInOverworld");
-        this.setCannotBeHunted(arg.getBoolean("CannotBeHunted"));
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        this.setImmuneToZombification(tag.getBoolean("IsImmuneToZombification"));
+        this.timeInOverworld = tag.getInt("TimeInOverworld");
+        this.setCannotBeHunted(tag.getBoolean("CannotBeHunted"));
     }
 
-    public void setImmuneToZombification(boolean bl) {
-        this.getDataTracker().set(BABY, bl);
+    public void setImmuneToZombification(boolean immuneToZombification) {
+        this.getDataTracker().set(BABY, immuneToZombification);
     }
 
     private boolean isImmuneToZombification() {
@@ -287,8 +289,8 @@ Hoglin {
         return !this.world.getDimension().isPiglinSafe() && !this.isImmuneToZombification() && !this.isAiDisabled();
     }
 
-    private void setCannotBeHunted(boolean bl) {
-        this.cannotBeHunted = bl;
+    private void setCannotBeHunted(boolean cannotBeHunted) {
+        this.cannotBeHunted = cannotBeHunted;
     }
 
     public boolean canBeHunted() {
@@ -324,7 +326,7 @@ Hoglin {
     }
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource arg) {
+    protected SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.ENTITY_HOGLIN_HURT;
     }
 
@@ -344,7 +346,7 @@ Hoglin {
     }
 
     @Override
-    protected void playStepSound(BlockPos arg, BlockState arg2) {
+    protected void playStepSound(BlockPos pos, BlockState state) {
         this.playSound(SoundEvents.ENTITY_HOGLIN_STEP, 0.15f, 1.0f);
     }
 

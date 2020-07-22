@@ -27,7 +27,6 @@ import java.util.function.Predicate;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.class_5414;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryListener;
@@ -58,11 +57,13 @@ import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.tag.ItemTags;
 import net.minecraft.tag.Tag;
+import net.minecraft.tag.TagGroup;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Language;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.registry.Registry;
@@ -85,9 +86,9 @@ extends AbstractInventoryScreen<CreativeScreenHandler> {
     private boolean lastClickOutsideBounds;
     private final Map<Identifier, Tag<Item>> searchResultTags = Maps.newTreeMap();
 
-    public CreativeInventoryScreen(PlayerEntity arg) {
-        super(new CreativeScreenHandler(arg), arg.inventory, LiteralText.EMPTY);
-        arg.currentScreenHandler = this.handler;
+    public CreativeInventoryScreen(PlayerEntity player) {
+        super(new CreativeScreenHandler(player), player.inventory, LiteralText.EMPTY);
+        player.currentScreenHandler = this.handler;
         this.passEvents = true;
         this.backgroundHeight = 136;
         this.backgroundWidth = 195;
@@ -103,70 +104,70 @@ extends AbstractInventoryScreen<CreativeScreenHandler> {
     }
 
     @Override
-    protected void onMouseClick(@Nullable Slot arg, int i, int j, SlotActionType arg2) {
-        if (this.isCreativeInventorySlot(arg)) {
+    protected void onMouseClick(@Nullable Slot slot, int invSlot, int clickData, SlotActionType actionType) {
+        if (this.isCreativeInventorySlot(slot)) {
             this.searchBox.setCursorToEnd();
             this.searchBox.setSelectionEnd(0);
         }
-        boolean bl = arg2 == SlotActionType.QUICK_MOVE;
-        SlotActionType slotActionType = arg2 = i == -999 && arg2 == SlotActionType.PICKUP ? SlotActionType.THROW : arg2;
-        if (arg != null || selectedTab == ItemGroup.INVENTORY.getIndex() || arg2 == SlotActionType.QUICK_CRAFT) {
-            if (arg != null && !arg.canTakeItems(this.client.player)) {
+        boolean bl = actionType == SlotActionType.QUICK_MOVE;
+        SlotActionType slotActionType = actionType = invSlot == -999 && actionType == SlotActionType.PICKUP ? SlotActionType.THROW : actionType;
+        if (slot != null || selectedTab == ItemGroup.INVENTORY.getIndex() || actionType == SlotActionType.QUICK_CRAFT) {
+            if (slot != null && !slot.canTakeItems(this.client.player)) {
                 return;
             }
-            if (arg == this.deleteItemSlot && bl) {
+            if (slot == this.deleteItemSlot && bl) {
                 for (int k = 0; k < this.client.player.playerScreenHandler.getStacks().size(); ++k) {
                     this.client.interactionManager.clickCreativeStack(ItemStack.EMPTY, k);
                 }
             } else if (selectedTab == ItemGroup.INVENTORY.getIndex()) {
-                if (arg == this.deleteItemSlot) {
+                if (slot == this.deleteItemSlot) {
                     this.client.player.inventory.setCursorStack(ItemStack.EMPTY);
-                } else if (arg2 == SlotActionType.THROW && arg != null && arg.hasStack()) {
-                    ItemStack lv = arg.takeStack(j == 0 ? 1 : arg.getStack().getMaxCount());
-                    ItemStack lv2 = arg.getStack();
+                } else if (actionType == SlotActionType.THROW && slot != null && slot.hasStack()) {
+                    ItemStack lv = slot.takeStack(clickData == 0 ? 1 : slot.getStack().getMaxCount());
+                    ItemStack lv2 = slot.getStack();
                     this.client.player.dropItem(lv, true);
                     this.client.interactionManager.dropCreativeStack(lv);
-                    this.client.interactionManager.clickCreativeStack(lv2, ((CreativeSlot)((CreativeSlot)arg)).slot.id);
-                } else if (arg2 == SlotActionType.THROW && !this.client.player.inventory.getCursorStack().isEmpty()) {
+                    this.client.interactionManager.clickCreativeStack(lv2, ((CreativeSlot)((CreativeSlot)slot)).slot.id);
+                } else if (actionType == SlotActionType.THROW && !this.client.player.inventory.getCursorStack().isEmpty()) {
                     this.client.player.dropItem(this.client.player.inventory.getCursorStack(), true);
                     this.client.interactionManager.dropCreativeStack(this.client.player.inventory.getCursorStack());
                     this.client.player.inventory.setCursorStack(ItemStack.EMPTY);
                 } else {
-                    this.client.player.playerScreenHandler.onSlotClick(arg == null ? i : ((CreativeSlot)((CreativeSlot)arg)).slot.id, j, arg2, this.client.player);
+                    this.client.player.playerScreenHandler.onSlotClick(slot == null ? invSlot : ((CreativeSlot)((CreativeSlot)slot)).slot.id, clickData, actionType, this.client.player);
                     this.client.player.playerScreenHandler.sendContentUpdates();
                 }
-            } else if (arg2 != SlotActionType.QUICK_CRAFT && arg.inventory == inventory) {
+            } else if (actionType != SlotActionType.QUICK_CRAFT && slot.inventory == inventory) {
                 PlayerInventory lv3 = this.client.player.inventory;
                 ItemStack lv4 = lv3.getCursorStack();
-                ItemStack lv5 = arg.getStack();
-                if (arg2 == SlotActionType.SWAP) {
+                ItemStack lv5 = slot.getStack();
+                if (actionType == SlotActionType.SWAP) {
                     if (!lv5.isEmpty()) {
                         ItemStack lv6 = lv5.copy();
                         lv6.setCount(lv6.getMaxCount());
-                        this.client.player.inventory.setStack(j, lv6);
+                        this.client.player.inventory.setStack(clickData, lv6);
                         this.client.player.playerScreenHandler.sendContentUpdates();
                     }
                     return;
                 }
-                if (arg2 == SlotActionType.CLONE) {
-                    if (lv3.getCursorStack().isEmpty() && arg.hasStack()) {
-                        ItemStack lv7 = arg.getStack().copy();
+                if (actionType == SlotActionType.CLONE) {
+                    if (lv3.getCursorStack().isEmpty() && slot.hasStack()) {
+                        ItemStack lv7 = slot.getStack().copy();
                         lv7.setCount(lv7.getMaxCount());
                         lv3.setCursorStack(lv7);
                     }
                     return;
                 }
-                if (arg2 == SlotActionType.THROW) {
+                if (actionType == SlotActionType.THROW) {
                     if (!lv5.isEmpty()) {
                         ItemStack lv8 = lv5.copy();
-                        lv8.setCount(j == 0 ? 1 : lv8.getMaxCount());
+                        lv8.setCount(clickData == 0 ? 1 : lv8.getMaxCount());
                         this.client.player.dropItem(lv8, true);
                         this.client.interactionManager.dropCreativeStack(lv8);
                     }
                     return;
                 }
                 if (!lv4.isEmpty() && !lv5.isEmpty() && lv4.isItemEqualIgnoreDamage(lv5) && ItemStack.areTagsEqual(lv4, lv5)) {
-                    if (j == 0) {
+                    if (clickData == 0) {
                         if (bl) {
                             lv4.setCount(lv4.getMaxCount());
                         } else if (lv4.getCount() < lv4.getMaxCount()) {
@@ -176,7 +177,7 @@ extends AbstractInventoryScreen<CreativeScreenHandler> {
                         lv4.decrement(1);
                     }
                 } else if (lv5.isEmpty() || !lv4.isEmpty()) {
-                    if (j == 0) {
+                    if (clickData == 0) {
                         lv3.setCursorStack(ItemStack.EMPTY);
                     } else {
                         lv3.getCursorStack().decrement(1);
@@ -189,21 +190,21 @@ extends AbstractInventoryScreen<CreativeScreenHandler> {
                     }
                 }
             } else if (this.handler != null) {
-                ItemStack lv9 = arg == null ? ItemStack.EMPTY : ((CreativeScreenHandler)this.handler).getSlot(arg.id).getStack();
-                ((CreativeScreenHandler)this.handler).onSlotClick(arg == null ? i : arg.id, j, arg2, this.client.player);
-                if (ScreenHandler.unpackQuickCraftStage(j) == 2) {
+                ItemStack lv9 = slot == null ? ItemStack.EMPTY : ((CreativeScreenHandler)this.handler).getSlot(slot.id).getStack();
+                ((CreativeScreenHandler)this.handler).onSlotClick(slot == null ? invSlot : slot.id, clickData, actionType, this.client.player);
+                if (ScreenHandler.unpackQuickCraftStage(clickData) == 2) {
                     for (int l = 0; l < 9; ++l) {
                         this.client.interactionManager.clickCreativeStack(((CreativeScreenHandler)this.handler).getSlot(45 + l).getStack(), 36 + l);
                     }
-                } else if (arg != null) {
-                    ItemStack lv10 = ((CreativeScreenHandler)this.handler).getSlot(arg.id).getStack();
-                    this.client.interactionManager.clickCreativeStack(lv10, arg.id - ((CreativeScreenHandler)this.handler).slots.size() + 9 + 36);
-                    int m = 45 + j;
-                    if (arg2 == SlotActionType.SWAP) {
+                } else if (slot != null) {
+                    ItemStack lv10 = ((CreativeScreenHandler)this.handler).getSlot(slot.id).getStack();
+                    this.client.interactionManager.clickCreativeStack(lv10, slot.id - ((CreativeScreenHandler)this.handler).slots.size() + 9 + 36);
+                    int m = 45 + clickData;
+                    if (actionType == SlotActionType.SWAP) {
                         this.client.interactionManager.clickCreativeStack(lv9, m - ((CreativeScreenHandler)this.handler).slots.size() + 9 + 36);
-                    } else if (arg2 == SlotActionType.THROW && !lv9.isEmpty()) {
+                    } else if (actionType == SlotActionType.THROW && !lv9.isEmpty()) {
                         ItemStack lv11 = lv9.copy();
-                        lv11.setCount(j == 0 ? 1 : lv11.getMaxCount());
+                        lv11.setCount(clickData == 0 ? 1 : lv11.getMaxCount());
                         this.client.player.dropItem(lv11, true);
                         this.client.interactionManager.dropCreativeStack(lv11);
                     }
@@ -213,12 +214,12 @@ extends AbstractInventoryScreen<CreativeScreenHandler> {
         } else {
             PlayerInventory lv12 = this.client.player.inventory;
             if (!lv12.getCursorStack().isEmpty() && this.lastClickOutsideBounds) {
-                if (j == 0) {
+                if (clickData == 0) {
                     this.client.player.dropItem(lv12.getCursorStack(), true);
                     this.client.interactionManager.dropCreativeStack(lv12.getCursorStack());
                     lv12.setCursorStack(ItemStack.EMPTY);
                 }
-                if (j == 1) {
+                if (clickData == 1) {
                     ItemStack lv13 = lv12.getCursorStack().split(1);
                     this.client.player.dropItem(lv13, true);
                     this.client.interactionManager.dropCreativeStack(lv13);
@@ -227,8 +228,8 @@ extends AbstractInventoryScreen<CreativeScreenHandler> {
         }
     }
 
-    private boolean isCreativeInventorySlot(@Nullable Slot arg) {
-        return arg != null && arg.inventory == inventory;
+    private boolean isCreativeInventorySlot(@Nullable Slot slot) {
+        return slot != null && slot.inventory == inventory;
     }
 
     @Override
@@ -264,9 +265,9 @@ extends AbstractInventoryScreen<CreativeScreenHandler> {
     }
 
     @Override
-    public void resize(MinecraftClient arg, int i, int j) {
+    public void resize(MinecraftClient client, int width, int height) {
         String string = this.searchBox.getText();
-        this.init(arg, i, j);
+        this.init(client, width, height);
         this.searchBox.setText(string);
         if (!this.searchBox.getText().isEmpty()) {
             this.search();
@@ -283,7 +284,7 @@ extends AbstractInventoryScreen<CreativeScreenHandler> {
     }
 
     @Override
-    public boolean charTyped(char c, int i) {
+    public boolean charTyped(char chr, int keyCode) {
         if (this.ignoreTypedCharacter) {
             return false;
         }
@@ -291,7 +292,7 @@ extends AbstractInventoryScreen<CreativeScreenHandler> {
             return false;
         }
         String string = this.searchBox.getText();
-        if (this.searchBox.charTyped(c, i)) {
+        if (this.searchBox.charTyped(chr, keyCode)) {
             if (!Objects.equals(string, this.searchBox.getText())) {
                 this.search();
             }
@@ -301,39 +302,39 @@ extends AbstractInventoryScreen<CreativeScreenHandler> {
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         this.ignoreTypedCharacter = false;
         if (selectedTab != ItemGroup.SEARCH.getIndex()) {
-            if (this.client.options.keyChat.matchesKey(i, j)) {
+            if (this.client.options.keyChat.matchesKey(keyCode, scanCode)) {
                 this.ignoreTypedCharacter = true;
                 this.setSelectedTab(ItemGroup.SEARCH);
                 return true;
             }
-            return super.keyPressed(i, j, k);
+            return super.keyPressed(keyCode, scanCode, modifiers);
         }
         boolean bl = !this.isCreativeInventorySlot(this.focusedSlot) || this.focusedSlot.hasStack();
-        boolean bl2 = InputUtil.fromKeyCode(i, j).method_30103().isPresent();
-        if (bl && bl2 && this.handleHotbarKeyPressed(i, j)) {
+        boolean bl2 = InputUtil.fromKeyCode(keyCode, scanCode).method_30103().isPresent();
+        if (bl && bl2 && this.handleHotbarKeyPressed(keyCode, scanCode)) {
             this.ignoreTypedCharacter = true;
             return true;
         }
         String string = this.searchBox.getText();
-        if (this.searchBox.keyPressed(i, j, k)) {
+        if (this.searchBox.keyPressed(keyCode, scanCode, modifiers)) {
             if (!Objects.equals(string, this.searchBox.getText())) {
                 this.search();
             }
             return true;
         }
-        if (this.searchBox.isFocused() && this.searchBox.isVisible() && i != 256) {
+        if (this.searchBox.isFocused() && this.searchBox.isVisible() && keyCode != 256) {
             return true;
         }
-        return super.keyPressed(i, j, k);
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
-    public boolean keyReleased(int i, int j, int k) {
+    public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
         this.ignoreTypedCharacter = false;
-        return super.keyReleased(i, j, k);
+        return super.keyReleased(keyCode, scanCode, modifiers);
     }
 
     private void search() {
@@ -351,6 +352,7 @@ extends AbstractInventoryScreen<CreativeScreenHandler> {
                 SearchableContainer<ItemStack> lv2 = this.client.getSearchableContainer(SearchManager.ITEM_TAG);
                 this.searchForTags(string);
             } else {
+                string = Language.getInstance().reorder(string, false);
                 lv3 = this.client.getSearchableContainer(SearchManager.ITEM_TOOLTIP);
             }
             ((CreativeScreenHandler)this.handler).itemList.addAll(lv3.findAll(string.toLowerCase(Locale.ROOT)));
@@ -369,41 +371,41 @@ extends AbstractInventoryScreen<CreativeScreenHandler> {
             String string3 = string.substring(i + 1).trim();
             predicate2 = arg -> arg.getNamespace().contains(string2) && arg.getPath().contains(string3);
         }
-        class_5414<Item> lv = ItemTags.getContainer();
-        lv.method_30211().stream().filter(predicate2).forEach(arg2 -> this.searchResultTags.put((Identifier)arg2, lv.method_30210((Identifier)arg2)));
+        TagGroup<Item> lv = ItemTags.getTagGroup();
+        lv.getTagIds().stream().filter(predicate2).forEach(arg2 -> this.searchResultTags.put((Identifier)arg2, lv.getTag((Identifier)arg2)));
     }
 
     @Override
-    protected void drawForeground(MatrixStack arg, int i, int j) {
+    protected void drawForeground(MatrixStack matrices, int mouseX, int mouseY) {
         ItemGroup lv = ItemGroup.GROUPS[selectedTab];
         if (lv.hasTooltip()) {
             RenderSystem.disableBlend();
-            this.textRenderer.draw(arg, I18n.translate(lv.getTranslationKey(), new Object[0]), 8.0f, 6.0f, 0x404040);
+            this.textRenderer.draw(matrices, I18n.translate(lv.getTranslationKey(), new Object[0]), 8.0f, 6.0f, 0x404040);
         }
     }
 
     @Override
-    public boolean mouseClicked(double d, double e, int i) {
-        if (i == 0) {
-            double f = d - (double)this.x;
-            double g = e - (double)this.y;
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (button == 0) {
+            double f = mouseX - (double)this.x;
+            double g = mouseY - (double)this.y;
             for (ItemGroup lv : ItemGroup.GROUPS) {
                 if (!this.isClickInTab(lv, f, g)) continue;
                 return true;
             }
-            if (selectedTab != ItemGroup.INVENTORY.getIndex() && this.isClickInScrollbar(d, e)) {
+            if (selectedTab != ItemGroup.INVENTORY.getIndex() && this.isClickInScrollbar(mouseX, mouseY)) {
                 this.scrolling = this.hasScrollbar();
                 return true;
             }
         }
-        return super.mouseClicked(d, e, i);
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
-    public boolean mouseReleased(double d, double e, int i) {
-        if (i == 0) {
-            double f = d - (double)this.x;
-            double g = e - (double)this.y;
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        if (button == 0) {
+            double f = mouseX - (double)this.x;
+            double g = mouseY - (double)this.y;
             this.scrolling = false;
             for (ItemGroup lv : ItemGroup.GROUPS) {
                 if (!this.isClickInTab(lv, f, g)) continue;
@@ -411,19 +413,19 @@ extends AbstractInventoryScreen<CreativeScreenHandler> {
                 return true;
             }
         }
-        return super.mouseReleased(d, e, i);
+        return super.mouseReleased(mouseX, mouseY, button);
     }
 
     private boolean hasScrollbar() {
         return selectedTab != ItemGroup.INVENTORY.getIndex() && ItemGroup.GROUPS[selectedTab].hasScrollbar() && ((CreativeScreenHandler)this.handler).shouldShowScrollbar();
     }
 
-    private void setSelectedTab(ItemGroup arg) {
+    private void setSelectedTab(ItemGroup group) {
         int i = selectedTab;
-        selectedTab = arg.getIndex();
+        selectedTab = group.getIndex();
         this.cursorDragSlots.clear();
         ((CreativeScreenHandler)this.handler).itemList.clear();
-        if (arg == ItemGroup.HOTBAR) {
+        if (group == ItemGroup.HOTBAR) {
             HotbarStorage lv = this.client.getCreativeHotbarStorage();
             for (int j = 0; j < 9; ++j) {
                 HotbarStorageEntry lv2 = lv.getSavedHotbar(j);
@@ -444,10 +446,10 @@ extends AbstractInventoryScreen<CreativeScreenHandler> {
                 }
                 ((CreativeScreenHandler)this.handler).itemList.addAll((Collection<ItemStack>)((Object)lv2));
             }
-        } else if (arg != ItemGroup.SEARCH) {
-            arg.appendStacks(((CreativeScreenHandler)this.handler).itemList);
+        } else if (group != ItemGroup.SEARCH) {
+            group.appendStacks(((CreativeScreenHandler)this.handler).itemList);
         }
-        if (arg == ItemGroup.INVENTORY) {
+        if (group == ItemGroup.INVENTORY) {
             PlayerScreenHandler lv6 = this.client.player.playerScreenHandler;
             if (this.slots == null) {
                 this.slots = ImmutableList.copyOf((Collection)((CreativeScreenHandler)this.handler).slots);
@@ -490,11 +492,11 @@ extends AbstractInventoryScreen<CreativeScreenHandler> {
             this.slots = null;
         }
         if (this.searchBox != null) {
-            if (arg == ItemGroup.SEARCH) {
+            if (group == ItemGroup.SEARCH) {
                 this.searchBox.setVisible(true);
                 this.searchBox.setFocusUnlocked(false);
                 this.searchBox.setSelected(true);
-                if (i != arg.getIndex()) {
+                if (i != group.getIndex()) {
                     this.searchBox.setText("");
                 }
                 this.search();
@@ -510,70 +512,70 @@ extends AbstractInventoryScreen<CreativeScreenHandler> {
     }
 
     @Override
-    public boolean mouseScrolled(double d, double e, double f) {
+    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
         if (!this.hasScrollbar()) {
             return false;
         }
         int i = (((CreativeScreenHandler)this.handler).itemList.size() + 9 - 1) / 9 - 5;
-        this.scrollPosition = (float)((double)this.scrollPosition - f / (double)i);
+        this.scrollPosition = (float)((double)this.scrollPosition - amount / (double)i);
         this.scrollPosition = MathHelper.clamp(this.scrollPosition, 0.0f, 1.0f);
         ((CreativeScreenHandler)this.handler).scrollItems(this.scrollPosition);
         return true;
     }
 
     @Override
-    protected boolean isClickOutsideBounds(double d, double e, int i, int j, int k) {
-        boolean bl = d < (double)i || e < (double)j || d >= (double)(i + this.backgroundWidth) || e >= (double)(j + this.backgroundHeight);
-        this.lastClickOutsideBounds = bl && !this.isClickInTab(ItemGroup.GROUPS[selectedTab], d, e);
+    protected boolean isClickOutsideBounds(double mouseX, double mouseY, int left, int top, int button) {
+        boolean bl = mouseX < (double)left || mouseY < (double)top || mouseX >= (double)(left + this.backgroundWidth) || mouseY >= (double)(top + this.backgroundHeight);
+        this.lastClickOutsideBounds = bl && !this.isClickInTab(ItemGroup.GROUPS[selectedTab], mouseX, mouseY);
         return this.lastClickOutsideBounds;
     }
 
-    protected boolean isClickInScrollbar(double d, double e) {
+    protected boolean isClickInScrollbar(double mouseX, double mouseY) {
         int i = this.x;
         int j = this.y;
         int k = i + 175;
         int l = j + 18;
         int m = k + 14;
         int n = l + 112;
-        return d >= (double)k && e >= (double)l && d < (double)m && e < (double)n;
+        return mouseX >= (double)k && mouseY >= (double)l && mouseX < (double)m && mouseY < (double)n;
     }
 
     @Override
-    public boolean mouseDragged(double d, double e, int i, double f, double g) {
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
         if (this.scrolling) {
             int j = this.y + 18;
             int k = j + 112;
-            this.scrollPosition = ((float)e - (float)j - 7.5f) / ((float)(k - j) - 15.0f);
+            this.scrollPosition = ((float)mouseY - (float)j - 7.5f) / ((float)(k - j) - 15.0f);
             this.scrollPosition = MathHelper.clamp(this.scrollPosition, 0.0f, 1.0f);
             ((CreativeScreenHandler)this.handler).scrollItems(this.scrollPosition);
             return true;
         }
-        return super.mouseDragged(d, e, i, f, g);
+        return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.renderBackground(arg);
-        super.render(arg, i, j, f);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.renderBackground(matrices);
+        super.render(matrices, mouseX, mouseY, delta);
         for (ItemGroup lv : ItemGroup.GROUPS) {
-            if (this.renderTabTooltipIfHovered(arg, lv, i, j)) break;
+            if (this.renderTabTooltipIfHovered(matrices, lv, mouseX, mouseY)) break;
         }
-        if (this.deleteItemSlot != null && selectedTab == ItemGroup.INVENTORY.getIndex() && this.isPointWithinBounds(this.deleteItemSlot.x, this.deleteItemSlot.y, 16, 16, i, j)) {
-            this.renderTooltip(arg, new TranslatableText("inventory.binSlot"), i, j);
+        if (this.deleteItemSlot != null && selectedTab == ItemGroup.INVENTORY.getIndex() && this.isPointWithinBounds(this.deleteItemSlot.x, this.deleteItemSlot.y, 16, 16, mouseX, mouseY)) {
+            this.renderTooltip(matrices, new TranslatableText("inventory.binSlot"), mouseX, mouseY);
         }
         RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
-        this.drawMouseoverTooltip(arg, i, j);
+        this.drawMouseoverTooltip(matrices, mouseX, mouseY);
     }
 
     @Override
-    protected void renderTooltip(MatrixStack arg, ItemStack arg22, int i, int j) {
+    protected void renderTooltip(MatrixStack matrices, ItemStack stack, int x, int y) {
         if (selectedTab == ItemGroup.SEARCH.getIndex()) {
             Map<Enchantment, Integer> map;
-            List<Text> list = arg22.getTooltip(this.client.player, this.client.options.advancedItemTooltips ? TooltipContext.Default.ADVANCED : TooltipContext.Default.NORMAL);
+            List<Text> list = stack.getTooltip(this.client.player, this.client.options.advancedItemTooltips ? TooltipContext.Default.ADVANCED : TooltipContext.Default.NORMAL);
             ArrayList list2 = Lists.newArrayList(list);
-            Item lv = arg22.getItem();
+            Item lv = stack.getItem();
             ItemGroup lv2 = lv.getGroup();
-            if (lv2 == null && lv == Items.ENCHANTED_BOOK && (map = EnchantmentHelper.get(arg22)).size() == 1) {
+            if (lv2 == null && lv == Items.ENCHANTED_BOOK && (map = EnchantmentHelper.get(stack)).size() == 1) {
                 Enchantment lv3 = map.keySet().iterator().next();
                 for (ItemGroup lv4 : ItemGroup.GROUPS) {
                     if (!lv4.containsEnchantments(lv3.type)) continue;
@@ -589,49 +591,49 @@ extends AbstractInventoryScreen<CreativeScreenHandler> {
             if (lv2 != null) {
                 list2.add(1, new TranslatableText(lv2.getTranslationKey()).formatted(Formatting.BLUE));
             }
-            this.renderTooltip(arg, list2, i, j);
+            this.renderTooltip(matrices, list2, x, y);
         } else {
-            super.renderTooltip(arg, arg22, i, j);
+            super.renderTooltip(matrices, stack, x, y);
         }
     }
 
     @Override
-    protected void drawBackground(MatrixStack arg, float f, int i, int j) {
+    protected void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY) {
         RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
         ItemGroup lv = ItemGroup.GROUPS[selectedTab];
         for (ItemGroup lv2 : ItemGroup.GROUPS) {
             this.client.getTextureManager().bindTexture(TEXTURE);
             if (lv2.getIndex() == selectedTab) continue;
-            this.renderTabIcon(arg, lv2);
+            this.renderTabIcon(matrices, lv2);
         }
         this.client.getTextureManager().bindTexture(new Identifier("textures/gui/container/creative_inventory/tab_" + lv.getTexture()));
-        this.drawTexture(arg, this.x, this.y, 0, 0, this.backgroundWidth, this.backgroundHeight);
-        this.searchBox.render(arg, i, j, f);
+        this.drawTexture(matrices, this.x, this.y, 0, 0, this.backgroundWidth, this.backgroundHeight);
+        this.searchBox.render(matrices, mouseX, mouseY, delta);
         RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
         int k = this.x + 175;
         int l = this.y + 18;
         int m = l + 112;
         this.client.getTextureManager().bindTexture(TEXTURE);
         if (lv.hasScrollbar()) {
-            this.drawTexture(arg, k, l + (int)((float)(m - l - 17) * this.scrollPosition), 232 + (this.hasScrollbar() ? 0 : 12), 0, 12, 15);
+            this.drawTexture(matrices, k, l + (int)((float)(m - l - 17) * this.scrollPosition), 232 + (this.hasScrollbar() ? 0 : 12), 0, 12, 15);
         }
-        this.renderTabIcon(arg, lv);
+        this.renderTabIcon(matrices, lv);
         if (lv == ItemGroup.INVENTORY) {
-            InventoryScreen.drawEntity(this.x + 88, this.y + 45, 20, this.x + 88 - i, this.y + 45 - 30 - j, this.client.player);
+            InventoryScreen.drawEntity(this.x + 88, this.y + 45, 20, this.x + 88 - mouseX, this.y + 45 - 30 - mouseY, this.client.player);
         }
     }
 
-    protected boolean isClickInTab(ItemGroup arg, double d, double e) {
-        int i = arg.getColumn();
+    protected boolean isClickInTab(ItemGroup group, double mouseX, double mouseY) {
+        int i = group.getColumn();
         int j = 28 * i;
         int k = 0;
-        if (arg.isSpecial()) {
+        if (group.isSpecial()) {
             j = this.backgroundWidth - 28 * (6 - i) + 2;
         } else if (i > 0) {
             j += i;
         }
-        k = arg.isTopRow() ? (k -= 32) : (k += this.backgroundHeight);
-        return d >= (double)j && d <= (double)(j + 28) && e >= (double)k && e <= (double)(k + 32);
+        k = group.isTopRow() ? (k -= 32) : (k += this.backgroundHeight);
+        return mouseX >= (double)j && mouseX <= (double)(j + 28) && mouseY >= (double)k && mouseY <= (double)(k + 32);
     }
 
     protected boolean renderTabTooltipIfHovered(MatrixStack arg, ItemGroup arg2, int i, int j) {
@@ -688,24 +690,24 @@ extends AbstractInventoryScreen<CreativeScreenHandler> {
         return selectedTab;
     }
 
-    public static void onHotbarKeyPress(MinecraftClient arg, int i, boolean bl, boolean bl2) {
-        ClientPlayerEntity lv = arg.player;
-        HotbarStorage lv2 = arg.getCreativeHotbarStorage();
-        HotbarStorageEntry lv3 = lv2.getSavedHotbar(i);
-        if (bl) {
+    public static void onHotbarKeyPress(MinecraftClient client, int index, boolean restore, boolean save) {
+        ClientPlayerEntity lv = client.player;
+        HotbarStorage lv2 = client.getCreativeHotbarStorage();
+        HotbarStorageEntry lv3 = lv2.getSavedHotbar(index);
+        if (restore) {
             for (int j = 0; j < PlayerInventory.getHotbarSize(); ++j) {
                 ItemStack lv4 = ((ItemStack)lv3.get(j)).copy();
                 lv.inventory.setStack(j, lv4);
-                arg.interactionManager.clickCreativeStack(lv4, 36 + j);
+                client.interactionManager.clickCreativeStack(lv4, 36 + j);
             }
             lv.playerScreenHandler.sendContentUpdates();
-        } else if (bl2) {
+        } else if (save) {
             for (int k = 0; k < PlayerInventory.getHotbarSize(); ++k) {
                 lv3.set(k, lv.inventory.getStack(k).copy());
             }
-            Text lv5 = arg.options.keysHotbar[i].getBoundKeyLocalizedText();
-            Text lv6 = arg.options.keyLoadToolbarActivator.getBoundKeyLocalizedText();
-            arg.inGameHud.setOverlayMessage(new TranslatableText("inventory.hotbarSaved", lv6, lv5), false);
+            Text lv5 = client.options.keysHotbar[index].getBoundKeyLocalizedText();
+            Text lv6 = client.options.keyLoadToolbarActivator.getBoundKeyLocalizedText();
+            client.inGameHud.setOverlayMessage(new TranslatableText("inventory.hotbarSaved", lv6, lv5), false);
             lv2.save();
         }
     }
@@ -718,8 +720,8 @@ extends AbstractInventoryScreen<CreativeScreenHandler> {
         }
 
         @Override
-        public boolean canTakeItems(PlayerEntity arg) {
-            if (super.canTakeItems(arg) && this.hasStack()) {
+        public boolean canTakeItems(PlayerEntity playerEntity) {
+            if (super.canTakeItems(playerEntity) && this.hasStack()) {
                 return this.getStack().getSubTag("CustomCreativeLock") == null;
             }
             return !this.hasStack();
@@ -731,19 +733,19 @@ extends AbstractInventoryScreen<CreativeScreenHandler> {
     extends Slot {
         private final Slot slot;
 
-        public CreativeSlot(Slot arg, int i, int j, int k) {
-            super(arg.inventory, i, j, k);
-            this.slot = arg;
+        public CreativeSlot(Slot slot, int invSlot, int x, int y) {
+            super(slot.inventory, invSlot, x, y);
+            this.slot = slot;
         }
 
         @Override
-        public ItemStack onTakeItem(PlayerEntity arg, ItemStack arg2) {
-            return this.slot.onTakeItem(arg, arg2);
+        public ItemStack onTakeItem(PlayerEntity player, ItemStack stack) {
+            return this.slot.onTakeItem(player, stack);
         }
 
         @Override
-        public boolean canInsert(ItemStack arg) {
-            return this.slot.canInsert(arg);
+        public boolean canInsert(ItemStack stack) {
+            return this.slot.canInsert(stack);
         }
 
         @Override
@@ -757,8 +759,8 @@ extends AbstractInventoryScreen<CreativeScreenHandler> {
         }
 
         @Override
-        public void setStack(ItemStack arg) {
-            this.slot.setStack(arg);
+        public void setStack(ItemStack stack) {
+            this.slot.setStack(stack);
         }
 
         @Override
@@ -772,8 +774,8 @@ extends AbstractInventoryScreen<CreativeScreenHandler> {
         }
 
         @Override
-        public int getMaxStackAmount(ItemStack arg) {
-            return this.slot.getMaxStackAmount(arg);
+        public int getMaxStackAmount(ItemStack stack) {
+            return this.slot.getMaxStackAmount(stack);
         }
 
         @Override
@@ -783,8 +785,8 @@ extends AbstractInventoryScreen<CreativeScreenHandler> {
         }
 
         @Override
-        public ItemStack takeStack(int i) {
-            return this.slot.takeStack(i);
+        public ItemStack takeStack(int amount) {
+            return this.slot.takeStack(amount);
         }
 
         @Override
@@ -793,8 +795,8 @@ extends AbstractInventoryScreen<CreativeScreenHandler> {
         }
 
         @Override
-        public boolean canTakeItems(PlayerEntity arg) {
-            return this.slot.canTakeItems(arg);
+        public boolean canTakeItems(PlayerEntity playerEntity) {
+            return this.slot.canTakeItems(playerEntity);
         }
     }
 
@@ -818,13 +820,13 @@ extends AbstractInventoryScreen<CreativeScreenHandler> {
         }
 
         @Override
-        public boolean canUse(PlayerEntity arg) {
+        public boolean canUse(PlayerEntity player) {
             return true;
         }
 
-        public void scrollItems(float f) {
+        public void scrollItems(float position) {
             int i = (this.itemList.size() + 9 - 1) / 9 - 5;
-            int j = (int)((double)(f * (float)i) + 0.5);
+            int j = (int)((double)(position * (float)i) + 0.5);
             if (j < 0) {
                 j = 0;
             }
@@ -845,22 +847,22 @@ extends AbstractInventoryScreen<CreativeScreenHandler> {
         }
 
         @Override
-        public ItemStack transferSlot(PlayerEntity arg, int i) {
+        public ItemStack transferSlot(PlayerEntity player, int index) {
             Slot lv;
-            if (i >= this.slots.size() - 9 && i < this.slots.size() && (lv = (Slot)this.slots.get(i)) != null && lv.hasStack()) {
+            if (index >= this.slots.size() - 9 && index < this.slots.size() && (lv = (Slot)this.slots.get(index)) != null && lv.hasStack()) {
                 lv.setStack(ItemStack.EMPTY);
             }
             return ItemStack.EMPTY;
         }
 
         @Override
-        public boolean canInsertIntoSlot(ItemStack arg, Slot arg2) {
-            return arg2.inventory != inventory;
+        public boolean canInsertIntoSlot(ItemStack stack, Slot slot) {
+            return slot.inventory != inventory;
         }
 
         @Override
-        public boolean canInsertIntoSlot(Slot arg) {
-            return arg.inventory != inventory;
+        public boolean canInsertIntoSlot(Slot slot) {
+            return slot.inventory != inventory;
         }
     }
 }

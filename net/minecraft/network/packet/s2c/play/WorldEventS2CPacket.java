@@ -25,27 +25,27 @@ implements Packet<ClientPlayPacketListener> {
     public WorldEventS2CPacket() {
     }
 
-    public WorldEventS2CPacket(int i, BlockPos arg, int j, boolean bl) {
-        this.eventId = i;
-        this.pos = arg.toImmutable();
-        this.data = j;
-        this.global = bl;
+    public WorldEventS2CPacket(int eventId, BlockPos pos, int data, boolean global) {
+        this.eventId = eventId;
+        this.pos = pos.toImmutable();
+        this.data = data;
+        this.global = global;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.eventId = arg.readInt();
-        this.pos = arg.readBlockPos();
-        this.data = arg.readInt();
-        this.global = arg.readBoolean();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.eventId = buf.readInt();
+        this.pos = buf.readBlockPos();
+        this.data = buf.readInt();
+        this.global = buf.readBoolean();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeInt(this.eventId);
-        arg.writeBlockPos(this.pos);
-        arg.writeInt(this.data);
-        arg.writeBoolean(this.global);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeInt(this.eventId);
+        buf.writeBlockPos(this.pos);
+        buf.writeInt(this.data);
+        buf.writeBoolean(this.global);
     }
 
     @Override

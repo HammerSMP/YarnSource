@@ -12,12 +12,12 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.structure.rule.RuleTest;
 import net.minecraft.structure.rule.RuleTestType;
+import net.minecraft.tag.ServerTagManagerHolder;
 import net.minecraft.tag.Tag;
-import net.minecraft.tag.TagContainers;
 
 public class TagMatchRuleTest
 extends RuleTest {
-    public static final Codec<TagMatchRuleTest> field_25014 = Tag.method_28134(TagContainers.instance()::method_30215).fieldOf("tag").xmap(TagMatchRuleTest::new, arg -> arg.tag).codec();
+    public static final Codec<TagMatchRuleTest> field_25014 = Tag.codec(() -> ServerTagManagerHolder.getTagManager().getBlocks()).fieldOf("tag").xmap(TagMatchRuleTest::new, arg -> arg.tag).codec();
     private final Tag<Block> tag;
 
     public TagMatchRuleTest(Tag<Block> arg) {
@@ -25,8 +25,8 @@ extends RuleTest {
     }
 
     @Override
-    public boolean test(BlockState arg, Random random) {
-        return arg.isIn(this.tag);
+    public boolean test(BlockState state, Random random) {
+        return state.isIn(this.tag);
     }
 
     @Override

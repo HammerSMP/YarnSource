@@ -97,9 +97,9 @@ implements SkinOverlayOwner {
     }
 
     @Override
-    public boolean handleFallDamage(float f, float g) {
-        boolean bl = super.handleFallDamage(f, g);
-        this.currentFuseTime = (int)((float)this.currentFuseTime + f * 1.5f);
+    public boolean handleFallDamage(float fallDistance, float damageMultiplier) {
+        boolean bl = super.handleFallDamage(fallDistance, damageMultiplier);
+        this.currentFuseTime = (int)((float)this.currentFuseTime + fallDistance * 1.5f);
         if (this.currentFuseTime > this.fuseTime - 5) {
             this.currentFuseTime = this.fuseTime - 5;
         }
@@ -115,27 +115,27 @@ implements SkinOverlayOwner {
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
         if (this.dataTracker.get(CHARGED).booleanValue()) {
-            arg.putBoolean("powered", true);
+            tag.putBoolean("powered", true);
         }
-        arg.putShort("Fuse", (short)this.fuseTime);
-        arg.putByte("ExplosionRadius", (byte)this.explosionRadius);
-        arg.putBoolean("ignited", this.getIgnited());
+        tag.putShort("Fuse", (short)this.fuseTime);
+        tag.putByte("ExplosionRadius", (byte)this.explosionRadius);
+        tag.putBoolean("ignited", this.getIgnited());
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        this.dataTracker.set(CHARGED, arg.getBoolean("powered"));
-        if (arg.contains("Fuse", 99)) {
-            this.fuseTime = arg.getShort("Fuse");
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        this.dataTracker.set(CHARGED, tag.getBoolean("powered"));
+        if (tag.contains("Fuse", 99)) {
+            this.fuseTime = tag.getShort("Fuse");
         }
-        if (arg.contains("ExplosionRadius", 99)) {
-            this.explosionRadius = arg.getByte("ExplosionRadius");
+        if (tag.contains("ExplosionRadius", 99)) {
+            this.explosionRadius = tag.getByte("ExplosionRadius");
         }
-        if (arg.getBoolean("ignited")) {
+        if (tag.getBoolean("ignited")) {
             this.setIgnited();
         }
     }
@@ -164,7 +164,7 @@ implements SkinOverlayOwner {
     }
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource arg) {
+    protected SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.ENTITY_CREEPER_HURT;
     }
 
@@ -174,10 +174,10 @@ implements SkinOverlayOwner {
     }
 
     @Override
-    protected void dropEquipment(DamageSource arg, int i, boolean bl) {
+    protected void dropEquipment(DamageSource source, int lootingMultiplier, boolean allowDrops) {
         CreeperEntity lv2;
-        super.dropEquipment(arg, i, bl);
-        Entity lv = arg.getAttacker();
+        super.dropEquipment(source, lootingMultiplier, allowDrops);
+        Entity lv = source.getAttacker();
         if (lv != this && lv instanceof CreeperEntity && (lv2 = (CreeperEntity)lv).shouldDropHead()) {
             lv2.onHeadDropped();
             this.dropItem(Items.CREEPER_HEAD);
@@ -185,7 +185,7 @@ implements SkinOverlayOwner {
     }
 
     @Override
-    public boolean tryAttack(Entity arg) {
+    public boolean tryAttack(Entity target) {
         return true;
     }
 
@@ -195,16 +195,16 @@ implements SkinOverlayOwner {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public float getClientFuseTime(float f) {
-        return MathHelper.lerp(f, this.lastFuseTime, this.currentFuseTime) / (float)(this.fuseTime - 2);
+    public float getClientFuseTime(float timeDelta) {
+        return MathHelper.lerp(timeDelta, this.lastFuseTime, this.currentFuseTime) / (float)(this.fuseTime - 2);
     }
 
     public int getFuseSpeed() {
         return this.dataTracker.get(FUSE_SPEED);
     }
 
-    public void setFuseSpeed(int i) {
-        this.dataTracker.set(FUSE_SPEED, i);
+    public void setFuseSpeed(int fuseSpeed) {
+        this.dataTracker.set(FUSE_SPEED, fuseSpeed);
     }
 
     @Override
@@ -214,17 +214,17 @@ implements SkinOverlayOwner {
     }
 
     @Override
-    protected ActionResult interactMob(PlayerEntity arg, Hand arg22) {
-        ItemStack lv = arg.getStackInHand(arg22);
+    protected ActionResult interactMob(PlayerEntity player, Hand hand) {
+        ItemStack lv = player.getStackInHand(hand);
         if (lv.getItem() == Items.FLINT_AND_STEEL) {
-            this.world.playSound(arg, this.getX(), this.getY(), this.getZ(), SoundEvents.ITEM_FLINTANDSTEEL_USE, this.getSoundCategory(), 1.0f, this.random.nextFloat() * 0.4f + 0.8f);
+            this.world.playSound(player, this.getX(), this.getY(), this.getZ(), SoundEvents.ITEM_FLINTANDSTEEL_USE, this.getSoundCategory(), 1.0f, this.random.nextFloat() * 0.4f + 0.8f);
             if (!this.world.isClient) {
                 this.setIgnited();
-                lv.damage(1, arg, arg2 -> arg2.sendToolBreakStatus(arg22));
+                lv.damage(1, player, arg2 -> arg2.sendToolBreakStatus(hand));
             }
             return ActionResult.success(this.world.isClient);
         }
-        return super.interactMob(arg, arg22);
+        return super.interactMob(player, hand);
     }
 
     private void explode() {

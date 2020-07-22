@@ -25,17 +25,17 @@ implements AutoCloseable {
     protected boolean bilinear;
     protected boolean mipmap;
 
-    public void setFilter(boolean bl, boolean bl2) {
+    public void setFilter(boolean bilinear, boolean mipmap) {
         int l;
         int k;
         RenderSystem.assertThread(RenderSystem::isOnRenderThreadOrInit);
-        this.bilinear = bl;
-        this.mipmap = bl2;
-        if (bl) {
-            int i = bl2 ? 9987 : 9729;
+        this.bilinear = bilinear;
+        this.mipmap = mipmap;
+        if (bilinear) {
+            int i = mipmap ? 9987 : 9729;
             int j = 9729;
         } else {
-            k = bl2 ? 9986 : 9728;
+            k = mipmap ? 9986 : 9728;
             l = 9728;
         }
         GlStateManager.texParameter(3553, 10241, k);

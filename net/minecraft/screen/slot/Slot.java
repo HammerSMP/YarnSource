@@ -25,35 +25,35 @@ public class Slot {
     public final int x;
     public final int y;
 
-    public Slot(Inventory arg, int i, int j, int k) {
-        this.inventory = arg;
-        this.index = i;
-        this.x = j;
-        this.y = k;
+    public Slot(Inventory inventory, int index, int x, int y) {
+        this.inventory = inventory;
+        this.index = index;
+        this.x = x;
+        this.y = y;
     }
 
-    public void onStackChanged(ItemStack arg, ItemStack arg2) {
-        int i = arg2.getCount() - arg.getCount();
+    public void onStackChanged(ItemStack originalItem, ItemStack arg2) {
+        int i = arg2.getCount() - originalItem.getCount();
         if (i > 0) {
             this.onCrafted(arg2, i);
         }
     }
 
-    protected void onCrafted(ItemStack arg, int i) {
+    protected void onCrafted(ItemStack stack, int amount) {
     }
 
-    protected void onTake(int i) {
+    protected void onTake(int amount) {
     }
 
-    protected void onCrafted(ItemStack arg) {
+    protected void onCrafted(ItemStack stack) {
     }
 
-    public ItemStack onTakeItem(PlayerEntity arg, ItemStack arg2) {
+    public ItemStack onTakeItem(PlayerEntity player, ItemStack stack) {
         this.markDirty();
-        return arg2;
+        return stack;
     }
 
-    public boolean canInsert(ItemStack arg) {
+    public boolean canInsert(ItemStack stack) {
         return true;
     }
 
@@ -65,8 +65,8 @@ public class Slot {
         return !this.getStack().isEmpty();
     }
 
-    public void setStack(ItemStack arg) {
-        this.inventory.setStack(this.index, arg);
+    public void setStack(ItemStack stack) {
+        this.inventory.setStack(this.index, stack);
         this.markDirty();
     }
 
@@ -78,7 +78,7 @@ public class Slot {
         return this.inventory.getMaxCountPerStack();
     }
 
-    public int getMaxStackAmount(ItemStack arg) {
+    public int getMaxStackAmount(ItemStack stack) {
         return this.getMaxStackAmount();
     }
 
@@ -88,11 +88,11 @@ public class Slot {
         return null;
     }
 
-    public ItemStack takeStack(int i) {
-        return this.inventory.removeStack(this.index, i);
+    public ItemStack takeStack(int amount) {
+        return this.inventory.removeStack(this.index, amount);
     }
 
-    public boolean canTakeItems(PlayerEntity arg) {
+    public boolean canTakeItems(PlayerEntity playerEntity) {
         return true;
     }
 

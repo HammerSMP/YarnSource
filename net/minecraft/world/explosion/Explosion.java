@@ -55,11 +55,11 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RayTraceContext;
 import net.minecraft.world.World;
-import net.minecraft.world.explosion.DefaultExplosionBehavior;
 import net.minecraft.world.explosion.EntityExplosionBehavior;
 import net.minecraft.world.explosion.ExplosionBehavior;
 
 public class Explosion {
+    private static final ExplosionBehavior field_25818 = new ExplosionBehavior();
     private final boolean createFire;
     private final DestructionType destructionType;
     private final Random random = new Random();
@@ -76,14 +76,14 @@ public class Explosion {
     private final Map<PlayerEntity, Vec3d> affectedPlayers = Maps.newHashMap();
 
     @Environment(value=EnvType.CLIENT)
-    public Explosion(World arg, @Nullable Entity arg2, double d, double e, double f, float g, List<BlockPos> list) {
-        this(arg, arg2, d, e, f, g, false, DestructionType.DESTROY, list);
+    public Explosion(World world, @Nullable Entity entity, double x, double y, double z, float power, List<BlockPos> affectedBlocks) {
+        this(world, entity, x, y, z, power, false, DestructionType.DESTROY, affectedBlocks);
     }
 
     @Environment(value=EnvType.CLIENT)
-    public Explosion(World arg, @Nullable Entity arg2, double d, double e, double f, float g, boolean bl, DestructionType arg3, List<BlockPos> list) {
-        this(arg, arg2, d, e, f, g, bl, arg3);
-        this.affectedBlocks.addAll(list);
+    public Explosion(World world, @Nullable Entity entity, double x, double y, double z, float power, boolean createFire, DestructionType destructionType, List<BlockPos> affectedBlocks) {
+        this(world, entity, x, y, z, power, createFire, destructionType);
+        this.affectedBlocks.addAll(affectedBlocks);
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -91,9 +91,9 @@ public class Explosion {
         this(arg, arg2, null, null, d, e, f, g, bl, arg3);
     }
 
-    public Explosion(World arg, @Nullable Entity arg2, @Nullable DamageSource arg3, @Nullable ExplosionBehavior arg4, double d, double e, double f, float g, boolean bl, DestructionType arg5) {
-        this.world = arg;
-        this.entity = arg2;
+    public Explosion(World world, @Nullable Entity entity, @Nullable DamageSource arg3, @Nullable ExplosionBehavior arg4, double d, double e, double f, float g, boolean bl, DestructionType arg5) {
+        this.world = world;
+        this.entity = entity;
         this.power = g;
         this.x = d;
         this.y = e;
@@ -101,15 +101,15 @@ public class Explosion {
         this.createFire = bl;
         this.destructionType = arg5;
         this.damageSource = arg3 == null ? DamageSource.explosion(this) : arg3;
-        this.behavior = arg4 == null ? this.chooseBehavior(arg2) : arg4;
+        this.behavior = arg4 == null ? this.chooseBehavior(entity) : arg4;
     }
 
-    private ExplosionBehavior chooseBehavior(@Nullable Entity arg) {
-        return arg == null ? DefaultExplosionBehavior.INSTANCE : new EntityExplosionBehavior(arg);
+    private ExplosionBehavior chooseBehavior(@Nullable Entity entity) {
+        return entity == null ? field_25818 : new EntityExplosionBehavior(entity);
     }
 
-    public static float getExposure(Vec3d arg, Entity arg2) {
-        Box lv = arg2.getBoundingBox();
+    public static float getExposure(Vec3d source, Entity entity) {
+        Box lv = entity.getBoundingBox();
         double d = 1.0 / ((lv.maxX - lv.minX) * 2.0 + 1.0);
         double e = 1.0 / ((lv.maxY - lv.minY) * 2.0 + 1.0);
         double f = 1.0 / ((lv.maxZ - lv.minZ) * 2.0 + 1.0);
@@ -130,7 +130,7 @@ public class Explosion {
                     double o;
                     double n = MathHelper.lerp((double)k, lv.minX, lv.maxX);
                     Vec3d lv2 = new Vec3d(n + g, o = MathHelper.lerp((double)l, lv.minY, lv.maxY), (p = MathHelper.lerp((double)m, lv.minZ, lv.maxZ)) + h);
-                    if (arg2.world.rayTrace(new RayTraceContext(lv2, arg, RayTraceContext.ShapeType.COLLIDER, RayTraceContext.FluidHandling.NONE, arg2)).getType() == HitResult.Type.MISS) {
+                    if (entity.world.rayTrace(new RayTraceContext(lv2, source, RayTraceContext.ShapeType.COLLIDER, RayTraceContext.FluidHandling.NONE, entity)).getType() == HitResult.Type.MISS) {
                         ++i;
                     }
                     ++j;
@@ -187,7 +187,7 @@ public class Explosion {
         int u = MathHelper.floor(this.y + (double)q + 1.0);
         int v = MathHelper.floor(this.z - (double)q - 1.0);
         int w = MathHelper.floor(this.z + (double)q + 1.0);
-        List<Entity> list = this.world.getEntities(this.entity, new Box(r, t, v, s, u, w));
+        List<Entity> list = this.world.getOtherEntities(this.entity, new Box(r, t, v, s, u, w));
         Vec3d lv4 = new Vec3d(this.x, this.y, this.z);
         for (int x = 0; x < list.size(); ++x) {
             PlayerEntity lv6;

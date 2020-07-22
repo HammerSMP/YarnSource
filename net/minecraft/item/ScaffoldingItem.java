@@ -32,23 +32,23 @@ extends BlockItem {
 
     @Override
     @Nullable
-    public ItemPlacementContext getPlacementContext(ItemPlacementContext arg) {
+    public ItemPlacementContext getPlacementContext(ItemPlacementContext context) {
         Block lv4;
-        BlockPos lv = arg.getBlockPos();
-        World lv2 = arg.getWorld();
+        BlockPos lv = context.getBlockPos();
+        World lv2 = context.getWorld();
         BlockState lv3 = lv2.getBlockState(lv);
         if (lv3.isOf(lv4 = this.getBlock())) {
             Direction lv6;
-            if (arg.shouldCancelInteraction()) {
-                Direction lv5 = arg.hitsInsideBlock() ? arg.getSide().getOpposite() : arg.getSide();
+            if (context.shouldCancelInteraction()) {
+                Direction lv5 = context.hitsInsideBlock() ? context.getSide().getOpposite() : context.getSide();
             } else {
-                lv6 = arg.getSide() == Direction.UP ? arg.getPlayerFacing() : Direction.UP;
+                lv6 = context.getSide() == Direction.UP ? context.getPlayerFacing() : Direction.UP;
             }
             int i = 0;
             BlockPos.Mutable lv7 = lv.mutableCopy().move(lv6);
             while (i < 7) {
                 if (!lv2.isClient && !World.method_24794(lv7)) {
-                    PlayerEntity lv8 = arg.getPlayer();
+                    PlayerEntity lv8 = context.getPlayer();
                     int j = lv2.getHeight();
                     if (!(lv8 instanceof ServerPlayerEntity) || lv7.getY() < j) break;
                     GameMessageS2CPacket lv9 = new GameMessageS2CPacket(new TranslatableText("build.tooHigh", j).formatted(Formatting.RED), MessageType.GAME_INFO, Util.NIL_UUID);
@@ -57,8 +57,8 @@ extends BlockItem {
                 }
                 lv3 = lv2.getBlockState(lv7);
                 if (!lv3.isOf(this.getBlock())) {
-                    if (!lv3.canReplace(arg)) break;
-                    return ItemPlacementContext.offset(arg, lv7, lv6);
+                    if (!lv3.canReplace(context)) break;
+                    return ItemPlacementContext.offset(context, lv7, lv6);
                 }
                 lv7.move(lv6);
                 if (!lv6.getAxis().isHorizontal()) continue;
@@ -69,7 +69,7 @@ extends BlockItem {
         if (ScaffoldingBlock.calculateDistance(lv2, lv) == 7) {
             return null;
         }
-        return arg;
+        return context;
     }
 
     @Override

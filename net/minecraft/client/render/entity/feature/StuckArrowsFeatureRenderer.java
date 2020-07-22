@@ -32,19 +32,19 @@ extends StuckObjectsFeatureRenderer<T, M> {
     }
 
     @Override
-    protected int getObjectCount(T arg) {
-        return ((LivingEntity)arg).getStuckArrowCount();
+    protected int getObjectCount(T entity) {
+        return ((LivingEntity)entity).getStuckArrowCount();
     }
 
     @Override
-    protected void renderObject(MatrixStack arg, VertexConsumerProvider arg2, int i, Entity arg3, float f, float g, float h, float j) {
-        float k = MathHelper.sqrt(f * f + h * h);
-        this.arrow = new ArrowEntity(arg3.world, arg3.getX(), arg3.getY(), arg3.getZ());
-        this.arrow.yaw = (float)(Math.atan2(f, h) * 57.2957763671875);
-        this.arrow.pitch = (float)(Math.atan2(g, k) * 57.2957763671875);
+    protected void renderObject(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, Entity entity, float directionX, float directionY, float directionZ, float tickDelta) {
+        float k = MathHelper.sqrt(directionX * directionX + directionZ * directionZ);
+        this.arrow = new ArrowEntity(entity.world, entity.getX(), entity.getY(), entity.getZ());
+        this.arrow.yaw = (float)(Math.atan2(directionX, directionZ) * 57.2957763671875);
+        this.arrow.pitch = (float)(Math.atan2(directionY, k) * 57.2957763671875);
         this.arrow.prevYaw = this.arrow.yaw;
         this.arrow.prevPitch = this.arrow.pitch;
-        this.dispatcher.render(this.arrow, 0.0, 0.0, 0.0, 0.0f, j, arg, arg2, i);
+        this.dispatcher.render(this.arrow, 0.0, 0.0, 0.0, 0.0f, tickDelta, matrices, vertexConsumers, light);
     }
 }
 

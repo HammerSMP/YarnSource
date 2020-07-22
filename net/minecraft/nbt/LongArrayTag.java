@@ -51,22 +51,22 @@ extends AbstractListTag<LongTag> {
         }
 
         @Override
-        public /* synthetic */ Tag read(DataInput dataInput, int i, PositionTracker arg) throws IOException {
-            return this.read(dataInput, i, arg);
+        public /* synthetic */ Tag read(DataInput input, int depth, PositionTracker tracker) throws IOException {
+            return this.read(input, depth, tracker);
         }
     };
     private long[] value;
 
-    public LongArrayTag(long[] ls) {
-        this.value = ls;
+    public LongArrayTag(long[] value) {
+        this.value = value;
     }
 
-    public LongArrayTag(LongSet longSet) {
-        this.value = longSet.toLongArray();
+    public LongArrayTag(LongSet value) {
+        this.value = value.toLongArray();
     }
 
-    public LongArrayTag(List<Long> list) {
-        this(LongArrayTag.toArray(list));
+    public LongArrayTag(List<Long> value) {
+        this(LongArrayTag.toArray(value));
     }
 
     private static long[] toArray(List<Long> list) {
@@ -79,10 +79,10 @@ extends AbstractListTag<LongTag> {
     }
 
     @Override
-    public void write(DataOutput dataOutput) throws IOException {
-        dataOutput.writeInt(this.value.length);
+    public void write(DataOutput output) throws IOException {
+        output.writeInt(this.value.length);
         for (long l : this.value) {
-            dataOutput.writeLong(l);
+            output.writeLong(l);
         }
     }
 
@@ -115,11 +115,11 @@ extends AbstractListTag<LongTag> {
     }
 
     @Override
-    public boolean equals(Object object) {
-        if (this == object) {
+    public boolean equals(Object o) {
+        if (this == o) {
             return true;
         }
-        return object instanceof LongArrayTag && Arrays.equals(this.value, ((LongArrayTag)object).value);
+        return o instanceof LongArrayTag && Arrays.equals(this.value, ((LongArrayTag)o).value);
     }
 
     @Override
@@ -128,7 +128,7 @@ extends AbstractListTag<LongTag> {
     }
 
     @Override
-    public Text toText(String string, int i) {
+    public Text toText(String indent, int depth) {
         MutableText lv = new LiteralText("L").formatted(RED);
         MutableText lv2 = new LiteralText("[").append(lv).append(";");
         for (int j = 0; j < this.value.length; ++j) {
@@ -167,18 +167,18 @@ extends AbstractListTag<LongTag> {
     }
 
     @Override
-    public boolean setTag(int i, Tag arg) {
-        if (arg instanceof AbstractNumberTag) {
-            this.value[i] = ((AbstractNumberTag)arg).getLong();
+    public boolean setTag(int index, Tag tag) {
+        if (tag instanceof AbstractNumberTag) {
+            this.value[index] = ((AbstractNumberTag)tag).getLong();
             return true;
         }
         return false;
     }
 
     @Override
-    public boolean addTag(int i, Tag arg) {
-        if (arg instanceof AbstractNumberTag) {
-            this.value = ArrayUtils.add((long[])this.value, (int)i, (long)((AbstractNumberTag)arg).getLong());
+    public boolean addTag(int index, Tag tag) {
+        if (tag instanceof AbstractNumberTag) {
+            this.value = ArrayUtils.add((long[])this.value, (int)index, (long)((AbstractNumberTag)tag).getLong());
             return true;
         }
         return false;

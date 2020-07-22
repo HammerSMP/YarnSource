@@ -20,26 +20,26 @@ import net.minecraft.text.Text;
 
 public class BannedPlayerEntry
 extends BanEntry<GameProfile> {
-    public BannedPlayerEntry(GameProfile gameProfile) {
-        this(gameProfile, null, null, null, null);
+    public BannedPlayerEntry(GameProfile profile) {
+        this(profile, null, null, null, null);
     }
 
-    public BannedPlayerEntry(GameProfile gameProfile, @Nullable Date date, @Nullable String string, @Nullable Date date2, @Nullable String string2) {
-        super(gameProfile, date, string, date2, string2);
+    public BannedPlayerEntry(GameProfile profile, @Nullable Date created, @Nullable String source, @Nullable Date expiry, @Nullable String reason) {
+        super(profile, created, source, expiry, reason);
     }
 
-    public BannedPlayerEntry(JsonObject jsonObject) {
-        super(BannedPlayerEntry.profileFromJson(jsonObject), jsonObject);
+    public BannedPlayerEntry(JsonObject json) {
+        super(BannedPlayerEntry.profileFromJson(json), json);
     }
 
     @Override
-    protected void fromJson(JsonObject jsonObject) {
+    protected void fromJson(JsonObject json) {
         if (this.getKey() == null) {
             return;
         }
-        jsonObject.addProperty("uuid", ((GameProfile)this.getKey()).getId() == null ? "" : ((GameProfile)this.getKey()).getId().toString());
-        jsonObject.addProperty("name", ((GameProfile)this.getKey()).getName());
-        super.fromJson(jsonObject);
+        json.addProperty("uuid", ((GameProfile)this.getKey()).getId() == null ? "" : ((GameProfile)this.getKey()).getId().toString());
+        json.addProperty("name", ((GameProfile)this.getKey()).getName());
+        super.fromJson(json);
     }
 
     @Override
@@ -51,19 +51,19 @@ extends BanEntry<GameProfile> {
     /*
      * WARNING - void declaration
      */
-    private static GameProfile profileFromJson(JsonObject jsonObject) {
+    private static GameProfile profileFromJson(JsonObject json) {
         void uUID2;
-        if (!jsonObject.has("uuid") || !jsonObject.has("name")) {
+        if (!json.has("uuid") || !json.has("name")) {
             return null;
         }
-        String string = jsonObject.get("uuid").getAsString();
+        String string = json.get("uuid").getAsString();
         try {
             UUID uUID = UUID.fromString(string);
         }
         catch (Throwable throwable) {
             return null;
         }
-        return new GameProfile((UUID)uUID2, jsonObject.get("name").getAsString());
+        return new GameProfile((UUID)uUID2, json.get("name").getAsString());
     }
 }
 

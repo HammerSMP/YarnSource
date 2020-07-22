@@ -40,15 +40,15 @@ extends PersistentState {
     private int nextAvailableId;
     private int currentTime;
 
-    public RaidManager(ServerWorld arg) {
-        super(RaidManager.nameFor(arg.getDimension()));
-        this.world = arg;
+    public RaidManager(ServerWorld world) {
+        super(RaidManager.nameFor(world.getDimension()));
+        this.world = world;
         this.nextAvailableId = 1;
         this.markDirty();
     }
 
-    public Raid getRaid(int i) {
-        return this.raids.get(i);
+    public Raid getRaid(int id) {
+        return this.raids.get(id);
     }
 
     public void tick() {
@@ -72,27 +72,27 @@ extends PersistentState {
         DebugInfoSender.sendRaids(this.world, this.raids.values());
     }
 
-    public static boolean isValidRaiderFor(RaiderEntity arg, Raid arg2) {
-        if (arg != null && arg2 != null && arg2.getWorld() != null) {
-            return arg.isAlive() && arg.canJoinRaid() && arg.getDespawnCounter() <= 2400 && arg.world.getDimension() == arg2.getWorld().getDimension();
+    public static boolean isValidRaiderFor(RaiderEntity raider, Raid raid) {
+        if (raider != null && raid != null && raid.getWorld() != null) {
+            return raider.isAlive() && raider.canJoinRaid() && raider.getDespawnCounter() <= 2400 && raider.world.getDimension() == raid.getWorld().getDimension();
         }
         return false;
     }
 
     @Nullable
-    public Raid startRaid(ServerPlayerEntity arg) {
+    public Raid startRaid(ServerPlayerEntity player) {
         BlockPos lv7;
-        if (arg.isSpectator()) {
+        if (player.isSpectator()) {
             return null;
         }
         if (this.world.getGameRules().getBoolean(GameRules.DISABLE_RAIDS)) {
             return null;
         }
-        DimensionType lv = arg.world.getDimension();
+        DimensionType lv = player.world.getDimension();
         if (!lv.hasRaids()) {
             return null;
         }
-        BlockPos lv2 = arg.getBlockPos();
+        BlockPos lv2 = player.getBlockPos();
         List list = this.world.getPointOfInterestStorage().getInCircle(PointOfInterestType.ALWAYS_TRUE, lv2, 64, PointOfInterestStorage.OccupationStatus.IS_OCCUPIED).collect(Collectors.toList());
         int i = 0;
         Vec3d lv3 = Vec3d.ZERO;
@@ -107,7 +107,7 @@ extends PersistentState {
         } else {
             lv7 = lv2;
         }
-        Raid lv8 = this.getOrCreateRaid(arg.getServerWorld(), lv7);
+        Raid lv8 = this.getOrCreateRaid(player.getServerWorld(), lv7);
         boolean bl = false;
         if (!lv8.hasStarted()) {
             if (!this.raids.containsKey(lv8.getRaidId())) {
@@ -117,31 +117,31 @@ extends PersistentState {
         } else if (lv8.getBadOmenLevel() < lv8.getMaxAcceptableBadOmenLevel()) {
             bl = true;
         } else {
-            arg.removeStatusEffect(StatusEffects.BAD_OMEN);
-            arg.networkHandler.sendPacket(new EntityStatusS2CPacket(arg, 43));
+            player.removeStatusEffect(StatusEffects.BAD_OMEN);
+            player.networkHandler.sendPacket(new EntityStatusS2CPacket(player, 43));
         }
         if (bl) {
-            lv8.start(arg);
-            arg.networkHandler.sendPacket(new EntityStatusS2CPacket(arg, 43));
+            lv8.start(player);
+            player.networkHandler.sendPacket(new EntityStatusS2CPacket(player, 43));
             if (!lv8.hasSpawned()) {
-                arg.incrementStat(Stats.RAID_TRIGGER);
-                Criteria.VOLUNTARY_EXILE.trigger(arg);
+                player.incrementStat(Stats.RAID_TRIGGER);
+                Criteria.VOLUNTARY_EXILE.trigger(player);
             }
         }
         this.markDirty();
         return lv8;
     }
 
-    private Raid getOrCreateRaid(ServerWorld arg, BlockPos arg2) {
-        Raid lv = arg.getRaidAt(arg2);
-        return lv != null ? lv : new Raid(this.nextId(), arg, arg2);
+    private Raid getOrCreateRaid(ServerWorld world, BlockPos pos) {
+        Raid lv = world.getRaidAt(pos);
+        return lv != null ? lv : new Raid(this.nextId(), world, pos);
     }
 
     @Override
-    public void fromTag(CompoundTag arg) {
-        this.nextAvailableId = arg.getInt("NextAvailableID");
-        this.currentTime = arg.getInt("Tick");
-        ListTag lv = arg.getList("Raids", 10);
+    public void fromTag(CompoundTag tag) {
+        this.nextAvailableId = tag.getInt("NextAvailableID");
+        this.currentTime = tag.getInt("Tick");
+        ListTag lv = tag.getList("Raids", 10);
         for (int i = 0; i < lv.size(); ++i) {
             CompoundTag lv2 = lv.getCompound(i);
             Raid lv3 = new Raid(this.world, lv2);
@@ -150,17 +150,17 @@ extends PersistentState {
     }
 
     @Override
-    public CompoundTag toTag(CompoundTag arg) {
-        arg.putInt("NextAvailableID", this.nextAvailableId);
-        arg.putInt("Tick", this.currentTime);
+    public CompoundTag toTag(CompoundTag tag) {
+        tag.putInt("NextAvailableID", this.nextAvailableId);
+        tag.putInt("Tick", this.currentTime);
         ListTag lv = new ListTag();
         for (Raid lv2 : this.raids.values()) {
             CompoundTag lv3 = new CompoundTag();
             lv2.toTag(lv3);
             lv.add(lv3);
         }
-        arg.put("Raids", lv);
-        return arg;
+        tag.put("Raids", lv);
+        return tag;
     }
 
     public static String nameFor(DimensionType arg) {
@@ -172,11 +172,11 @@ extends PersistentState {
     }
 
     @Nullable
-    public Raid getRaidAt(BlockPos arg, int i) {
+    public Raid getRaidAt(BlockPos pos, int i) {
         Raid lv = null;
         double d = i;
         for (Raid lv2 : this.raids.values()) {
-            double e = lv2.getCenter().getSquaredDistance(arg);
+            double e = lv2.getCenter().getSquaredDistance(pos);
             if (!lv2.isActive() || !(e < d)) continue;
             lv = lv2;
             d = e;

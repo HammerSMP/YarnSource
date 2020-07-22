@@ -27,26 +27,26 @@ public class LevelLoadingScreen
 extends Screen {
     private final WorldGenerationProgressTracker progressProvider;
     private long field_19101 = -1L;
-    private static final Object2IntMap<ChunkStatus> STATUS_TO_COLOR = (Object2IntMap)Util.make(new Object2IntOpenHashMap(), object2IntOpenHashMap -> {
-        object2IntOpenHashMap.defaultReturnValue(0);
-        object2IntOpenHashMap.put((Object)ChunkStatus.EMPTY, 0x545454);
-        object2IntOpenHashMap.put((Object)ChunkStatus.STRUCTURE_STARTS, 0x999999);
-        object2IntOpenHashMap.put((Object)ChunkStatus.STRUCTURE_REFERENCES, 6250897);
-        object2IntOpenHashMap.put((Object)ChunkStatus.BIOMES, 8434258);
-        object2IntOpenHashMap.put((Object)ChunkStatus.NOISE, 0xD1D1D1);
-        object2IntOpenHashMap.put((Object)ChunkStatus.SURFACE, 7497737);
-        object2IntOpenHashMap.put((Object)ChunkStatus.CARVERS, 7169628);
-        object2IntOpenHashMap.put((Object)ChunkStatus.LIQUID_CARVERS, 3159410);
-        object2IntOpenHashMap.put((Object)ChunkStatus.FEATURES, 2213376);
-        object2IntOpenHashMap.put((Object)ChunkStatus.LIGHT, 0xCCCCCC);
-        object2IntOpenHashMap.put((Object)ChunkStatus.SPAWN, 15884384);
-        object2IntOpenHashMap.put((Object)ChunkStatus.HEIGHTMAPS, 0xEEEEEE);
-        object2IntOpenHashMap.put((Object)ChunkStatus.FULL, 0xFFFFFF);
+    private static final Object2IntMap<ChunkStatus> STATUS_TO_COLOR = (Object2IntMap)Util.make(new Object2IntOpenHashMap(), map -> {
+        map.defaultReturnValue(0);
+        map.put((Object)ChunkStatus.EMPTY, 0x545454);
+        map.put((Object)ChunkStatus.STRUCTURE_STARTS, 0x999999);
+        map.put((Object)ChunkStatus.STRUCTURE_REFERENCES, 6250897);
+        map.put((Object)ChunkStatus.BIOMES, 8434258);
+        map.put((Object)ChunkStatus.NOISE, 0xD1D1D1);
+        map.put((Object)ChunkStatus.SURFACE, 7497737);
+        map.put((Object)ChunkStatus.CARVERS, 7169628);
+        map.put((Object)ChunkStatus.LIQUID_CARVERS, 3159410);
+        map.put((Object)ChunkStatus.FEATURES, 2213376);
+        map.put((Object)ChunkStatus.LIGHT, 0xCCCCCC);
+        map.put((Object)ChunkStatus.SPAWN, 15884384);
+        map.put((Object)ChunkStatus.HEIGHTMAPS, 0xEEEEEE);
+        map.put((Object)ChunkStatus.FULL, 0xFFFFFF);
     });
 
-    public LevelLoadingScreen(WorldGenerationProgressTracker arg) {
+    public LevelLoadingScreen(WorldGenerationProgressTracker progressProvider) {
         super(NarratorManager.EMPTY);
-        this.progressProvider = arg;
+        this.progressProvider = progressProvider;
     }
 
     @Override
@@ -60,8 +60,8 @@ extends Screen {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.renderBackground(arg);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.renderBackground(matrices);
         String string = MathHelper.clamp(this.progressProvider.getProgressPercentage(), 0, 100) + "%";
         long l = Util.getMeasuringTimeMs();
         if (l - this.field_19101 > 2000L) {
@@ -71,9 +71,9 @@ extends Screen {
         int k = this.width / 2;
         int m = this.height / 2;
         int n = 30;
-        LevelLoadingScreen.drawChunkMap(arg, this.progressProvider, k, m + 30, 2, 0);
+        LevelLoadingScreen.drawChunkMap(matrices, this.progressProvider, k, m + 30, 2, 0);
         this.textRenderer.getClass();
-        this.drawCenteredString(arg, this.textRenderer, string, k, m - 9 / 2 - 30, 0xFFFFFF);
+        this.drawCenteredString(matrices, this.textRenderer, string, k, m - 9 / 2 - 30, 0xFFFFFF);
     }
 
     public static void drawChunkMap(MatrixStack arg, WorldGenerationProgressTracker arg2, int i, int j, int k, int l) {

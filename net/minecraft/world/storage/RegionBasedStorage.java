@@ -26,13 +26,13 @@ implements AutoCloseable {
     private final File directory;
     private final boolean dsync;
 
-    RegionBasedStorage(File file, boolean bl) {
-        this.directory = file;
-        this.dsync = bl;
+    RegionBasedStorage(File directory, boolean dsync) {
+        this.directory = directory;
+        this.dsync = dsync;
     }
 
-    private RegionFile getRegionFile(ChunkPos arg) throws IOException {
-        long l = ChunkPos.toLong(arg.getRegionX(), arg.getRegionZ());
+    private RegionFile getRegionFile(ChunkPos pos) throws IOException {
+        long l = ChunkPos.toLong(pos.getRegionX(), pos.getRegionZ());
         RegionFile lv = (RegionFile)this.cachedRegionFiles.getAndMoveToFirst(l);
         if (lv != null) {
             return lv;
@@ -43,16 +43,16 @@ implements AutoCloseable {
         if (!this.directory.exists()) {
             this.directory.mkdirs();
         }
-        File file = new File(this.directory, "r." + arg.getRegionX() + "." + arg.getRegionZ() + ".mca");
+        File file = new File(this.directory, "r." + pos.getRegionX() + "." + pos.getRegionZ() + ".mca");
         RegionFile lv2 = new RegionFile(file, this.directory, this.dsync);
         this.cachedRegionFiles.putAndMoveToFirst(l, (Object)lv2);
         return lv2;
     }
 
     @Nullable
-    public CompoundTag getTagAt(ChunkPos arg) throws IOException {
-        RegionFile lv = this.getRegionFile(arg);
-        try (DataInputStream dataInputStream = lv.getChunkInputStream(arg);){
+    public CompoundTag getTagAt(ChunkPos pos) throws IOException {
+        RegionFile lv = this.getRegionFile(pos);
+        try (DataInputStream dataInputStream = lv.getChunkInputStream(pos);){
             if (dataInputStream == null) {
                 CompoundTag compoundTag = null;
                 return compoundTag;
@@ -62,10 +62,10 @@ implements AutoCloseable {
         }
     }
 
-    protected void write(ChunkPos arg, CompoundTag arg2) throws IOException {
-        RegionFile lv = this.getRegionFile(arg);
-        try (DataOutputStream dataOutputStream = lv.getChunkOutputStream(arg);){
-            NbtIo.write(arg2, (DataOutput)dataOutputStream);
+    protected void write(ChunkPos pos, CompoundTag tag) throws IOException {
+        RegionFile lv = this.getRegionFile(pos);
+        try (DataOutputStream dataOutputStream = lv.getChunkOutputStream(pos);){
+            NbtIo.write(tag, (DataOutput)dataOutputStream);
         }
     }
 

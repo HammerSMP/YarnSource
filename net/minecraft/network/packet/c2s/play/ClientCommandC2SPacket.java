@@ -25,29 +25,29 @@ implements Packet<ServerPlayPacketListener> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public ClientCommandC2SPacket(Entity arg, Mode arg2) {
-        this(arg, arg2, 0);
+    public ClientCommandC2SPacket(Entity entity, Mode mode) {
+        this(entity, mode, 0);
     }
 
     @Environment(value=EnvType.CLIENT)
-    public ClientCommandC2SPacket(Entity arg, Mode arg2, int i) {
-        this.entityId = arg.getEntityId();
-        this.mode = arg2;
-        this.mountJumpHeight = i;
+    public ClientCommandC2SPacket(Entity entity, Mode mode, int mountJumpHeight) {
+        this.entityId = entity.getEntityId();
+        this.mode = mode;
+        this.mountJumpHeight = mountJumpHeight;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.entityId = arg.readVarInt();
-        this.mode = arg.readEnumConstant(Mode.class);
-        this.mountJumpHeight = arg.readVarInt();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.entityId = buf.readVarInt();
+        this.mode = buf.readEnumConstant(Mode.class);
+        this.mountJumpHeight = buf.readVarInt();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeVarInt(this.entityId);
-        arg.writeEnumConstant(this.mode);
-        arg.writeVarInt(this.mountJumpHeight);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeVarInt(this.entityId);
+        buf.writeEnumConstant(this.mode);
+        buf.writeVarInt(this.mountJumpHeight);
     }
 
     @Override

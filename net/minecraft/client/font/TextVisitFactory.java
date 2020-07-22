@@ -19,110 +19,110 @@ import net.minecraft.util.Unit;
 public class TextVisitFactory {
     private static final Optional<Object> VISIT_TERMINATED = Optional.of(Unit.INSTANCE);
 
-    private static boolean visitRegularCharacter(Style arg, CharacterVisitor arg2, int i, char c) {
+    private static boolean visitRegularCharacter(Style style, CharacterVisitor visitor, int index, char c) {
         if (Character.isSurrogate(c)) {
-            return arg2.onChar(i, arg, 65533);
+            return visitor.onChar(index, style, 65533);
         }
-        return arg2.onChar(i, arg, c);
+        return visitor.onChar(index, style, c);
     }
 
-    public static boolean visitForwards(String string, Style arg, CharacterVisitor arg2) {
-        int i = string.length();
+    public static boolean visitForwards(String text, Style style, CharacterVisitor visitor) {
+        int i = text.length();
         for (int j = 0; j < i; ++j) {
-            char c = string.charAt(j);
+            char c = text.charAt(j);
             if (Character.isHighSurrogate(c)) {
                 if (j + 1 >= i) {
-                    if (arg2.onChar(j, arg, 65533)) break;
+                    if (visitor.onChar(j, style, 65533)) break;
                     return false;
                 }
-                char d = string.charAt(j + 1);
+                char d = text.charAt(j + 1);
                 if (Character.isLowSurrogate(d)) {
-                    if (!arg2.onChar(j, arg, Character.toCodePoint(c, d))) {
+                    if (!visitor.onChar(j, style, Character.toCodePoint(c, d))) {
                         return false;
                     }
                     ++j;
                     continue;
                 }
-                if (arg2.onChar(j, arg, 65533)) continue;
+                if (visitor.onChar(j, style, 65533)) continue;
                 return false;
             }
-            if (TextVisitFactory.visitRegularCharacter(arg, arg2, j, c)) continue;
+            if (TextVisitFactory.visitRegularCharacter(style, visitor, j, c)) continue;
             return false;
         }
         return true;
     }
 
-    public static boolean visitBackwards(String string, Style arg, CharacterVisitor arg2) {
-        int i = string.length();
+    public static boolean visitBackwards(String text, Style style, CharacterVisitor visitor) {
+        int i = text.length();
         for (int j = i - 1; j >= 0; --j) {
-            char c = string.charAt(j);
+            char c = text.charAt(j);
             if (Character.isLowSurrogate(c)) {
                 if (j - 1 < 0) {
-                    if (arg2.onChar(0, arg, 65533)) break;
+                    if (visitor.onChar(0, style, 65533)) break;
                     return false;
                 }
-                char d = string.charAt(j - 1);
-                if (!(Character.isHighSurrogate(d) ? !arg2.onChar(--j, arg, Character.toCodePoint(d, c)) : !arg2.onChar(j, arg, 65533))) continue;
+                char d = text.charAt(j - 1);
+                if (!(Character.isHighSurrogate(d) ? !visitor.onChar(--j, style, Character.toCodePoint(d, c)) : !visitor.onChar(j, style, 65533))) continue;
                 return false;
             }
-            if (TextVisitFactory.visitRegularCharacter(arg, arg2, j, c)) continue;
+            if (TextVisitFactory.visitRegularCharacter(style, visitor, j, c)) continue;
             return false;
         }
         return true;
     }
 
-    public static boolean visitFormatted(String string, Style arg, CharacterVisitor arg2) {
-        return TextVisitFactory.visitFormatted(string, 0, arg, arg2);
+    public static boolean visitFormatted(String text, Style style, CharacterVisitor visitor) {
+        return TextVisitFactory.visitFormatted(text, 0, style, visitor);
     }
 
-    public static boolean visitFormatted(String string, int i, Style arg, CharacterVisitor arg2) {
-        return TextVisitFactory.visitFormatted(string, i, arg, arg, arg2);
+    public static boolean visitFormatted(String text, int startIndex, Style style, CharacterVisitor visitor) {
+        return TextVisitFactory.visitFormatted(text, startIndex, style, style, visitor);
     }
 
-    public static boolean visitFormatted(String string, int i, Style arg, Style arg2, CharacterVisitor arg3) {
-        int j = string.length();
-        Style lv = arg;
-        for (int k = i; k < j; ++k) {
-            char c = string.charAt(k);
+    public static boolean visitFormatted(String text, int startIndex, Style startingStyle, Style resetStyle, CharacterVisitor visitor) {
+        int j = text.length();
+        Style lv = startingStyle;
+        for (int k = startIndex; k < j; ++k) {
+            char c = text.charAt(k);
             if (c == '\u00a7') {
                 if (k + 1 >= j) break;
-                char d = string.charAt(k + 1);
+                char d = text.charAt(k + 1);
                 Formatting lv2 = Formatting.byCode(d);
                 if (lv2 != null) {
-                    lv = lv2 == Formatting.RESET ? arg2 : lv.withExclusiveFormatting(lv2);
+                    lv = lv2 == Formatting.RESET ? resetStyle : lv.withExclusiveFormatting(lv2);
                 }
                 ++k;
                 continue;
             }
             if (Character.isHighSurrogate(c)) {
                 if (k + 1 >= j) {
-                    if (arg3.onChar(k, lv, 65533)) break;
+                    if (visitor.onChar(k, lv, 65533)) break;
                     return false;
                 }
-                char e = string.charAt(k + 1);
+                char e = text.charAt(k + 1);
                 if (Character.isLowSurrogate(e)) {
-                    if (!arg3.onChar(k, lv, Character.toCodePoint(c, e))) {
+                    if (!visitor.onChar(k, lv, Character.toCodePoint(c, e))) {
                         return false;
                     }
                     ++k;
                     continue;
                 }
-                if (arg3.onChar(k, lv, 65533)) continue;
+                if (visitor.onChar(k, lv, 65533)) continue;
                 return false;
             }
-            if (TextVisitFactory.visitRegularCharacter(lv, arg3, k, c)) continue;
+            if (TextVisitFactory.visitRegularCharacter(lv, visitor, k, c)) continue;
             return false;
         }
         return true;
     }
 
-    public static boolean visitFormatted(StringRenderable arg, Style arg22, CharacterVisitor arg3) {
-        return !arg.visit((arg2, string) -> TextVisitFactory.visitFormatted(string, 0, arg2, arg3) ? Optional.empty() : VISIT_TERMINATED, arg22).isPresent();
+    public static boolean visitFormatted(StringRenderable text, Style style, CharacterVisitor visitor) {
+        return !text.visit((arg2, string) -> TextVisitFactory.visitFormatted(string, 0, arg2, visitor) ? Optional.empty() : VISIT_TERMINATED, style).isPresent();
     }
 
-    public static String validateSurrogates(String string) {
+    public static String validateSurrogates(String text) {
         StringBuilder stringBuilder = new StringBuilder();
-        TextVisitFactory.visitForwards(string, Style.EMPTY, (i, arg, j) -> {
+        TextVisitFactory.visitForwards(text, Style.EMPTY, (i, arg, j) -> {
             stringBuilder.appendCodePoint(j);
             return true;
         });

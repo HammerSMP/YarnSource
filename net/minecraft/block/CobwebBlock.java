@@ -18,8 +18,8 @@ extends Block {
     }
 
     @Override
-    public void onEntityCollision(BlockState arg, World arg2, BlockPos arg3, Entity arg4) {
-        arg4.slowMovement(arg, new Vec3d(0.25, 0.05f, 0.25));
+    public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
+        entity.slowMovement(state, new Vec3d(0.25, 0.05f, 0.25));
     }
 }
 

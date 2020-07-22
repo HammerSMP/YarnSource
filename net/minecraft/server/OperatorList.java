@@ -21,8 +21,8 @@ extends ServerConfigList<GameProfile, OperatorEntry> {
     }
 
     @Override
-    protected ServerConfigEntry<GameProfile> fromJson(JsonObject jsonObject) {
-        return new OperatorEntry(jsonObject);
+    protected ServerConfigEntry<GameProfile> fromJson(JsonObject json) {
+        return new OperatorEntry(json);
     }
 
     @Override
@@ -35,8 +35,8 @@ extends ServerConfigList<GameProfile, OperatorEntry> {
         return strings;
     }
 
-    public boolean isOp(GameProfile gameProfile) {
-        OperatorEntry lv = (OperatorEntry)this.get(gameProfile);
+    public boolean isOp(GameProfile profile) {
+        OperatorEntry lv = (OperatorEntry)this.get(profile);
         if (lv != null) {
             return lv.canBypassPlayerLimit();
         }
@@ -49,8 +49,8 @@ extends ServerConfigList<GameProfile, OperatorEntry> {
     }
 
     @Override
-    protected /* synthetic */ String toString(Object object) {
-        return this.toString((GameProfile)object);
+    protected /* synthetic */ String toString(Object profile) {
+        return this.toString((GameProfile)profile);
     }
 }
 

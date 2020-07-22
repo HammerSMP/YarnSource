@@ -26,28 +26,28 @@ extends Item {
     }
 
     @Override
-    public ActionResult useOnBlock(ItemUsageContext arg) {
+    public ActionResult useOnBlock(ItemUsageContext context) {
         BlockPos lv3;
-        PlayerEntity lv = arg.getPlayer();
-        World lv2 = arg.getWorld();
-        BlockState lv4 = lv2.getBlockState(lv3 = arg.getBlockPos());
+        PlayerEntity lv = context.getPlayer();
+        World lv2 = context.getWorld();
+        BlockState lv4 = lv2.getBlockState(lv3 = context.getBlockPos());
         if (CampfireBlock.method_30035(lv4)) {
             lv2.playSound(lv, lv3, SoundEvents.ITEM_FLINTANDSTEEL_USE, SoundCategory.BLOCKS, 1.0f, RANDOM.nextFloat() * 0.4f + 0.8f);
             lv2.setBlockState(lv3, (BlockState)lv4.with(Properties.LIT, true), 11);
             if (lv != null) {
-                arg.getStack().damage(1, lv, arg2 -> arg2.sendToolBreakStatus(arg.getHand()));
+                context.getStack().damage(1, lv, p -> p.sendToolBreakStatus(context.getHand()));
             }
             return ActionResult.success(lv2.isClient());
         }
-        BlockPos lv5 = lv3.offset(arg.getSide());
-        if (AbstractFireBlock.method_30032(lv2, lv5)) {
+        BlockPos lv5 = lv3.offset(context.getSide());
+        if (AbstractFireBlock.method_30032(lv2, lv5, context.getPlayerFacing())) {
             lv2.playSound(lv, lv5, SoundEvents.ITEM_FLINTANDSTEEL_USE, SoundCategory.BLOCKS, 1.0f, RANDOM.nextFloat() * 0.4f + 0.8f);
             BlockState lv6 = AbstractFireBlock.getState(lv2, lv5);
             lv2.setBlockState(lv5, lv6, 11);
-            ItemStack lv7 = arg.getStack();
+            ItemStack lv7 = context.getStack();
             if (lv instanceof ServerPlayerEntity) {
                 Criteria.PLACED_BLOCK.trigger((ServerPlayerEntity)lv, lv5, lv7);
-                lv7.damage(1, lv, arg2 -> arg2.sendToolBreakStatus(arg.getHand()));
+                lv7.damage(1, lv, p -> p.sendToolBreakStatus(context.getHand()));
             }
             return ActionResult.success(lv2.isClient());
         }

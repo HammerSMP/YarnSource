@@ -29,45 +29,45 @@ extends BlockWithEntity {
     }
 
     @Override
-    public BlockEntity createBlockEntity(BlockView arg) {
+    public BlockEntity createBlockEntity(BlockView world) {
         return new EndGatewayBlockEntity();
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void randomDisplayTick(BlockState arg, World arg2, BlockPos arg3, Random random) {
-        BlockEntity lv = arg2.getBlockEntity(arg3);
+    public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
+        BlockEntity lv = world.getBlockEntity(pos);
         if (!(lv instanceof EndGatewayBlockEntity)) {
             return;
         }
         int i = ((EndGatewayBlockEntity)lv).getDrawnSidesCount();
         for (int j = 0; j < i; ++j) {
-            double d = (double)arg3.getX() + random.nextDouble();
-            double e = (double)arg3.getY() + random.nextDouble();
-            double f = (double)arg3.getZ() + random.nextDouble();
+            double d = (double)pos.getX() + random.nextDouble();
+            double e = (double)pos.getY() + random.nextDouble();
+            double f = (double)pos.getZ() + random.nextDouble();
             double g = (random.nextDouble() - 0.5) * 0.5;
             double h = (random.nextDouble() - 0.5) * 0.5;
             double k = (random.nextDouble() - 0.5) * 0.5;
             int l = random.nextInt(2) * 2 - 1;
             if (random.nextBoolean()) {
-                f = (double)arg3.getZ() + 0.5 + 0.25 * (double)l;
+                f = (double)pos.getZ() + 0.5 + 0.25 * (double)l;
                 k = random.nextFloat() * 2.0f * (float)l;
             } else {
-                d = (double)arg3.getX() + 0.5 + 0.25 * (double)l;
+                d = (double)pos.getX() + 0.5 + 0.25 * (double)l;
                 g = random.nextFloat() * 2.0f * (float)l;
             }
-            arg2.addParticle(ParticleTypes.PORTAL, d, e, f, g, h, k);
+            world.addParticle(ParticleTypes.PORTAL, d, e, f, g, h, k);
         }
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public ItemStack getPickStack(BlockView arg, BlockPos arg2, BlockState arg3) {
+    public ItemStack getPickStack(BlockView world, BlockPos pos, BlockState state) {
         return ItemStack.EMPTY;
     }
 
     @Override
-    public boolean canBucketPlace(BlockState arg, Fluid arg2) {
+    public boolean canBucketPlace(BlockState state, Fluid fluid) {
         return false;
     }
 }

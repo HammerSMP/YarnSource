@@ -56,16 +56,16 @@ extends FacingBlock {
     protected static final VoxelShape EXTENDED_DOWN_SHAPE = Block.createCuboidShape(0.0, 4.0, 0.0, 16.0, 16.0, 16.0);
     private final boolean sticky;
 
-    public PistonBlock(boolean bl, AbstractBlock.Settings arg) {
-        super(arg);
+    public PistonBlock(boolean sticky, AbstractBlock.Settings settings) {
+        super(settings);
         this.setDefaultState((BlockState)((BlockState)((BlockState)this.stateManager.getDefaultState()).with(FACING, Direction.NORTH)).with(EXTENDED, false));
-        this.sticky = bl;
+        this.sticky = sticky;
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
-        if (arg.get(EXTENDED).booleanValue()) {
-            switch (arg.get(FACING)) {
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        if (state.get(EXTENDED).booleanValue()) {
+            switch (state.get(FACING)) {
                 case DOWN: {
                     return EXTENDED_DOWN_SHAPE;
                 }
@@ -89,65 +89,65 @@ extends FacingBlock {
     }
 
     @Override
-    public void onPlaced(World arg, BlockPos arg2, BlockState arg3, LivingEntity arg4, ItemStack arg5) {
-        if (!arg.isClient) {
-            this.tryMove(arg, arg2, arg3);
+    public void onPlaced(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack) {
+        if (!world.isClient) {
+            this.tryMove(world, pos, state);
         }
     }
 
     @Override
-    public void neighborUpdate(BlockState arg, World arg2, BlockPos arg3, Block arg4, BlockPos arg5, boolean bl) {
-        if (!arg2.isClient) {
-            this.tryMove(arg2, arg3, arg);
+    public void neighborUpdate(BlockState state, World world, BlockPos pos, Block block, BlockPos fromPos, boolean notify) {
+        if (!world.isClient) {
+            this.tryMove(world, pos, state);
         }
     }
 
     @Override
-    public void onBlockAdded(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
-        if (arg4.isOf(arg.getBlock())) {
+    public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
+        if (oldState.isOf(state.getBlock())) {
             return;
         }
-        if (!arg2.isClient && arg2.getBlockEntity(arg3) == null) {
-            this.tryMove(arg2, arg3, arg);
+        if (!world.isClient && world.getBlockEntity(pos) == null) {
+            this.tryMove(world, pos, state);
         }
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext arg) {
-        return (BlockState)((BlockState)this.getDefaultState().with(FACING, arg.getPlayerLookDirection().getOpposite())).with(EXTENDED, false);
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        return (BlockState)((BlockState)this.getDefaultState().with(FACING, ctx.getPlayerLookDirection().getOpposite())).with(EXTENDED, false);
     }
 
-    private void tryMove(World arg, BlockPos arg2, BlockState arg3) {
-        Direction lv = arg3.get(FACING);
-        boolean bl = this.shouldExtend(arg, arg2, lv);
-        if (bl && !arg3.get(EXTENDED).booleanValue()) {
-            if (new PistonHandler(arg, arg2, lv, true).calculatePush()) {
-                arg.addSyncedBlockEvent(arg2, this, 0, lv.getId());
+    private void tryMove(World world, BlockPos pos, BlockState state) {
+        Direction lv = state.get(FACING);
+        boolean bl = this.shouldExtend(world, pos, lv);
+        if (bl && !state.get(EXTENDED).booleanValue()) {
+            if (new PistonHandler(world, pos, lv, true).calculatePush()) {
+                world.addSyncedBlockEvent(pos, this, 0, lv.getId());
             }
-        } else if (!bl && arg3.get(EXTENDED).booleanValue()) {
+        } else if (!bl && state.get(EXTENDED).booleanValue()) {
             PistonBlockEntity lv5;
             BlockEntity lv4;
-            BlockPos lv2 = arg2.offset(lv, 2);
-            BlockState lv3 = arg.getBlockState(lv2);
+            BlockPos lv2 = pos.offset(lv, 2);
+            BlockState lv3 = world.getBlockState(lv2);
             int i = 1;
-            if (lv3.isOf(Blocks.MOVING_PISTON) && lv3.get(FACING) == lv && (lv4 = arg.getBlockEntity(lv2)) instanceof PistonBlockEntity && (lv5 = (PistonBlockEntity)lv4).isExtending() && (lv5.getProgress(0.0f) < 0.5f || arg.getTime() == lv5.getSavedWorldTime() || ((ServerWorld)arg).isInBlockTick())) {
+            if (lv3.isOf(Blocks.MOVING_PISTON) && lv3.get(FACING) == lv && (lv4 = world.getBlockEntity(lv2)) instanceof PistonBlockEntity && (lv5 = (PistonBlockEntity)lv4).isExtending() && (lv5.getProgress(0.0f) < 0.5f || world.getTime() == lv5.getSavedWorldTime() || ((ServerWorld)world).isInBlockTick())) {
                 i = 2;
             }
-            arg.addSyncedBlockEvent(arg2, this, i, lv.getId());
+            world.addSyncedBlockEvent(pos, this, i, lv.getId());
         }
     }
 
-    private boolean shouldExtend(World arg, BlockPos arg2, Direction arg3) {
+    private boolean shouldExtend(World world, BlockPos pos, Direction pistonFace) {
         for (Direction lv : Direction.values()) {
-            if (lv == arg3 || !arg.isEmittingRedstonePower(arg2.offset(lv), lv)) continue;
+            if (lv == pistonFace || !world.isEmittingRedstonePower(pos.offset(lv), lv)) continue;
             return true;
         }
-        if (arg.isEmittingRedstonePower(arg2, Direction.DOWN)) {
+        if (world.isEmittingRedstonePower(pos, Direction.DOWN)) {
             return true;
         }
-        BlockPos lv2 = arg2.up();
+        BlockPos lv2 = pos.up();
         for (Direction lv3 : Direction.values()) {
-            if (lv3 == Direction.DOWN || !arg.isEmittingRedstonePower(lv2.offset(lv3), lv3)) continue;
+            if (lv3 == Direction.DOWN || !world.isEmittingRedstonePower(lv2.offset(lv3), lv3)) continue;
             return true;
         }
         return false;
@@ -158,102 +158,102 @@ extends FacingBlock {
      * Lifted jumps to return sites
      */
     @Override
-    public boolean onSyncedBlockEvent(BlockState arg, World arg2, BlockPos arg3, int i, int j) {
-        Direction lv = arg.get(FACING);
-        if (!arg2.isClient) {
-            boolean bl = this.shouldExtend(arg2, arg3, lv);
-            if (bl && (i == 1 || i == 2)) {
-                arg2.setBlockState(arg3, (BlockState)arg.with(EXTENDED, true), 2);
+    public boolean onSyncedBlockEvent(BlockState state, World world, BlockPos pos, int type, int data) {
+        Direction lv = state.get(FACING);
+        if (!world.isClient) {
+            boolean bl = this.shouldExtend(world, pos, lv);
+            if (bl && (type == 1 || type == 2)) {
+                world.setBlockState(pos, (BlockState)state.with(EXTENDED, true), 2);
                 return false;
             }
-            if (!bl && i == 0) {
+            if (!bl && type == 0) {
                 return false;
             }
         }
-        if (i == 0) {
-            if (!this.move(arg2, arg3, lv, true)) return false;
-            arg2.setBlockState(arg3, (BlockState)arg.with(EXTENDED, true), 67);
-            arg2.playSound(null, arg3, SoundEvents.BLOCK_PISTON_EXTEND, SoundCategory.BLOCKS, 0.5f, arg2.random.nextFloat() * 0.25f + 0.6f);
+        if (type == 0) {
+            if (!this.move(world, pos, lv, true)) return false;
+            world.setBlockState(pos, (BlockState)state.with(EXTENDED, true), 67);
+            world.playSound(null, pos, SoundEvents.BLOCK_PISTON_EXTEND, SoundCategory.BLOCKS, 0.5f, world.random.nextFloat() * 0.25f + 0.6f);
             return true;
         } else {
-            if (i != 1 && i != 2) return true;
-            BlockEntity lv2 = arg2.getBlockEntity(arg3.offset(lv));
+            if (type != 1 && type != 2) return true;
+            BlockEntity lv2 = world.getBlockEntity(pos.offset(lv));
             if (lv2 instanceof PistonBlockEntity) {
                 ((PistonBlockEntity)lv2).finish();
             }
             BlockState lv3 = (BlockState)((BlockState)Blocks.MOVING_PISTON.getDefaultState().with(PistonExtensionBlock.FACING, lv)).with(PistonExtensionBlock.TYPE, this.sticky ? PistonType.STICKY : PistonType.DEFAULT);
-            arg2.setBlockState(arg3, lv3, 20);
-            arg2.setBlockEntity(arg3, PistonExtensionBlock.createBlockEntityPiston((BlockState)this.getDefaultState().with(FACING, Direction.byId(j & 7)), lv, false, true));
-            arg2.updateNeighbors(arg3, lv3.getBlock());
-            lv3.method_30101(arg2, arg3, 2);
+            world.setBlockState(pos, lv3, 20);
+            world.setBlockEntity(pos, PistonExtensionBlock.createBlockEntityPiston((BlockState)this.getDefaultState().with(FACING, Direction.byId(data & 7)), lv, false, true));
+            world.updateNeighbors(pos, lv3.getBlock());
+            lv3.method_30101(world, pos, 2);
             if (this.sticky) {
                 PistonBlockEntity lv7;
                 BlockEntity lv6;
-                BlockPos lv4 = arg3.add(lv.getOffsetX() * 2, lv.getOffsetY() * 2, lv.getOffsetZ() * 2);
-                BlockState lv5 = arg2.getBlockState(lv4);
+                BlockPos lv4 = pos.add(lv.getOffsetX() * 2, lv.getOffsetY() * 2, lv.getOffsetZ() * 2);
+                BlockState lv5 = world.getBlockState(lv4);
                 boolean bl2 = false;
-                if (lv5.isOf(Blocks.MOVING_PISTON) && (lv6 = arg2.getBlockEntity(lv4)) instanceof PistonBlockEntity && (lv7 = (PistonBlockEntity)lv6).getFacing() == lv && lv7.isExtending()) {
+                if (lv5.isOf(Blocks.MOVING_PISTON) && (lv6 = world.getBlockEntity(lv4)) instanceof PistonBlockEntity && (lv7 = (PistonBlockEntity)lv6).getFacing() == lv && lv7.isExtending()) {
                     lv7.finish();
                     bl2 = true;
                 }
                 if (!bl2) {
-                    if (i == 1 && !lv5.isAir() && PistonBlock.isMovable(lv5, arg2, lv4, lv.getOpposite(), false, lv) && (lv5.getPistonBehavior() == PistonBehavior.NORMAL || lv5.isOf(Blocks.PISTON) || lv5.isOf(Blocks.STICKY_PISTON))) {
-                        this.move(arg2, arg3, lv, false);
+                    if (type == 1 && !lv5.isAir() && PistonBlock.isMovable(lv5, world, lv4, lv.getOpposite(), false, lv) && (lv5.getPistonBehavior() == PistonBehavior.NORMAL || lv5.isOf(Blocks.PISTON) || lv5.isOf(Blocks.STICKY_PISTON))) {
+                        this.move(world, pos, lv, false);
                     } else {
-                        arg2.removeBlock(arg3.offset(lv), false);
+                        world.removeBlock(pos.offset(lv), false);
                     }
                 }
             } else {
-                arg2.removeBlock(arg3.offset(lv), false);
+                world.removeBlock(pos.offset(lv), false);
             }
-            arg2.playSound(null, arg3, SoundEvents.BLOCK_PISTON_CONTRACT, SoundCategory.BLOCKS, 0.5f, arg2.random.nextFloat() * 0.15f + 0.6f);
+            world.playSound(null, pos, SoundEvents.BLOCK_PISTON_CONTRACT, SoundCategory.BLOCKS, 0.5f, world.random.nextFloat() * 0.15f + 0.6f);
         }
         return true;
     }
 
-    public static boolean isMovable(BlockState arg, World arg2, BlockPos arg3, Direction arg4, boolean bl, Direction arg5) {
-        if (arg.isOf(Blocks.OBSIDIAN) || arg.isOf(Blocks.CRYING_OBSIDIAN) || arg.isOf(Blocks.RESPAWN_ANCHOR)) {
+    public static boolean isMovable(BlockState state, World world, BlockPos pos, Direction motionDir, boolean canBreak, Direction pistonDir) {
+        if (state.isOf(Blocks.OBSIDIAN) || state.isOf(Blocks.CRYING_OBSIDIAN) || state.isOf(Blocks.RESPAWN_ANCHOR)) {
             return false;
         }
-        if (!arg2.getWorldBorder().contains(arg3)) {
+        if (!world.getWorldBorder().contains(pos)) {
             return false;
         }
-        if (arg3.getY() < 0 || arg4 == Direction.DOWN && arg3.getY() == 0) {
+        if (pos.getY() < 0 || motionDir == Direction.DOWN && pos.getY() == 0) {
             return false;
         }
-        if (arg3.getY() > arg2.getHeight() - 1 || arg4 == Direction.UP && arg3.getY() == arg2.getHeight() - 1) {
+        if (pos.getY() > world.getHeight() - 1 || motionDir == Direction.UP && pos.getY() == world.getHeight() - 1) {
             return false;
         }
-        if (arg.isOf(Blocks.PISTON) || arg.isOf(Blocks.STICKY_PISTON)) {
-            if (arg.get(EXTENDED).booleanValue()) {
+        if (state.isOf(Blocks.PISTON) || state.isOf(Blocks.STICKY_PISTON)) {
+            if (state.get(EXTENDED).booleanValue()) {
                 return false;
             }
         } else {
-            if (arg.getHardness(arg2, arg3) == -1.0f) {
+            if (state.getHardness(world, pos) == -1.0f) {
                 return false;
             }
-            switch (arg.getPistonBehavior()) {
+            switch (state.getPistonBehavior()) {
                 case BLOCK: {
                     return false;
                 }
                 case DESTROY: {
-                    return bl;
+                    return canBreak;
                 }
                 case PUSH_ONLY: {
-                    return arg4 == arg5;
+                    return motionDir == pistonDir;
                 }
             }
         }
-        return !arg.getBlock().hasBlockEntity();
+        return !state.getBlock().hasBlockEntity();
     }
 
-    private boolean move(World arg, BlockPos arg2, Direction arg3, boolean bl) {
+    private boolean move(World world, BlockPos pos, Direction dir, boolean retract) {
         PistonHandler lv2;
-        BlockPos lv = arg2.offset(arg3);
-        if (!bl && arg.getBlockState(lv).isOf(Blocks.PISTON_HEAD)) {
-            arg.setBlockState(lv, Blocks.AIR.getDefaultState(), 20);
+        BlockPos lv = pos.offset(dir);
+        if (!retract && world.getBlockState(lv).isOf(Blocks.PISTON_HEAD)) {
+            world.setBlockState(lv, Blocks.AIR.getDefaultState(), 20);
         }
-        if (!(lv2 = new PistonHandler(arg, arg2, arg3, bl)).calculatePush()) {
+        if (!(lv2 = new PistonHandler(world, pos, dir, retract)).calculatePush()) {
             return false;
         }
         HashMap map = Maps.newHashMap();
@@ -261,88 +261,88 @@ extends FacingBlock {
         ArrayList list2 = Lists.newArrayList();
         for (int i = 0; i < list.size(); ++i) {
             BlockPos lv3 = list.get(i);
-            BlockState lv4 = arg.getBlockState(lv3);
+            BlockState lv4 = world.getBlockState(lv3);
             list2.add(lv4);
             map.put(lv3, lv4);
         }
         List<BlockPos> list3 = lv2.getBrokenBlocks();
         BlockState[] lvs = new BlockState[list.size() + list3.size()];
-        Direction lv5 = bl ? arg3 : arg3.getOpposite();
+        Direction lv5 = retract ? dir : dir.getOpposite();
         int j = 0;
         for (int k = list3.size() - 1; k >= 0; --k) {
             BlockPos lv6 = list3.get(k);
-            BlockState blockState = arg.getBlockState(lv6);
-            BlockEntity lv8 = blockState.getBlock().hasBlockEntity() ? arg.getBlockEntity(lv6) : null;
-            PistonBlock.dropStacks(blockState, arg, lv6, lv8);
-            arg.setBlockState(lv6, Blocks.AIR.getDefaultState(), 18);
+            BlockState blockState = world.getBlockState(lv6);
+            BlockEntity lv8 = blockState.getBlock().hasBlockEntity() ? world.getBlockEntity(lv6) : null;
+            PistonBlock.dropStacks(blockState, world, lv6, lv8);
+            world.setBlockState(lv6, Blocks.AIR.getDefaultState(), 18);
             lvs[j++] = blockState;
         }
         for (int l = list.size() - 1; l >= 0; --l) {
             BlockPos lv9 = list.get(l);
-            BlockState blockState = arg.getBlockState(lv9);
+            BlockState blockState = world.getBlockState(lv9);
             lv9 = lv9.offset(lv5);
             map.remove(lv9);
-            arg.setBlockState(lv9, (BlockState)Blocks.MOVING_PISTON.getDefaultState().with(FACING, arg3), 68);
-            arg.setBlockEntity(lv9, PistonExtensionBlock.createBlockEntityPiston((BlockState)list2.get(l), arg3, bl, false));
+            world.setBlockState(lv9, (BlockState)Blocks.MOVING_PISTON.getDefaultState().with(FACING, dir), 68);
+            world.setBlockEntity(lv9, PistonExtensionBlock.createBlockEntityPiston((BlockState)list2.get(l), dir, retract, false));
             lvs[j++] = blockState;
         }
-        if (bl) {
+        if (retract) {
             PistonType lv11 = this.sticky ? PistonType.STICKY : PistonType.DEFAULT;
-            BlockState lv12 = (BlockState)((BlockState)Blocks.PISTON_HEAD.getDefaultState().with(PistonHeadBlock.FACING, arg3)).with(PistonHeadBlock.TYPE, lv11);
-            BlockState blockState = (BlockState)((BlockState)Blocks.MOVING_PISTON.getDefaultState().with(PistonExtensionBlock.FACING, arg3)).with(PistonExtensionBlock.TYPE, this.sticky ? PistonType.STICKY : PistonType.DEFAULT);
+            BlockState lv12 = (BlockState)((BlockState)Blocks.PISTON_HEAD.getDefaultState().with(PistonHeadBlock.FACING, dir)).with(PistonHeadBlock.TYPE, lv11);
+            BlockState blockState = (BlockState)((BlockState)Blocks.MOVING_PISTON.getDefaultState().with(PistonExtensionBlock.FACING, dir)).with(PistonExtensionBlock.TYPE, this.sticky ? PistonType.STICKY : PistonType.DEFAULT);
             map.remove(lv);
-            arg.setBlockState(lv, blockState, 68);
-            arg.setBlockEntity(lv, PistonExtensionBlock.createBlockEntityPiston(lv12, arg3, true, true));
+            world.setBlockState(lv, blockState, 68);
+            world.setBlockEntity(lv, PistonExtensionBlock.createBlockEntityPiston(lv12, dir, true, true));
         }
         BlockState lv14 = Blocks.AIR.getDefaultState();
         for (BlockPos blockPos : map.keySet()) {
-            arg.setBlockState(blockPos, lv14, 82);
+            world.setBlockState(blockPos, lv14, 82);
         }
         for (Map.Entry entry : map.entrySet()) {
             BlockPos lv16 = (BlockPos)entry.getKey();
             BlockState lv17 = (BlockState)entry.getValue();
-            lv17.method_30102(arg, lv16, 2);
-            lv14.method_30101(arg, lv16, 2);
-            lv14.method_30102(arg, lv16, 2);
+            lv17.method_30102(world, lv16, 2);
+            lv14.method_30101(world, lv16, 2);
+            lv14.method_30102(world, lv16, 2);
         }
         j = 0;
         for (int m = list3.size() - 1; m >= 0; --m) {
             BlockState blockState = lvs[j++];
             BlockPos lv19 = list3.get(m);
-            blockState.method_30102(arg, lv19, 2);
-            arg.updateNeighborsAlways(lv19, blockState.getBlock());
+            blockState.method_30102(world, lv19, 2);
+            world.updateNeighborsAlways(lv19, blockState.getBlock());
         }
         for (int n = list.size() - 1; n >= 0; --n) {
-            arg.updateNeighborsAlways(list.get(n), lvs[j++].getBlock());
+            world.updateNeighborsAlways(list.get(n), lvs[j++].getBlock());
         }
-        if (bl) {
-            arg.updateNeighborsAlways(lv, Blocks.PISTON_HEAD);
+        if (retract) {
+            world.updateNeighborsAlways(lv, Blocks.PISTON_HEAD);
         }
         return true;
     }
 
     @Override
-    public BlockState rotate(BlockState arg, BlockRotation arg2) {
-        return (BlockState)arg.with(FACING, arg2.rotate(arg.get(FACING)));
+    public BlockState rotate(BlockState state, BlockRotation rotation) {
+        return (BlockState)state.with(FACING, rotation.rotate(state.get(FACING)));
     }
 
     @Override
-    public BlockState mirror(BlockState arg, BlockMirror arg2) {
-        return arg.rotate(arg2.getRotation(arg.get(FACING)));
+    public BlockState mirror(BlockState state, BlockMirror mirror) {
+        return state.rotate(mirror.getRotation(state.get(FACING)));
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(FACING, EXTENDED);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(FACING, EXTENDED);
     }
 
     @Override
-    public boolean hasSidedTransparency(BlockState arg) {
-        return arg.get(EXTENDED);
+    public boolean hasSidedTransparency(BlockState state) {
+        return state.get(EXTENDED);
     }
 
     @Override
-    public boolean canPathfindThrough(BlockState arg, BlockView arg2, BlockPos arg3, NavigationType arg4) {
+    public boolean canPathfindThrough(BlockState state, BlockView world, BlockPos pos, NavigationType type) {
         return false;
     }
 }

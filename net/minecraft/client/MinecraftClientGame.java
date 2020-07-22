@@ -41,8 +41,8 @@ implements RunningGame {
     private final Launcher launcher;
     private SessionEventListener listener = SessionEventListener.NONE;
 
-    public MinecraftClientGame(MinecraftClient arg) {
-        this.client = arg;
+    public MinecraftClientGame(MinecraftClient client) {
+        this.client = client;
         this.launcher = Bridge.getLauncher();
         if (this.launcher != null) {
             this.launcher.registerGame((RunningGame)this);
@@ -76,8 +76,8 @@ implements RunningGame {
         return new PerformanceMetricsImpl((int)l, (int)m, (int)(n / (long)lv.getSamples().length), lv.getSamples().length);
     }
 
-    public void setSessionEventListener(SessionEventListener sessionEventListener) {
-        this.listener = sessionEventListener;
+    public void setSessionEventListener(SessionEventListener listener) {
+        this.listener = listener;
     }
 
     public void onStartGameSession() {
@@ -96,11 +96,11 @@ implements RunningGame {
         private final int averageTime;
         private final int sampleCount;
 
-        public PerformanceMetricsImpl(int i, int j, int k, int l) {
-            this.minTime = i;
-            this.maxTime = j;
-            this.averageTime = k;
-            this.sampleCount = l;
+        public PerformanceMetricsImpl(int minTime, int maxTime, int averageTime, int sampleCount) {
+            this.minTime = minTime;
+            this.maxTime = maxTime;
+            this.averageTime = averageTime;
+            this.sampleCount = sampleCount;
         }
 
         public int getMinTime() {

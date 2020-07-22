@@ -24,13 +24,13 @@ public class SharedConstants {
     public static final char[] INVALID_CHARS_LEVEL_NAME;
     private static GameVersion gameVersion;
 
-    public static boolean isValidChar(char c) {
-        return c != '\u00a7' && c >= ' ' && c != '\u007f';
+    public static boolean isValidChar(char chr) {
+        return chr != '\u00a7' && chr >= ' ' && chr != '\u007f';
     }
 
-    public static String stripInvalidChars(String string) {
+    public static String stripInvalidChars(String s) {
         StringBuilder stringBuilder = new StringBuilder();
-        for (char c : string.toCharArray()) {
+        for (char c : s.toCharArray()) {
             if (!SharedConstants.isValidChar(c)) continue;
             stringBuilder.append(c);
         }

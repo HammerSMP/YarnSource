@@ -19,20 +19,20 @@ import net.minecraft.world.gen.feature.size.FeatureSizeType;
 
 public class ThreeLayersFeatureSize
 extends FeatureSize {
-    public static final Codec<ThreeLayersFeatureSize> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Codec.INT.fieldOf("limit").withDefault((Object)1).forGetter(arg -> arg.limit), (App)Codec.INT.fieldOf("upper_limit").withDefault((Object)1).forGetter(arg -> arg.upperLimit), (App)Codec.INT.fieldOf("lower_size").withDefault((Object)0).forGetter(arg -> arg.lowerSize), (App)Codec.INT.fieldOf("middle_size").withDefault((Object)1).forGetter(arg -> arg.middleSize), (App)Codec.INT.fieldOf("upper_size").withDefault((Object)1).forGetter(arg -> arg.upperSize), ThreeLayersFeatureSize.createCodecBuilder()).apply((Applicative)instance, ThreeLayersFeatureSize::new));
+    public static final Codec<ThreeLayersFeatureSize> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Codec.intRange((int)0, (int)80).fieldOf("limit").orElse((Object)1).forGetter(arg -> arg.limit), (App)Codec.intRange((int)0, (int)80).fieldOf("upper_limit").orElse((Object)1).forGetter(arg -> arg.upperLimit), (App)Codec.intRange((int)0, (int)16).fieldOf("lower_size").orElse((Object)0).forGetter(arg -> arg.lowerSize), (App)Codec.intRange((int)0, (int)16).fieldOf("middle_size").orElse((Object)1).forGetter(arg -> arg.middleSize), (App)Codec.intRange((int)0, (int)16).fieldOf("upper_size").orElse((Object)1).forGetter(arg -> arg.upperSize), ThreeLayersFeatureSize.createCodecBuilder()).apply((Applicative)instance, ThreeLayersFeatureSize::new));
     private final int limit;
     private final int upperLimit;
     private final int lowerSize;
     private final int middleSize;
     private final int upperSize;
 
-    public ThreeLayersFeatureSize(int i, int j, int k, int l, int m, OptionalInt optionalInt) {
-        super(optionalInt);
-        this.limit = i;
-        this.upperLimit = j;
-        this.lowerSize = k;
-        this.middleSize = l;
-        this.upperSize = m;
+    public ThreeLayersFeatureSize(int limit, int upperLimit, int lowerSize, int middleSize, int upperSize, OptionalInt minClippedHeight) {
+        super(minClippedHeight);
+        this.limit = limit;
+        this.upperLimit = upperLimit;
+        this.lowerSize = lowerSize;
+        this.middleSize = middleSize;
+        this.upperSize = upperSize;
     }
 
     @Override

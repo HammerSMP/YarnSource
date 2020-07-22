@@ -14,39 +14,39 @@ import net.minecraft.server.ServerConfigEntry;
 
 public class WhitelistEntry
 extends ServerConfigEntry<GameProfile> {
-    public WhitelistEntry(GameProfile gameProfile) {
-        super(gameProfile);
+    public WhitelistEntry(GameProfile profile) {
+        super(profile);
     }
 
-    public WhitelistEntry(JsonObject jsonObject) {
-        super(WhitelistEntry.profileFromJson(jsonObject));
+    public WhitelistEntry(JsonObject json) {
+        super(WhitelistEntry.profileFromJson(json));
     }
 
     @Override
-    protected void fromJson(JsonObject jsonObject) {
+    protected void fromJson(JsonObject json) {
         if (this.getKey() == null) {
             return;
         }
-        jsonObject.addProperty("uuid", ((GameProfile)this.getKey()).getId() == null ? "" : ((GameProfile)this.getKey()).getId().toString());
-        jsonObject.addProperty("name", ((GameProfile)this.getKey()).getName());
+        json.addProperty("uuid", ((GameProfile)this.getKey()).getId() == null ? "" : ((GameProfile)this.getKey()).getId().toString());
+        json.addProperty("name", ((GameProfile)this.getKey()).getName());
     }
 
     /*
      * WARNING - void declaration
      */
-    private static GameProfile profileFromJson(JsonObject jsonObject) {
+    private static GameProfile profileFromJson(JsonObject json) {
         void uUID2;
-        if (!jsonObject.has("uuid") || !jsonObject.has("name")) {
+        if (!json.has("uuid") || !json.has("name")) {
             return null;
         }
-        String string = jsonObject.get("uuid").getAsString();
+        String string = json.get("uuid").getAsString();
         try {
             UUID uUID = UUID.fromString(string);
         }
         catch (Throwable throwable) {
             return null;
         }
-        return new GameProfile((UUID)uUID2, jsonObject.get("name").getAsString());
+        return new GameProfile((UUID)uUID2, json.get("name").getAsString());
     }
 }
 

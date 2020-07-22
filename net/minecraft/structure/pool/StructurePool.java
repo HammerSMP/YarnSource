@@ -29,6 +29,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import net.minecraft.structure.StructureManager;
 import net.minecraft.structure.pool.StructurePoolElement;
@@ -38,34 +40,48 @@ import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.Util;
+import net.minecraft.util.dynamic.RegistryElementCodec;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.Heightmap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class StructurePool {
     private static final Logger LOGGER = LogManager.getLogger();
-    public static final Codec<StructurePool> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Identifier.CODEC.fieldOf("name").forGetter(StructurePool::getId), (App)Identifier.CODEC.fieldOf("fallback").forGetter(StructurePool::getTerminatorsId), (App)Codec.mapPair((MapCodec)StructurePoolElement.field_24953.fieldOf("element"), (MapCodec)Codec.INT.fieldOf("weight")).codec().listOf().promotePartial(Util.method_29188("Pool element: ", ((Logger)LOGGER)::error)).fieldOf("elements").forGetter(arg -> arg.elementCounts), (App)Projection.field_24956.fieldOf("projection").forGetter(arg -> arg.projection)).apply((Applicative)instance, StructurePool::new));
-    public static final StructurePool EMPTY = new StructurePool(new Identifier("empty"), new Identifier("empty"), (List<Pair<StructurePoolElement, Integer>>)ImmutableList.of(), Projection.RIGID);
-    public static final StructurePool INVALID = new StructurePool(new Identifier("invalid"), new Identifier("invalid"), (List<Pair<StructurePoolElement, Integer>>)ImmutableList.of(), Projection.RIGID);
+    public static final MapCodec<StructurePool> field_25853 = RecordCodecBuilder.mapCodec(instance -> instance.group((App)Identifier.CODEC.fieldOf("name").forGetter(StructurePool::getId), (App)Identifier.CODEC.fieldOf("fallback").forGetter(StructurePool::getTerminatorsId), (App)Codec.mapPair((MapCodec)StructurePoolElement.field_24953.fieldOf("element"), (MapCodec)Codec.INT.fieldOf("weight")).codec().listOf().promotePartial(Util.method_29188("Pool element: ", ((Logger)LOGGER)::error)).fieldOf("elements").forGetter(arg -> arg.elementCounts)).apply((Applicative)instance, StructurePool::new));
+    public static final Codec<Supplier<StructurePool>> CODEC = RegistryElementCodec.of(Registry.TEMPLATE_POOL_WORLDGEN, field_25853);
     private final Identifier id;
-    private final ImmutableList<Pair<StructurePoolElement, Integer>> elementCounts;
+    private final List<Pair<StructurePoolElement, Integer>> elementCounts;
     private final List<StructurePoolElement> elements;
     private final Identifier terminatorsId;
-    private final Projection projection;
     private int highestY = Integer.MIN_VALUE;
 
-    public StructurePool(Identifier arg, Identifier arg2, List<Pair<StructurePoolElement, Integer>> list, Projection arg3) {
+    public StructurePool(Identifier arg, Identifier arg2, List<Pair<StructurePoolElement, Integer>> list) {
         this.id = arg;
-        this.elementCounts = ImmutableList.copyOf(list);
+        this.elementCounts = list;
         this.elements = Lists.newArrayList();
         for (Pair<StructurePoolElement, Integer> pair : list) {
+            StructurePoolElement lv = (StructurePoolElement)pair.getFirst();
             for (int i = 0; i < (Integer)pair.getSecond(); ++i) {
-                this.elements.add(((StructurePoolElement)pair.getFirst()).setProjection(arg3));
+                this.elements.add(lv);
             }
         }
         this.terminatorsId = arg2;
-        this.projection = arg3;
+    }
+
+    public StructurePool(Identifier arg, Identifier arg2, List<Pair<Function<Projection, ? extends StructurePoolElement>, Integer>> list, Projection arg3) {
+        this.id = arg;
+        this.elementCounts = Lists.newArrayList();
+        this.elements = Lists.newArrayList();
+        for (Pair<Function<Projection, ? extends StructurePoolElement>, Integer> pair : list) {
+            StructurePoolElement lv = (StructurePoolElement)((Function)pair.getFirst()).apply(arg3);
+            this.elementCounts.add((Pair<StructurePoolElement, Integer>)Pair.of((Object)lv, (Object)pair.getSecond()));
+            for (int i = 0; i < (Integer)pair.getSecond(); ++i) {
+                this.elements.add(lv);
+            }
+        }
+        this.terminatorsId = arg2;
     }
 
     public int getHighestY(StructureManager arg) {
@@ -114,8 +130,8 @@ public class StructurePool {
             return this.id;
         }
 
-        public static Projection getById(String string) {
-            return PROJECTIONS_BY_ID.get(string);
+        public static Projection getById(String id) {
+            return PROJECTIONS_BY_ID.get(id);
         }
 
         public ImmutableList<StructureProcessor> getProcessors() {
@@ -128,7 +144,7 @@ public class StructurePool {
         }
 
         static {
-            field_24956 = StringIdentifiable.method_28140(Projection::values, Projection::getById);
+            field_24956 = StringIdentifiable.createCodec(Projection::values, Projection::getById);
             PROJECTIONS_BY_ID = Arrays.stream(Projection.values()).collect(Collectors.toMap(Projection::getId, arg -> arg));
         }
     }

@@ -29,39 +29,39 @@ extends FallingBlock {
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
         return SHAPE;
     }
 
     @Override
-    public ActionResult onUse(BlockState arg, World arg2, BlockPos arg3, PlayerEntity arg4, Hand arg5, BlockHitResult arg6) {
-        this.teleport(arg, arg2, arg3);
-        return ActionResult.success(arg2.isClient);
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        this.teleport(state, world, pos);
+        return ActionResult.success(world.isClient);
     }
 
     @Override
-    public void onBlockBreakStart(BlockState arg, World arg2, BlockPos arg3, PlayerEntity arg4) {
-        this.teleport(arg, arg2, arg3);
+    public void onBlockBreakStart(BlockState state, World world, BlockPos pos, PlayerEntity player) {
+        this.teleport(state, world, pos);
     }
 
-    private void teleport(BlockState arg, World arg2, BlockPos arg3) {
+    private void teleport(BlockState state, World world, BlockPos pos) {
         for (int i = 0; i < 1000; ++i) {
-            BlockPos lv = arg3.add(arg2.random.nextInt(16) - arg2.random.nextInt(16), arg2.random.nextInt(8) - arg2.random.nextInt(8), arg2.random.nextInt(16) - arg2.random.nextInt(16));
-            if (!arg2.getBlockState(lv).isAir()) continue;
-            if (arg2.isClient) {
+            BlockPos lv = pos.add(world.random.nextInt(16) - world.random.nextInt(16), world.random.nextInt(8) - world.random.nextInt(8), world.random.nextInt(16) - world.random.nextInt(16));
+            if (!world.getBlockState(lv).isAir()) continue;
+            if (world.isClient) {
                 for (int j = 0; j < 128; ++j) {
-                    double d = arg2.random.nextDouble();
-                    float f = (arg2.random.nextFloat() - 0.5f) * 0.2f;
-                    float g = (arg2.random.nextFloat() - 0.5f) * 0.2f;
-                    float h = (arg2.random.nextFloat() - 0.5f) * 0.2f;
-                    double e = MathHelper.lerp(d, (double)lv.getX(), (double)arg3.getX()) + (arg2.random.nextDouble() - 0.5) + 0.5;
-                    double k = MathHelper.lerp(d, (double)lv.getY(), (double)arg3.getY()) + arg2.random.nextDouble() - 0.5;
-                    double l = MathHelper.lerp(d, (double)lv.getZ(), (double)arg3.getZ()) + (arg2.random.nextDouble() - 0.5) + 0.5;
-                    arg2.addParticle(ParticleTypes.PORTAL, e, k, l, f, g, h);
+                    double d = world.random.nextDouble();
+                    float f = (world.random.nextFloat() - 0.5f) * 0.2f;
+                    float g = (world.random.nextFloat() - 0.5f) * 0.2f;
+                    float h = (world.random.nextFloat() - 0.5f) * 0.2f;
+                    double e = MathHelper.lerp(d, (double)lv.getX(), (double)pos.getX()) + (world.random.nextDouble() - 0.5) + 0.5;
+                    double k = MathHelper.lerp(d, (double)lv.getY(), (double)pos.getY()) + world.random.nextDouble() - 0.5;
+                    double l = MathHelper.lerp(d, (double)lv.getZ(), (double)pos.getZ()) + (world.random.nextDouble() - 0.5) + 0.5;
+                    world.addParticle(ParticleTypes.PORTAL, e, k, l, f, g, h);
                 }
             } else {
-                arg2.setBlockState(lv, arg, 2);
-                arg2.removeBlock(arg3, false);
+                world.setBlockState(lv, state, 2);
+                world.removeBlock(pos, false);
             }
             return;
         }
@@ -73,7 +73,7 @@ extends FallingBlock {
     }
 
     @Override
-    public boolean canPathfindThrough(BlockState arg, BlockView arg2, BlockPos arg3, NavigationType arg4) {
+    public boolean canPathfindThrough(BlockState state, BlockView world, BlockPos pos, NavigationType type) {
         return false;
     }
 }

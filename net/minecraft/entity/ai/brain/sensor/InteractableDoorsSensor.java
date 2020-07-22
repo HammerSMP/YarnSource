@@ -25,20 +25,20 @@ import net.minecraft.world.World;
 public class InteractableDoorsSensor
 extends Sensor<LivingEntity> {
     @Override
-    protected void sense(ServerWorld arg, LivingEntity arg2) {
-        RegistryKey<World> lv = arg.getRegistryKey();
-        BlockPos lv2 = arg2.getBlockPos();
+    protected void sense(ServerWorld world, LivingEntity entity) {
+        RegistryKey<World> lv = world.getRegistryKey();
+        BlockPos lv2 = entity.getBlockPos();
         ArrayList list = Lists.newArrayList();
         for (int i = -1; i <= 1; ++i) {
             for (int j = -1; j <= 1; ++j) {
                 for (int k = -1; k <= 1; ++k) {
                     BlockPos lv3 = lv2.add(i, j, k);
-                    if (!arg.getBlockState(lv3).isIn(BlockTags.WOODEN_DOORS)) continue;
+                    if (!world.getBlockState(lv3).isIn(BlockTags.WOODEN_DOORS)) continue;
                     list.add(GlobalPos.create(lv, lv3));
                 }
             }
         }
-        Brain<?> lv4 = arg2.getBrain();
+        Brain<?> lv4 = entity.getBrain();
         if (!list.isEmpty()) {
             lv4.remember(MemoryModuleType.INTERACTABLE_DOORS, list);
         } else {

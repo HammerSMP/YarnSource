@@ -58,47 +58,47 @@ public class LootTable {
     private final LootFunction[] functions;
     private final BiFunction<ItemStack, LootContext, ItemStack> combinedFunction;
 
-    private LootTable(LootContextType arg, LootPool[] args, LootFunction[] args2) {
-        this.type = arg;
-        this.pools = args;
-        this.functions = args2;
-        this.combinedFunction = LootFunctionTypes.join(args2);
+    private LootTable(LootContextType type, LootPool[] pools, LootFunction[] functions) {
+        this.type = type;
+        this.pools = pools;
+        this.functions = functions;
+        this.combinedFunction = LootFunctionTypes.join(functions);
     }
 
-    public static Consumer<ItemStack> processStacks(Consumer<ItemStack> consumer) {
-        return arg -> {
-            if (arg.getCount() < arg.getMaxCount()) {
-                consumer.accept((ItemStack)arg);
+    public static Consumer<ItemStack> processStacks(Consumer<ItemStack> lootConsumer) {
+        return stack -> {
+            if (stack.getCount() < stack.getMaxCount()) {
+                lootConsumer.accept((ItemStack)stack);
             } else {
                 ItemStack lv;
-                for (int i = arg.getCount(); i > 0; i -= lv.getCount()) {
-                    lv = arg.copy();
-                    lv.setCount(Math.min(arg.getMaxCount(), i));
-                    consumer.accept(lv);
+                for (int i = stack.getCount(); i > 0; i -= lv.getCount()) {
+                    lv = stack.copy();
+                    lv.setCount(Math.min(stack.getMaxCount(), i));
+                    lootConsumer.accept(lv);
                 }
             }
         };
     }
 
-    public void generateUnprocessedLoot(LootContext arg, Consumer<ItemStack> consumer) {
-        if (arg.markActive(this)) {
-            Consumer<ItemStack> consumer2 = LootFunction.apply(this.combinedFunction, consumer, arg);
+    public void generateUnprocessedLoot(LootContext context, Consumer<ItemStack> lootConsumer) {
+        if (context.markActive(this)) {
+            Consumer<ItemStack> consumer2 = LootFunction.apply(this.combinedFunction, lootConsumer, context);
             for (LootPool lv : this.pools) {
-                lv.addGeneratedLoot(consumer2, arg);
+                lv.addGeneratedLoot(consumer2, context);
             }
-            arg.markInactive(this);
+            context.markInactive(this);
         } else {
             LOGGER.warn("Detected infinite loop in loot tables");
         }
     }
 
-    public void generateLoot(LootContext arg, Consumer<ItemStack> consumer) {
-        this.generateUnprocessedLoot(arg, LootTable.processStacks(consumer));
+    public void generateLoot(LootContext context, Consumer<ItemStack> lootConsumer) {
+        this.generateUnprocessedLoot(context, LootTable.processStacks(lootConsumer));
     }
 
-    public List<ItemStack> generateLoot(LootContext arg) {
+    public List<ItemStack> generateLoot(LootContext context) {
         ArrayList list = Lists.newArrayList();
-        this.generateLoot(arg, list::add);
+        this.generateLoot(context, list::add);
         return list;
     }
 
@@ -106,19 +106,19 @@ public class LootTable {
         return this.type;
     }
 
-    public void validate(LootTableReporter arg) {
+    public void validate(LootTableReporter reporter) {
         for (int i = 0; i < this.pools.length; ++i) {
-            this.pools[i].validate(arg.makeChild(".pools[" + i + "]"));
+            this.pools[i].validate(reporter.makeChild(".pools[" + i + "]"));
         }
         for (int j = 0; j < this.functions.length; ++j) {
-            this.functions[j].validate(arg.makeChild(".functions[" + j + "]"));
+            this.functions[j].validate(reporter.makeChild(".functions[" + j + "]"));
         }
     }
 
-    public void supplyInventory(Inventory arg, LootContext arg2) {
-        List<ItemStack> list = this.generateLoot(arg2);
-        Random random = arg2.getRandom();
-        List<Integer> list2 = this.getFreeSlots(arg, random);
+    public void supplyInventory(Inventory inventory, LootContext context) {
+        List<ItemStack> list = this.generateLoot(context);
+        Random random = context.getRandom();
+        List<Integer> list2 = this.getFreeSlots(inventory, random);
         this.shuffle(list, list2.size(), random);
         for (ItemStack lv : list) {
             if (list2.isEmpty()) {
@@ -126,16 +126,16 @@ public class LootTable {
                 return;
             }
             if (lv.isEmpty()) {
-                arg.setStack(list2.remove(list2.size() - 1), ItemStack.EMPTY);
+                inventory.setStack(list2.remove(list2.size() - 1), ItemStack.EMPTY);
                 continue;
             }
-            arg.setStack(list2.remove(list2.size() - 1), lv);
+            inventory.setStack(list2.remove(list2.size() - 1), lv);
         }
     }
 
-    private void shuffle(List<ItemStack> list, int i, Random random) {
+    private void shuffle(List<ItemStack> drops, int freeSlots, Random random) {
         ArrayList list2 = Lists.newArrayList();
-        Iterator<ItemStack> iterator = list.iterator();
+        Iterator<ItemStack> iterator = drops.iterator();
         while (iterator.hasNext()) {
             ItemStack lv = iterator.next();
             if (lv.isEmpty()) {
@@ -146,29 +146,29 @@ public class LootTable {
             list2.add(lv);
             iterator.remove();
         }
-        while (i - list.size() - list2.size() > 0 && !list2.isEmpty()) {
+        while (freeSlots - drops.size() - list2.size() > 0 && !list2.isEmpty()) {
             ItemStack lv2 = (ItemStack)list2.remove(MathHelper.nextInt(random, 0, list2.size() - 1));
             int j = MathHelper.nextInt(random, 1, lv2.getCount() / 2);
             ItemStack lv3 = lv2.split(j);
             if (lv2.getCount() > 1 && random.nextBoolean()) {
                 list2.add(lv2);
             } else {
-                list.add(lv2);
+                drops.add(lv2);
             }
             if (lv3.getCount() > 1 && random.nextBoolean()) {
                 list2.add(lv3);
                 continue;
             }
-            list.add(lv3);
+            drops.add(lv3);
         }
-        list.addAll(list2);
-        Collections.shuffle(list, random);
+        drops.addAll(list2);
+        Collections.shuffle(drops, random);
     }
 
-    private List<Integer> getFreeSlots(Inventory arg, Random random) {
+    private List<Integer> getFreeSlots(Inventory inventory, Random random) {
         ArrayList list = Lists.newArrayList();
-        for (int i = 0; i < arg.size(); ++i) {
-            if (!arg.getStack(i).isEmpty()) continue;
+        for (int i = 0; i < inventory.size(); ++i) {
+            if (!inventory.getStack(i).isEmpty()) continue;
             list.add(i);
         }
         Collections.shuffle(list, random);
@@ -213,12 +213,12 @@ public class LootTable {
             return jsonObject;
         }
 
-        public /* synthetic */ JsonElement serialize(Object object, Type type, JsonSerializationContext jsonSerializationContext) {
-            return this.serialize((LootTable)object, type, jsonSerializationContext);
+        public /* synthetic */ JsonElement serialize(Object supplier, Type unused, JsonSerializationContext context) {
+            return this.serialize((LootTable)supplier, unused, context);
         }
 
-        public /* synthetic */ Object deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
-            return this.deserialize(jsonElement, type, jsonDeserializationContext);
+        public /* synthetic */ Object deserialize(JsonElement json, Type unused, JsonDeserializationContext context) throws JsonParseException {
+            return this.deserialize(json, unused, context);
         }
     }
 
@@ -228,13 +228,13 @@ public class LootTable {
         private final List<LootFunction> functions = Lists.newArrayList();
         private LootContextType type = GENERIC;
 
-        public Builder pool(LootPool.Builder arg) {
-            this.pools.add(arg.build());
+        public Builder pool(LootPool.Builder poolBuilder) {
+            this.pools.add(poolBuilder.build());
             return this;
         }
 
-        public Builder type(LootContextType arg) {
-            this.type = arg;
+        public Builder type(LootContextType context) {
+            this.type = context;
             return this;
         }
 
@@ -259,8 +259,8 @@ public class LootTable {
         }
 
         @Override
-        public /* synthetic */ Object apply(LootFunction.Builder arg) {
-            return this.apply(arg);
+        public /* synthetic */ Object apply(LootFunction.Builder function) {
+            return this.apply(function);
         }
     }
 }

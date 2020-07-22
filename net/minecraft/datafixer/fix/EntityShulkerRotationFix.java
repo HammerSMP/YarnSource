@@ -19,8 +19,8 @@ import net.minecraft.datafixer.fix.ChoiceFix;
 
 public class EntityShulkerRotationFix
 extends ChoiceFix {
-    public EntityShulkerRotationFix(Schema schema) {
-        super(schema, false, "EntityShulkerRotationFix", TypeReferences.ENTITY, "minecraft:shulker");
+    public EntityShulkerRotationFix(Schema outputSchema) {
+        super(outputSchema, false, "EntityShulkerRotationFix", TypeReferences.ENTITY, "minecraft:shulker");
     }
 
     public Dynamic<?> fixRotation(Dynamic<?> dynamic2) {
@@ -33,8 +33,8 @@ extends ChoiceFix {
     }
 
     @Override
-    protected Typed<?> transform(Typed<?> typed) {
-        return typed.update(DSL.remainderFinder(), this::fixRotation);
+    protected Typed<?> transform(Typed<?> inputType) {
+        return inputType.update(DSL.remainderFinder(), this::fixRotation);
     }
 }
 

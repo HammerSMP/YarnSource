@@ -19,8 +19,8 @@ import net.minecraft.util.Identifier;
 
 public class SmeltingRecipe
 extends AbstractCookingRecipe {
-    public SmeltingRecipe(Identifier arg, String string, Ingredient arg2, ItemStack arg3, float f, int i) {
-        super(RecipeType.SMELTING, arg, string, arg2, arg3, f, i);
+    public SmeltingRecipe(Identifier id, String group, Ingredient input, ItemStack output, float experience, int cookTime) {
+        super(RecipeType.SMELTING, id, group, input, output, experience, cookTime);
     }
 
     @Override

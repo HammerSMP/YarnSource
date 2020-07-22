@@ -16,10 +16,10 @@ import java.util.Collection;
 import java.util.List;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.class_5411;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.listener.ClientPlayPacketListener;
+import net.minecraft.recipe.book.RecipeBookOptions;
 import net.minecraft.util.Identifier;
 
 public class UnlockRecipesS2CPacket
@@ -27,12 +27,12 @@ implements Packet<ClientPlayPacketListener> {
     private Action action;
     private List<Identifier> recipeIdsToChange;
     private List<Identifier> recipeIdsToInit;
-    private class_5411 field_25797;
+    private RecipeBookOptions field_25797;
 
     public UnlockRecipesS2CPacket() {
     }
 
-    public UnlockRecipesS2CPacket(Action arg, Collection<Identifier> collection, Collection<Identifier> collection2, class_5411 arg2) {
+    public UnlockRecipesS2CPacket(Action arg, Collection<Identifier> collection, Collection<Identifier> collection2, RecipeBookOptions arg2) {
         this.action = arg;
         this.recipeIdsToChange = ImmutableList.copyOf(collection);
         this.recipeIdsToInit = ImmutableList.copyOf(collection2);
@@ -45,35 +45,35 @@ implements Packet<ClientPlayPacketListener> {
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.action = arg.readEnumConstant(Action.class);
-        this.field_25797 = class_5411.method_30186(arg);
-        int i = arg.readVarInt();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.action = buf.readEnumConstant(Action.class);
+        this.field_25797 = RecipeBookOptions.fromPacket(buf);
+        int i = buf.readVarInt();
         this.recipeIdsToChange = Lists.newArrayList();
         for (int j = 0; j < i; ++j) {
-            this.recipeIdsToChange.add(arg.readIdentifier());
+            this.recipeIdsToChange.add(buf.readIdentifier());
         }
         if (this.action == Action.INIT) {
-            i = arg.readVarInt();
+            i = buf.readVarInt();
             this.recipeIdsToInit = Lists.newArrayList();
             for (int k = 0; k < i; ++k) {
-                this.recipeIdsToInit.add(arg.readIdentifier());
+                this.recipeIdsToInit.add(buf.readIdentifier());
             }
         }
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeEnumConstant(this.action);
-        this.field_25797.method_30190(arg);
-        arg.writeVarInt(this.recipeIdsToChange.size());
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeEnumConstant(this.action);
+        this.field_25797.toPacket(buf);
+        buf.writeVarInt(this.recipeIdsToChange.size());
         for (Identifier lv : this.recipeIdsToChange) {
-            arg.writeIdentifier(lv);
+            buf.writeIdentifier(lv);
         }
         if (this.action == Action.INIT) {
-            arg.writeVarInt(this.recipeIdsToInit.size());
+            buf.writeVarInt(this.recipeIdsToInit.size());
             for (Identifier lv2 : this.recipeIdsToInit) {
-                arg.writeIdentifier(lv2);
+                buf.writeIdentifier(lv2);
             }
         }
     }
@@ -89,7 +89,7 @@ implements Packet<ClientPlayPacketListener> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public class_5411 isFurnaceFilteringCraftable() {
+    public RecipeBookOptions isFurnaceFilteringCraftable() {
         return this.field_25797;
     }
 

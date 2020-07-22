@@ -29,8 +29,8 @@ public class ChunkStatusFix2
 extends DataFix {
     private static final Map<String, String> statusMap = ImmutableMap.builder().put((Object)"structure_references", (Object)"empty").put((Object)"biomes", (Object)"empty").put((Object)"base", (Object)"surface").put((Object)"carved", (Object)"carvers").put((Object)"liquid_carved", (Object)"liquid_carvers").put((Object)"decorated", (Object)"features").put((Object)"lighted", (Object)"light").put((Object)"mobs_spawned", (Object)"spawn").put((Object)"finalized", (Object)"heightmaps").put((Object)"fullchunk", (Object)"full").build();
 
-    public ChunkStatusFix2(Schema schema, boolean bl) {
-        super(schema, bl);
+    public ChunkStatusFix2(Schema outputSchema, boolean changesType) {
+        super(outputSchema, changesType);
     }
 
     protected TypeRewriteRule makeRule() {

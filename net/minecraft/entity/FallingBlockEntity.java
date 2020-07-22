@@ -65,15 +65,15 @@ extends Entity {
         super(arg, arg2);
     }
 
-    public FallingBlockEntity(World arg, double d, double e, double f, BlockState arg2) {
-        this((EntityType<? extends FallingBlockEntity>)EntityType.FALLING_BLOCK, arg);
-        this.block = arg2;
+    public FallingBlockEntity(World world, double x, double y, double z, BlockState block) {
+        this((EntityType<? extends FallingBlockEntity>)EntityType.FALLING_BLOCK, world);
+        this.block = block;
         this.inanimate = true;
-        this.updatePosition(d, e + (double)((1.0f - this.getHeight()) / 2.0f), f);
+        this.updatePosition(x, y + (double)((1.0f - this.getHeight()) / 2.0f), z);
         this.setVelocity(Vec3d.ZERO);
-        this.prevX = d;
-        this.prevY = e;
-        this.prevZ = f;
+        this.prevX = x;
+        this.prevY = y;
+        this.prevZ = z;
         this.setFallingBlockPos(this.getBlockPos());
     }
 
@@ -82,8 +82,8 @@ extends Entity {
         return false;
     }
 
-    public void setFallingBlockPos(BlockPos arg) {
-        this.dataTracker.set(BLOCK_POS, arg);
+    public void setFallingBlockPos(BlockPos pos) {
+        this.dataTracker.set(BLOCK_POS, pos);
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -186,10 +186,10 @@ extends Entity {
     }
 
     @Override
-    public boolean handleFallDamage(float f, float g) {
+    public boolean handleFallDamage(float fallDistance, float damageMultiplier) {
         int i;
-        if (this.hurtEntities && (i = MathHelper.ceil(f - 1.0f)) > 0) {
-            ArrayList list = Lists.newArrayList(this.world.getEntities(this, this.getBoundingBox()));
+        if (this.hurtEntities && (i = MathHelper.ceil(fallDistance - 1.0f)) > 0) {
+            ArrayList list = Lists.newArrayList(this.world.getOtherEntities(this, this.getBoundingBox()));
             boolean bl = this.block.isIn(BlockTags.ANVIL);
             DamageSource lv = bl ? DamageSource.ANVIL : DamageSource.FALLING_BLOCK;
             for (Entity lv2 : list) {
@@ -208,34 +208,34 @@ extends Entity {
     }
 
     @Override
-    protected void writeCustomDataToTag(CompoundTag arg) {
-        arg.put("BlockState", NbtHelper.fromBlockState(this.block));
-        arg.putInt("Time", this.timeFalling);
-        arg.putBoolean("DropItem", this.dropItem);
-        arg.putBoolean("HurtEntities", this.hurtEntities);
-        arg.putFloat("FallHurtAmount", this.fallHurtAmount);
-        arg.putInt("FallHurtMax", this.fallHurtMax);
+    protected void writeCustomDataToTag(CompoundTag tag) {
+        tag.put("BlockState", NbtHelper.fromBlockState(this.block));
+        tag.putInt("Time", this.timeFalling);
+        tag.putBoolean("DropItem", this.dropItem);
+        tag.putBoolean("HurtEntities", this.hurtEntities);
+        tag.putFloat("FallHurtAmount", this.fallHurtAmount);
+        tag.putInt("FallHurtMax", this.fallHurtMax);
         if (this.blockEntityData != null) {
-            arg.put("TileEntityData", this.blockEntityData);
+            tag.put("TileEntityData", this.blockEntityData);
         }
     }
 
     @Override
-    protected void readCustomDataFromTag(CompoundTag arg) {
-        this.block = NbtHelper.toBlockState(arg.getCompound("BlockState"));
-        this.timeFalling = arg.getInt("Time");
-        if (arg.contains("HurtEntities", 99)) {
-            this.hurtEntities = arg.getBoolean("HurtEntities");
-            this.fallHurtAmount = arg.getFloat("FallHurtAmount");
-            this.fallHurtMax = arg.getInt("FallHurtMax");
+    protected void readCustomDataFromTag(CompoundTag tag) {
+        this.block = NbtHelper.toBlockState(tag.getCompound("BlockState"));
+        this.timeFalling = tag.getInt("Time");
+        if (tag.contains("HurtEntities", 99)) {
+            this.hurtEntities = tag.getBoolean("HurtEntities");
+            this.fallHurtAmount = tag.getFloat("FallHurtAmount");
+            this.fallHurtMax = tag.getInt("FallHurtMax");
         } else if (this.block.isIn(BlockTags.ANVIL)) {
             this.hurtEntities = true;
         }
-        if (arg.contains("DropItem", 99)) {
-            this.dropItem = arg.getBoolean("DropItem");
+        if (tag.contains("DropItem", 99)) {
+            this.dropItem = tag.getBoolean("DropItem");
         }
-        if (arg.contains("TileEntityData", 10)) {
-            this.blockEntityData = arg.getCompound("TileEntityData");
+        if (tag.contains("TileEntityData", 10)) {
+            this.blockEntityData = tag.getCompound("TileEntityData");
         }
         if (this.block.isAir()) {
             this.block = Blocks.SAND.getDefaultState();
@@ -247,8 +247,8 @@ extends Entity {
         return this.world;
     }
 
-    public void setHurtEntities(boolean bl) {
-        this.hurtEntities = bl;
+    public void setHurtEntities(boolean hurtEntities) {
+        this.hurtEntities = hurtEntities;
     }
 
     @Override
@@ -258,9 +258,9 @@ extends Entity {
     }
 
     @Override
-    public void populateCrashReport(CrashReportSection arg) {
-        super.populateCrashReport(arg);
-        arg.add("Immitating BlockState", this.block.toString());
+    public void populateCrashReport(CrashReportSection section) {
+        super.populateCrashReport(section);
+        section.add("Immitating BlockState", this.block.toString());
     }
 
     public BlockState getBlockState() {

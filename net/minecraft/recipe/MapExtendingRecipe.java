@@ -46,9 +46,9 @@ extends ShapedRecipe {
         return lv3.scale < 4;
     }
 
-    private boolean matches(MapState arg) {
-        if (arg.icons != null) {
-            for (MapIcon lv : arg.icons.values()) {
+    private boolean matches(MapState state) {
+        if (state.icons != null) {
+            for (MapIcon lv : state.icons.values()) {
                 if (lv.getType() != MapIcon.Type.MANSION && lv.getType() != MapIcon.Type.MONUMENT) continue;
                 return true;
             }

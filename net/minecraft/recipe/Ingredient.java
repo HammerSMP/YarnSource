@@ -42,8 +42,8 @@ import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.recipe.RecipeFinder;
+import net.minecraft.tag.ServerTagManagerHolder;
 import net.minecraft.tag.Tag;
-import net.minecraft.tag.TagContainers;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.registry.Registry;
@@ -55,8 +55,8 @@ implements Predicate<ItemStack> {
     private ItemStack[] matchingStacks;
     private IntList ids;
 
-    private Ingredient(Stream<? extends Entry> stream) {
-        this.entries = (Entry[])stream.toArray(Entry[]::new);
+    private Ingredient(Stream<? extends Entry> entries) {
+        this.entries = (Entry[])entries.toArray(Entry[]::new);
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -99,11 +99,11 @@ implements Predicate<ItemStack> {
         return this.ids;
     }
 
-    public void write(PacketByteBuf arg) {
+    public void write(PacketByteBuf buf) {
         this.cacheMatchingStacks();
-        arg.writeVarInt(this.matchingStacks.length);
+        buf.writeVarInt(this.matchingStacks.length);
         for (int i = 0; i < this.matchingStacks.length; ++i) {
-            arg.writeItemStack(this.matchingStacks[i]);
+            buf.writeItemStack(this.matchingStacks[i]);
         }
     }
 
@@ -122,42 +122,42 @@ implements Predicate<ItemStack> {
         return !(this.entries.length != 0 || this.matchingStacks != null && this.matchingStacks.length != 0 || this.ids != null && !this.ids.isEmpty());
     }
 
-    private static Ingredient ofEntries(Stream<? extends Entry> stream) {
-        Ingredient lv = new Ingredient(stream);
+    private static Ingredient ofEntries(Stream<? extends Entry> entries) {
+        Ingredient lv = new Ingredient(entries);
         return lv.entries.length == 0 ? EMPTY : lv;
     }
 
-    public static Ingredient ofItems(ItemConvertible ... args) {
-        return Ingredient.method_26964(Arrays.stream(args).map(ItemStack::new));
+    public static Ingredient ofItems(ItemConvertible ... items) {
+        return Ingredient.method_26964(Arrays.stream(items).map(ItemStack::new));
     }
 
     @Environment(value=EnvType.CLIENT)
-    public static Ingredient ofStacks(ItemStack ... args) {
-        return Ingredient.method_26964(Arrays.stream(args));
+    public static Ingredient ofStacks(ItemStack ... stacks) {
+        return Ingredient.method_26964(Arrays.stream(stacks));
     }
 
     public static Ingredient method_26964(Stream<ItemStack> stream) {
-        return Ingredient.ofEntries(stream.filter(arg -> !arg.isEmpty()).map(arg -> new StackEntry((ItemStack)arg)));
+        return Ingredient.ofEntries(stream.filter(arg -> !arg.isEmpty()).map(stack -> new StackEntry((ItemStack)stack)));
     }
 
-    public static Ingredient fromTag(Tag<Item> arg) {
-        return Ingredient.ofEntries(Stream.of(new TagEntry(arg)));
+    public static Ingredient fromTag(Tag<Item> tag) {
+        return Ingredient.ofEntries(Stream.of(new TagEntry(tag)));
     }
 
-    public static Ingredient fromPacket(PacketByteBuf arg) {
-        int i = arg.readVarInt();
-        return Ingredient.ofEntries(Stream.generate(() -> new StackEntry(arg.readItemStack())).limit(i));
+    public static Ingredient fromPacket(PacketByteBuf buf) {
+        int i = buf.readVarInt();
+        return Ingredient.ofEntries(Stream.generate(() -> new StackEntry(buf.readItemStack())).limit(i));
     }
 
-    public static Ingredient fromJson(@Nullable JsonElement jsonElement2) {
-        if (jsonElement2 == null || jsonElement2.isJsonNull()) {
+    public static Ingredient fromJson(@Nullable JsonElement json) {
+        if (json == null || json.isJsonNull()) {
             throw new JsonSyntaxException("Item cannot be null");
         }
-        if (jsonElement2.isJsonObject()) {
-            return Ingredient.ofEntries(Stream.of(Ingredient.entryFromJson(jsonElement2.getAsJsonObject())));
+        if (json.isJsonObject()) {
+            return Ingredient.ofEntries(Stream.of(Ingredient.entryFromJson(json.getAsJsonObject())));
         }
-        if (jsonElement2.isJsonArray()) {
-            JsonArray jsonArray = jsonElement2.getAsJsonArray();
+        if (json.isJsonArray()) {
+            JsonArray jsonArray = json.getAsJsonArray();
             if (jsonArray.size() == 0) {
                 throw new JsonSyntaxException("Item array cannot be empty, at least one item must be defined");
             }
@@ -166,18 +166,18 @@ implements Predicate<ItemStack> {
         throw new JsonSyntaxException("Expected item to be object or array of objects");
     }
 
-    private static Entry entryFromJson(JsonObject jsonObject) {
-        if (jsonObject.has("item") && jsonObject.has("tag")) {
+    private static Entry entryFromJson(JsonObject json) {
+        if (json.has("item") && json.has("tag")) {
             throw new JsonParseException("An ingredient entry is either a tag or an item, not both");
         }
-        if (jsonObject.has("item")) {
-            Identifier lv = new Identifier(JsonHelper.getString(jsonObject, "item"));
-            Item lv2 = (Item)Registry.ITEM.getOrEmpty(lv).orElseThrow(() -> new JsonSyntaxException("Unknown item '" + lv + "'"));
+        if (json.has("item")) {
+            Identifier lv = new Identifier(JsonHelper.getString(json, "item"));
+            Item lv2 = Registry.ITEM.getOrEmpty(lv).orElseThrow(() -> new JsonSyntaxException("Unknown item '" + lv + "'"));
             return new StackEntry(new ItemStack(lv2));
         }
-        if (jsonObject.has("tag")) {
-            Identifier lv3 = new Identifier(JsonHelper.getString(jsonObject, "tag"));
-            Tag<Item> lv4 = TagContainers.instance().method_30218().method_30210(lv3);
+        if (json.has("tag")) {
+            Identifier lv3 = new Identifier(JsonHelper.getString(json, "tag"));
+            Tag<Item> lv4 = ServerTagManagerHolder.getTagManager().getItems().getTag(lv3);
             if (lv4 == null) {
                 throw new JsonSyntaxException("Unknown item tag '" + lv3 + "'");
             }
@@ -187,16 +187,16 @@ implements Predicate<ItemStack> {
     }
 
     @Override
-    public /* synthetic */ boolean test(@Nullable Object object) {
-        return this.test((ItemStack)object);
+    public /* synthetic */ boolean test(@Nullable Object stack) {
+        return this.test((ItemStack)stack);
     }
 
     static class TagEntry
     implements Entry {
         private final Tag<Item> tag;
 
-        private TagEntry(Tag<Item> arg) {
-            this.tag = arg;
+        private TagEntry(Tag<Item> tag) {
+            this.tag = tag;
         }
 
         @Override
@@ -211,7 +211,7 @@ implements Predicate<ItemStack> {
         @Override
         public JsonObject toJson() {
             JsonObject jsonObject = new JsonObject();
-            jsonObject.addProperty("tag", TagContainers.instance().method_30218().method_30212(this.tag).toString());
+            jsonObject.addProperty("tag", ServerTagManagerHolder.getTagManager().getItems().getTagId(this.tag).toString());
             return jsonObject;
         }
     }
@@ -220,8 +220,8 @@ implements Predicate<ItemStack> {
     implements Entry {
         private final ItemStack stack;
 
-        private StackEntry(ItemStack arg) {
-            this.stack = arg;
+        private StackEntry(ItemStack stack) {
+            this.stack = stack;
         }
 
         @Override

@@ -85,8 +85,8 @@ implements Monster {
         this.dataTracker.startTracking(SIZE, 0);
     }
 
-    public void setPhantomSize(int i) {
-        this.dataTracker.set(SIZE, MathHelper.clamp(i, 0, 64));
+    public void setPhantomSize(int size) {
+        this.dataTracker.set(SIZE, MathHelper.clamp(size, 0, 64));
     }
 
     private void onSizeChanged() {
@@ -99,16 +99,16 @@ implements Monster {
     }
 
     @Override
-    protected float getActiveEyeHeight(EntityPose arg, EntityDimensions arg2) {
-        return arg2.height * 0.35f;
+    protected float getActiveEyeHeight(EntityPose pose, EntityDimensions dimensions) {
+        return dimensions.height * 0.35f;
     }
 
     @Override
-    public void onTrackedDataSet(TrackedData<?> arg) {
-        if (SIZE.equals(arg)) {
+    public void onTrackedDataSet(TrackedData<?> data) {
+        if (SIZE.equals(data)) {
             this.onSizeChanged();
         }
-        super.onTrackedDataSet(arg);
+        super.onTrackedDataSet(data);
     }
 
     @Override
@@ -148,33 +148,33 @@ implements Monster {
     }
 
     @Override
-    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(class_5425 arg, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable CompoundTag entityTag) {
         this.circlingCenter = this.getBlockPos().up(5);
         this.setPhantomSize(0);
-        return super.initialize(arg, arg2, arg3, arg4, arg5);
+        return super.initialize(arg, difficulty, spawnReason, entityData, entityTag);
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        if (arg.contains("AX")) {
-            this.circlingCenter = new BlockPos(arg.getInt("AX"), arg.getInt("AY"), arg.getInt("AZ"));
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        if (tag.contains("AX")) {
+            this.circlingCenter = new BlockPos(tag.getInt("AX"), tag.getInt("AY"), tag.getInt("AZ"));
         }
-        this.setPhantomSize(arg.getInt("Size"));
+        this.setPhantomSize(tag.getInt("Size"));
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
-        arg.putInt("AX", this.circlingCenter.getX());
-        arg.putInt("AY", this.circlingCenter.getY());
-        arg.putInt("AZ", this.circlingCenter.getZ());
-        arg.putInt("Size", this.getPhantomSize());
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
+        tag.putInt("AX", this.circlingCenter.getX());
+        tag.putInt("AY", this.circlingCenter.getY());
+        tag.putInt("AZ", this.circlingCenter.getZ());
+        tag.putInt("Size", this.getPhantomSize());
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public boolean shouldRender(double d) {
+    public boolean shouldRender(double distance) {
         return true;
     }
 
@@ -189,7 +189,7 @@ implements Monster {
     }
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource arg) {
+    protected SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.ENTITY_PHANTOM_HURT;
     }
 
@@ -209,14 +209,14 @@ implements Monster {
     }
 
     @Override
-    public boolean canTarget(EntityType<?> arg) {
+    public boolean canTarget(EntityType<?> type) {
         return true;
     }
 
     @Override
-    public EntityDimensions getDimensions(EntityPose arg) {
+    public EntityDimensions getDimensions(EntityPose pose) {
         int i = this.getPhantomSize();
-        EntityDimensions lv = super.getDimensions(arg);
+        EntityDimensions lv = super.getDimensions(pose);
         float f = (lv.width + 0.2f * (float)i) / lv.width;
         return lv.scaled(f);
     }
@@ -333,7 +333,7 @@ implements Monster {
             if (!this.canStart()) {
                 return false;
             }
-            if (PhantomEntity.this.age % 20 == 0 && !(list = PhantomEntity.this.world.getEntities(CatEntity.class, PhantomEntity.this.getBoundingBox().expand(16.0), EntityPredicates.VALID_ENTITY)).isEmpty()) {
+            if (PhantomEntity.this.age % 20 == 0 && !(list = PhantomEntity.this.world.getEntitiesByClass(CatEntity.class, PhantomEntity.this.getBoundingBox().expand(16.0), EntityPredicates.VALID_ENTITY)).isEmpty()) {
                 for (CatEntity catEntity : list) {
                     catEntity.hiss();
                 }
@@ -442,8 +442,8 @@ implements Monster {
 
     class PhantomLookControl
     extends LookControl {
-        public PhantomLookControl(MobEntity arg2) {
-            super(arg2);
+        public PhantomLookControl(MobEntity entity) {
+            super(entity);
         }
 
         @Override
@@ -453,8 +453,8 @@ implements Monster {
 
     class PhantomBodyControl
     extends BodyControl {
-        public PhantomBodyControl(MobEntity arg2) {
-            super(arg2);
+        public PhantomBodyControl(MobEntity entity) {
+            super(entity);
         }
 
         @Override
@@ -468,8 +468,8 @@ implements Monster {
     extends MoveControl {
         private float targetSpeed;
 
-        public PhantomMoveControl(MobEntity arg2) {
-            super(arg2);
+        public PhantomMoveControl(MobEntity owner) {
+            super(owner);
             this.targetSpeed = 0.1f;
         }
 

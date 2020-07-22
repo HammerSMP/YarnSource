@@ -22,8 +22,8 @@ public class Generic3x3ContainerScreen
 extends HandledScreen<Generic3x3ContainerScreenHandler> {
     private static final Identifier TEXTURE = new Identifier("textures/gui/container/dispenser.png");
 
-    public Generic3x3ContainerScreen(Generic3x3ContainerScreenHandler arg, PlayerInventory arg2, Text arg3) {
-        super(arg, arg2, arg3);
+    public Generic3x3ContainerScreen(Generic3x3ContainerScreenHandler handler, PlayerInventory inventory, Text title) {
+        super(handler, inventory, title);
     }
 
     @Override
@@ -33,19 +33,19 @@ extends HandledScreen<Generic3x3ContainerScreenHandler> {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.renderBackground(arg);
-        super.render(arg, i, j, f);
-        this.drawMouseoverTooltip(arg, i, j);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.renderBackground(matrices);
+        super.render(matrices, mouseX, mouseY, delta);
+        this.drawMouseoverTooltip(matrices, mouseX, mouseY);
     }
 
     @Override
-    protected void drawBackground(MatrixStack arg, float f, int i, int j) {
+    protected void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY) {
         RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
         this.client.getTextureManager().bindTexture(TEXTURE);
         int k = (this.width - this.backgroundWidth) / 2;
         int l = (this.height - this.backgroundHeight) / 2;
-        this.drawTexture(arg, k, l, 0, 0, this.backgroundWidth, this.backgroundHeight);
+        this.drawTexture(matrices, k, l, 0, 0, this.backgroundWidth, this.backgroundHeight);
     }
 }
 

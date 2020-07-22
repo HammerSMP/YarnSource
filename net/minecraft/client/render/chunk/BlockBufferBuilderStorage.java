@@ -18,8 +18,8 @@ import net.minecraft.client.render.RenderLayer;
 public class BlockBufferBuilderStorage {
     private final Map<RenderLayer, BufferBuilder> builders = RenderLayer.getBlockLayers().stream().collect(Collectors.toMap(arg -> arg, arg -> new BufferBuilder(arg.getExpectedBufferSize())));
 
-    public BufferBuilder get(RenderLayer arg) {
-        return this.builders.get(arg);
+    public BufferBuilder get(RenderLayer layer) {
+        return this.builders.get(layer);
     }
 
     public void clear() {

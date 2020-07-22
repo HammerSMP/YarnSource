@@ -38,11 +38,11 @@ public class Path {
     private final float manhattanDistanceFromTarget;
     private final boolean reachesTarget;
 
-    public Path(List<PathNode> list, BlockPos arg, boolean bl) {
-        this.nodes = list;
-        this.target = arg;
-        this.manhattanDistanceFromTarget = list.isEmpty() ? Float.MAX_VALUE : this.nodes.get(this.nodes.size() - 1).getManhattanDistance(this.target);
-        this.reachesTarget = bl;
+    public Path(List<PathNode> nodes, BlockPos target, boolean reachesTarget) {
+        this.nodes = nodes;
+        this.target = target;
+        this.manhattanDistanceFromTarget = nodes.isEmpty() ? Float.MAX_VALUE : this.nodes.get(this.nodes.size() - 1).getManhattanDistance(this.target);
+        this.reachesTarget = reachesTarget;
     }
 
     public void next() {
@@ -61,22 +61,22 @@ public class Path {
         return null;
     }
 
-    public PathNode getNode(int i) {
-        return this.nodes.get(i);
+    public PathNode getNode(int index) {
+        return this.nodes.get(index);
     }
 
     public List<PathNode> getNodes() {
         return this.nodes;
     }
 
-    public void setLength(int i) {
-        if (this.nodes.size() > i) {
-            this.nodes.subList(i, this.nodes.size()).clear();
+    public void setLength(int length) {
+        if (this.nodes.size() > length) {
+            this.nodes.subList(length, this.nodes.size()).clear();
         }
     }
 
-    public void setNode(int i, PathNode arg) {
-        this.nodes.set(i, arg);
+    public void setNode(int index, PathNode node) {
+        this.nodes.set(index, node);
     }
 
     public int getLength() {
@@ -87,15 +87,15 @@ public class Path {
         return this.currentNodeIndex;
     }
 
-    public void setCurrentNodeIndex(int i) {
-        this.currentNodeIndex = i;
+    public void setCurrentNodeIndex(int index) {
+        this.currentNodeIndex = index;
     }
 
-    public Vec3d getNodePosition(Entity arg, int i) {
-        PathNode lv = this.nodes.get(i);
-        double d = (double)lv.x + (double)((int)(arg.getWidth() + 1.0f)) * 0.5;
+    public Vec3d getNodePosition(Entity entity, int index) {
+        PathNode lv = this.nodes.get(index);
+        double d = (double)lv.x + (double)((int)(entity.getWidth() + 1.0f)) * 0.5;
         double e = lv.y;
-        double f = (double)lv.z + (double)((int)(arg.getWidth() + 1.0f)) * 0.5;
+        double f = (double)lv.z + (double)((int)(entity.getWidth() + 1.0f)) * 0.5;
         return new Vec3d(d, e, f);
     }
 
@@ -143,27 +143,27 @@ public class Path {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public static Path fromBuffer(PacketByteBuf arg) {
-        boolean bl = arg.readBoolean();
-        int i = arg.readInt();
-        int j = arg.readInt();
+    public static Path fromBuffer(PacketByteBuf buffer) {
+        boolean bl = buffer.readBoolean();
+        int i = buffer.readInt();
+        int j = buffer.readInt();
         HashSet set = Sets.newHashSet();
         for (int k = 0; k < j; ++k) {
-            set.add(TargetPathNode.fromBuffer(arg));
+            set.add(TargetPathNode.fromBuffer(buffer));
         }
-        BlockPos lv = new BlockPos(arg.readInt(), arg.readInt(), arg.readInt());
+        BlockPos lv = new BlockPos(buffer.readInt(), buffer.readInt(), buffer.readInt());
         ArrayList list = Lists.newArrayList();
-        int l = arg.readInt();
+        int l = buffer.readInt();
         for (int m = 0; m < l; ++m) {
-            list.add(PathNode.fromBuffer(arg));
+            list.add(PathNode.fromBuffer(buffer));
         }
-        PathNode[] lvs = new PathNode[arg.readInt()];
+        PathNode[] lvs = new PathNode[buffer.readInt()];
         for (int n = 0; n < lvs.length; ++n) {
-            lvs[n] = PathNode.fromBuffer(arg);
+            lvs[n] = PathNode.fromBuffer(buffer);
         }
-        PathNode[] lvs2 = new PathNode[arg.readInt()];
+        PathNode[] lvs2 = new PathNode[buffer.readInt()];
         for (int o = 0; o < lvs2.length; ++o) {
-            lvs2[o] = PathNode.fromBuffer(arg);
+            lvs2[o] = PathNode.fromBuffer(buffer);
         }
         Path lv2 = new Path(list, lv, bl);
         lv2.field_57 = lvs;

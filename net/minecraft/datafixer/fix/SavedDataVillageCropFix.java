@@ -19,8 +19,8 @@ import net.minecraft.datafixer.fix.BlockStateFlattening;
 
 public class SavedDataVillageCropFix
 extends DataFix {
-    public SavedDataVillageCropFix(Schema schema, boolean bl) {
-        super(schema, bl);
+    public SavedDataVillageCropFix(Schema outputSchema, boolean changesType) {
+        super(outputSchema, changesType);
     }
 
     public TypeRewriteRule makeRule() {
@@ -35,8 +35,8 @@ extends DataFix {
         return dynamic.asStreamOpt().map(SavedDataVillageCropFix::fixVillageChildren).map(dynamic::createList).result().orElse(dynamic);
     }
 
-    private static Stream<? extends Dynamic<?>> fixVillageChildren(Stream<? extends Dynamic<?>> stream) {
-        return stream.map(dynamic -> {
+    private static Stream<? extends Dynamic<?>> fixVillageChildren(Stream<? extends Dynamic<?>> villageChildren) {
+        return villageChildren.map(dynamic -> {
             String string = dynamic.get("id").asString("");
             if ("ViF".equals(string)) {
                 return SavedDataVillageCropFix.fixSmallPlotCropIds(dynamic);
@@ -60,9 +60,9 @@ extends DataFix {
         return SavedDataVillageCropFix.fixCropId(dynamic, "CD");
     }
 
-    private static <T> Dynamic<T> fixCropId(Dynamic<T> dynamic, String string) {
-        if (dynamic.get(string).asNumber().result().isPresent()) {
-            return dynamic.set(string, BlockStateFlattening.lookupState(dynamic.get(string).asInt(0) << 4));
+    private static <T> Dynamic<T> fixCropId(Dynamic<T> dynamic, String cropId) {
+        if (dynamic.get(cropId).asNumber().result().isPresent()) {
+            return dynamic.set(cropId, BlockStateFlattening.lookupState(dynamic.get(cropId).asInt(0) << 4));
         }
         return dynamic;
     }

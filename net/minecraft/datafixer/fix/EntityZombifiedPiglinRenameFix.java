@@ -17,13 +17,13 @@ public class EntityZombifiedPiglinRenameFix
 extends EntityRenameFix {
     public static final Map<String, String> RENAMES = ImmutableMap.builder().put((Object)"minecraft:zombie_pigman_spawn_egg", (Object)"minecraft:zombified_piglin_spawn_egg").build();
 
-    public EntityZombifiedPiglinRenameFix(Schema schema) {
-        super("EntityZombifiedPiglinRenameFix", schema, true);
+    public EntityZombifiedPiglinRenameFix(Schema outputSchema) {
+        super("EntityZombifiedPiglinRenameFix", outputSchema, true);
     }
 
     @Override
-    protected String rename(String string) {
-        return Objects.equals("minecraft:zombie_pigman", string) ? "minecraft:zombified_piglin" : string;
+    protected String rename(String oldName) {
+        return Objects.equals("minecraft:zombie_pigman", oldName) ? "minecraft:zombified_piglin" : oldName;
     }
 }
 

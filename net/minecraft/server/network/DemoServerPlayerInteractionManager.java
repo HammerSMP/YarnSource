@@ -72,30 +72,30 @@ extends ServerPlayerInteractionManager {
     }
 
     @Override
-    public void processBlockBreakingAction(BlockPos arg, PlayerActionC2SPacket.Action arg2, Direction arg3, int i) {
+    public void processBlockBreakingAction(BlockPos pos, PlayerActionC2SPacket.Action action, Direction direction, int worldHeight) {
         if (this.demoEnded) {
             this.sendDemoReminder();
             return;
         }
-        super.processBlockBreakingAction(arg, arg2, arg3, i);
+        super.processBlockBreakingAction(pos, action, direction, worldHeight);
     }
 
     @Override
-    public ActionResult interactItem(ServerPlayerEntity arg, World arg2, ItemStack arg3, Hand arg4) {
+    public ActionResult interactItem(ServerPlayerEntity player, World world, ItemStack stack, Hand hand) {
         if (this.demoEnded) {
             this.sendDemoReminder();
             return ActionResult.PASS;
         }
-        return super.interactItem(arg, arg2, arg3, arg4);
+        return super.interactItem(player, world, stack, hand);
     }
 
     @Override
-    public ActionResult interactBlock(ServerPlayerEntity arg, World arg2, ItemStack arg3, Hand arg4, BlockHitResult arg5) {
+    public ActionResult interactBlock(ServerPlayerEntity player, World world, ItemStack stack, Hand hand, BlockHitResult hitResult) {
         if (this.demoEnded) {
             this.sendDemoReminder();
             return ActionResult.PASS;
         }
-        return super.interactBlock(arg, arg2, arg3, arg4, arg5);
+        return super.interactBlock(player, world, stack, hand, hitResult);
     }
 }
 

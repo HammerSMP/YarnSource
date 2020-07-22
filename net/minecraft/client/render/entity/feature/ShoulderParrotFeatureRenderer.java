@@ -37,14 +37,14 @@ extends FeatureRenderer<T, PlayerEntityModel<T>> {
         this.renderShoulderParrot(arg, arg2, i, arg3, f, g, k, l, false);
     }
 
-    private void renderShoulderParrot(MatrixStack arg2, VertexConsumerProvider arg22, int i, T arg3, float f, float g, float h, float j, boolean bl) {
-        CompoundTag lv = bl ? ((PlayerEntity)arg3).getShoulderEntityLeft() : ((PlayerEntity)arg3).getShoulderEntityRight();
+    private void renderShoulderParrot(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, T player, float limbAngle, float limbDistance, float headYaw, float headPitch, boolean leftShoulder) {
+        CompoundTag lv = leftShoulder ? ((PlayerEntity)player).getShoulderEntityLeft() : ((PlayerEntity)player).getShoulderEntityRight();
         EntityType.get(lv.getString("id")).filter(arg -> arg == EntityType.PARROT).ifPresent(arg5 -> {
-            arg2.push();
-            arg2.translate(bl ? (double)0.4f : (double)-0.4f, arg3.isInSneakingPose() ? (double)-1.3f : -1.5, 0.0);
-            VertexConsumer lv = arg22.getBuffer(this.model.getLayer(ParrotEntityRenderer.TEXTURES[lv.getInt("Variant")]));
-            this.model.poseOnShoulder(arg2, lv, i, OverlayTexture.DEFAULT_UV, f, g, h, j, arg2.age);
-            arg2.pop();
+            matrices.push();
+            matrices.translate(leftShoulder ? (double)0.4f : (double)-0.4f, player.isInSneakingPose() ? (double)-1.3f : -1.5, 0.0);
+            VertexConsumer lv = vertexConsumers.getBuffer(this.model.getLayer(ParrotEntityRenderer.TEXTURES[lv.getInt("Variant")]));
+            this.model.poseOnShoulder(matrices, lv, light, OverlayTexture.DEFAULT_UV, limbAngle, limbDistance, headYaw, headPitch, arg2.age);
+            matrices.pop();
         });
     }
 }

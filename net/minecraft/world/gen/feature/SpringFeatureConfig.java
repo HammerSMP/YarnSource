@@ -25,19 +25,19 @@ import net.minecraft.world.gen.feature.FeatureConfig;
 
 public class SpringFeatureConfig
 implements FeatureConfig {
-    public static final Codec<SpringFeatureConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)FluidState.CODEC.fieldOf("state").forGetter(arg -> arg.state), (App)Codec.BOOL.fieldOf("requires_block_below").withDefault((Object)true).forGetter(arg -> arg.requiresBlockBelow), (App)Codec.INT.fieldOf("rock_count").withDefault((Object)4).forGetter(arg -> arg.rockCount), (App)Codec.INT.fieldOf("hole_count").withDefault((Object)1).forGetter(arg -> arg.holeCount), (App)Registry.BLOCK.listOf().fieldOf("valid_blocks").xmap(ImmutableSet::copyOf, ImmutableList::copyOf).forGetter(arg -> arg.validBlocks)).apply((Applicative)instance, SpringFeatureConfig::new));
+    public static final Codec<SpringFeatureConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)FluidState.CODEC.fieldOf("state").forGetter(arg -> arg.state), (App)Codec.BOOL.fieldOf("requires_block_below").orElse((Object)true).forGetter(arg -> arg.requiresBlockBelow), (App)Codec.INT.fieldOf("rock_count").orElse((Object)4).forGetter(arg -> arg.rockCount), (App)Codec.INT.fieldOf("hole_count").orElse((Object)1).forGetter(arg -> arg.holeCount), (App)Registry.BLOCK.listOf().fieldOf("valid_blocks").xmap(ImmutableSet::copyOf, ImmutableList::copyOf).forGetter(arg -> arg.validBlocks)).apply((Applicative)instance, SpringFeatureConfig::new));
     public final FluidState state;
     public final boolean requiresBlockBelow;
     public final int rockCount;
     public final int holeCount;
     public final Set<Block> validBlocks;
 
-    public SpringFeatureConfig(FluidState arg, boolean bl, int i, int j, Set<Block> set) {
-        this.state = arg;
-        this.requiresBlockBelow = bl;
-        this.rockCount = i;
-        this.holeCount = j;
-        this.validBlocks = set;
+    public SpringFeatureConfig(FluidState state, boolean requiresBlockBelow, int rockCount, int holeCount, Set<Block> validBlocks) {
+        this.state = state;
+        this.requiresBlockBelow = requiresBlockBelow;
+        this.rockCount = rockCount;
+        this.holeCount = holeCount;
+        this.validBlocks = validBlocks;
     }
 }
 

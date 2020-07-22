@@ -26,8 +26,8 @@ public class TurtleEntityModel<T extends TurtleEntity>
 extends QuadrupedEntityModel<T> {
     private final ModelPart tail;
 
-    public TurtleEntityModel(float f) {
-        super(12, f, true, 120.0f, 0.0f, 9.0f, 6.0f, 120);
+    public TurtleEntityModel(float scale) {
+        super(12, scale, true, 120.0f, 0.0f, 9.0f, 6.0f, 120);
         this.textureWidth = 128;
         this.textureHeight = 64;
         this.head = new ModelPart(this, 3, 0);
@@ -91,15 +91,15 @@ extends QuadrupedEntityModel<T> {
     }
 
     @Override
-    public void render(MatrixStack arg, VertexConsumer arg2, int i, int j, float f, float g, float h, float k) {
+    public void render(MatrixStack matrices, VertexConsumer vertices, int light, int overlay, float red, float green, float blue, float alpha) {
         boolean bl = this.tail.visible;
         if (bl) {
-            arg.push();
-            arg.translate(0.0, -0.08f, 0.0);
+            matrices.push();
+            matrices.translate(0.0, -0.08f, 0.0);
         }
-        super.render(arg, arg2, i, j, f, g, h, k);
+        super.render(matrices, vertices, light, overlay, red, green, blue, alpha);
         if (bl) {
-            arg.pop();
+            matrices.pop();
         }
     }
 }

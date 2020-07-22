@@ -23,9 +23,9 @@ public class RedDustParticle
 extends SpriteBillboardParticle {
     private final SpriteProvider spriteProvider;
 
-    private RedDustParticle(ClientWorld arg, double d, double e, double f, double g, double h, double i, DustParticleEffect arg2, SpriteProvider arg3) {
-        super(arg, d, e, f, g, h, i);
-        this.spriteProvider = arg3;
+    private RedDustParticle(ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ, DustParticleEffect arg2, SpriteProvider spriteProvider) {
+        super(world, x, y, z, velocityX, velocityY, velocityZ);
+        this.spriteProvider = spriteProvider;
         this.velocityX *= (double)0.1f;
         this.velocityY *= (double)0.1f;
         this.velocityZ *= (double)0.1f;
@@ -36,7 +36,7 @@ extends SpriteBillboardParticle {
         this.scale *= 0.75f * arg2.getScale();
         int k = (int)(8.0 / (Math.random() * 0.8 + 0.2));
         this.maxAge = (int)Math.max((float)k * arg2.getScale(), 1.0f);
-        this.setSpriteForAge(arg3);
+        this.setSpriteForAge(spriteProvider);
     }
 
     @Override
@@ -45,8 +45,8 @@ extends SpriteBillboardParticle {
     }
 
     @Override
-    public float getSize(float f) {
-        return this.scale * MathHelper.clamp(((float)this.age + f) / (float)this.maxAge * 32.0f, 0.0f, 1.0f);
+    public float getSize(float tickDelta) {
+        return this.scale * MathHelper.clamp(((float)this.age + tickDelta) / (float)this.maxAge * 32.0f, 0.0f, 1.0f);
     }
 
     @Override
@@ -78,8 +78,8 @@ extends SpriteBillboardParticle {
     implements ParticleFactory<DustParticleEffect> {
         private final SpriteProvider spriteProvider;
 
-        public Factory(SpriteProvider arg) {
-            this.spriteProvider = arg;
+        public Factory(SpriteProvider spriteProvider) {
+            this.spriteProvider = spriteProvider;
         }
 
         @Override

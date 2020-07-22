@@ -30,8 +30,8 @@ extends Task<E> {
         }
     }
 
-    private boolean hasKilledHoglin(E arg) {
-        LivingEntity lv = ((PiglinEntity)arg).getBrain().getOptionalMemory(MemoryModuleType.ATTACK_TARGET).get();
+    private boolean hasKilledHoglin(E piglin) {
+        LivingEntity lv = ((PiglinEntity)piglin).getBrain().getOptionalMemory(MemoryModuleType.ATTACK_TARGET).get();
         return lv.getType() == EntityType.HOGLIN && lv.isDead();
     }
 }

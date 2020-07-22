@@ -136,10 +136,10 @@ implements ResourceReloadListener {
     private final Map<Identifier, SimpleSpriteProvider> spriteAwareFactories = Maps.newHashMap();
     private final SpriteAtlasTexture particleAtlasTexture = new SpriteAtlasTexture(SpriteAtlasTexture.PARTICLE_ATLAS_TEX);
 
-    public ParticleManager(ClientWorld arg, TextureManager arg2) {
-        arg2.registerTexture(this.particleAtlasTexture.getId(), this.particleAtlasTexture);
-        this.world = arg;
-        this.textureManager = arg2;
+    public ParticleManager(ClientWorld world, TextureManager textureManager) {
+        textureManager.registerTexture(this.particleAtlasTexture.getId(), this.particleAtlasTexture);
+        this.world = world;
+        this.textureManager = textureManager;
         this.registerDefaultFactories();
     }
 
@@ -218,8 +218,8 @@ implements ResourceReloadListener {
         this.registerFactory(ParticleTypes.WHITE_ASH, WhiteAshParticle.Factory::new);
     }
 
-    private <T extends ParticleEffect> void registerFactory(ParticleType<T> arg, ParticleFactory<T> arg2) {
-        this.factories.put(Registry.PARTICLE_TYPE.getRawId(arg), arg2);
+    private <T extends ParticleEffect> void registerFactory(ParticleType<T> type, ParticleFactory<T> factory) {
+        this.factories.put(Registry.PARTICLE_TYPE.getRawId(type), factory);
     }
 
     private <T extends ParticleEffect> void registerFactory(ParticleType<T> arg, SpriteAwareFactory<T> arg2) {
@@ -229,70 +229,70 @@ implements ResourceReloadListener {
     }
 
     @Override
-    public CompletableFuture<Void> reload(ResourceReloadListener.Synchronizer arg, ResourceManager arg23, Profiler arg3, Profiler arg4, Executor executor, Executor executor2) {
+    public CompletableFuture<Void> reload(ResourceReloadListener.Synchronizer synchronizer, ResourceManager manager, Profiler prepareProfiler, Profiler applyProfiler, Executor prepareExecutor, Executor applyExecutor) {
         ConcurrentMap map = Maps.newConcurrentMap();
-        CompletableFuture[] completableFutures = (CompletableFuture[])Registry.PARTICLE_TYPE.getIds().stream().map(arg2 -> CompletableFuture.runAsync(() -> this.loadTextureList(arg23, (Identifier)arg2, map), executor)).toArray(CompletableFuture[]::new);
+        CompletableFuture[] completableFutures = (CompletableFuture[])Registry.PARTICLE_TYPE.getIds().stream().map(arg2 -> CompletableFuture.runAsync(() -> this.loadTextureList(manager, (Identifier)arg2, map), prepareExecutor)).toArray(CompletableFuture[]::new);
         return ((CompletableFuture)((CompletableFuture)CompletableFuture.allOf(completableFutures).thenApplyAsync(void_ -> {
-            arg3.startTick();
-            arg3.push("stitching");
-            SpriteAtlasTexture.Data lv = this.particleAtlasTexture.stitch(arg23, map.values().stream().flatMap(Collection::stream), arg3, 0);
-            arg3.pop();
-            arg3.endTick();
+            prepareProfiler.startTick();
+            prepareProfiler.push("stitching");
+            SpriteAtlasTexture.Data lv = this.particleAtlasTexture.stitch(manager, map.values().stream().flatMap(Collection::stream), prepareProfiler, 0);
+            prepareProfiler.pop();
+            prepareProfiler.endTick();
             return lv;
-        }, executor)).thenCompose(arg::whenPrepared)).thenAcceptAsync(arg22 -> {
+        }, prepareExecutor)).thenCompose(synchronizer::whenPrepared)).thenAcceptAsync(arg22 -> {
             this.particles.clear();
-            arg4.startTick();
-            arg4.push("upload");
+            applyProfiler.startTick();
+            applyProfiler.push("upload");
             this.particleAtlasTexture.upload((SpriteAtlasTexture.Data)arg22);
-            arg4.swap("bindSpriteSets");
+            applyProfiler.swap("bindSpriteSets");
             Sprite lv = this.particleAtlasTexture.getSprite(MissingSprite.getMissingSpriteId());
             map.forEach((arg2, list) -> {
                 ImmutableList immutableList = list.isEmpty() ? ImmutableList.of((Object)lv) : (ImmutableList)list.stream().map(this.particleAtlasTexture::getSprite).collect(ImmutableList.toImmutableList());
                 this.spriteAwareFactories.get(arg2).setSprites((List<Sprite>)immutableList);
             });
-            arg4.pop();
-            arg4.endTick();
-        }, executor2);
+            applyProfiler.pop();
+            applyProfiler.endTick();
+        }, applyExecutor);
     }
 
     public void clearAtlas() {
         this.particleAtlasTexture.clear();
     }
 
-    private void loadTextureList(ResourceManager arg2, Identifier arg22, Map<Identifier, List<Identifier>> map) {
-        Identifier lv = new Identifier(arg22.getNamespace(), "particles/" + arg22.getPath() + ".json");
-        try (Resource lv2 = arg2.getResource(lv);
+    private void loadTextureList(ResourceManager resourceManager, Identifier id, Map<Identifier, List<Identifier>> result) {
+        Identifier lv = new Identifier(id.getNamespace(), "particles/" + id.getPath() + ".json");
+        try (Resource lv2 = resourceManager.getResource(lv);
              InputStreamReader reader = new InputStreamReader(lv2.getInputStream(), Charsets.UTF_8);){
             ParticleTextureData lv3 = ParticleTextureData.load(JsonHelper.deserialize(reader));
             List<Identifier> list = lv3.getTextureList();
-            boolean bl = this.spriteAwareFactories.containsKey(arg22);
+            boolean bl = this.spriteAwareFactories.containsKey(id);
             if (list == null) {
                 if (bl) {
-                    throw new IllegalStateException("Missing texture list for particle " + arg22);
+                    throw new IllegalStateException("Missing texture list for particle " + id);
                 }
             } else {
                 if (!bl) {
-                    throw new IllegalStateException("Redundant texture list for particle " + arg22);
+                    throw new IllegalStateException("Redundant texture list for particle " + id);
                 }
-                map.put(arg22, list.stream().map(arg -> new Identifier(arg.getNamespace(), "particle/" + arg.getPath())).collect(Collectors.toList()));
+                result.put(id, list.stream().map(arg -> new Identifier(arg.getNamespace(), "particle/" + arg.getPath())).collect(Collectors.toList()));
             }
         }
         catch (IOException iOException) {
-            throw new IllegalStateException("Failed to load description for particle " + arg22, iOException);
+            throw new IllegalStateException("Failed to load description for particle " + id, iOException);
         }
     }
 
-    public void addEmitter(Entity arg, ParticleEffect arg2) {
-        this.newEmitterParticles.add(new EmitterParticle(this.world, arg, arg2));
+    public void addEmitter(Entity entity, ParticleEffect parameters) {
+        this.newEmitterParticles.add(new EmitterParticle(this.world, entity, parameters));
     }
 
-    public void addEmitter(Entity arg, ParticleEffect arg2, int i) {
-        this.newEmitterParticles.add(new EmitterParticle(this.world, arg, arg2, i));
+    public void addEmitter(Entity entity, ParticleEffect parameters, int maxAge) {
+        this.newEmitterParticles.add(new EmitterParticle(this.world, entity, parameters, maxAge));
     }
 
     @Nullable
-    public Particle addParticle(ParticleEffect arg, double d, double e, double f, double g, double h, double i) {
-        Particle lv = this.createParticle(arg, d, e, f, g, h, i);
+    public Particle addParticle(ParticleEffect parameters, double x, double y, double z, double velocityX, double velocityY, double velocityZ) {
+        Particle lv = this.createParticle(parameters, x, y, z, velocityX, velocityY, velocityZ);
         if (lv != null) {
             this.addParticle(lv);
             return lv;
@@ -301,16 +301,16 @@ implements ResourceReloadListener {
     }
 
     @Nullable
-    private <T extends ParticleEffect> Particle createParticle(T arg, double d, double e, double f, double g, double h, double i) {
-        ParticleFactory lv = (ParticleFactory)this.factories.get(Registry.PARTICLE_TYPE.getRawId(arg.getType()));
+    private <T extends ParticleEffect> Particle createParticle(T parameters, double x, double y, double z, double velocityX, double velocityY, double velocityZ) {
+        ParticleFactory lv = (ParticleFactory)this.factories.get(Registry.PARTICLE_TYPE.getRawId(parameters.getType()));
         if (lv == null) {
             return null;
         }
-        return lv.createParticle(arg, this.world, d, e, f, g, h, i);
+        return lv.createParticle(parameters, this.world, x, y, z, velocityX, velocityY, velocityZ);
     }
 
-    public void addParticle(Particle arg) {
-        this.newParticles.add(arg);
+    public void addParticle(Particle particle) {
+        this.newParticles.add(particle);
     }
 
     public void tick() {
@@ -348,15 +348,15 @@ implements ResourceReloadListener {
         }
     }
 
-    private void tickParticle(Particle arg) {
+    private void tickParticle(Particle particle) {
         try {
-            arg.tick();
+            particle.tick();
         }
         catch (Throwable throwable) {
             CrashReport lv = CrashReport.create(throwable, "Ticking Particle");
             CrashReportSection lv2 = lv.addElement("Particle being ticked");
-            lv2.add("Particle", arg::toString);
-            lv2.add("Particle Type", arg.getType()::toString);
+            lv2.add("Particle", particle::toString);
+            lv2.add("Particle Type", particle.getType()::toString);
             throw new CrashException(lv);
         }
     }
@@ -399,17 +399,17 @@ implements ResourceReloadListener {
         RenderSystem.disableFog();
     }
 
-    public void setWorld(@Nullable ClientWorld arg) {
-        this.world = arg;
+    public void setWorld(@Nullable ClientWorld world) {
+        this.world = world;
         this.particles.clear();
         this.newEmitterParticles.clear();
     }
 
-    public void addBlockBreakParticles(BlockPos arg, BlockState arg2) {
-        if (arg2.isAir()) {
+    public void addBlockBreakParticles(BlockPos pos, BlockState state) {
+        if (state.isAir()) {
             return;
         }
-        VoxelShape lv = arg2.getOutlineShape(this.world, arg);
+        VoxelShape lv = state.getOutlineShape(this.world, pos);
         double d2 = 0.25;
         lv.forEachBox((d, e, f, g, h, i) -> {
             double j = Math.min(1.0, g - d);
@@ -427,45 +427,45 @@ implements ResourceReloadListener {
                         double v = s * j + d;
                         double w = t * k + e;
                         double x = u * l + f;
-                        this.addParticle(new BlockDustParticle(this.world, (double)arg.getX() + v, (double)arg.getY() + w, (double)arg.getZ() + x, s - 0.5, t - 0.5, u - 0.5, arg2).setBlockPos(arg));
+                        this.addParticle(new BlockDustParticle(this.world, (double)pos.getX() + v, (double)pos.getY() + w, (double)pos.getZ() + x, s - 0.5, t - 0.5, u - 0.5, state).setBlockPos(pos));
                     }
                 }
             }
         });
     }
 
-    public void addBlockBreakingParticles(BlockPos arg, Direction arg2) {
-        BlockState lv = this.world.getBlockState(arg);
+    public void addBlockBreakingParticles(BlockPos pos, Direction direction) {
+        BlockState lv = this.world.getBlockState(pos);
         if (lv.getRenderType() == BlockRenderType.INVISIBLE) {
             return;
         }
-        int i = arg.getX();
-        int j = arg.getY();
-        int k = arg.getZ();
+        int i = pos.getX();
+        int j = pos.getY();
+        int k = pos.getZ();
         float f = 0.1f;
-        Box lv2 = lv.getOutlineShape(this.world, arg).getBoundingBox();
+        Box lv2 = lv.getOutlineShape(this.world, pos).getBoundingBox();
         double d = (double)i + this.random.nextDouble() * (lv2.maxX - lv2.minX - (double)0.2f) + (double)0.1f + lv2.minX;
         double e = (double)j + this.random.nextDouble() * (lv2.maxY - lv2.minY - (double)0.2f) + (double)0.1f + lv2.minY;
         double g = (double)k + this.random.nextDouble() * (lv2.maxZ - lv2.minZ - (double)0.2f) + (double)0.1f + lv2.minZ;
-        if (arg2 == Direction.DOWN) {
+        if (direction == Direction.DOWN) {
             e = (double)j + lv2.minY - (double)0.1f;
         }
-        if (arg2 == Direction.UP) {
+        if (direction == Direction.UP) {
             e = (double)j + lv2.maxY + (double)0.1f;
         }
-        if (arg2 == Direction.NORTH) {
+        if (direction == Direction.NORTH) {
             g = (double)k + lv2.minZ - (double)0.1f;
         }
-        if (arg2 == Direction.SOUTH) {
+        if (direction == Direction.SOUTH) {
             g = (double)k + lv2.maxZ + (double)0.1f;
         }
-        if (arg2 == Direction.WEST) {
+        if (direction == Direction.WEST) {
             d = (double)i + lv2.minX - (double)0.1f;
         }
-        if (arg2 == Direction.EAST) {
+        if (direction == Direction.EAST) {
             d = (double)i + lv2.maxX + (double)0.1f;
         }
-        this.addParticle(new BlockDustParticle(this.world, d, e, g, 0.0, 0.0, 0.0, lv).setBlockPos(arg).move(0.2f).scale(0.6f));
+        this.addParticle(new BlockDustParticle(this.world, d, e, g, 0.0, 0.0, 0.0, lv).setBlockPos(pos).move(0.2f).scale(0.6f));
     }
 
     public String getDebugString() {
@@ -490,8 +490,8 @@ implements ResourceReloadListener {
             return this.sprites.get(random.nextInt(this.sprites.size()));
         }
 
-        public void setSprites(List<Sprite> list) {
-            this.sprites = ImmutableList.copyOf(list);
+        public void setSprites(List<Sprite> sprites) {
+            this.sprites = ImmutableList.copyOf(sprites);
         }
     }
 

@@ -28,33 +28,33 @@ RecipeInputProvider {
     private final DefaultedList<ItemStack> stacks;
     private List<InventoryChangedListener> listeners;
 
-    public SimpleInventory(int i) {
-        this.size = i;
-        this.stacks = DefaultedList.ofSize(i, ItemStack.EMPTY);
+    public SimpleInventory(int size) {
+        this.size = size;
+        this.stacks = DefaultedList.ofSize(size, ItemStack.EMPTY);
     }
 
-    public SimpleInventory(ItemStack ... args) {
-        this.size = args.length;
-        this.stacks = DefaultedList.copyOf(ItemStack.EMPTY, args);
+    public SimpleInventory(ItemStack ... items) {
+        this.size = items.length;
+        this.stacks = DefaultedList.copyOf(ItemStack.EMPTY, items);
     }
 
-    public void addListener(InventoryChangedListener arg) {
+    public void addListener(InventoryChangedListener listener) {
         if (this.listeners == null) {
             this.listeners = Lists.newArrayList();
         }
-        this.listeners.add(arg);
+        this.listeners.add(listener);
     }
 
-    public void removeListener(InventoryChangedListener arg) {
-        this.listeners.remove(arg);
+    public void removeListener(InventoryChangedListener listener) {
+        this.listeners.remove(listener);
     }
 
     @Override
-    public ItemStack getStack(int i) {
-        if (i < 0 || i >= this.stacks.size()) {
+    public ItemStack getStack(int slot) {
+        if (slot < 0 || slot >= this.stacks.size()) {
             return ItemStack.EMPTY;
         }
-        return this.stacks.get(i);
+        return this.stacks.get(slot);
     }
 
     public List<ItemStack> clearToList() {
@@ -64,23 +64,23 @@ RecipeInputProvider {
     }
 
     @Override
-    public ItemStack removeStack(int i, int j) {
-        ItemStack lv = Inventories.splitStack(this.stacks, i, j);
+    public ItemStack removeStack(int slot, int amount) {
+        ItemStack lv = Inventories.splitStack(this.stacks, slot, amount);
         if (!lv.isEmpty()) {
             this.markDirty();
         }
         return lv;
     }
 
-    public ItemStack removeItem(Item arg, int i) {
-        ItemStack lv = new ItemStack(arg, 0);
+    public ItemStack removeItem(Item item, int count) {
+        ItemStack lv = new ItemStack(item, 0);
         for (int j = this.size - 1; j >= 0; --j) {
             ItemStack lv2 = this.getStack(j);
-            if (!lv2.getItem().equals(arg)) continue;
-            int k = i - lv.getCount();
+            if (!lv2.getItem().equals(item)) continue;
+            int k = count - lv.getCount();
             ItemStack lv3 = lv2.split(k);
             lv.increment(lv3.getCount());
-            if (lv.getCount() == i) break;
+            if (lv.getCount() == count) break;
         }
         if (!lv.isEmpty()) {
             this.markDirty();
@@ -88,8 +88,8 @@ RecipeInputProvider {
         return lv;
     }
 
-    public ItemStack addStack(ItemStack arg) {
-        ItemStack lv = arg.copy();
+    public ItemStack addStack(ItemStack stack) {
+        ItemStack lv = stack.copy();
         this.addToExistingSlot(lv);
         if (lv.isEmpty()) {
             return ItemStack.EMPTY;
@@ -101,10 +101,10 @@ RecipeInputProvider {
         return lv;
     }
 
-    public boolean canInsert(ItemStack arg) {
+    public boolean canInsert(ItemStack stack) {
         boolean bl = false;
         for (ItemStack lv : this.stacks) {
-            if (!lv.isEmpty() && (!this.canCombine(lv, arg) || lv.getCount() >= lv.getMaxCount())) continue;
+            if (!lv.isEmpty() && (!this.canCombine(lv, stack) || lv.getCount() >= lv.getMaxCount())) continue;
             bl = true;
             break;
         }
@@ -112,20 +112,20 @@ RecipeInputProvider {
     }
 
     @Override
-    public ItemStack removeStack(int i) {
-        ItemStack lv = this.stacks.get(i);
+    public ItemStack removeStack(int slot) {
+        ItemStack lv = this.stacks.get(slot);
         if (lv.isEmpty()) {
             return ItemStack.EMPTY;
         }
-        this.stacks.set(i, ItemStack.EMPTY);
+        this.stacks.set(slot, ItemStack.EMPTY);
         return lv;
     }
 
     @Override
-    public void setStack(int i, ItemStack arg) {
-        this.stacks.set(i, arg);
-        if (!arg.isEmpty() && arg.getCount() > this.getMaxCountPerStack()) {
-            arg.setCount(this.getMaxCountPerStack());
+    public void setStack(int slot, ItemStack stack) {
+        this.stacks.set(slot, stack);
+        if (!stack.isEmpty() && stack.getCount() > this.getMaxCountPerStack()) {
+            stack.setCount(this.getMaxCountPerStack());
         }
         this.markDirty();
     }
@@ -154,7 +154,7 @@ RecipeInputProvider {
     }
 
     @Override
-    public boolean canPlayerUse(PlayerEntity arg) {
+    public boolean canPlayerUse(PlayerEntity player) {
         return true;
     }
 
@@ -165,9 +165,9 @@ RecipeInputProvider {
     }
 
     @Override
-    public void provideRecipeInputs(RecipeFinder arg) {
+    public void provideRecipeInputs(RecipeFinder finder) {
         for (ItemStack lv : this.stacks) {
-            arg.addItem(lv);
+            finder.addItem(lv);
         }
     }
 
@@ -175,43 +175,43 @@ RecipeInputProvider {
         return this.stacks.stream().filter(arg -> !arg.isEmpty()).collect(Collectors.toList()).toString();
     }
 
-    private void addToNewSlot(ItemStack arg) {
+    private void addToNewSlot(ItemStack stack) {
         for (int i = 0; i < this.size; ++i) {
             ItemStack lv = this.getStack(i);
             if (!lv.isEmpty()) continue;
-            this.setStack(i, arg.copy());
-            arg.setCount(0);
+            this.setStack(i, stack.copy());
+            stack.setCount(0);
             return;
         }
     }
 
-    private void addToExistingSlot(ItemStack arg) {
+    private void addToExistingSlot(ItemStack stack) {
         for (int i = 0; i < this.size; ++i) {
             ItemStack lv = this.getStack(i);
-            if (!this.canCombine(lv, arg)) continue;
-            this.transfer(arg, lv);
-            if (!arg.isEmpty()) continue;
+            if (!this.canCombine(lv, stack)) continue;
+            this.transfer(stack, lv);
+            if (!stack.isEmpty()) continue;
             return;
         }
     }
 
-    private boolean canCombine(ItemStack arg, ItemStack arg2) {
-        return arg.getItem() == arg2.getItem() && ItemStack.areTagsEqual(arg, arg2);
+    private boolean canCombine(ItemStack one, ItemStack two) {
+        return one.getItem() == two.getItem() && ItemStack.areTagsEqual(one, two);
     }
 
-    private void transfer(ItemStack arg, ItemStack arg2) {
-        int i = Math.min(this.getMaxCountPerStack(), arg2.getMaxCount());
-        int j = Math.min(arg.getCount(), i - arg2.getCount());
+    private void transfer(ItemStack source, ItemStack target) {
+        int i = Math.min(this.getMaxCountPerStack(), target.getMaxCount());
+        int j = Math.min(source.getCount(), i - target.getCount());
         if (j > 0) {
-            arg2.increment(j);
-            arg.decrement(j);
+            target.increment(j);
+            source.decrement(j);
             this.markDirty();
         }
     }
 
-    public void readTags(ListTag arg) {
-        for (int i = 0; i < arg.size(); ++i) {
-            ItemStack lv = ItemStack.fromTag(arg.getCompound(i));
+    public void readTags(ListTag tags) {
+        for (int i = 0; i < tags.size(); ++i) {
+            ItemStack lv = ItemStack.fromTag(tags.getCompound(i));
             if (lv.isEmpty()) continue;
             this.addStack(lv);
         }

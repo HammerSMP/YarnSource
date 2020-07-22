@@ -29,40 +29,40 @@ extends Block {
     }
 
     @Override
-    public VoxelShape getCollisionShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
+    public VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
         return COLLISION_SHAPE;
     }
 
     @Override
-    public VoxelShape getSidesShape(BlockState arg, BlockView arg2, BlockPos arg3) {
+    public VoxelShape getSidesShape(BlockState state, BlockView world, BlockPos pos) {
         return VoxelShapes.fullCube();
     }
 
     @Override
-    public VoxelShape getVisualShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
+    public VoxelShape getVisualShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
         return VoxelShapes.fullCube();
     }
 
     @Override
-    public void scheduledTick(BlockState arg, ServerWorld arg2, BlockPos arg3, Random random) {
-        BubbleColumnBlock.update(arg2, arg3.up(), false);
+    public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        BubbleColumnBlock.update(world, pos.up(), false);
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
-        if (arg2 == Direction.UP && arg3.isOf(Blocks.WATER)) {
-            arg4.getBlockTickScheduler().schedule(arg5, this, 20);
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
+        if (direction == Direction.UP && newState.isOf(Blocks.WATER)) {
+            world.getBlockTickScheduler().schedule(pos, this, 20);
         }
-        return super.getStateForNeighborUpdate(arg, arg2, arg3, arg4, arg5, arg6);
+        return super.getStateForNeighborUpdate(state, direction, newState, world, pos, posFrom);
     }
 
     @Override
-    public void onBlockAdded(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
-        arg2.getBlockTickScheduler().schedule(arg3, this, 20);
+    public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
+        world.getBlockTickScheduler().schedule(pos, this, 20);
     }
 
     @Override
-    public boolean canPathfindThrough(BlockState arg, BlockView arg2, BlockPos arg3, NavigationType arg4) {
+    public boolean canPathfindThrough(BlockState state, BlockView world, BlockPos pos, NavigationType type) {
         return false;
     }
 }

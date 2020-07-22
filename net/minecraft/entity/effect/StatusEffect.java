@@ -38,78 +38,78 @@ public class StatusEffect {
     private String translationKey;
 
     @Nullable
-    public static StatusEffect byRawId(int i) {
-        return (StatusEffect)Registry.STATUS_EFFECT.get(i);
+    public static StatusEffect byRawId(int rawId) {
+        return (StatusEffect)Registry.STATUS_EFFECT.get(rawId);
     }
 
-    public static int getRawId(StatusEffect arg) {
-        return Registry.STATUS_EFFECT.getRawId(arg);
+    public static int getRawId(StatusEffect type) {
+        return Registry.STATUS_EFFECT.getRawId(type);
     }
 
-    protected StatusEffect(StatusEffectType arg, int i) {
-        this.type = arg;
-        this.color = i;
+    protected StatusEffect(StatusEffectType type, int color) {
+        this.type = type;
+        this.color = color;
     }
 
-    public void applyUpdateEffect(LivingEntity arg, int i) {
+    public void applyUpdateEffect(LivingEntity entity, int amplifier) {
         if (this == StatusEffects.REGENERATION) {
-            if (arg.getHealth() < arg.getMaxHealth()) {
-                arg.heal(1.0f);
+            if (entity.getHealth() < entity.getMaxHealth()) {
+                entity.heal(1.0f);
             }
         } else if (this == StatusEffects.POISON) {
-            if (arg.getHealth() > 1.0f) {
-                arg.damage(DamageSource.MAGIC, 1.0f);
+            if (entity.getHealth() > 1.0f) {
+                entity.damage(DamageSource.MAGIC, 1.0f);
             }
         } else if (this == StatusEffects.WITHER) {
-            arg.damage(DamageSource.WITHER, 1.0f);
-        } else if (this == StatusEffects.HUNGER && arg instanceof PlayerEntity) {
-            ((PlayerEntity)arg).addExhaustion(0.005f * (float)(i + 1));
-        } else if (this == StatusEffects.SATURATION && arg instanceof PlayerEntity) {
-            if (!arg.world.isClient) {
-                ((PlayerEntity)arg).getHungerManager().add(i + 1, 1.0f);
+            entity.damage(DamageSource.WITHER, 1.0f);
+        } else if (this == StatusEffects.HUNGER && entity instanceof PlayerEntity) {
+            ((PlayerEntity)entity).addExhaustion(0.005f * (float)(amplifier + 1));
+        } else if (this == StatusEffects.SATURATION && entity instanceof PlayerEntity) {
+            if (!entity.world.isClient) {
+                ((PlayerEntity)entity).getHungerManager().add(amplifier + 1, 1.0f);
             }
-        } else if (this == StatusEffects.INSTANT_HEALTH && !arg.isUndead() || this == StatusEffects.INSTANT_DAMAGE && arg.isUndead()) {
-            arg.heal(Math.max(4 << i, 0));
-        } else if (this == StatusEffects.INSTANT_DAMAGE && !arg.isUndead() || this == StatusEffects.INSTANT_HEALTH && arg.isUndead()) {
-            arg.damage(DamageSource.MAGIC, 6 << i);
+        } else if (this == StatusEffects.INSTANT_HEALTH && !entity.isUndead() || this == StatusEffects.INSTANT_DAMAGE && entity.isUndead()) {
+            entity.heal(Math.max(4 << amplifier, 0));
+        } else if (this == StatusEffects.INSTANT_DAMAGE && !entity.isUndead() || this == StatusEffects.INSTANT_HEALTH && entity.isUndead()) {
+            entity.damage(DamageSource.MAGIC, 6 << amplifier);
         }
     }
 
-    public void applyInstantEffect(@Nullable Entity arg, @Nullable Entity arg2, LivingEntity arg3, int i, double d) {
-        if (this == StatusEffects.INSTANT_HEALTH && !arg3.isUndead() || this == StatusEffects.INSTANT_DAMAGE && arg3.isUndead()) {
-            int j = (int)(d * (double)(4 << i) + 0.5);
-            arg3.heal(j);
-        } else if (this == StatusEffects.INSTANT_DAMAGE && !arg3.isUndead() || this == StatusEffects.INSTANT_HEALTH && arg3.isUndead()) {
-            int k = (int)(d * (double)(6 << i) + 0.5);
-            if (arg == null) {
-                arg3.damage(DamageSource.MAGIC, k);
+    public void applyInstantEffect(@Nullable Entity source, @Nullable Entity attacker, LivingEntity target, int amplifier, double proximity) {
+        if (this == StatusEffects.INSTANT_HEALTH && !target.isUndead() || this == StatusEffects.INSTANT_DAMAGE && target.isUndead()) {
+            int j = (int)(proximity * (double)(4 << amplifier) + 0.5);
+            target.heal(j);
+        } else if (this == StatusEffects.INSTANT_DAMAGE && !target.isUndead() || this == StatusEffects.INSTANT_HEALTH && target.isUndead()) {
+            int k = (int)(proximity * (double)(6 << amplifier) + 0.5);
+            if (source == null) {
+                target.damage(DamageSource.MAGIC, k);
             } else {
-                arg3.damage(DamageSource.magic(arg, arg2), k);
+                target.damage(DamageSource.magic(source, attacker), k);
             }
         } else {
-            this.applyUpdateEffect(arg3, i);
+            this.applyUpdateEffect(target, amplifier);
         }
     }
 
-    public boolean canApplyUpdateEffect(int i, int j) {
+    public boolean canApplyUpdateEffect(int duration, int amplifier) {
         if (this == StatusEffects.REGENERATION) {
-            int k = 50 >> j;
+            int k = 50 >> amplifier;
             if (k > 0) {
-                return i % k == 0;
+                return duration % k == 0;
             }
             return true;
         }
         if (this == StatusEffects.POISON) {
-            int l = 25 >> j;
+            int l = 25 >> amplifier;
             if (l > 0) {
-                return i % l == 0;
+                return duration % l == 0;
             }
             return true;
         }
         if (this == StatusEffects.WITHER) {
-            int m = 40 >> j;
+            int m = 40 >> amplifier;
             if (m > 0) {
-                return i % m == 0;
+                return duration % m == 0;
             }
             return true;
         }
@@ -144,9 +144,9 @@ public class StatusEffect {
         return this.color;
     }
 
-    public StatusEffect addAttributeModifier(EntityAttribute arg, String string, double d, EntityAttributeModifier.Operation arg2) {
-        EntityAttributeModifier lv = new EntityAttributeModifier(UUID.fromString(string), this::getTranslationKey, d, arg2);
-        this.attributeModifiers.put(arg, lv);
+    public StatusEffect addAttributeModifier(EntityAttribute attribute, String uuid, double amount, EntityAttributeModifier.Operation operation) {
+        EntityAttributeModifier lv = new EntityAttributeModifier(UUID.fromString(uuid), this::getTranslationKey, amount, operation);
+        this.attributeModifiers.put(attribute, lv);
         return this;
     }
 
@@ -155,26 +155,26 @@ public class StatusEffect {
         return this.attributeModifiers;
     }
 
-    public void onRemoved(LivingEntity arg, AttributeContainer arg2, int i) {
+    public void onRemoved(LivingEntity entity, AttributeContainer attributes, int amplifier) {
         for (Map.Entry<EntityAttribute, EntityAttributeModifier> entry : this.attributeModifiers.entrySet()) {
-            EntityAttributeInstance lv = arg2.getCustomInstance(entry.getKey());
+            EntityAttributeInstance lv = attributes.getCustomInstance(entry.getKey());
             if (lv == null) continue;
             lv.removeModifier(entry.getValue());
         }
     }
 
-    public void onApplied(LivingEntity arg, AttributeContainer arg2, int i) {
+    public void onApplied(LivingEntity entity, AttributeContainer attributes, int amplifier) {
         for (Map.Entry<EntityAttribute, EntityAttributeModifier> entry : this.attributeModifiers.entrySet()) {
-            EntityAttributeInstance lv = arg2.getCustomInstance(entry.getKey());
+            EntityAttributeInstance lv = attributes.getCustomInstance(entry.getKey());
             if (lv == null) continue;
             EntityAttributeModifier lv2 = entry.getValue();
             lv.removeModifier(lv2);
-            lv.addPersistentModifier(new EntityAttributeModifier(lv2.getId(), this.getTranslationKey() + " " + i, this.adjustModifierAmount(i, lv2), lv2.getOperation()));
+            lv.addPersistentModifier(new EntityAttributeModifier(lv2.getId(), this.getTranslationKey() + " " + amplifier, this.adjustModifierAmount(amplifier, lv2), lv2.getOperation()));
         }
     }
 
-    public double adjustModifierAmount(int i, EntityAttributeModifier arg) {
-        return arg.getValue() * (double)(i + 1);
+    public double adjustModifierAmount(int amplifier, EntityAttributeModifier modifier) {
+        return modifier.getValue() * (double)(amplifier + 1);
     }
 
     @Environment(value=EnvType.CLIENT)

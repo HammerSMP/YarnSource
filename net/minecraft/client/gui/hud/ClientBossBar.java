@@ -20,20 +20,20 @@ extends BossBar {
     protected float healthLatest;
     protected long timeHealthSet;
 
-    public ClientBossBar(BossBarS2CPacket arg) {
-        super(arg.getUuid(), arg.getName(), arg.getColor(), arg.getOverlay());
-        this.healthLatest = arg.getPercent();
-        this.percent = arg.getPercent();
+    public ClientBossBar(BossBarS2CPacket packet) {
+        super(packet.getUuid(), packet.getName(), packet.getColor(), packet.getOverlay());
+        this.healthLatest = packet.getPercent();
+        this.percent = packet.getPercent();
         this.timeHealthSet = Util.getMeasuringTimeMs();
-        this.setDarkenSky(arg.shouldDarkenSky());
-        this.setDragonMusic(arg.hasDragonMusic());
-        this.setThickenFog(arg.shouldThickenFog());
+        this.setDarkenSky(packet.shouldDarkenSky());
+        this.setDragonMusic(packet.hasDragonMusic());
+        this.setThickenFog(packet.shouldThickenFog());
     }
 
     @Override
-    public void setPercent(float f) {
+    public void setPercent(float percentage) {
         this.percent = this.getPercent();
-        this.healthLatest = f;
+        this.healthLatest = percentage;
         this.timeHealthSet = Util.getMeasuringTimeMs();
     }
 
@@ -44,24 +44,24 @@ extends BossBar {
         return MathHelper.lerp(f, this.percent, this.healthLatest);
     }
 
-    public void handlePacket(BossBarS2CPacket arg) {
-        switch (arg.getType()) {
+    public void handlePacket(BossBarS2CPacket packet) {
+        switch (packet.getType()) {
             case UPDATE_NAME: {
-                this.setName(arg.getName());
+                this.setName(packet.getName());
                 break;
             }
             case UPDATE_PCT: {
-                this.setPercent(arg.getPercent());
+                this.setPercent(packet.getPercent());
                 break;
             }
             case UPDATE_STYLE: {
-                this.setColor(arg.getColor());
-                this.setOverlay(arg.getOverlay());
+                this.setColor(packet.getColor());
+                this.setOverlay(packet.getOverlay());
                 break;
             }
             case UPDATE_PROPERTIES: {
-                this.setDarkenSky(arg.shouldDarkenSky());
-                this.setDragonMusic(arg.hasDragonMusic());
+                this.setDarkenSky(packet.shouldDarkenSky());
+                this.setDragonMusic(packet.hasDragonMusic());
             }
         }
     }

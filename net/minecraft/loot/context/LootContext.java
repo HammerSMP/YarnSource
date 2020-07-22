@@ -48,54 +48,54 @@ public class LootContext {
     private final Map<LootContextParameter<?>, Object> parameters;
     private final Map<Identifier, Dropper> drops;
 
-    private LootContext(Random random, float f, ServerWorld arg, Function<Identifier, LootTable> function, Function<Identifier, LootCondition> function2, Map<LootContextParameter<?>, Object> map, Map<Identifier, Dropper> map2) {
+    private LootContext(Random random, float luck, ServerWorld world, Function<Identifier, LootTable> tableGetter, Function<Identifier, LootCondition> conditionSetter, Map<LootContextParameter<?>, Object> parameters, Map<Identifier, Dropper> drops) {
         this.random = random;
-        this.luck = f;
-        this.world = arg;
-        this.tableGetter = function;
-        this.conditionGetter = function2;
-        this.parameters = ImmutableMap.copyOf(map);
-        this.drops = ImmutableMap.copyOf(map2);
+        this.luck = luck;
+        this.world = world;
+        this.tableGetter = tableGetter;
+        this.conditionGetter = conditionSetter;
+        this.parameters = ImmutableMap.copyOf(parameters);
+        this.drops = ImmutableMap.copyOf(drops);
     }
 
-    public boolean hasParameter(LootContextParameter<?> arg) {
-        return this.parameters.containsKey(arg);
+    public boolean hasParameter(LootContextParameter<?> parameter) {
+        return this.parameters.containsKey(parameter);
     }
 
-    public void drop(Identifier arg, Consumer<ItemStack> consumer) {
-        Dropper lv = this.drops.get(arg);
+    public void drop(Identifier id, Consumer<ItemStack> lootConsumer) {
+        Dropper lv = this.drops.get(id);
         if (lv != null) {
-            lv.add(this, consumer);
+            lv.add(this, lootConsumer);
         }
     }
 
     @Nullable
-    public <T> T get(LootContextParameter<T> arg) {
-        return (T)this.parameters.get(arg);
+    public <T> T get(LootContextParameter<T> parameter) {
+        return (T)this.parameters.get(parameter);
     }
 
-    public boolean markActive(LootTable arg) {
-        return this.activeTables.add(arg);
+    public boolean markActive(LootTable table) {
+        return this.activeTables.add(table);
     }
 
-    public void markInactive(LootTable arg) {
-        this.activeTables.remove(arg);
+    public void markInactive(LootTable table) {
+        this.activeTables.remove(table);
     }
 
-    public boolean addCondition(LootCondition arg) {
-        return this.conditions.add(arg);
+    public boolean addCondition(LootCondition condition) {
+        return this.conditions.add(condition);
     }
 
-    public void removeCondition(LootCondition arg) {
-        this.conditions.remove(arg);
+    public void removeCondition(LootCondition condition) {
+        this.conditions.remove(condition);
     }
 
-    public LootTable getSupplier(Identifier arg) {
-        return this.tableGetter.apply(arg);
+    public LootTable getSupplier(Identifier id) {
+        return this.tableGetter.apply(id);
     }
 
-    public LootCondition getCondition(Identifier arg) {
-        return this.conditionGetter.apply(arg);
+    public LootCondition getCondition(Identifier id) {
+        return this.conditionGetter.apply(id);
     }
 
     public Random getRandom() {
@@ -119,21 +119,21 @@ public class LootContext {
         private final String type;
         private final LootContextParameter<? extends Entity> parameter;
 
-        private EntityTarget(String string2, LootContextParameter<? extends Entity> arg) {
-            this.type = string2;
-            this.parameter = arg;
+        private EntityTarget(String type, LootContextParameter<? extends Entity> parameter) {
+            this.type = type;
+            this.parameter = parameter;
         }
 
         public LootContextParameter<? extends Entity> getParameter() {
             return this.parameter;
         }
 
-        public static EntityTarget fromString(String string) {
+        public static EntityTarget fromString(String type) {
             for (EntityTarget lv : EntityTarget.values()) {
-                if (!lv.type.equals(string)) continue;
+                if (!lv.type.equals(type)) continue;
                 return lv;
             }
-            throw new IllegalArgumentException("Invalid entity target " + string);
+            throw new IllegalArgumentException("Invalid entity target " + type);
         }
 
         public static class Serializer
@@ -146,12 +146,12 @@ public class LootContext {
                 return EntityTarget.fromString(jsonReader.nextString());
             }
 
-            public /* synthetic */ Object read(JsonReader jsonReader) throws IOException {
-                return this.read(jsonReader);
+            public /* synthetic */ Object read(JsonReader reader) throws IOException {
+                return this.read(reader);
             }
 
-            public /* synthetic */ void write(JsonWriter jsonWriter, Object object) throws IOException {
-                this.write(jsonWriter, (EntityTarget)((Object)object));
+            public /* synthetic */ void write(JsonWriter writer, Object entity) throws IOException {
+                this.write(writer, (EntityTarget)((Object)entity));
             }
         }
     }
@@ -163,8 +163,8 @@ public class LootContext {
         private Random random;
         private float luck;
 
-        public Builder(ServerWorld arg) {
-            this.world = arg;
+        public Builder(ServerWorld world) {
+            this.world = world;
         }
 
         public Builder random(Random random) {
@@ -172,39 +172,39 @@ public class LootContext {
             return this;
         }
 
-        public Builder random(long l) {
-            if (l != 0L) {
-                this.random = new Random(l);
+        public Builder random(long seed) {
+            if (seed != 0L) {
+                this.random = new Random(seed);
             }
             return this;
         }
 
-        public Builder random(long l, Random random) {
-            this.random = l == 0L ? random : new Random(l);
+        public Builder random(long seed, Random random) {
+            this.random = seed == 0L ? random : new Random(seed);
             return this;
         }
 
-        public Builder luck(float f) {
-            this.luck = f;
+        public Builder luck(float luck) {
+            this.luck = luck;
             return this;
         }
 
-        public <T> Builder parameter(LootContextParameter<T> arg, T object) {
-            this.parameters.put(arg, object);
+        public <T> Builder parameter(LootContextParameter<T> key, T value) {
+            this.parameters.put(key, value);
             return this;
         }
 
-        public <T> Builder optionalParameter(LootContextParameter<T> arg, @Nullable T object) {
-            if (object == null) {
-                this.parameters.remove(arg);
+        public <T> Builder optionalParameter(LootContextParameter<T> key, @Nullable T value) {
+            if (value == null) {
+                this.parameters.remove(key);
             } else {
-                this.parameters.put(arg, object);
+                this.parameters.put(key, value);
             }
             return this;
         }
 
-        public Builder putDrop(Identifier arg, Dropper arg2) {
-            Dropper lv = this.drops.put(arg, arg2);
+        public Builder putDrop(Identifier id, Dropper value) {
+            Dropper lv = this.drops.put(id, value);
             if (lv != null) {
                 throw new IllegalStateException("Duplicated dynamic drop '" + this.drops + "'");
             }
@@ -215,25 +215,25 @@ public class LootContext {
             return this.world;
         }
 
-        public <T> T get(LootContextParameter<T> arg) {
-            Object object = this.parameters.get(arg);
+        public <T> T get(LootContextParameter<T> parameter) {
+            Object object = this.parameters.get(parameter);
             if (object == null) {
-                throw new IllegalArgumentException("No parameter " + arg);
+                throw new IllegalArgumentException("No parameter " + parameter);
             }
             return (T)object;
         }
 
         @Nullable
-        public <T> T getNullable(LootContextParameter<T> arg) {
-            return (T)this.parameters.get(arg);
+        public <T> T getNullable(LootContextParameter<T> parameter) {
+            return (T)this.parameters.get(parameter);
         }
 
-        public LootContext build(LootContextType arg) {
-            Sets.SetView set = Sets.difference(this.parameters.keySet(), arg.getAllowed());
+        public LootContext build(LootContextType type) {
+            Sets.SetView set = Sets.difference(this.parameters.keySet(), type.getAllowed());
             if (!set.isEmpty()) {
                 throw new IllegalArgumentException("Parameters not allowed in this parameter set: " + (Object)set);
             }
-            Sets.SetView set2 = Sets.difference(arg.getRequired(), this.parameters.keySet());
+            Sets.SetView set2 = Sets.difference(type.getRequired(), this.parameters.keySet());
             if (!set2.isEmpty()) {
                 throw new IllegalArgumentException("Missing required parameters: " + (Object)set2);
             }

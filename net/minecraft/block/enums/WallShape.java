@@ -13,8 +13,8 @@ public enum WallShape implements StringIdentifiable
 
     private final String name;
 
-    private WallShape(String string2) {
-        this.name = string2;
+    private WallShape(String name) {
+        this.name = name;
     }
 
     public String toString() {

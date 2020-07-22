@@ -22,21 +22,21 @@ extends Item {
     private static final Map<DyeColor, DyeItem> DYES = Maps.newEnumMap(DyeColor.class);
     private final DyeColor color;
 
-    public DyeItem(DyeColor arg, Item.Settings arg2) {
-        super(arg2);
-        this.color = arg;
-        DYES.put(arg, this);
+    public DyeItem(DyeColor color, Item.Settings settings) {
+        super(settings);
+        this.color = color;
+        DYES.put(color, this);
     }
 
     @Override
-    public ActionResult useOnEntity(ItemStack arg, PlayerEntity arg2, LivingEntity arg3, Hand arg4) {
+    public ActionResult useOnEntity(ItemStack stack, PlayerEntity user, LivingEntity entity, Hand hand) {
         SheepEntity lv;
-        if (arg3 instanceof SheepEntity && (lv = (SheepEntity)arg3).isAlive() && !lv.isSheared() && lv.getColor() != this.color) {
-            if (!arg2.world.isClient) {
+        if (entity instanceof SheepEntity && (lv = (SheepEntity)entity).isAlive() && !lv.isSheared() && lv.getColor() != this.color) {
+            if (!user.world.isClient) {
                 lv.setColor(this.color);
-                arg.decrement(1);
+                stack.decrement(1);
             }
-            return ActionResult.success(arg2.world.isClient);
+            return ActionResult.success(user.world.isClient);
         }
         return ActionResult.PASS;
     }
@@ -45,8 +45,8 @@ extends Item {
         return this.color;
     }
 
-    public static DyeItem byColor(DyeColor arg) {
-        return DYES.get(arg);
+    public static DyeItem byColor(DyeColor color) {
+        return DYES.get(color);
     }
 }
 

@@ -32,14 +32,14 @@ extends Screen {
     private int buttonEnableTimer;
     protected final BooleanConsumer callback;
 
-    public ConfirmScreen(BooleanConsumer booleanConsumer, Text arg, Text arg2) {
-        this(booleanConsumer, arg, arg2, ScreenTexts.YES, ScreenTexts.NO);
+    public ConfirmScreen(BooleanConsumer callback, Text title, Text message) {
+        this(callback, title, message, ScreenTexts.YES, ScreenTexts.NO);
     }
 
-    public ConfirmScreen(BooleanConsumer booleanConsumer, Text arg, Text arg2, Text arg3, Text arg4) {
-        super(arg);
-        this.callback = booleanConsumer;
-        this.message = arg2;
+    public ConfirmScreen(BooleanConsumer callback, Text title, Text message, Text arg3, Text arg4) {
+        super(title);
+        this.callback = callback;
+        this.message = message;
         this.yesTranslated = arg3;
         this.noTranslated = arg4;
     }
@@ -59,16 +59,16 @@ extends Screen {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.renderBackground(arg);
-        this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 70, 0xFFFFFF);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.renderBackground(matrices);
+        this.drawCenteredText(matrices, this.textRenderer, this.title, this.width / 2, 70, 0xFFFFFF);
         int k = 90;
         for (StringRenderable lv : this.messageSplit) {
-            this.drawCenteredText(arg, this.textRenderer, lv, this.width / 2, k, 0xFFFFFF);
+            this.drawCenteredText(matrices, this.textRenderer, lv, this.width / 2, k, 0xFFFFFF);
             this.textRenderer.getClass();
             k += 9;
         }
-        super.render(arg, i, j, f);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 
     public void disableButtons(int i) {
@@ -94,12 +94,12 @@ extends Screen {
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (i == 256) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (keyCode == 256) {
             this.callback.accept(false);
             return true;
         }
-        return super.keyPressed(i, j, k);
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 }
 

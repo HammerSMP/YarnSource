@@ -64,11 +64,11 @@ extends HorseBaseEntity {
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
-        arg.putInt("Variant", this.getVariant());
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
+        tag.putInt("Variant", this.getVariant());
         if (!this.items.getStack(1).isEmpty()) {
-            arg.put("ArmorItem", this.items.getStack(1).toTag(new CompoundTag()));
+            tag.put("ArmorItem", this.items.getStack(1).toTag(new CompoundTag()));
         }
     }
 
@@ -76,32 +76,32 @@ extends HorseBaseEntity {
         return this.getEquippedStack(EquipmentSlot.CHEST);
     }
 
-    private void equipArmor(ItemStack arg) {
-        this.equipStack(EquipmentSlot.CHEST, arg);
+    private void equipArmor(ItemStack stack) {
+        this.equipStack(EquipmentSlot.CHEST, stack);
         this.setEquipmentDropChance(EquipmentSlot.CHEST, 0.0f);
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
+    public void readCustomDataFromTag(CompoundTag tag) {
         ItemStack lv;
-        super.readCustomDataFromTag(arg);
-        this.setVariant(arg.getInt("Variant"));
-        if (arg.contains("ArmorItem", 10) && !(lv = ItemStack.fromTag(arg.getCompound("ArmorItem"))).isEmpty() && this.canEquip(lv)) {
+        super.readCustomDataFromTag(tag);
+        this.setVariant(tag.getInt("Variant"));
+        if (tag.contains("ArmorItem", 10) && !(lv = ItemStack.fromTag(tag.getCompound("ArmorItem"))).isEmpty() && this.canEquip(lv)) {
             this.items.setStack(1, lv);
         }
         this.updateSaddle();
     }
 
-    private void setVariant(int i) {
-        this.dataTracker.set(VARIANT, i);
+    private void setVariant(int variant) {
+        this.dataTracker.set(VARIANT, variant);
     }
 
     private int getVariant() {
         return this.dataTracker.get(VARIANT);
     }
 
-    private void setVariant(HorseColor arg, HorseMarking arg2) {
-        this.setVariant(arg.getIndex() & 0xFF | arg2.getIndex() << 8 & 0xFF00);
+    private void setVariant(HorseColor color, HorseMarking marking) {
+        this.setVariant(color.getIndex() & 0xFF | marking.getIndex() << 8 & 0xFF00);
     }
 
     public HorseColor getColor() {
@@ -122,21 +122,21 @@ extends HorseBaseEntity {
         this.setEquipmentDropChance(EquipmentSlot.CHEST, 0.0f);
     }
 
-    private void setArmorTypeFromStack(ItemStack arg) {
-        this.equipArmor(arg);
+    private void setArmorTypeFromStack(ItemStack stack) {
+        this.equipArmor(stack);
         if (!this.world.isClient) {
             int i;
             this.getAttributeInstance(EntityAttributes.GENERIC_ARMOR).removeModifier(HORSE_ARMOR_BONUS_ID);
-            if (this.canEquip(arg) && (i = ((HorseArmorItem)arg.getItem()).getBonus()) != 0) {
+            if (this.canEquip(stack) && (i = ((HorseArmorItem)stack.getItem()).getBonus()) != 0) {
                 this.getAttributeInstance(EntityAttributes.GENERIC_ARMOR).addTemporaryModifier(new EntityAttributeModifier(HORSE_ARMOR_BONUS_ID, "Horse armor bonus", (double)i, EntityAttributeModifier.Operation.ADDITION));
             }
         }
     }
 
     @Override
-    public void onInventoryChanged(Inventory arg) {
+    public void onInventoryChanged(Inventory sender) {
         ItemStack lv = this.getArmorType();
-        super.onInventoryChanged(arg);
+        super.onInventoryChanged(sender);
         ItemStack lv2 = this.getArmorType();
         if (this.age > 20 && this.canEquip(lv2) && lv != lv2) {
             this.playSound(SoundEvents.ENTITY_HORSE_ARMOR, 0.5f, 1.0f);
@@ -144,10 +144,10 @@ extends HorseBaseEntity {
     }
 
     @Override
-    protected void playWalkSound(BlockSoundGroup arg) {
-        super.playWalkSound(arg);
+    protected void playWalkSound(BlockSoundGroup group) {
+        super.playWalkSound(group);
         if (this.random.nextInt(10) == 0) {
-            this.playSound(SoundEvents.ENTITY_HORSE_BREATHE, arg.getVolume() * 0.6f, arg.getPitch());
+            this.playSound(SoundEvents.ENTITY_HORSE_BREATHE, group.getVolume() * 0.6f, group.getPitch());
         }
     }
 
@@ -170,8 +170,8 @@ extends HorseBaseEntity {
     }
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource arg) {
-        super.getHurtSound(arg);
+    protected SoundEvent getHurtSound(DamageSource source) {
+        super.getHurtSound(source);
         return SoundEvents.ENTITY_HORSE_HURT;
     }
 
@@ -182,23 +182,23 @@ extends HorseBaseEntity {
     }
 
     @Override
-    public ActionResult interactMob(PlayerEntity arg, Hand arg2) {
-        ItemStack lv = arg.getStackInHand(arg2);
+    public ActionResult interactMob(PlayerEntity player, Hand hand) {
+        ItemStack lv = player.getStackInHand(hand);
         if (!this.isBaby()) {
-            if (this.isTame() && arg.shouldCancelInteraction()) {
-                this.openInventory(arg);
+            if (this.isTame() && player.shouldCancelInteraction()) {
+                this.openInventory(player);
                 return ActionResult.success(this.world.isClient);
             }
             if (this.hasPassengers()) {
-                return super.interactMob(arg, arg2);
+                return super.interactMob(player, hand);
             }
         }
         if (!lv.isEmpty()) {
             boolean bl;
             if (this.isBreedingItem(lv)) {
-                return this.method_30009(arg, lv);
+                return this.method_30009(player, lv);
             }
-            ActionResult lv2 = lv.useOnEntity(arg, this, arg2);
+            ActionResult lv2 = lv.useOnEntity(player, this, hand);
             if (lv2.isAccepted()) {
                 return lv2;
             }
@@ -208,24 +208,24 @@ extends HorseBaseEntity {
             }
             boolean bl2 = bl = !this.isBaby() && !this.isSaddled() && lv.getItem() == Items.SADDLE;
             if (this.canEquip(lv) || bl) {
-                this.openInventory(arg);
+                this.openInventory(player);
                 return ActionResult.success(this.world.isClient);
             }
         }
         if (this.isBaby()) {
-            return super.interactMob(arg, arg2);
+            return super.interactMob(player, hand);
         }
-        this.putPlayerOnBack(arg);
+        this.putPlayerOnBack(player);
         return ActionResult.success(this.world.isClient);
     }
 
     @Override
-    public boolean canBreedWith(AnimalEntity arg) {
-        if (arg == this) {
+    public boolean canBreedWith(AnimalEntity other) {
+        if (other == this) {
             return false;
         }
-        if (arg instanceof DonkeyEntity || arg instanceof HorseEntity) {
-            return this.canBreed() && ((HorseBaseEntity)arg).canBreed();
+        if (other instanceof DonkeyEntity || other instanceof HorseEntity) {
+            return this.canBreed() && ((HorseBaseEntity)other).canBreed();
         }
         return false;
     }
@@ -268,30 +268,31 @@ extends HorseBaseEntity {
     }
 
     @Override
-    public boolean canEquip(ItemStack arg) {
-        return arg.getItem() instanceof HorseArmorItem;
+    public boolean canEquip(ItemStack item) {
+        return item.getItem() instanceof HorseArmorItem;
     }
 
     @Override
     @Nullable
-    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(class_5425 arg, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable CompoundTag entityTag) {
         HorseColor lv2;
-        if (arg4 instanceof HorseData) {
-            HorseColor lv = ((HorseData)arg4).color;
+        if (entityData instanceof HorseData) {
+            HorseColor lv = ((HorseData)entityData).color;
         } else {
             lv2 = Util.getRandom(HorseColor.values(), this.random);
-            arg4 = new HorseData(lv2);
+            entityData = new HorseData(lv2);
         }
         this.setVariant(lv2, Util.getRandom(HorseMarking.values(), this.random));
-        return super.initialize(arg, arg2, arg3, arg4, arg5);
+        return super.initialize(arg, difficulty, spawnReason, entityData, entityTag);
     }
 
     public static class HorseData
     extends PassiveEntity.PassiveData {
         public final HorseColor color;
 
-        public HorseData(HorseColor arg) {
-            this.color = arg;
+        public HorseData(HorseColor color) {
+            super(true);
+            this.color = color;
         }
     }
 }

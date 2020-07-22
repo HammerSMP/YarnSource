@@ -67,7 +67,7 @@ import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Util;
 import net.minecraft.util.dynamic.RegistryOps;
-import net.minecraft.util.registry.RegistryTracker;
+import net.minecraft.util.registry.DynamicRegistryManager;
 import net.minecraft.world.gen.GeneratorOptions;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -89,44 +89,37 @@ Drawable {
     private ButtonWidget mapTypeButton;
     private ButtonWidget customizeTypeButton;
     private ButtonWidget field_25048;
-    private RegistryTracker.Modifiable field_25483;
+    private DynamicRegistryManager.Impl field_25483;
     private GeneratorOptions generatorOptions;
     private Optional<GeneratorType> field_25049;
-    private String seedText;
+    private OptionalLong seedText;
 
-    public MoreOptionsDialog() {
-        this.field_25483 = RegistryTracker.create();
-        this.generatorOptions = GeneratorOptions.getDefaultOptions();
-        this.field_25049 = Optional.of(GeneratorType.DEFAULT);
-        this.seedText = "";
-    }
-
-    public MoreOptionsDialog(RegistryTracker.Modifiable arg, GeneratorOptions arg2) {
+    public MoreOptionsDialog(DynamicRegistryManager.Impl arg, GeneratorOptions arg2, Optional<GeneratorType> optional, OptionalLong optionalLong) {
         this.field_25483 = arg;
         this.generatorOptions = arg2;
-        this.field_25049 = GeneratorType.method_29078(arg2);
-        this.seedText = Long.toString(arg2.getSeed());
+        this.field_25049 = optional;
+        this.seedText = optionalLong;
     }
 
-    public void method_28092(final CreateWorldScreen arg4, MinecraftClient arg22, TextRenderer arg32) {
-        this.textRenderer = arg32;
-        this.parentWidth = arg4.width;
+    public void method_28092(final CreateWorldScreen parent, MinecraftClient client, TextRenderer textRenderer) {
+        this.textRenderer = textRenderer;
+        this.parentWidth = parent.width;
         this.seedTextField = new TextFieldWidget(this.textRenderer, this.parentWidth / 2 - 100, 60, 200, 20, new TranslatableText("selectWorld.enterSeed"));
-        this.seedTextField.setText(this.seedText);
+        this.seedTextField.setText(MoreOptionsDialog.method_30510(this.seedText));
         this.seedTextField.setChangedListener(string -> {
-            this.seedText = this.seedTextField.getText();
+            this.seedText = this.method_30511();
         });
-        arg4.addChild(this.seedTextField);
+        parent.addChild(this.seedTextField);
         int i = this.parentWidth / 2 - 155;
         int j = this.parentWidth / 2 + 5;
-        this.mapFeaturesButton = arg4.addButton(new ButtonWidget(i, 100, 150, 20, new TranslatableText("selectWorld.mapFeatures"), arg -> {
+        this.mapFeaturesButton = parent.addButton(new ButtonWidget(i, 100, 150, 20, new TranslatableText("selectWorld.mapFeatures"), arg -> {
             this.generatorOptions = this.generatorOptions.toggleGenerateStructures();
             arg.queueNarration(250);
         }){
 
             @Override
             public Text getMessage() {
-                return super.getMessage().shallowCopy().append(" ").append(ScreenTexts.getToggleText(MoreOptionsDialog.this.generatorOptions.shouldGenerateStructures()));
+                return ScreenTexts.method_30619(super.getMessage(), MoreOptionsDialog.this.generatorOptions.shouldGenerateStructures());
             }
 
             @Override
@@ -135,7 +128,7 @@ Drawable {
             }
         });
         this.mapFeaturesButton.visible = false;
-        this.mapTypeButton = arg4.addButton(new ButtonWidget(j, 100, 150, 20, new TranslatableText("selectWorld.mapType"), arg2 -> {
+        this.mapTypeButton = parent.addButton(new ButtonWidget(j, 100, 150, 20, new TranslatableText("selectWorld.mapType"), arg2 -> {
             while (this.field_25049.isPresent()) {
                 int i = GeneratorType.VALUES.indexOf(this.field_25049.get()) + 1;
                 if (i >= GeneratorType.VALUES.size()) {
@@ -146,7 +139,7 @@ Drawable {
                 this.generatorOptions = lv.method_29077(this.field_25483, this.generatorOptions.getSeed(), this.generatorOptions.shouldGenerateStructures(), this.generatorOptions.hasBonusChest());
                 if (this.generatorOptions.isDebugWorld() && !Screen.hasShiftDown()) continue;
             }
-            arg4.setMoreOptionsOpen();
+            parent.setMoreOptionsOpen();
             arg2.queueNarration(250);
         }){
 
@@ -165,25 +158,25 @@ Drawable {
         });
         this.mapTypeButton.visible = false;
         this.mapTypeButton.active = this.field_25049.isPresent();
-        this.customizeTypeButton = arg4.addButton(new ButtonWidget(j, 120, 150, 20, new TranslatableText("selectWorld.customizeType"), arg3 -> {
+        this.customizeTypeButton = parent.addButton(new ButtonWidget(j, 120, 150, 20, new TranslatableText("selectWorld.customizeType"), arg3 -> {
             GeneratorType.ScreenProvider lv = GeneratorType.field_25053.get(this.field_25049);
             if (lv != null) {
-                arg22.openScreen(lv.createEditScreen(arg4, this.generatorOptions));
+                client.openScreen(lv.createEditScreen(parent, this.generatorOptions));
             }
         }));
         this.customizeTypeButton.visible = false;
-        this.bonusItemsButton = arg4.addButton(new ButtonWidget(i, 151, 150, 20, new TranslatableText("selectWorld.bonusItems"), arg -> {
+        this.bonusItemsButton = parent.addButton(new ButtonWidget(i, 151, 150, 20, new TranslatableText("selectWorld.bonusItems"), arg -> {
             this.generatorOptions = this.generatorOptions.toggleBonusChest();
             arg.queueNarration(250);
         }){
 
             @Override
             public Text getMessage() {
-                return super.getMessage().shallowCopy().append(" ").append(ScreenTexts.getToggleText(MoreOptionsDialog.this.generatorOptions.hasBonusChest() && !arg4.hardcore));
+                return ScreenTexts.method_30619(super.getMessage(), MoreOptionsDialog.this.generatorOptions.hasBonusChest() && !parent.hardcore);
             }
         });
         this.bonusItemsButton.visible = false;
-        this.field_25048 = arg4.addButton(new ButtonWidget(i, 185, 150, 20, new TranslatableText("selectWorld.import_worldgen_settings"), arg3 -> {
+        this.field_25048 = parent.addButton(new ButtonWidget(i, 185, 150, 20, new TranslatableText("selectWorld.import_worldgen_settings"), arg3 -> {
             DataResult dataResult3;
             void lv7;
             TranslatableText lv = new TranslatableText("selectWorld.import_worldgen_settings.select_file");
@@ -191,19 +184,19 @@ Drawable {
             if (string == null) {
                 return;
             }
-            RegistryTracker.Modifiable lv2 = RegistryTracker.create();
-            ResourcePackManager lv3 = new ResourcePackManager(new VanillaDataPackProvider(), new FileResourcePackProvider(arg4.method_29693().toFile(), ResourcePackSource.PACK_SOURCE_WORLD));
+            DynamicRegistryManager.Impl lv2 = DynamicRegistryManager.create();
+            ResourcePackManager lv3 = new ResourcePackManager(new VanillaDataPackProvider(), new FileResourcePackProvider(parent.method_29693().toFile(), ResourcePackSource.PACK_SOURCE_WORLD));
             try {
                 MinecraftServer.loadDataPacks(lv3, arg.field_25479, false);
-                CompletableFuture<ServerResourceManager> completableFuture = ServerResourceManager.reload(lv3.createResourcePacks(), CommandManager.RegistrationEnvironment.INTEGRATED, 2, Util.getServerWorkerExecutor(), arg22);
-                arg22.runTasks(completableFuture::isDone);
+                CompletableFuture<ServerResourceManager> completableFuture = ServerResourceManager.reload(lv3.createResourcePacks(), CommandManager.RegistrationEnvironment.INTEGRATED, 2, Util.getServerWorkerExecutor(), client);
+                client.runTasks(completableFuture::isDone);
                 ServerResourceManager lv4 = completableFuture.get();
             }
             catch (InterruptedException | ExecutionException exception) {
                 field_25046.error("Error loading data packs when importing world settings", (Throwable)exception);
                 TranslatableText lv5 = new TranslatableText("selectWorld.import_worldgen_settings.failure");
                 LiteralText lv6 = new LiteralText(exception.getMessage());
-                arg22.getToastManager().add(SystemToast.method_29047(arg22, SystemToast.Type.WORLD_GEN_SETTINGS_TRANSFER, lv5, lv6));
+                client.getToastManager().add(SystemToast.create(client, SystemToast.Type.WORLD_GEN_SETTINGS_TRANSFER, lv5, lv6));
                 lv3.close();
                 return;
             }
@@ -221,12 +214,13 @@ Drawable {
                 String string2 = ((DataResult.PartialResult)dataResult3.error().get()).message();
                 field_25046.error("Error parsing world settings: {}", (Object)string2);
                 LiteralText lv10 = new LiteralText(string2);
-                arg22.getToastManager().add(SystemToast.method_29047(arg22, SystemToast.Type.WORLD_GEN_SETTINGS_TRANSFER, lv9, lv10));
+                client.getToastManager().add(SystemToast.create(client, SystemToast.Type.WORLD_GEN_SETTINGS_TRANSFER, lv9, lv10));
             }
+            lv7.close();
             Lifecycle lifecycle = dataResult3.lifecycle();
             dataResult3.resultOrPartial(((Logger)field_25046)::error).ifPresent(arg4 -> {
                 BooleanConsumer booleanConsumer = bl -> {
-                    arg22.openScreen(arg4);
+                    client.openScreen(parent);
                     if (bl) {
                         this.method_29073(lv2, (GeneratorOptions)arg4);
                     }
@@ -234,21 +228,21 @@ Drawable {
                 if (lifecycle == Lifecycle.stable()) {
                     this.method_29073(lv2, (GeneratorOptions)arg4);
                 } else if (lifecycle == Lifecycle.experimental()) {
-                    arg22.openScreen(new ConfirmScreen(booleanConsumer, new TranslatableText("selectWorld.import_worldgen_settings.experimental.title"), new TranslatableText("selectWorld.import_worldgen_settings.experimental.question")));
+                    client.openScreen(new ConfirmScreen(booleanConsumer, new TranslatableText("selectWorld.import_worldgen_settings.experimental.title"), new TranslatableText("selectWorld.import_worldgen_settings.experimental.question")));
                 } else {
-                    arg22.openScreen(new ConfirmScreen(booleanConsumer, new TranslatableText("selectWorld.import_worldgen_settings.deprecated.title"), new TranslatableText("selectWorld.import_worldgen_settings.deprecated.question")));
+                    client.openScreen(new ConfirmScreen(booleanConsumer, new TranslatableText("selectWorld.import_worldgen_settings.deprecated.title"), new TranslatableText("selectWorld.import_worldgen_settings.deprecated.question")));
                 }
             });
         }));
         this.field_25048.visible = false;
     }
 
-    private void method_29073(RegistryTracker.Modifiable arg, GeneratorOptions arg2) {
-        this.field_25483 = arg;
+    private void method_29073(DynamicRegistryManager.Impl arg, GeneratorOptions arg2) {
+        this.method_30509(arg);
         this.generatorOptions = arg2;
         this.field_25049 = GeneratorType.method_29078(arg2);
-        this.seedText = Long.toString(arg2.getSeed());
-        this.seedTextField.setText(this.seedText);
+        this.seedText = OptionalLong.of(arg2.getSeed());
+        this.seedTextField.setText(MoreOptionsDialog.method_30510(this.seedText));
         this.mapTypeButton.active = this.field_25049.isPresent();
     }
 
@@ -258,11 +252,11 @@ Drawable {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         if (this.mapFeaturesButton.visible) {
-            this.textRenderer.drawWithShadow(arg, I18n.translate("selectWorld.mapFeatures.info", new Object[0]), (float)(this.parentWidth / 2 - 150), 122.0f, -6250336);
+            this.textRenderer.drawWithShadow(matrices, I18n.translate("selectWorld.mapFeatures.info", new Object[0]), (float)(this.parentWidth / 2 - 150), 122.0f, -6250336);
         }
-        this.seedTextField.render(arg, i, j, f);
+        this.seedTextField.render(matrices, mouseX, mouseY, delta);
         if (this.field_25049.equals(Optional.of(GeneratorType.AMPLIFIED))) {
             this.textRenderer.drawTrimmed(AMPLIFIED_INFO_TEXT, this.mapTypeButton.x + 2, this.mapTypeButton.y + 22, this.mapTypeButton.getWidth(), 0xA0A0A0);
         }
@@ -270,6 +264,13 @@ Drawable {
 
     protected void setGeneratorOptions(GeneratorOptions arg) {
         this.generatorOptions = arg;
+    }
+
+    private static String method_30510(OptionalLong optionalLong) {
+        if (optionalLong.isPresent()) {
+            return Long.toString(optionalLong.getAsLong());
+        }
+        return "";
     }
 
     private static OptionalLong tryParseLong(String string) {
@@ -281,7 +282,12 @@ Drawable {
         }
     }
 
-    public GeneratorOptions getGeneratorOptions(boolean bl) {
+    public GeneratorOptions getGeneratorOptions(boolean hardcore) {
+        OptionalLong optionalLong = this.method_30511();
+        return this.generatorOptions.withHardcore(hardcore, optionalLong);
+    }
+
+    private OptionalLong method_30511() {
         OptionalLong optionalLong4;
         String string = this.seedTextField.getText();
         if (StringUtils.isEmpty((CharSequence)string)) {
@@ -294,31 +300,35 @@ Drawable {
                 optionalLong4 = OptionalLong.of(string.hashCode());
             }
         }
-        return this.generatorOptions.withHardcore(bl, optionalLong4);
+        return optionalLong4;
     }
 
     public boolean isDebugWorld() {
         return this.generatorOptions.isDebugWorld();
     }
 
-    public void setVisible(boolean bl) {
-        this.mapTypeButton.visible = bl;
+    public void setVisible(boolean visible) {
+        this.mapTypeButton.visible = visible;
         if (this.generatorOptions.isDebugWorld()) {
             this.mapFeaturesButton.visible = false;
             this.bonusItemsButton.visible = false;
             this.customizeTypeButton.visible = false;
             this.field_25048.visible = false;
         } else {
-            this.mapFeaturesButton.visible = bl;
-            this.bonusItemsButton.visible = bl;
-            this.customizeTypeButton.visible = bl && GeneratorType.field_25053.containsKey(this.field_25049);
-            this.field_25048.visible = bl;
+            this.mapFeaturesButton.visible = visible;
+            this.bonusItemsButton.visible = visible;
+            this.customizeTypeButton.visible = visible && GeneratorType.field_25053.containsKey(this.field_25049);
+            this.field_25048.visible = visible;
         }
-        this.seedTextField.setVisible(bl);
+        this.seedTextField.setVisible(visible);
     }
 
-    public RegistryTracker.Modifiable method_29700() {
+    public DynamicRegistryManager.Impl method_29700() {
         return this.field_25483;
+    }
+
+    protected void method_30509(DynamicRegistryManager.Impl arg) {
+        this.field_25483 = arg;
     }
 }
 

@@ -54,29 +54,29 @@ extends AbstractFireBlock {
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
-        if (this.canPlaceAt(arg, arg4, arg5)) {
-            return this.method_24855(arg4, arg5, arg.get(AGE));
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
+        if (this.canPlaceAt(state, world, pos)) {
+            return this.method_24855(world, pos, state.get(AGE));
         }
         return Blocks.AIR.getDefaultState();
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
         VoxelShape lv = VoxelShapes.empty();
-        if (arg.get(UP).booleanValue()) {
+        if (state.get(UP).booleanValue()) {
             lv = field_22497;
         }
-        if (arg.get(WEST).booleanValue()) {
+        if (state.get(WEST).booleanValue()) {
             lv = VoxelShapes.union(lv, field_22499);
         }
-        if (arg.get(EAST).booleanValue()) {
+        if (state.get(EAST).booleanValue()) {
             lv = VoxelShapes.union(lv, field_22500);
         }
-        if (arg.get(NORTH).booleanValue()) {
+        if (state.get(NORTH).booleanValue()) {
             lv = VoxelShapes.union(lv, field_22501);
         }
-        if (arg.get(SOUTH).booleanValue()) {
+        if (state.get(SOUTH).booleanValue()) {
             lv = VoxelShapes.union(lv, field_22502);
         }
         if (lv == VoxelShapes.empty()) {
@@ -86,73 +86,73 @@ extends AbstractFireBlock {
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext arg) {
-        return this.getStateForPosition(arg.getWorld(), arg.getBlockPos());
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        return this.getStateForPosition(ctx.getWorld(), ctx.getBlockPos());
     }
 
-    protected BlockState getStateForPosition(BlockView arg, BlockPos arg2) {
-        BlockPos lv = arg2.down();
-        BlockState lv2 = arg.getBlockState(lv);
-        if (this.isFlammable(lv2) || lv2.isSideSolidFullSquare(arg, lv, Direction.UP)) {
+    protected BlockState getStateForPosition(BlockView world, BlockPos pos) {
+        BlockPos lv = pos.down();
+        BlockState lv2 = world.getBlockState(lv);
+        if (this.isFlammable(lv2) || lv2.isSideSolidFullSquare(world, lv, Direction.UP)) {
             return this.getDefaultState();
         }
         BlockState lv3 = this.getDefaultState();
         for (Direction lv4 : Direction.values()) {
             BooleanProperty lv5 = DIRECTION_PROPERTIES.get(lv4);
             if (lv5 == null) continue;
-            lv3 = (BlockState)lv3.with(lv5, this.isFlammable(arg.getBlockState(arg2.offset(lv4))));
+            lv3 = (BlockState)lv3.with(lv5, this.isFlammable(world.getBlockState(pos.offset(lv4))));
         }
         return lv3;
     }
 
     @Override
-    public boolean canPlaceAt(BlockState arg, WorldView arg2, BlockPos arg3) {
-        BlockPos lv = arg3.down();
-        return arg2.getBlockState(lv).isSideSolidFullSquare(arg2, lv, Direction.UP) || this.areBlocksAroundFlammable(arg2, arg3);
+    public boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
+        BlockPos lv = pos.down();
+        return world.getBlockState(lv).isSideSolidFullSquare(world, lv, Direction.UP) || this.areBlocksAroundFlammable(world, pos);
     }
 
     @Override
-    public void scheduledTick(BlockState arg, ServerWorld arg2, BlockPos arg3, Random random) {
+    public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
         boolean bl2;
-        arg2.getBlockTickScheduler().schedule(arg3, this, FireBlock.method_26155(arg2.random));
-        if (!arg2.getGameRules().getBoolean(GameRules.DO_FIRE_TICK)) {
+        world.getBlockTickScheduler().schedule(pos, this, FireBlock.method_26155(world.random));
+        if (!world.getGameRules().getBoolean(GameRules.DO_FIRE_TICK)) {
             return;
         }
-        if (!arg.canPlaceAt(arg2, arg3)) {
-            arg2.removeBlock(arg3, false);
+        if (!state.canPlaceAt(world, pos)) {
+            world.removeBlock(pos, false);
         }
-        BlockState lv = arg2.getBlockState(arg3.down());
-        boolean bl = lv.isIn(arg2.getDimension().getInfiniburnBlocks());
-        int i = arg.get(AGE);
-        if (!bl && arg2.isRaining() && this.isRainingAround(arg2, arg3) && random.nextFloat() < 0.2f + (float)i * 0.03f) {
-            arg2.removeBlock(arg3, false);
+        BlockState lv = world.getBlockState(pos.down());
+        boolean bl = lv.isIn(world.getDimension().getInfiniburnBlocks());
+        int i = state.get(AGE);
+        if (!bl && world.isRaining() && this.isRainingAround(world, pos) && random.nextFloat() < 0.2f + (float)i * 0.03f) {
+            world.removeBlock(pos, false);
             return;
         }
         int j = Math.min(15, i + random.nextInt(3) / 2);
         if (i != j) {
-            arg = (BlockState)arg.with(AGE, j);
-            arg2.setBlockState(arg3, arg, 4);
+            state = (BlockState)state.with(AGE, j);
+            world.setBlockState(pos, state, 4);
         }
         if (!bl) {
-            if (!this.areBlocksAroundFlammable(arg2, arg3)) {
-                BlockPos lv2 = arg3.down();
-                if (!arg2.getBlockState(lv2).isSideSolidFullSquare(arg2, lv2, Direction.UP) || i > 3) {
-                    arg2.removeBlock(arg3, false);
+            if (!this.areBlocksAroundFlammable(world, pos)) {
+                BlockPos lv2 = pos.down();
+                if (!world.getBlockState(lv2).isSideSolidFullSquare(world, lv2, Direction.UP) || i > 3) {
+                    world.removeBlock(pos, false);
                 }
                 return;
             }
-            if (i == 15 && random.nextInt(4) == 0 && !this.isFlammable(arg2.getBlockState(arg3.down()))) {
-                arg2.removeBlock(arg3, false);
+            if (i == 15 && random.nextInt(4) == 0 && !this.isFlammable(world.getBlockState(pos.down()))) {
+                world.removeBlock(pos, false);
                 return;
             }
         }
-        int k = (bl2 = arg2.hasHighHumidity(arg3)) ? -50 : 0;
-        this.trySpreadingFire(arg2, arg3.east(), 300 + k, random, i);
-        this.trySpreadingFire(arg2, arg3.west(), 300 + k, random, i);
-        this.trySpreadingFire(arg2, arg3.down(), 250 + k, random, i);
-        this.trySpreadingFire(arg2, arg3.up(), 250 + k, random, i);
-        this.trySpreadingFire(arg2, arg3.north(), 300 + k, random, i);
-        this.trySpreadingFire(arg2, arg3.south(), 300 + k, random, i);
+        int k = (bl2 = world.hasHighHumidity(pos)) ? -50 : 0;
+        this.trySpreadingFire(world, pos.east(), 300 + k, random, i);
+        this.trySpreadingFire(world, pos.west(), 300 + k, random, i);
+        this.trySpreadingFire(world, pos.down(), 250 + k, random, i);
+        this.trySpreadingFire(world, pos.up(), 250 + k, random, i);
+        this.trySpreadingFire(world, pos.north(), 300 + k, random, i);
+        this.trySpreadingFire(world, pos.south(), 300 + k, random, i);
         BlockPos.Mutable lv3 = new BlockPos.Mutable();
         for (int l = -1; l <= 1; ++l) {
             for (int m = -1; m <= 1; ++m) {
@@ -162,53 +162,53 @@ extends AbstractFireBlock {
                     if (n > 1) {
                         o += (n - 1) * 100;
                     }
-                    lv3.set(arg3, l, n, m);
-                    int p = this.getBurnChance(arg2, lv3);
+                    lv3.set(pos, l, n, m);
+                    int p = this.getBurnChance(world, lv3);
                     if (p <= 0) continue;
-                    int q = (p + 40 + arg2.getDifficulty().getId() * 7) / (i + 30);
+                    int q = (p + 40 + world.getDifficulty().getId() * 7) / (i + 30);
                     if (bl2) {
                         q /= 2;
                     }
-                    if (q <= 0 || random.nextInt(o) > q || arg2.isRaining() && this.isRainingAround(arg2, lv3)) continue;
+                    if (q <= 0 || random.nextInt(o) > q || world.isRaining() && this.isRainingAround(world, lv3)) continue;
                     int r = Math.min(15, i + random.nextInt(5) / 4);
-                    arg2.setBlockState(lv3, this.method_24855(arg2, lv3, r), 3);
+                    world.setBlockState(lv3, this.method_24855(world, lv3, r), 3);
                 }
             }
         }
     }
 
-    protected boolean isRainingAround(World arg, BlockPos arg2) {
-        return arg.hasRain(arg2) || arg.hasRain(arg2.west()) || arg.hasRain(arg2.east()) || arg.hasRain(arg2.north()) || arg.hasRain(arg2.south());
+    protected boolean isRainingAround(World world, BlockPos pos) {
+        return world.hasRain(pos) || world.hasRain(pos.west()) || world.hasRain(pos.east()) || world.hasRain(pos.north()) || world.hasRain(pos.south());
     }
 
-    private int getSpreadChance(BlockState arg) {
-        if (arg.contains(Properties.WATERLOGGED) && arg.get(Properties.WATERLOGGED).booleanValue()) {
+    private int getSpreadChance(BlockState state) {
+        if (state.contains(Properties.WATERLOGGED) && state.get(Properties.WATERLOGGED).booleanValue()) {
             return 0;
         }
-        return this.spreadChances.getInt((Object)arg.getBlock());
+        return this.spreadChances.getInt((Object)state.getBlock());
     }
 
-    private int getBurnChance(BlockState arg) {
-        if (arg.contains(Properties.WATERLOGGED) && arg.get(Properties.WATERLOGGED).booleanValue()) {
+    private int getBurnChance(BlockState state) {
+        if (state.contains(Properties.WATERLOGGED) && state.get(Properties.WATERLOGGED).booleanValue()) {
             return 0;
         }
-        return this.burnChances.getInt((Object)arg.getBlock());
+        return this.burnChances.getInt((Object)state.getBlock());
     }
 
-    private void trySpreadingFire(World arg, BlockPos arg2, int i, Random random, int j) {
-        int k = this.getSpreadChance(arg.getBlockState(arg2));
-        if (random.nextInt(i) < k) {
-            BlockState lv = arg.getBlockState(arg2);
-            if (random.nextInt(j + 10) < 5 && !arg.hasRain(arg2)) {
-                int l = Math.min(j + random.nextInt(5) / 4, 15);
-                arg.setBlockState(arg2, this.method_24855(arg, arg2, l), 3);
+    private void trySpreadingFire(World world, BlockPos pos, int spreadFactor, Random rand, int currentAge) {
+        int k = this.getSpreadChance(world.getBlockState(pos));
+        if (rand.nextInt(spreadFactor) < k) {
+            BlockState lv = world.getBlockState(pos);
+            if (rand.nextInt(currentAge + 10) < 5 && !world.hasRain(pos)) {
+                int l = Math.min(currentAge + rand.nextInt(5) / 4, 15);
+                world.setBlockState(pos, this.method_24855(world, pos, l), 3);
             } else {
-                arg.removeBlock(arg2, false);
+                world.removeBlock(pos, false);
             }
             Block lv2 = lv.getBlock();
             if (lv2 instanceof TntBlock) {
                 TntBlock cfr_ignored_0 = (TntBlock)lv2;
-                TntBlock.primeTnt(arg, arg2);
+                TntBlock.primeTnt(world, pos);
             }
         }
     }
@@ -221,35 +221,35 @@ extends AbstractFireBlock {
         return lv;
     }
 
-    private boolean areBlocksAroundFlammable(BlockView arg, BlockPos arg2) {
+    private boolean areBlocksAroundFlammable(BlockView world, BlockPos pos) {
         for (Direction lv : Direction.values()) {
-            if (!this.isFlammable(arg.getBlockState(arg2.offset(lv)))) continue;
+            if (!this.isFlammable(world.getBlockState(pos.offset(lv)))) continue;
             return true;
         }
         return false;
     }
 
-    private int getBurnChance(WorldView arg, BlockPos arg2) {
-        if (!arg.isAir(arg2)) {
+    private int getBurnChance(WorldView arg, BlockPos pos) {
+        if (!arg.isAir(pos)) {
             return 0;
         }
         int i = 0;
         for (Direction lv : Direction.values()) {
-            BlockState lv2 = arg.getBlockState(arg2.offset(lv));
+            BlockState lv2 = arg.getBlockState(pos.offset(lv));
             i = Math.max(this.getBurnChance(lv2), i);
         }
         return i;
     }
 
     @Override
-    protected boolean isFlammable(BlockState arg) {
-        return this.getBurnChance(arg) > 0;
+    protected boolean isFlammable(BlockState state) {
+        return this.getBurnChance(state) > 0;
     }
 
     @Override
-    public void onBlockAdded(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
-        super.onBlockAdded(arg, arg2, arg3, arg4, bl);
-        arg2.getBlockTickScheduler().schedule(arg3, this, FireBlock.method_26155(arg2.random));
+    public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
+        super.onBlockAdded(state, world, pos, oldState, notify);
+        world.getBlockTickScheduler().schedule(pos, this, FireBlock.method_26155(world.random));
     }
 
     private static int method_26155(Random random) {
@@ -257,13 +257,13 @@ extends AbstractFireBlock {
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(AGE, NORTH, EAST, SOUTH, WEST, UP);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(AGE, NORTH, EAST, SOUTH, WEST, UP);
     }
 
-    private void registerFlammableBlock(Block arg, int i, int j) {
-        this.burnChances.put((Object)arg, i);
-        this.spreadChances.put((Object)arg, j);
+    private void registerFlammableBlock(Block block, int burnChance, int spreadChance) {
+        this.burnChances.put((Object)block, burnChance);
+        this.spreadChances.put((Object)block, spreadChance);
     }
 
     public static void registerDefaultFlammables() {

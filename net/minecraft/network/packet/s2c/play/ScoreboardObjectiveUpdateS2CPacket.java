@@ -27,30 +27,30 @@ implements Packet<ClientPlayPacketListener> {
     public ScoreboardObjectiveUpdateS2CPacket() {
     }
 
-    public ScoreboardObjectiveUpdateS2CPacket(ScoreboardObjective arg, int i) {
-        this.name = arg.getName();
-        this.displayName = arg.getDisplayName();
-        this.type = arg.getRenderType();
-        this.mode = i;
+    public ScoreboardObjectiveUpdateS2CPacket(ScoreboardObjective objective, int mode) {
+        this.name = objective.getName();
+        this.displayName = objective.getDisplayName();
+        this.type = objective.getRenderType();
+        this.mode = mode;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.name = arg.readString(16);
-        this.mode = arg.readByte();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.name = buf.readString(16);
+        this.mode = buf.readByte();
         if (this.mode == 0 || this.mode == 2) {
-            this.displayName = arg.readText();
-            this.type = arg.readEnumConstant(ScoreboardCriterion.RenderType.class);
+            this.displayName = buf.readText();
+            this.type = buf.readEnumConstant(ScoreboardCriterion.RenderType.class);
         }
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeString(this.name);
-        arg.writeByte(this.mode);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeString(this.name);
+        buf.writeByte(this.mode);
         if (this.mode == 0 || this.mode == 2) {
-            arg.writeText(this.displayName);
-            arg.writeEnumConstant(this.type);
+            buf.writeText(this.displayName);
+            buf.writeEnumConstant(this.type);
         }
     }
 

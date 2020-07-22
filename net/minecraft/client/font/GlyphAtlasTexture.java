@@ -29,17 +29,17 @@ extends AbstractTexture {
     private final boolean hasColor;
     private final Slot rootSlot;
 
-    public GlyphAtlasTexture(Identifier arg, boolean bl) {
-        this.id = arg;
-        this.hasColor = bl;
+    public GlyphAtlasTexture(Identifier id, boolean hasColor) {
+        this.id = id;
+        this.hasColor = hasColor;
         this.rootSlot = new Slot(0, 0, 256, 256);
-        TextureUtil.allocate(bl ? NativeImage.GLFormat.ABGR : NativeImage.GLFormat.INTENSITY, this.getGlId(), 256, 256);
-        this.field_21690 = RenderLayer.getText(arg);
-        this.field_21691 = RenderLayer.getTextSeeThrough(arg);
+        TextureUtil.allocate(hasColor ? NativeImage.GLFormat.ABGR : NativeImage.GLFormat.INTENSITY, this.getGlId(), 256, 256);
+        this.field_21690 = RenderLayer.getText(id);
+        this.field_21691 = RenderLayer.getTextSeeThrough(id);
     }
 
     @Override
-    public void load(ResourceManager arg) {
+    public void load(ResourceManager manager) {
     }
 
     @Override
@@ -48,18 +48,18 @@ extends AbstractTexture {
     }
 
     @Nullable
-    public GlyphRenderer getGlyphRenderer(RenderableGlyph arg) {
-        if (arg.hasColor() != this.hasColor) {
+    public GlyphRenderer getGlyphRenderer(RenderableGlyph glyph) {
+        if (glyph.hasColor() != this.hasColor) {
             return null;
         }
-        Slot lv = this.rootSlot.findSlotFor(arg);
+        Slot lv = this.rootSlot.findSlotFor(glyph);
         if (lv != null) {
             this.bindTexture();
-            arg.upload(lv.x, lv.y);
+            glyph.upload(lv.x, lv.y);
             float f = 256.0f;
             float g = 256.0f;
             float h = 0.01f;
-            return new GlyphRenderer(this.field_21690, this.field_21691, ((float)lv.x + 0.01f) / 256.0f, ((float)lv.x - 0.01f + (float)arg.getWidth()) / 256.0f, ((float)lv.y + 0.01f) / 256.0f, ((float)lv.y - 0.01f + (float)arg.getHeight()) / 256.0f, arg.getXMin(), arg.getXMax(), arg.getYMin(), arg.getYMax());
+            return new GlyphRenderer(this.field_21690, this.field_21691, ((float)lv.x + 0.01f) / 256.0f, ((float)lv.x - 0.01f + (float)glyph.getWidth()) / 256.0f, ((float)lv.y + 0.01f) / 256.0f, ((float)lv.y - 0.01f + (float)glyph.getHeight()) / 256.0f, glyph.getXMin(), glyph.getXMax(), glyph.getYMin(), glyph.getYMax());
         }
         return null;
     }
@@ -78,27 +78,27 @@ extends AbstractTexture {
         private Slot subSlot2;
         private boolean occupied;
 
-        private Slot(int i, int j, int k, int l) {
-            this.x = i;
-            this.y = j;
-            this.width = k;
-            this.height = l;
+        private Slot(int x, int y, int width, int height) {
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
         }
 
         @Nullable
-        Slot findSlotFor(RenderableGlyph arg) {
+        Slot findSlotFor(RenderableGlyph glyph) {
             if (this.subSlot1 != null && this.subSlot2 != null) {
-                Slot lv = this.subSlot1.findSlotFor(arg);
+                Slot lv = this.subSlot1.findSlotFor(glyph);
                 if (lv == null) {
-                    lv = this.subSlot2.findSlotFor(arg);
+                    lv = this.subSlot2.findSlotFor(glyph);
                 }
                 return lv;
             }
             if (this.occupied) {
                 return null;
             }
-            int i = arg.getWidth();
-            int j = arg.getHeight();
+            int i = glyph.getWidth();
+            int j = glyph.getHeight();
             if (i > this.width || j > this.height) {
                 return null;
             }
@@ -115,7 +115,7 @@ extends AbstractTexture {
                 this.subSlot1 = new Slot(this.x, this.y, this.width, j);
                 this.subSlot2 = new Slot(this.x, this.y + j + 1, this.width, this.height - j - 1);
             }
-            return this.subSlot1.findSlotFor(arg);
+            return this.subSlot1.findSlotFor(glyph);
         }
     }
 }

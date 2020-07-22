@@ -22,8 +22,8 @@ implements Packet<ServerPlayPacketListener> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public UpdateDifficultyLockC2SPacket(boolean bl) {
-        this.difficultyLocked = bl;
+    public UpdateDifficultyLockC2SPacket(boolean difficultyLocked) {
+        this.difficultyLocked = difficultyLocked;
     }
 
     @Override
@@ -32,13 +32,13 @@ implements Packet<ServerPlayPacketListener> {
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.difficultyLocked = arg.readBoolean();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.difficultyLocked = buf.readBoolean();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeBoolean(this.difficultyLocked);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeBoolean(this.difficultyLocked);
     }
 
     public boolean isDifficultyLocked() {

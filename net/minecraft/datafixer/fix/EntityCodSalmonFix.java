@@ -17,13 +17,13 @@ extends EntityRenameFix {
     public static final Map<String, String> ENTITIES = ImmutableMap.builder().put((Object)"minecraft:salmon_mob", (Object)"minecraft:salmon").put((Object)"minecraft:cod_mob", (Object)"minecraft:cod").build();
     public static final Map<String, String> SPAWN_EGGS = ImmutableMap.builder().put((Object)"minecraft:salmon_mob_spawn_egg", (Object)"minecraft:salmon_spawn_egg").put((Object)"minecraft:cod_mob_spawn_egg", (Object)"minecraft:cod_spawn_egg").build();
 
-    public EntityCodSalmonFix(Schema schema, boolean bl) {
-        super("EntityCodSalmonFix", schema, bl);
+    public EntityCodSalmonFix(Schema outputSchema, boolean changesType) {
+        super("EntityCodSalmonFix", outputSchema, changesType);
     }
 
     @Override
-    protected String rename(String string) {
-        return ENTITIES.getOrDefault(string, string);
+    protected String rename(String oldName) {
+        return ENTITIES.getOrDefault(oldName, oldName);
     }
 }
 

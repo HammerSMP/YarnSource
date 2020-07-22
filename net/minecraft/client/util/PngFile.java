@@ -44,9 +44,9 @@ public class PngFile {
     public final int width;
     public final int height;
 
-    public PngFile(String string, InputStream inputStream) throws IOException {
+    public PngFile(String name, InputStream in) throws IOException {
         try (MemoryStack memoryStack = MemoryStack.stackPush();
-             Reader lv = PngFile.createReader(inputStream);
+             Reader lv = PngFile.createReader(in);
              STBIReadCallback sTBIReadCallback = STBIReadCallback.create((arg_0, arg_1, arg_2) -> lv.read(arg_0, arg_1, arg_2));
              STBISkipCallback sTBISkipCallback = STBISkipCallback.create((arg_0, arg_1) -> lv.skip(arg_0, arg_1));
              STBIEOFCallback sTBIEOFCallback = STBIEOFCallback.create(lv::eof);){
@@ -58,18 +58,18 @@ public class PngFile {
             IntBuffer intBuffer2 = memoryStack.mallocInt(1);
             IntBuffer intBuffer3 = memoryStack.mallocInt(1);
             if (!STBImage.stbi_info_from_callbacks((STBIIOCallbacks)sTBIIOCallbacks, (long)0L, (IntBuffer)intBuffer, (IntBuffer)intBuffer2, (IntBuffer)intBuffer3)) {
-                throw new IOException("Could not read info from the PNG file " + string + " " + STBImage.stbi_failure_reason());
+                throw new IOException("Could not read info from the PNG file " + name + " " + STBImage.stbi_failure_reason());
             }
             this.width = intBuffer.get(0);
             this.height = intBuffer2.get(0);
         }
     }
 
-    private static Reader createReader(InputStream inputStream) {
-        if (inputStream instanceof FileInputStream) {
-            return new SeekableChannelReader(((FileInputStream)inputStream).getChannel());
+    private static Reader createReader(InputStream is) {
+        if (is instanceof FileInputStream) {
+            return new SeekableChannelReader(((FileInputStream)is).getChannel());
         }
-        return new ChannelReader(Channels.newChannel(inputStream));
+        return new ChannelReader(Channels.newChannel(is));
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -88,15 +88,15 @@ public class PngFile {
         /*
          * WARNING - Removed try catching itself - possible behaviour change.
          */
-        private void readToBuffer(int i) throws IOException {
+        private void readToBuffer(int size) throws IOException {
             ByteBuffer byteBuffer = MemoryUtil.memByteBuffer((long)this.buffer, (int)this.bufferSize);
-            if (i + this.readPosition > this.bufferSize) {
-                this.bufferSize = i + this.readPosition;
+            if (size + this.readPosition > this.bufferSize) {
+                this.bufferSize = size + this.readPosition;
                 byteBuffer = MemoryUtil.memRealloc((ByteBuffer)byteBuffer, (int)this.bufferSize);
                 this.buffer = MemoryUtil.memAddress((ByteBuffer)byteBuffer);
             }
             byteBuffer.position(this.bufferPosition);
-            while (i + this.readPosition > this.bufferPosition) {
+            while (size + this.readPosition > this.bufferPosition) {
                 try {
                     int j = this.channel.read(byteBuffer);
                     if (j != -1) continue;
@@ -109,28 +109,28 @@ public class PngFile {
         }
 
         @Override
-        public int read(long l, int i) throws IOException {
-            this.readToBuffer(i);
-            if (i + this.readPosition > this.bufferPosition) {
-                i = this.bufferPosition - this.readPosition;
+        public int read(long data, int size) throws IOException {
+            this.readToBuffer(size);
+            if (size + this.readPosition > this.bufferPosition) {
+                size = this.bufferPosition - this.readPosition;
             }
-            MemoryUtil.memCopy((long)(this.buffer + (long)this.readPosition), (long)l, (long)i);
-            this.readPosition += i;
-            return i;
+            MemoryUtil.memCopy((long)(this.buffer + (long)this.readPosition), (long)data, (long)size);
+            this.readPosition += size;
+            return size;
         }
 
         @Override
-        public void skip(int i) throws IOException {
-            if (i > 0) {
-                this.readToBuffer(i);
-                if (i + this.readPosition > this.bufferPosition) {
+        public void skip(int n) throws IOException {
+            if (n > 0) {
+                this.readToBuffer(n);
+                if (n + this.readPosition > this.bufferPosition) {
                     throw new EOFException("Can't skip past the EOF.");
                 }
             }
-            if (this.readPosition + i < 0) {
-                throw new IOException("Can't seek before the beginning: " + (this.readPosition + i));
+            if (this.readPosition + n < 0) {
+                throw new IOException("Can't seek before the beginning: " + (this.readPosition + n));
             }
-            this.readPosition += i;
+            this.readPosition += n;
         }
 
         @Override
@@ -145,24 +145,24 @@ public class PngFile {
     extends Reader {
         private final SeekableByteChannel channel;
 
-        private SeekableChannelReader(SeekableByteChannel seekableByteChannel) {
-            this.channel = seekableByteChannel;
+        private SeekableChannelReader(SeekableByteChannel channel) {
+            this.channel = channel;
         }
 
         @Override
-        public int read(long l, int i) throws IOException {
-            ByteBuffer byteBuffer = MemoryUtil.memByteBuffer((long)l, (int)i);
+        public int read(long data, int size) throws IOException {
+            ByteBuffer byteBuffer = MemoryUtil.memByteBuffer((long)data, (int)size);
             return this.channel.read(byteBuffer);
         }
 
         @Override
-        public void skip(int i) throws IOException {
-            this.channel.position(this.channel.position() + (long)i);
+        public void skip(int n) throws IOException {
+            this.channel.position(this.channel.position() + (long)n);
         }
 
         @Override
-        public int eof(long l) {
-            return super.eof(l) != 0 && this.channel.isOpen() ? 1 : 0;
+        public int eof(long user) {
+            return super.eof(user) != 0 && this.channel.isOpen() ? 1 : 0;
         }
 
         @Override
@@ -179,9 +179,9 @@ public class PngFile {
         private Reader() {
         }
 
-        int read(long l, long m, int i) {
+        int read(long user, long data, int size) {
             try {
-                return this.read(m, i);
+                return this.read(data, size);
             }
             catch (IOException iOException) {
                 this.errored = true;
@@ -189,16 +189,16 @@ public class PngFile {
             }
         }
 
-        void skip(long l, int i) {
+        void skip(long user, int n) {
             try {
-                this.skip(i);
+                this.skip(n);
             }
             catch (IOException iOException) {
                 this.errored = true;
             }
         }
 
-        int eof(long l) {
+        int eof(long user) {
             return this.errored ? 1 : 0;
         }
 

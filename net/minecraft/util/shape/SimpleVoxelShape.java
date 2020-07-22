@@ -20,14 +20,14 @@ extends VoxelShape {
     }
 
     @Override
-    protected DoubleList getPointPositions(Direction.Axis arg) {
-        return new FractionalDoubleList(this.voxels.getSize(arg));
+    protected DoubleList getPointPositions(Direction.Axis axis) {
+        return new FractionalDoubleList(this.voxels.getSize(axis));
     }
 
     @Override
-    protected int getCoordIndex(Direction.Axis arg, double d) {
+    protected int getCoordIndex(Direction.Axis arg, double coord) {
         int i = this.voxels.getSize(arg);
-        return MathHelper.clamp(MathHelper.floor(d * (double)i), -1, i);
+        return MathHelper.clamp(MathHelper.floor(coord * (double)i), -1, i);
     }
 }
 

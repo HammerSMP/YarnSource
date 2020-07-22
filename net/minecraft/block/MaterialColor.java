@@ -74,28 +74,28 @@ public class MaterialColor {
     public final int color;
     public final int id;
 
-    private MaterialColor(int i, int j) {
-        if (i < 0 || i > 63) {
+    private MaterialColor(int id, int color) {
+        if (id < 0 || id > 63) {
             throw new IndexOutOfBoundsException("Map colour ID must be between 0 and 63 (inclusive)");
         }
-        this.id = i;
-        this.color = j;
-        MaterialColor.COLORS[i] = this;
+        this.id = id;
+        this.color = color;
+        MaterialColor.COLORS[id] = this;
     }
 
     @Environment(value=EnvType.CLIENT)
-    public int getRenderColor(int i) {
+    public int getRenderColor(int shade) {
         int j = 220;
-        if (i == 3) {
+        if (shade == 3) {
             j = 135;
         }
-        if (i == 2) {
+        if (shade == 2) {
             j = 255;
         }
-        if (i == 1) {
+        if (shade == 1) {
             j = 220;
         }
-        if (i == 0) {
+        if (shade == 0) {
             j = 180;
         }
         int k = (this.color >> 16 & 0xFF) * j / 255;

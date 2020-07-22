@@ -27,20 +27,20 @@ extends Task<PathAwareEntity> {
     private final int range;
     private final Function<T, Vec3d> posRetriever;
 
-    public GoToRememberedPositionTask(MemoryModuleType<T> arg, float f, int i, boolean bl, Function<T, Vec3d> function) {
-        super((Map<MemoryModuleType<?>, MemoryModuleState>)ImmutableMap.of(MemoryModuleType.WALK_TARGET, (Object)((Object)(bl ? MemoryModuleState.REGISTERED : MemoryModuleState.VALUE_ABSENT)), arg, (Object)((Object)MemoryModuleState.VALUE_PRESENT)));
-        this.entityMemory = arg;
-        this.speed = f;
-        this.range = i;
-        this.posRetriever = function;
+    public GoToRememberedPositionTask(MemoryModuleType<T> memoryType, float speed, int range, boolean requiresWalkTarget, Function<T, Vec3d> posRetriever) {
+        super((Map<MemoryModuleType<?>, MemoryModuleState>)ImmutableMap.of(MemoryModuleType.WALK_TARGET, (Object)((Object)(requiresWalkTarget ? MemoryModuleState.REGISTERED : MemoryModuleState.VALUE_ABSENT)), memoryType, (Object)((Object)MemoryModuleState.VALUE_PRESENT)));
+        this.entityMemory = memoryType;
+        this.speed = speed;
+        this.range = range;
+        this.posRetriever = posRetriever;
     }
 
-    public static GoToRememberedPositionTask<BlockPos> toBlock(MemoryModuleType<BlockPos> arg, float f, int i, boolean bl) {
-        return new GoToRememberedPositionTask<BlockPos>(arg, f, i, bl, Vec3d::ofBottomCenter);
+    public static GoToRememberedPositionTask<BlockPos> toBlock(MemoryModuleType<BlockPos> memoryType, float speed, int range, boolean requiresWalkTarget) {
+        return new GoToRememberedPositionTask<BlockPos>(memoryType, speed, range, requiresWalkTarget, Vec3d::ofBottomCenter);
     }
 
-    public static GoToRememberedPositionTask<? extends Entity> toEntity(MemoryModuleType<? extends Entity> arg, float f, int i, boolean bl) {
-        return new GoToRememberedPositionTask<Entity>(arg, f, i, bl, Entity::getPos);
+    public static GoToRememberedPositionTask<? extends Entity> toEntity(MemoryModuleType<? extends Entity> memoryType, float speed, int range, boolean requiresWalkTarget) {
+        return new GoToRememberedPositionTask<Entity>(memoryType, speed, range, requiresWalkTarget, Entity::getPos);
     }
 
     @Override
@@ -51,8 +51,8 @@ extends Task<PathAwareEntity> {
         return arg2.getPos().isInRange(this.getPos(arg2), this.range);
     }
 
-    private Vec3d getPos(PathAwareEntity arg) {
-        return this.posRetriever.apply(arg.getBrain().getOptionalMemory(this.entityMemory).get());
+    private Vec3d getPos(PathAwareEntity entity) {
+        return this.posRetriever.apply(entity.getBrain().getOptionalMemory(this.entityMemory).get());
     }
 
     private boolean isWalkTargetPresentAndFar(PathAwareEntity arg) {
@@ -73,11 +73,11 @@ extends Task<PathAwareEntity> {
         GoToRememberedPositionTask.setWalkTarget(arg2, this.getPos(arg2), this.speed);
     }
 
-    private static void setWalkTarget(PathAwareEntity arg, Vec3d arg2, float f) {
+    private static void setWalkTarget(PathAwareEntity entity, Vec3d pos, float speed) {
         for (int i = 0; i < 10; ++i) {
-            Vec3d lv = TargetFinder.findGroundTargetAwayFrom(arg, 16, 7, arg2);
+            Vec3d lv = TargetFinder.findGroundTargetAwayFrom(entity, 16, 7, pos);
             if (lv == null) continue;
-            arg.getBrain().remember(MemoryModuleType.WALK_TARGET, new WalkTarget(lv, f, 0));
+            entity.getBrain().remember(MemoryModuleType.WALK_TARGET, new WalkTarget(lv, speed, 0));
             return;
         }
     }

@@ -52,10 +52,10 @@ extends FishEntity {
         return this.leader != null && this.leader.isAlive();
     }
 
-    public SchoolingFishEntity joinGroupOf(SchoolingFishEntity arg) {
-        this.leader = arg;
-        arg.increaseGroupSize();
-        return arg;
+    public SchoolingFishEntity joinGroupOf(SchoolingFishEntity groupLeader) {
+        this.leader = groupLeader;
+        groupLeader.increaseGroupSize();
+        return groupLeader;
     }
 
     public void leaveGroup() {
@@ -98,28 +98,28 @@ extends FishEntity {
         }
     }
 
-    public void pullInOtherFish(Stream<SchoolingFishEntity> stream) {
-        stream.limit(this.getMaxGroupSize() - this.groupSize).filter(arg -> arg != this).forEach(arg -> arg.joinGroupOf(this));
+    public void pullInOtherFish(Stream<SchoolingFishEntity> fish) {
+        fish.limit(this.getMaxGroupSize() - this.groupSize).filter(arg -> arg != this).forEach(arg -> arg.joinGroupOf(this));
     }
 
     @Override
     @Nullable
-    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
-        super.initialize(arg, arg2, arg3, arg4, arg5);
-        if (arg4 == null) {
-            arg4 = new FishData(this);
+    public EntityData initialize(class_5425 arg, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable CompoundTag entityTag) {
+        super.initialize(arg, difficulty, spawnReason, entityData, entityTag);
+        if (entityData == null) {
+            entityData = new FishData(this);
         } else {
-            this.joinGroupOf(((FishData)arg4).leader);
+            this.joinGroupOf(((FishData)entityData).leader);
         }
-        return arg4;
+        return entityData;
     }
 
     public static class FishData
     implements EntityData {
         public final SchoolingFishEntity leader;
 
-        public FishData(SchoolingFishEntity arg) {
-            this.leader = arg;
+        public FishData(SchoolingFishEntity leader) {
+            this.leader = leader;
         }
     }
 }
